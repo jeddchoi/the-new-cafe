@@ -28,16 +28,22 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 }
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.8.0")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    androidTestImplementation(kotlin("test"))
 }
+
+// androidx.test is forcing JUnit, 4.12. This forces it to use 4.13
+//configurations.configureEach {
+//    resolutionStrategy {
+//        force(libs.junit4)
+//        // Temporary workaround for https://issuetracker.google.com/174733673
+//        force("org.objenesis:objenesis:2.6")
+//    }
+//}
