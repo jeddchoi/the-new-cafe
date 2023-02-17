@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("buildlogic")
     repositories {
         google()
         mavenCentral()
@@ -13,4 +14,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "The New Cafe"
-include ':app'
+include(":app")
