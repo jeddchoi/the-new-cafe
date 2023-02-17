@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.ApplicationExtension
+import io.github.jeddchoi.buildlogic.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -10,11 +12,11 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.android")
             }
 
-//            extensions.configure<ApplicationExtension> {
-//                configureKotlinAndroid(this)
-//                defaultConfig.targetSdk = 33
+            extensions.configure<ApplicationExtension> {
+                configureKotlinAndroid(this)
+                defaultConfig.targetSdk = 33
 //                configureFlavors(this)
-//            }
+            }
 //            extensions.configure<ApplicationAndroidComponentsExtension> {
 //                configurePrintApksTask(this)
 //            }

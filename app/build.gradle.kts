@@ -1,3 +1,6 @@
+
+import io.github.jeddchoi.buildlogic.AppBuildType
+
 plugins {
     id("jeddchoi.android.application")
     id("org.jetbrains.kotlin.android")
@@ -8,16 +11,19 @@ android {
 
     defaultConfig {
         applicationId = "io.github.jeddchoi.thenewcafe"
-        targetSdk = 33
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
-        release {
+        val debug by getting {
+            applicationIdSuffix = AppBuildType.DEBUG.applicationIdSuffix
+        }
+        val release by getting {
             isMinifyEnabled = true
+            applicationIdSuffix = AppBuildType.RELEASE.applicationIdSuffix
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
