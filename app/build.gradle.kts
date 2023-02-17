@@ -1,15 +1,13 @@
 plugins {
-    id("com.android.application")
+    id("jeddchoi.android.application")
     id("org.jetbrains.kotlin.android")
 }
 
 android {
     namespace = "io.github.jeddchoi.thenewcafe"
-    compileSdk = 33
 
     defaultConfig {
         applicationId = "io.github.jeddchoi.thenewcafe"
-        minSdk = 26
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -22,13 +20,6 @@ android {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 }
 

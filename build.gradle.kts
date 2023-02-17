@@ -1,6 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+
 plugins {
-    id("com.android.application")  version "7.4.0" apply false
-    id("com.android.library") version "7.4.0" apply false
-    id("org.jetbrains.kotlin.android") version "1.7.21" apply false
+    @Suppress("DSL_SCOPE_VIOLATION") // TODO: delete these suppress when updating Gradle 8.1+
+    alias(libs.plugins.android.application) apply false
+    @Suppress("DSL_SCOPE_VIOLATION")
+    alias(libs.plugins.kotlin.jvm) apply false
+    @Suppress("DSL_SCOPE_VIOLATION")
+    alias(libs.plugins.android.library) apply false
 }
