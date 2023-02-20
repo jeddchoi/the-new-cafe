@@ -1,20 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":feature:seats")
-
-
-include(":feature:stores")
-
-
-include(":feature:actionlog")
-
-
-include(":feature:mystatus")
-
-
-include(":feature:account")
-
-
 pluginManagement {
     includeBuild("buildlogic")
     repositories {
@@ -33,3 +18,16 @@ dependencyResolutionManagement {
 }
 rootProject.name = "The New Cafe"
 include(":app")
+
+include(":feature:seats")
+include(":feature:stores")
+include(":feature:actionlog")
+include(":feature:mystatus")
+include(":feature:account")
+
+include(":core:ui")
+include(":core:data")
+include(":core:designsystem")
+include(":core:domain")
+include(":core:model")
+include(":core:testing")

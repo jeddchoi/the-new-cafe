@@ -33,9 +33,20 @@ android {
 
 dependencies {
 
+    implementation(project(":feature:seats"))
+    implementation(project(":feature:stores"))
+    implementation(project(":feature:actionlog"))
+    implementation(project(":feature:mystatus"))
+    implementation(project(":feature:account"))
+
+    implementation(project(":core:ui"))
+    implementation(project(":core:designsystem"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+
     androidTestImplementation(kotlin("test"))
+    testImplementation(project(":core:testing"))
 }
 
 // TODO: Investigate this, or delete it
