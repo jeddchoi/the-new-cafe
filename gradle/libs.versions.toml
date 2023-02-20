@@ -1,8 +1,9 @@
 [versions]
+accompanist = "0.29.1-alpha"
 androidGradlePlugin = "7.4.1"
 androidxActivity = "1.6.1"
 androidxAppCompat = "1.5.1"
-androidxComposeBom = "2022.12.00"
+androidxComposeBom = "2023.01.00"
 androidxComposeCompiler = "1.4.0"
 androidxCore = "1.9.0"
 androidxEspresso = "3.5.0"
@@ -20,6 +21,7 @@ kotlinxCoroutines = "1.6.4"
 
 
 [libraries]
+accompanist-pager = { group = "com.google.accompanist", name = "accompanist-pager", version.ref = "accompanist" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
