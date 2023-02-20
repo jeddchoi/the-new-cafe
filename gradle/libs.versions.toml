@@ -1,6 +1,8 @@
 [versions]
 androidGradlePlugin = "7.4.1"
 androidxAppCompat = "1.5.1"
+androidxComposeBom = "2022.12.00"
+androidxComposeCompiler = "1.4.0"
 androidxCore = "1.9.0"
 androidxEspresso = "3.5.0"
 androidxTestExt = "1.1.5"
@@ -10,6 +12,7 @@ kotlin = "1.7.21"
 
 [libraries]
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
 androidx-test-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidxEspresso" }
 androidx-test-ext = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "androidxTestExt" }
