@@ -8,5 +8,6 @@ android {
 }
 
 dependencies {
+    implementation(libs.kotlinx.coroutines.android)
     androidTestImplementation(project(":core:testing"))
 }
