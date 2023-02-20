@@ -1,3 +1,4 @@
+@file:Suppress("UnstableApiUsage")
 
 import io.github.jeddchoi.buildlogic.AppBuildType
 
@@ -16,6 +17,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    @Suppress("UNUSED_VARIABLE")
     buildTypes {
         val debug by getting {
             applicationIdSuffix = AppBuildType.DEBUG.applicationIdSuffix
