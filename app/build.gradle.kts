@@ -16,6 +16,14 @@ android {
         versionName = "0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
+    }
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 
     @Suppress("UNUSED_VARIABLE")
@@ -42,11 +50,10 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))
 
-    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.core.ktx)
 
-    androidTestImplementation(kotlin("test"))
-    testImplementation(project(":core:testing"))
 }
 
 // TODO: Investigate this, or delete it

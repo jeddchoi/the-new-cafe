@@ -1,5 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-@file:Suppress("DSL_SCOPE_VIOLATION") // TODO: delete these suppress when updating Gradle 8.1+
+// TODO: delete these suppress when updating Gradle 8.1+
+@file:Suppress("DSL_SCOPE_VIOLATION")
 
 plugins {
     alias(libs.plugins.android.application) apply false
