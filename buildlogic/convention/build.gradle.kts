@@ -27,9 +27,9 @@ gradlePlugin {
             id = "jeddchoi.android.feature"
             implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidFeatureConventionPlugin"
         }
-//        register("androidHilt") {
-//            id = "jeddchoi.android.hilt"
-//            implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidHiltConventionPlugin"
-//        }
+        register("androidHilt") {
+            id = "jeddchoi.android.hilt"
+            implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidHiltConventionPlugin"
+        }
     }
 }

@@ -37,6 +37,7 @@ dependencies {
     androidTestImplementation(kotlin("test"))
 }
 
+// TODO: Investigate this, or delete it
 // androidx.test is forcing JUnit, 4.12. This forces it to use 4.13
 //configurations.configureEach {
 //    resolutionStrategy {

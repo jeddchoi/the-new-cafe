@@ -21,6 +21,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 configureFlavors(this)
             }
 
+            // TODO: investigate this
 //            extensions.configure<ApplicationAndroidComponentsExtension> {
 //                configurePrintApksTask(this)
 //            }
