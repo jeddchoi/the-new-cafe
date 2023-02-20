@@ -1,4 +1,7 @@
+package io.github.jeddchoi.buildlogic.plugins
+
 import com.android.build.api.dsl.ApplicationExtension
+import io.github.jeddchoi.buildlogic.configureFlavors
 import io.github.jeddchoi.buildlogic.configureKotlinAndroid
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -15,7 +18,9 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             extensions.configure<ApplicationExtension> {
                 configureKotlinAndroid(this)
                 defaultConfig.targetSdk = 33
+                configureFlavors(this)
             }
+
 //            extensions.configure<ApplicationAndroidComponentsExtension> {
 //                configurePrintApksTask(this)
 //            }

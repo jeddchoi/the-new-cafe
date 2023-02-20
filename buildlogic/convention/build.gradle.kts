@@ -17,7 +17,19 @@ gradlePlugin {
     plugins {
         register("androidApplication") {
             id = "jeddchoi.android.application"
-            implementationClass = "AndroidApplicationConventionPlugin"
+            implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidApplicationConventionPlugin"
         }
+        register("androidLibrary") {
+            id = "jeddchoi.android.library"
+            implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidLibraryConventionPlugin"
+        }
+        register("androidFeature") {
+            id = "jeddchoi.android.feature"
+            implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidFeatureConventionPlugin"
+        }
+//        register("androidHilt") {
+//            id = "jeddchoi.android.hilt"
+//            implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidHiltConventionPlugin"
+//        }
     }
 }
