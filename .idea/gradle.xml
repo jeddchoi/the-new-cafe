@@ -26,6 +26,12 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/buildlogic" />
             <option value="$PROJECT_DIR$/buildlogic/convention" />
+            <option value="$PROJECT_DIR$/feature" />
+            <option value="$PROJECT_DIR$/feature/account" />
+            <option value="$PROJECT_DIR$/feature/actionlog" />
+            <option value="$PROJECT_DIR$/feature/mystatus" />
+            <option value="$PROJECT_DIR$/feature/seats" />
+            <option value="$PROJECT_DIR$/feature/stores" />
           </set>
         </option>
       </GradleProjectSettings>

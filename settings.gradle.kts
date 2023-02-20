@@ -1,5 +1,20 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":feature:seats")
+
+
+include(":feature:stores")
+
+
+include(":feature:actionlog")
+
+
+include(":feature:mystatus")
+
+
+include(":feature:account")
+
+
 pluginManagement {
     includeBuild("buildlogic")
     repositories {
