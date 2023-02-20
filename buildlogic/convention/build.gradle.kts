@@ -19,10 +19,19 @@ gradlePlugin {
             id = "jeddchoi.android.application"
             implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidApplicationConventionPlugin"
         }
+        register("androidApplicationCompose") {
+            id = "jeddchoi.android.application.compose"
+            implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidApplicationComposeConventionPlugin"
+        }
         register("androidLibrary") {
             id = "jeddchoi.android.library"
             implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidLibraryConventionPlugin"
         }
+        register("androidLibraryCompose") {
+            id = "jeddchoi.android.library.compose"
+            implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidLibraryComposeConventionPlugin"
+        }
+
         register("androidFeature") {
             id = "jeddchoi.android.feature"
             implementationClass = "io.github.jeddchoi.buildlogic.plugins.AndroidFeatureConventionPlugin"

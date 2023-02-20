@@ -1,6 +1,7 @@
 
 plugins {
     id("jeddchoi.android.feature")
+    id("jeddchoi.android.library.compose")
 }
 
 android {

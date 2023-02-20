@@ -4,6 +4,7 @@ import io.github.jeddchoi.buildlogic.AppBuildType
 
 plugins {
     id("jeddchoi.android.application")
+    id("jeddchoi.android.application.compose")
 }
 
 android {
