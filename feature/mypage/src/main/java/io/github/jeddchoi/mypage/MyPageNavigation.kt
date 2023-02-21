@@ -2,10 +2,8 @@ package io.github.jeddchoi.mypage
 
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 
 const val myPageRoute = "mypage_route"
 internal const val tabIdArg = "tabId"
@@ -15,7 +13,9 @@ internal class MyPageArgs(val tabId: String) {
             this(Uri.decode(checkNotNull(savedStateHandle[tabIdArg])))
 }
 
-
+fun NavController.navigateToMyPage(navOptions: NavOptions? = null) {
+    this.navigate(myPageRoute, navOptions)
+}
 fun NavGraphBuilder.myPageScreen(
     onBackClick: () -> Unit = {},
 ) {
