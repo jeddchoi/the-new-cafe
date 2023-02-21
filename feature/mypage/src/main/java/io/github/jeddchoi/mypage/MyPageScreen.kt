@@ -20,7 +20,7 @@ import kotlin.random.Random
 
 @Composable
 fun MyPageRoute(
-    onBackClick: () -> Unit,
+    onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: MyPageViewModel = hiltViewModel()
 ) {

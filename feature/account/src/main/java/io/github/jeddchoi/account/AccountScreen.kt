@@ -1,4 +1,4 @@
-package io.github.jeddchoi.mystatus
+package io.github.jeddchoi.account
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,22 +15,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.jeddchoi.designsystem.ui.theme.TheNewCafeTheme
 import io.github.jeddchoi.ui.UiState
 
+
 @Composable
-fun MyStatusRoute(
+fun AccountRoute(
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 
     ) {
-    val viewModel: MyStatusViewModel = viewModel()
+    val viewModel: AccountViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    MyStatusScreen(uiState = uiState)
+    AccountScreen(uiState = uiState)
 }
 
 
 @Composable
-fun MyStatusScreen(
-    uiState: UiState<MyStatusUiStateData>,
+fun AccountScreen(
+    uiState: UiState<AccountUiStateData>,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -54,10 +55,10 @@ fun MyStatusScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun MyStatusScreenPreview() {
+fun AccountScreenPreview() {
     TheNewCafeTheme {
-        MyStatusScreen(
-            UiState.Success(MyStatusUiStateData("Hello!")),
+        AccountScreen(
+            UiState.Success(AccountUiStateData("Hello!")),
         )
     }
 }

@@ -10,7 +10,7 @@ import io.github.jeddchoi.account.accountScreen
 @Composable
 fun CafeNavHost(
     navController: NavHostController,
-    onBackClick: () -> Unit,
+    onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     startDestination: String = accountRoute,
 ) {

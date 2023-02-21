@@ -17,7 +17,7 @@ internal class MyPageArgs(val tabId: String) {
 
 
 fun NavGraphBuilder.myPageScreen(
-    onBackClick: () -> Unit,
+    onBackClick: () -> Unit = {},
 ) {
     composable(
         route = "$myPageRoute/{$tabIdArg}",

@@ -17,7 +17,7 @@ import io.github.jeddchoi.ui.UiState
 
 @Composable
 fun ActionLogRoute(
-    onBackClick: () -> Unit,
+    onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 
     ) {

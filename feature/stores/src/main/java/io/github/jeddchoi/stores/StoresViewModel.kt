@@ -1,19 +1,19 @@
-package io.github.jeddchoi.actionlog
+package io.github.jeddchoi.stores
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jeddchoi.ui.UiState
 import kotlinx.coroutines.flow.*
 
-class ActionLogViewModel : ViewModel() {
+class StoresViewModel : ViewModel() {
 
-    private val _uiState: Flow<ActionLogUiStateData> = flow {
-        emit(ActionLogUiStateData("ActionLog"))
+    private val _uiState: Flow<StoresUiStateData> = flow {
+        emit(StoresUiStateData("Stores"))
     }
 
 
-    val uiState: StateFlow<UiState<ActionLogUiStateData>>
-        get() = _uiState.map<ActionLogUiStateData, UiState<ActionLogUiStateData>> {
+    val uiState: StateFlow<UiState<StoresUiStateData>>
+        get() = _uiState.map<StoresUiStateData, UiState<StoresUiStateData>> {
             UiState.Success(it)
         }.catch {
             emit(UiState.Error(it))
@@ -25,6 +25,6 @@ class ActionLogViewModel : ViewModel() {
 }
 
 
-data class ActionLogUiStateData(
+data class StoresUiStateData(
     val data : String
 )
