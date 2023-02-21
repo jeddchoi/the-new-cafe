@@ -1,6 +1,9 @@
 package io.github.jeddchoi.thenewcafe
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -43,10 +46,6 @@ class CafeAppState(
             else -> null
         }
 
-    var shouldShowSettingsDialog by mutableStateOf(false)
-        private set
-
-
     /**
      * Map of top level destinations to be used in the TopBar, BottomBar and NavRail. The key is the
      * route.
@@ -85,9 +84,5 @@ class CafeAppState(
 
     fun onBackClick() {
         navController.popBackStack()
-    }
-
-    fun setShowSettingsDialog(shouldShow: Boolean) {
-        shouldShowSettingsDialog = shouldShow
     }
 }

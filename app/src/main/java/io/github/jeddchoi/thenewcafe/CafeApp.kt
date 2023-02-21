@@ -12,7 +12,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.compose.rememberNavController
 import io.github.jeddchoi.designsystem.Icon
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,7 +32,7 @@ fun CafeApp(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            CafeNavHost(navController = rememberNavController(), onBackClick = { })
+            CafeNavHost(navController = appState.navController, onBackClick = appState::onBackClick)
         }
     }
 }
@@ -81,7 +80,6 @@ private fun NavDestination?.isTopLevelDestinationInHierarchy(destination: TopLev
     this?.hierarchy?.any {
         it.route?.contains(destination.name, true) ?: false
     } ?: false
-
 
 
 /**
