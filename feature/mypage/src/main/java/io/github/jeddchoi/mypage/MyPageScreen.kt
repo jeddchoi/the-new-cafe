@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -22,8 +22,8 @@ import kotlin.random.Random
 fun MyPageRoute(
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
-    viewModel: MyPageViewModel = hiltViewModel()
-) {
+    ) {
+    val viewModel: MyPageViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     MyPageScreen(uiState)

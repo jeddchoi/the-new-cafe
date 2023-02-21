@@ -3,12 +3,10 @@ package io.github.jeddchoi.mypage
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.ui.UiState
 import kotlinx.coroutines.flow.*
 
 
-@HiltViewModel
 class MyPageViewModel(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
