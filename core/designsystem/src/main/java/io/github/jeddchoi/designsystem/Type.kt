@@ -1,4 +1,4 @@
-package io.github.jeddchoi.designsystem.ui.theme
+package io.github.jeddchoi.designsystem
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

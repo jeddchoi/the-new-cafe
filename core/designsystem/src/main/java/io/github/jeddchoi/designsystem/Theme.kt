@@ -1,4 +1,4 @@
-package io.github.jeddchoi.designsystem.ui.theme
+package io.github.jeddchoi.designsystem
 
 import android.app.Activity
 import android.os.Build

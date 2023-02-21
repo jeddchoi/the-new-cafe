@@ -13,7 +13,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import io.github.jeddchoi.actionlog.ActionLogRoute
-import io.github.jeddchoi.designsystem.ui.theme.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.mystatus.MyStatusRoute
 import io.github.jeddchoi.ui.UiState
 import kotlinx.coroutines.launch

@@ -6,6 +6,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import io.github.jeddchoi.account.accountRoute
 import io.github.jeddchoi.account.accountScreen
+import io.github.jeddchoi.mypage.myPageScreen
+import io.github.jeddchoi.store.navigateToStore
+import io.github.jeddchoi.store.storeScreen
+import io.github.jeddchoi.stores.storesGraph
 
 @Composable
 fun CafeNavHost(
@@ -20,6 +24,14 @@ fun CafeNavHost(
         modifier = modifier
     ) {
         accountScreen()
-
+        storesGraph(
+            navigateToStore = {storeId ->
+                navController.navigateToStore(storeId)
+            },
+            nestedGraphs = {
+                storeScreen()
+            }
+        )
+        myPageScreen()
     }
 }

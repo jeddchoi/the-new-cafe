@@ -8,7 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
-import io.github.jeddchoi.designsystem.ui.theme.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.TheNewCafeTheme
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 

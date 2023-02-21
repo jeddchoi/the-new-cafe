@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.jeddchoi.designsystem.ui.theme.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.ui.UiState
 
 

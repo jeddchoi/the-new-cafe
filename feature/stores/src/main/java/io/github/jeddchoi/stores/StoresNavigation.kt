@@ -10,7 +10,7 @@ const val storesRoute = "stores_route"
 
 
 fun NavGraphBuilder.storesGraph(
-    navigateToSeats: (String) -> Unit,
+    navigateToStore: (String) -> Unit,
     nestedGraphs: NavGraphBuilder.() -> Unit,
 ) {
     navigation(
@@ -19,7 +19,7 @@ fun NavGraphBuilder.storesGraph(
     ) {
         composable(route = storesRoute) {
             StoresRoute(
-                navigateToSeats = navigateToSeats,
+                navigateToSeats = navigateToStore,
             )
         }
         nestedGraphs()

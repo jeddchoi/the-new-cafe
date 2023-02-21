@@ -1,11 +1,15 @@
 package io.github.jeddchoi.store
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jeddchoi.ui.UiState
 import kotlinx.coroutines.flow.*
 
-class StoreViewModel : ViewModel() {
+class StoreViewModel(
+    savedStateHandle: SavedStateHandle,
+) : ViewModel() {
+    private val storeArgs: StoreArgs = StoreArgs(savedStateHandle)
 
     private val _uiState: Flow<SeatsUiStateData> = flow {
         emit(SeatsUiStateData("Seats"))
