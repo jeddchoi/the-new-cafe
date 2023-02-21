@@ -1,7 +1,6 @@
 package io.github.jeddchoi.thenewcafe
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
@@ -9,9 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import io.github.jeddchoi.designsystem.CafeNavigationBar
+import io.github.jeddchoi.designsystem.CafeNavigationBarItem
 import io.github.jeddchoi.designsystem.Icon
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,43 +82,3 @@ private fun NavDestination?.isTopLevelDestinationInHierarchy(destination: TopLev
     } ?: false
 
 
-/**
- * Now in Android navigation bar with content slot. Wraps Material 3 [NavigationBar].
- *
- * @param modifier Modifier to be applied to the navigation bar.
- * @param content Destinations inside the navigation bar. This should contain multiple
- * [NavigationBarItem]s.
- */
-@Composable
-fun CafeNavigationBar(
-    modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit,
-) {
-    NavigationBar(
-        modifier = modifier,
-        tonalElevation = 0.dp,
-        content = content,
-    )
-}
-
-@Composable
-fun RowScope.CafeNavigationBarItem(
-    selected: Boolean,
-    onClick: () -> Unit,
-    icon: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    selectedIcon: @Composable () -> Unit = icon,
-    enabled: Boolean = true,
-    label: @Composable (() -> Unit)? = null,
-    alwaysShowLabel: Boolean = true,
-) {
-    NavigationBarItem(
-        selected = selected,
-        onClick = onClick,
-        icon = if (selected) selectedIcon else icon,
-        modifier = modifier,
-        enabled = enabled,
-        label = label,
-        alwaysShowLabel = alwaysShowLabel,
-    )
-}
