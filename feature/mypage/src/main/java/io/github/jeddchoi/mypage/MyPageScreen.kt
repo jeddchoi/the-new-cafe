@@ -19,8 +19,10 @@ import kotlin.random.Random
 
 
 @Composable
-fun MyPageRoute() {
-
+fun MyPageRoute(
+    modifier: Modifier = Modifier,
+//    viewModel: MyPageViewModel = viewModel()
+) {
 
 
     MyPageScreen()
