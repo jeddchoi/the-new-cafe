@@ -17,7 +17,7 @@ internal class StoreArgs(val storeId: String) {
 
 fun NavController.navigateToStore(storeId: String) {
     val encodedId = Uri.encode(storeId)
-    this.navigate("store_route/$encodedId")
+    this.navigate("$storeRoute/$encodedId")
 }
 fun NavGraphBuilder.storeScreen(
     onBackClick: () -> Unit = {},

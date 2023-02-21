@@ -1,19 +1,19 @@
-package io.github.jeddchoi.stores
+package io.github.jeddchoi.order
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jeddchoi.ui.UiState
 import kotlinx.coroutines.flow.*
 
-class StoresViewModel : ViewModel() {
+class OrderViewModel : ViewModel() {
 
-    private val _uiState: Flow<StoresUiStateData> = flow {
-        emit(StoresUiStateData("Stores"))
+    private val _uiState: Flow<OrderUiStateData> = flow {
+        emit(OrderUiStateData("Order"))
     }
 
 
-    val uiState: StateFlow<UiState<StoresUiStateData>>
-        get() = _uiState.map<StoresUiStateData, UiState<StoresUiStateData>> {
+    val uiState: StateFlow<UiState<OrderUiStateData>>
+        get() = _uiState.map<OrderUiStateData, UiState<OrderUiStateData>> {
             UiState.Success(it)
         }.catch {
             emit(UiState.Error(it))
@@ -25,6 +25,6 @@ class StoresViewModel : ViewModel() {
 }
 
 
-data class StoresUiStateData(
+data class OrderUiStateData(
     val data : String
 )

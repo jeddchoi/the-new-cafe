@@ -1,4 +1,4 @@
-package io.github.jeddchoi.stores
+package io.github.jeddchoi.order
 
 import org.junit.Test
 

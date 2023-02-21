@@ -14,8 +14,8 @@ import io.github.jeddchoi.account.accountRoute
 import io.github.jeddchoi.account.navigateToAccount
 import io.github.jeddchoi.mypage.myPageRoute
 import io.github.jeddchoi.mypage.navigateToMyPage
-import io.github.jeddchoi.stores.navigateToStoresGraph
-import io.github.jeddchoi.stores.storesRoute
+import io.github.jeddchoi.order.navigateToOrderGraph
+import io.github.jeddchoi.order.orderRoute
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -41,7 +41,7 @@ class CafeAppState(
     val currentTopLevelDestination: TopLevelDestination?
         @Composable get() = when (currentDestination?.route) {
             accountRoute -> TopLevelDestination.ACCOUNT
-            storesRoute -> TopLevelDestination.ORDER
+            orderRoute -> TopLevelDestination.ORDER
             myPageRoute -> TopLevelDestination.MYPAGE
             else -> null
         }
@@ -76,7 +76,7 @@ class CafeAppState(
 
         when (topLevelDestination) {
             TopLevelDestination.ACCOUNT -> navController.navigateToAccount(topLevelNavOptions)
-            TopLevelDestination.ORDER -> navController.navigateToStoresGraph(topLevelNavOptions)
+            TopLevelDestination.ORDER -> navController.navigateToOrderGraph(topLevelNavOptions)
             TopLevelDestination.MYPAGE -> navController.navigateToMyPage(topLevelNavOptions)
         }
 

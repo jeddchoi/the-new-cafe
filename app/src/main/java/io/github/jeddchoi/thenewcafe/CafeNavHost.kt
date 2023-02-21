@@ -9,7 +9,7 @@ import io.github.jeddchoi.account.accountScreen
 import io.github.jeddchoi.mypage.myPageScreen
 import io.github.jeddchoi.store.navigateToStore
 import io.github.jeddchoi.store.storeScreen
-import io.github.jeddchoi.stores.storesGraph
+import io.github.jeddchoi.order.orderGraph
 
 @Composable
 fun CafeNavHost(
@@ -24,7 +24,7 @@ fun CafeNavHost(
         modifier = modifier
     ) {
         accountScreen()
-        storesGraph(
+        orderGraph(
             navigateToStore = {storeId ->
                 navController.navigateToStore(storeId)
             },

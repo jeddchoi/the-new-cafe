@@ -43,7 +43,7 @@ android {
 dependencies {
 
     implementation(project(":feature:store"))
-    implementation(project(":feature:stores"))
+    implementation(project(":feature:order"))
     implementation(project(":feature:account"))
     implementation(project(":feature:mypage"))
 
@@ -56,6 +56,10 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
 
+    testImplementation(kotlin("test"))
+    testImplementation(project(":core:testing"))
+    androidTestImplementation(kotlin("test"))
+    androidTestImplementation(project(":core:testing"))
 }
 
 // TODO: Investigate this, or delete it
