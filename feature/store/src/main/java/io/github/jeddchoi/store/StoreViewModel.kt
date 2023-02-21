@@ -1,11 +1,11 @@
-package io.github.jeddchoi.seats
+package io.github.jeddchoi.store
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jeddchoi.ui.UiState
 import kotlinx.coroutines.flow.*
 
-class SeatsViewModel : ViewModel() {
+class StoreViewModel : ViewModel() {
 
     private val _uiState: Flow<SeatsUiStateData> = flow {
         emit(SeatsUiStateData("Seats"))

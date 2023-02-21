@@ -23,7 +23,7 @@ rootProject.name = "The New Cafe"
 include(":app")
 
 include(":feature:account")
-include(":feature:seats")
+include(":feature:store")
 include(":feature:stores")
 include(":feature:mypage")
 include(":feature:actionlog")

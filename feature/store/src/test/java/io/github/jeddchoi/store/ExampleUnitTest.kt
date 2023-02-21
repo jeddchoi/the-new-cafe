@@ -1,4 +1,4 @@
-package io.github.jeddchoi.seats
+package io.github.jeddchoi.store
 
 import org.junit.Test
 

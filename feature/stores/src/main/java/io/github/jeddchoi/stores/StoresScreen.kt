@@ -17,10 +17,10 @@ import io.github.jeddchoi.ui.UiState
 
 @Composable
 fun StoresRoute(
+    navigateToSeats: (String) -> Unit,
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
-
-    ) {
+) {
     val viewModel: StoresViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

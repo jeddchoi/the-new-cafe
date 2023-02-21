@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "io.github.jeddchoi.seats"
+    namespace = "io.github.jeddchoi.store"
 }
 
 dependencies {

@@ -42,7 +42,7 @@ android {
 
 dependencies {
 
-    implementation(project(":feature:seats"))
+    implementation(project(":feature:store"))
     implementation(project(":feature:stores"))
     implementation(project(":feature:account"))
     implementation(project(":feature:mypage"))
