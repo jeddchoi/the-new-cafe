@@ -6,13 +6,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import io.github.jeddchoi.designsystem.CafeNavigationBar
-import io.github.jeddchoi.designsystem.CafeNavigationBarItem
-import io.github.jeddchoi.designsystem.Icon
+import io.github.jeddchoi.designsystem.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,6 +28,17 @@ fun CafeApp(
                 onNavigateToDestination = appState::navigateToTopLevelDestination,
                 currentDestination = appState.currentDestination,
             )
+        },
+        topBar = {
+            val destination = appState.currentTopLevelDestination
+            if (destination != null) {
+                CafeTopAppBar(
+                    titleRes = destination.titleTextId,
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Transparent,
+                    ),
+                )
+            }
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
