@@ -1,4 +1,4 @@
-package io.github.jeddchoi.mystatus
+package io.github.jeddchoi.mypage
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
