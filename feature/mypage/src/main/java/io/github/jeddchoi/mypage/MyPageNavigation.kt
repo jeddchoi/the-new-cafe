@@ -20,9 +20,12 @@ fun NavGraphBuilder.myPageScreen(
     onBackClick: () -> Unit = {},
 ) {
     composable(
-        route = "$myPageRoute/{$tabIdArg}",
+        route = "$myPageRoute?$tabIdArg={$tabIdArg}",
         arguments = listOf(
-            navArgument(tabIdArg) { type = NavType.StringType },
+            navArgument(tabIdArg) {
+                type = NavType.StringType
+                defaultValue = "my_status"
+            },
         ),
     ) {
         MyPageRoute(onBackClick = onBackClick)

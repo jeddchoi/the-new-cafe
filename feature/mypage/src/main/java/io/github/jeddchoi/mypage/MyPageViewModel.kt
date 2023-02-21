@@ -25,7 +25,7 @@ class MyPageViewModel(
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
-            UiState.Loading()
+            UiState.Loading(MyPageUiStateData(myPageArgs.tabId))
         )
 }
 
