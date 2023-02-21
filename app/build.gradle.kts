@@ -46,8 +46,6 @@ dependencies {
     implementation(project(":feature:stores"))
     implementation(project(":feature:account"))
     implementation(project(":feature:mypage"))
-    implementation(project(":feature:actionlog"))
-    implementation(project(":feature:mystatus"))
 
     implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))

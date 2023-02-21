@@ -8,5 +8,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature:mystatus"))
+    implementation(project(":feature:actionlog"))
+
     implementation(libs.accompanist.pager)
 }
