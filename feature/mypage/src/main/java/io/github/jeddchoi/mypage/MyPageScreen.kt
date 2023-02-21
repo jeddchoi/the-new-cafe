@@ -3,34 +3,45 @@ package io.github.jeddchoi.mypage
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import io.github.jeddchoi.ui.UiState
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 
 @Composable
 fun MyPageRoute(
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-//    viewModel: MyPageViewModel = viewModel()
+    viewModel: MyPageViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-
-    MyPageScreen()
+    MyPageScreen(uiState)
 }
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun MyPageScreen() {
+fun MyPageScreen(
+    myPageUiState: UiState<MyPageUiStateData>
+) {
+    when (myPageUiState) {
+        UiState.Empty -> TODO()
+        is UiState.Error -> TODO()
+        is UiState.Loading -> TODO()
+        is UiState.Success -> {
+            myPageUiState.data.tabId
+        }
+    }
     val pages = remember {
         listOf("My Status", "Action Log")
     }
@@ -39,7 +50,8 @@ fun MyPageScreen() {
     Column(
         Modifier
             .fillMaxSize()
-            .padding(8.dp)) {
+            .padding(8.dp)
+    ) {
         val coroutineScope = rememberCoroutineScope()
 
         // Remember a PagerState
@@ -99,10 +111,12 @@ fun MyPageScreen() {
 fun Odd() {
     LazyColumn {
         items(50) {
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .sizeIn(minHeight = 72.dp)
-                .padding(vertical = 8.dp)) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .sizeIn(minHeight = 72.dp)
+                    .padding(vertical = 8.dp)
+            ) {
                 Text("Odd!")
             }
 
@@ -114,10 +128,12 @@ fun Odd() {
 fun Even() {
     LazyColumn {
         items(50) {
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .sizeIn(minHeight = 72.dp)
-                .padding(vertical = 8.dp)) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .sizeIn(minHeight = 72.dp)
+                    .padding(vertical = 8.dp)
+            ) {
                 Text("Even!")
             }
         }

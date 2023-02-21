@@ -1,26 +1,37 @@
 package io.github.jeddchoi.mypage
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.ui.UiState
-import io.github.jeddchoi.ui.asUiState
 import kotlinx.coroutines.flow.*
 
 
-//@HiltViewModel
-class MyPageViewModel : ViewModel() {
+@HiltViewModel
+class MyPageViewModel(
+    savedStateHandle: SavedStateHandle,
+) : ViewModel() {
+    private val myPageArgs: MyPageArgs = MyPageArgs(savedStateHandle)
 
-    private val _uiState: Flow<MyPageUiState> = flow {
-        emit(null)
-        emit("Hello")
-    }.asUiState()
-    val uiState: StateFlow<MyPageUiState>
-        get() = _uiState.stateIn(
+    private val _uiState: Flow<MyPageUiStateData> = flow {
+        emit(MyPageUiStateData(myPageArgs.tabId))
+    }
+
+
+    val uiState: StateFlow<UiState<MyPageUiStateData>>
+        get() = _uiState.map<MyPageUiStateData, UiState<MyPageUiStateData>> {
+            UiState.Success(it)
+        }.catch {
+            emit(UiState.Error(it))
+        }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
             UiState.Loading()
         )
 }
 
+data class MyPageUiStateData(
+    val tabId: String
+)
 
-typealias MyPageUiState = UiState<String?>

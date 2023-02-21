@@ -22,3 +22,5 @@ fun <T> Flow<T>.asUiState(): Flow<UiState<T>> {
         .onStart { emit(UiState.Loading()) }
         .catch { emit(UiState.Error(it)) }
 }
+
+
