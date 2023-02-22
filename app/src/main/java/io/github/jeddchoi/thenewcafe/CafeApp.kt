@@ -15,6 +15,11 @@ import io.github.jeddchoi.designsystem.*
 import io.github.jeddchoi.thenewcafe.navigation.CafeNavHost
 import io.github.jeddchoi.thenewcafe.navigation.TopLevelDestination
 
+/**
+ * Single entry point of composable world
+ *
+ * @param appState : state holder of app
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeApp(
