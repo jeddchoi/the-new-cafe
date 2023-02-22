@@ -12,6 +12,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import io.github.jeddchoi.designsystem.*
+import io.github.jeddchoi.thenewcafe.navigation.CafeNavHost
+import io.github.jeddchoi.thenewcafe.navigation.TopLevelDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

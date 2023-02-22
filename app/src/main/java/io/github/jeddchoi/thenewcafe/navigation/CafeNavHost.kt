@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe
+package io.github.jeddchoi.thenewcafe.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

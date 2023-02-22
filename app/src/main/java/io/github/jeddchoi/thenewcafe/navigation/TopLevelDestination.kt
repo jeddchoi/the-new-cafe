@@ -1,7 +1,8 @@
-package io.github.jeddchoi.thenewcafe
+package io.github.jeddchoi.thenewcafe.navigation
 
 import io.github.jeddchoi.designsystem.CafeIcons
 import io.github.jeddchoi.designsystem.Icon
+import io.github.jeddchoi.thenewcafe.R
 
 enum class TopLevelDestination(
     val selectedIcon: Icon,
