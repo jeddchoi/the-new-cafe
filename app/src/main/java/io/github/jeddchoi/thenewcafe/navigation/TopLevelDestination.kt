@@ -4,6 +4,14 @@ import io.github.jeddchoi.designsystem.CafeIcons
 import io.github.jeddchoi.designsystem.Icon
 import io.github.jeddchoi.thenewcafe.R
 
+/**
+ * Top-level destination which is navigated to when pressed bottom navigation item.
+ *
+ * @property selectedIcon : Icon on selected
+ * @property unselectedIcon : Icon on not selected
+ * @property iconTextId : Label text in bottom navigation item
+ * @property titleTextId : Title text in top app bar
+ */
 enum class TopLevelDestination(
     val selectedIcon: Icon,
     val unselectedIcon: Icon,
