@@ -9,13 +9,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+
+
+/**
+ * Single activity which is main entry.
+ * It should be kept simple.
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         setContent {
             TheNewCafeTheme {
                 // A surface container using the 'background' color from the theme
