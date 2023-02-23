@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jeddchoi.ui.UiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 class StoreViewModel(
@@ -12,12 +13,13 @@ class StoreViewModel(
     private val storeArgs: StoreArgs = StoreArgs(savedStateHandle)
 
     private val _uiState: Flow<SeatsUiStateData> = flow {
+        delay(1000)
         emit(SeatsUiStateData("Seats"))
     }
 
 
-    val uiState: StateFlow<UiState<SeatsUiStateData>>
-        get() = _uiState.map<SeatsUiStateData, UiState<SeatsUiStateData>> {
+    val uiState: StateFlow<UiState<SeatsUiStateData>> =
+        _uiState.map<SeatsUiStateData, UiState<SeatsUiStateData>> {
             UiState.Success(it)
         }.catch {
             emit(UiState.Error(it))
@@ -30,5 +32,5 @@ class StoreViewModel(
 
 
 data class SeatsUiStateData(
-    val data : String
+    val data: String
 )

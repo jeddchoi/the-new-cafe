@@ -3,18 +3,20 @@ package io.github.jeddchoi.mystatus
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jeddchoi.ui.UiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 
 class MyStatusViewModel : ViewModel() {
 
     private val _uiState: Flow<MyStatusUiStateData> = flow {
+        delay(1000)
         emit(MyStatusUiStateData("MyStatus"))
     }
 
 
-    val uiState: StateFlow<UiState<MyStatusUiStateData>>
-        get() = _uiState.map<MyStatusUiStateData, UiState<MyStatusUiStateData>> {
+    val uiState: StateFlow<UiState<MyStatusUiStateData>> =
+        _uiState.map<MyStatusUiStateData, UiState<MyStatusUiStateData>> {
             UiState.Success(it)
         }.catch {
             emit(UiState.Error(it))
@@ -27,5 +29,5 @@ class MyStatusViewModel : ViewModel() {
 
 
 data class MyStatusUiStateData(
-    val data : String
+    val data: String
 )

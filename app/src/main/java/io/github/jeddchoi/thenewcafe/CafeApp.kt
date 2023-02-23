@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import io.github.jeddchoi.account.LogCompositions
 import io.github.jeddchoi.designsystem.*
 import io.github.jeddchoi.thenewcafe.navigation.CafeNavHost
 import io.github.jeddchoi.thenewcafe.navigation.TopLevelDestination
@@ -26,7 +27,7 @@ fun CafeApp(
     modifier: Modifier = Modifier,
     appState: CafeAppState = rememberCafeAppState()
 ) {
-
+    LogCompositions(tag = "TAG", msg = "CafeApp")
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {

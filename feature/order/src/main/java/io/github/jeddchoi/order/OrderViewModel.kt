@@ -3,17 +3,19 @@ package io.github.jeddchoi.order
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jeddchoi.ui.UiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 class OrderViewModel : ViewModel() {
 
     private val _uiState: Flow<OrderUiStateData> = flow {
+        delay(1000)
         emit(OrderUiStateData("Order"))
     }
 
 
-    val uiState: StateFlow<UiState<OrderUiStateData>>
-        get() = _uiState.map<OrderUiStateData, UiState<OrderUiStateData>> {
+    val uiState: StateFlow<UiState<OrderUiStateData>> =
+        _uiState.map<OrderUiStateData, UiState<OrderUiStateData>> {
             UiState.Success(it)
         }.catch {
             emit(UiState.Error(it))
@@ -26,5 +28,5 @@ class OrderViewModel : ViewModel() {
 
 
 data class OrderUiStateData(
-    val data : String
+    val data: String
 )

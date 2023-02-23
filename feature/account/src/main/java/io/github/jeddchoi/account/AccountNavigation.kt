@@ -14,6 +14,7 @@ fun NavController.navigateToAccount(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.accountScreen(baseWebUri: String, baseAppUri: String) {
+
     composable(
         route = accountRoute,
         deepLinks = listOf(

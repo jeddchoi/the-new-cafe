@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import io.github.jeddchoi.account.LogCompositions
 import io.github.jeddchoi.account.accountRoute
 import io.github.jeddchoi.account.accountScreen
 import io.github.jeddchoi.mypage.myPageScreen
@@ -24,6 +25,7 @@ fun CafeNavHost(
     modifier: Modifier = Modifier,
     startDestination: String = accountRoute,
 ) {
+    LogCompositions(tag = "TAG", msg = "CafeNavHost")
     NavHost(
         navController = navController,
         startDestination = startDestination,
