@@ -27,7 +27,7 @@ class MyPageState(
 ) {
     private val currentPageFlow =
         snapshotFlow { pagerState.currentPage }.distinctUntilChanged().map {
-            myPageTabs[it]
+            MyPageNavigation.myPageTabs[it]
         }
 
 

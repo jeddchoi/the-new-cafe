@@ -66,7 +66,7 @@ fun MyPageScreen(
         TabRow(selectedTabIndex = selectedTab.ordinal) {
 
             // Add tabs for all of our pages
-            myPageTabs.forEach { tab ->
+            MyPageNavigation.myPageTabs.forEach { tab ->
                 Tab(
                     text = {
                         Text(
@@ -94,7 +94,7 @@ fun MyPageScreen(
                 .fillMaxWidth()
         ) { pageIndex ->
             // Our content for each page
-            when (myPageTabs[pageIndex]) {
+            when (MyPageNavigation.myPageTabs[pageIndex]) {
                 MyPageTab.MY_STATUS -> MyStatusRoute()
                 MyPageTab.ACTION_LOG -> ActionLogRoute()
             }

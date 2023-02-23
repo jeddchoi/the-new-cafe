@@ -7,14 +7,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import io.github.jeddchoi.account.accountRoute
+import io.github.jeddchoi.account.AccountNavigation
 import io.github.jeddchoi.account.navigateToAccount
+import io.github.jeddchoi.mypage.MyPageNavigation
 import io.github.jeddchoi.mypage.MyPageTab
-import io.github.jeddchoi.mypage.myPageRoute
-import io.github.jeddchoi.mypage.myPageRouteWithTabId
 import io.github.jeddchoi.mypage.navigateToMyPage
+import io.github.jeddchoi.order.OrderNavigation
 import io.github.jeddchoi.order.navigateToOrderGraph
-import io.github.jeddchoi.order.orderRoute
 import io.github.jeddchoi.thenewcafe.navigation.TopLevelDestination
 import kotlinx.coroutines.CoroutineScope
 
@@ -41,10 +40,9 @@ class CafeAppState(
     val currentTopLevelDestination: TopLevelDestination?
         @Composable get() {
             return when (currentDestination?.route) {
-                accountRoute -> TopLevelDestination.ACCOUNT
-                orderRoute -> TopLevelDestination.ORDER
-                myPageRoute -> TopLevelDestination.MYPAGE
-                myPageRouteWithTabId -> TopLevelDestination.MYPAGE
+                AccountNavigation.route() -> TopLevelDestination.ACCOUNT
+                OrderNavigation.route() -> TopLevelDestination.ORDER
+                MyPageNavigation.route() -> TopLevelDestination.MYPAGE
                 else -> null
             }
         }

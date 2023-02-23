@@ -4,6 +4,8 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavDeepLink
 import io.github.jeddchoi.designsystem.Icon
 
+const val baseWebUri = "https://www.example.com"
+const val baseAppUri = "jeddchoi://thenewcafe"
 
 interface AppNavigation {
     val selectedIcon: Icon

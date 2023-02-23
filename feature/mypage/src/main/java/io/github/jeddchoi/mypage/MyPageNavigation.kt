@@ -4,13 +4,14 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.navigation.*
 import androidx.navigation.compose.composable
+import io.github.jeddchoi.designsystem.CafeIcons
+import io.github.jeddchoi.designsystem.Icon
+import io.github.jeddchoi.mypage.MyPageNavigation.tabIdArg
 import io.github.jeddchoi.ui.LogCompositions
+import io.github.jeddchoi.ui.feature.AppNavigation
+import io.github.jeddchoi.ui.feature.baseAppUri
+import io.github.jeddchoi.ui.feature.baseWebUri
 import java.util.*
-
-const val tabIdArg = "tabId"
-const val myPageRoute = "mypage"
-const val myPageRouteWithTabId = "$myPageRoute?$tabIdArg={$tabIdArg}"
-
 
 /**
  * Tabs which My page contains.
@@ -25,7 +26,34 @@ enum class MyPageTab(@StringRes val titleId: Int) {
     ACTION_LOG(R.string.action_log)
 }
 
-val myPageTabs = MyPageTab.values()
+object MyPageNavigation : AppNavigation {
+    override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.MyPage_Filled)
+    override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.MyPage)
+
+    @StringRes
+    override val iconTextId: Int = R.string.mypage
+
+    @StringRes
+    override val titleTextId: Int = R.string.mypage
+
+    const val tabIdArg = "tabId"
+    override fun route(arg: String?): String = "mypage?$tabIdArg={${arg ?: tabIdArg}}"
+
+    override val arguments: List<NamedNavArgument> = listOf(
+        navArgument(tabIdArg) {
+            type = NavType.StringType
+            nullable = true
+        }
+    )
+    override val deepLinks: List<NavDeepLink> = listOf(
+        navDeepLink { uriPattern = "$baseWebUri/${route()}" },
+        navDeepLink { uriPattern = "$baseAppUri/${route()}" }
+    )
+
+    
+
+    val myPageTabs = MyPageTab.values()
+}
 
 
 fun NavController.navigateToMyPage(
@@ -33,29 +61,18 @@ fun NavController.navigateToMyPage(
     tab: MyPageTab? = null,
 ) {
     Log.i("TAG", "Navigate to MyPage $tab")
-    if (tab == null) this.navigate(myPageRoute, navOptions)
-    else this.navigate("$myPageRoute?$tabIdArg=${tab.name}", navOptions)
+    this.navigate(MyPageNavigation.route(tab?.name), navOptions)
 }
 
 fun NavGraphBuilder.myPageScreen(
-    baseWebUri: String,
-    baseAppUri: String,
     shouldHandleReselection: Boolean,
     onHandleReselection: () -> Unit,
     onBackClick: () -> Unit = {},
 ) {
     composable(
-        route = myPageRouteWithTabId,
-        deepLinks = listOf(
-            navDeepLink { uriPattern = "$baseWebUri/$myPageRoute/{$tabIdArg}" },
-            navDeepLink { uriPattern = "$baseAppUri/$myPageRoute/{$tabIdArg}" }
-        ),
-        arguments = listOf(
-            navArgument(tabIdArg) {
-                type = NavType.StringType
-                nullable = true
-            },
-        ),
+        route = MyPageNavigation.route(),
+        deepLinks = MyPageNavigation.deepLinks,
+        arguments = MyPageNavigation.arguments,
     ) { backStackEntry ->
 
         LogCompositions(tag = "TAG", msg = "MyPage : backStackEntry = ${backStackEntry.arguments}")

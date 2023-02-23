@@ -4,6 +4,8 @@ import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.*
 import androidx.navigation.compose.composable
+import io.github.jeddchoi.ui.feature.baseAppUri
+import io.github.jeddchoi.ui.feature.baseWebUri
 
 const val storeRoute = "store"
 internal const val storeIdArg = "storeId"
@@ -17,8 +19,6 @@ fun NavController.navigateToStore(storeId: String) {
     this.navigate("$storeRoute/$encodedId")
 }
 fun NavGraphBuilder.storeScreen(
-    baseWebUri: String,
-    baseAppUri: String,
     onBackClick: () -> Unit = {},
 ) {
     composable(

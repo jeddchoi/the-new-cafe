@@ -1,38 +1,48 @@
 package io.github.jeddchoi.account
 
 import android.util.Log
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
+import androidx.annotation.StringRes
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navDeepLink
-import io.github.jeddchoi.ui.LogCompositions
+import io.github.jeddchoi.designsystem.CafeIcons
+import io.github.jeddchoi.designsystem.Icon
+import io.github.jeddchoi.ui.feature.AppNavigation
+import io.github.jeddchoi.ui.feature.baseAppUri
+import io.github.jeddchoi.ui.feature.baseWebUri
 
+object AccountNavigation : AppNavigation {
+    override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Account_Filled)
+    override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Account)
 
-const val accountRoute = "account"
+    @StringRes
+    override val iconTextId: Int = R.string.account
+    @StringRes
+    override val titleTextId: Int = R.string.account
 
+    override fun route(arg: String?): String = "account"
+
+    override val arguments: List<NamedNavArgument> = listOf()
+    override val deepLinks: List<NavDeepLink> = listOf(
+        navDeepLink { uriPattern = "$baseWebUri/${route()}" },
+        navDeepLink { uriPattern = "$baseAppUri/${route()}" }
+    )
+}
 
 
 fun NavController.navigateToAccount(navOptions: NavOptions? = null) {
     Log.i("TAG", "Navigate to Account")
-    this.navigate(accountRoute, navOptions)
+    this.navigate(AccountNavigation.route(), navOptions)
 }
 
 
 fun NavGraphBuilder.accountScreen(
-    baseWebUri: String,
-    baseAppUri: String,
     onShowActionLog: () -> Unit = {},
 ) {
 
     composable(
-        route = accountRoute,
-        deepLinks = listOf(
-            navDeepLink { uriPattern = "$baseWebUri/$accountRoute" },
-            navDeepLink { uriPattern = "$baseAppUri/$accountRoute" }
-        )
-    ) {backStackEntry ->
-        LogCompositions(tag = "TAG", msg = "Account : backStackEntry = ${backStackEntry.arguments}")
+        route = AccountNavigation.route(),
+        deepLinks = AccountNavigation.deepLinks
+    ) { _ ->
         AccountRoute(onShowActionLog = onShowActionLog)
     }
 }

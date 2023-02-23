@@ -2,4 +2,5 @@
 <resources>
     <string name="my_status">My Status</string>
     <string name="action_log">Action Log</string>
+    <string name="mypage">My Page</string>
 </resources>

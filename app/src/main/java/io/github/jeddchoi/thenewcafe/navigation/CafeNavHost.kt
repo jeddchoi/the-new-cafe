@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import io.github.jeddchoi.account.accountRoute
+import io.github.jeddchoi.account.AccountNavigation
 import io.github.jeddchoi.account.accountScreen
 import io.github.jeddchoi.mypage.myPageScreen
 import io.github.jeddchoi.order.orderGraph
@@ -13,8 +13,6 @@ import io.github.jeddchoi.store.storeScreen
 import io.github.jeddchoi.ui.LogCompositions
 
 
-const val webUri = "https://www.example.com"
-const val appUri = "jeddchoi://thenewcafe"
 
 @Composable
 fun CafeNavHost(
@@ -24,7 +22,7 @@ fun CafeNavHost(
     onHandleReselection: () -> Unit,
     onBackClick: () -> Unit = {},
     onShowActionLog: () -> Unit = {},
-    startDestination: String = accountRoute,
+    startDestination: String = AccountNavigation.route(),
 ) {
     LogCompositions(tag = "TAG", msg = "CafeNavHost")
     NavHost(
@@ -33,26 +31,17 @@ fun CafeNavHost(
         modifier = modifier
     ) {
         accountScreen(
-            baseWebUri = webUri,
-            baseAppUri = appUri,
             onShowActionLog = onShowActionLog,
         )
         orderGraph(
-            baseWebUri = webUri,
-            baseAppUri = appUri,
             navigateToStore = { storeId ->
                 navController.navigateToStore(storeId)
             },
             nestedGraphs = {
-                storeScreen(
-                    baseWebUri = webUri,
-                    baseAppUri = appUri,
-                )
+                storeScreen()
             }
         )
         myPageScreen(
-            baseWebUri = webUri,
-            baseAppUri = appUri,
             shouldHandleReselection = shouldHandleReselection,
             onHandleReselection = onHandleReselection
         )
