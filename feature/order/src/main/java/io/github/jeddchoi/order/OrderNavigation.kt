@@ -1,10 +1,7 @@
 package io.github.jeddchoi.order
 
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
 
 
 private const val orderGraphRoutePattern = "order_graph"
@@ -16,6 +13,8 @@ fun NavController.navigateToOrderGraph(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.orderGraph(
+    baseWebUri: String,
+    baseAppUri: String,
     navigateToStore: (String) -> Unit,
     nestedGraphs: NavGraphBuilder.() -> Unit,
 ) {
@@ -23,7 +22,13 @@ fun NavGraphBuilder.orderGraph(
         route = orderGraphRoutePattern,
         startDestination = orderRoute,
     ) {
-        composable(route = orderRoute) {
+        composable(
+            route = orderRoute,
+            deepLinks = listOf(
+                navDeepLink { uriPattern = "$baseWebUri/ORDER" },
+                navDeepLink { uriPattern = "$baseAppUri/ORDER" }
+            )
+        ) {
             OrderRoute(
                 navigateToSeats = navigateToStore,
             )

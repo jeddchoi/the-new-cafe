@@ -3,9 +3,10 @@ package io.github.jeddchoi.mypage
 import androidx.annotation.StringRes
 import androidx.navigation.*
 import androidx.navigation.compose.composable
+import java.util.*
 
 internal const val tabIdArg = "tabId"
-const val myPageRoute = "mypage_route"
+const val myPageRoute = "mypage"
 const val myPageRouteWithTabId = "$myPageRoute?$tabIdArg={$tabIdArg}"
 
 
@@ -43,8 +44,8 @@ fun NavGraphBuilder.myPageScreen(
     composable(
         route = myPageRouteWithTabId,
         deepLinks = listOf(
-            navDeepLink { uriPattern = "$baseWebUri/{$tabIdArg}" },
-            navDeepLink { uriPattern = "$baseAppUri/{$tabIdArg}" }
+            navDeepLink { uriPattern = "$baseWebUri/$myPageRoute/{$tabIdArg}" },
+            navDeepLink { uriPattern = "$baseAppUri/$myPageRoute/{$tabIdArg}" }
         ),
         arguments = listOf(
             navArgument(tabIdArg) {
@@ -54,7 +55,7 @@ fun NavGraphBuilder.myPageScreen(
         ),
     ) { backStackEntry ->
 
-        val navArg = backStackEntry.arguments?.getString(tabIdArg)
+        val navArg = backStackEntry.arguments?.getString(tabIdArg)?.uppercase(Locale.getDefault())
         val navTab = try {
             navArg?.let { MyPageTab.valueOf(it) }
         } catch (e: IllegalArgumentException) {

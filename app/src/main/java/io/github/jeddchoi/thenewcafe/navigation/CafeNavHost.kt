@@ -13,8 +13,8 @@ import io.github.jeddchoi.store.storeScreen
 import io.github.jeddchoi.ui.LogCompositions
 
 
-val webUri = "https://www.example.com"
-val appUri = "jeddchoi://thenewcafe"
+const val webUri = "https://www.example.com"
+const val appUri = "jeddchoi://thenewcafe"
 
 @Composable
 fun CafeNavHost(
@@ -36,11 +36,16 @@ fun CafeNavHost(
             baseAppUri = appUri,
         )
         orderGraph(
+            baseWebUri = webUri,
+            baseAppUri = appUri,
             navigateToStore = { storeId ->
                 navController.navigateToStore(storeId)
             },
             nestedGraphs = {
-                storeScreen()
+                storeScreen(
+                    baseWebUri = webUri,
+                    baseAppUri = appUri,
+                )
             }
         )
         myPageScreen(

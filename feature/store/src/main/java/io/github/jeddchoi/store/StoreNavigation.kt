@@ -2,13 +2,10 @@ package io.github.jeddchoi.store
 
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 
-const val storeRoute = "store_route"
+const val storeRoute = "store"
 internal const val storeIdArg = "storeId"
 
 internal class StoreArgs(val storeId: String) {
@@ -20,10 +17,16 @@ fun NavController.navigateToStore(storeId: String) {
     this.navigate("$storeRoute/$encodedId")
 }
 fun NavGraphBuilder.storeScreen(
+    baseWebUri: String,
+    baseAppUri: String,
     onBackClick: () -> Unit = {},
 ) {
     composable(
         route = "${storeRoute}/{$storeIdArg}",
+        deepLinks = listOf(
+            navDeepLink { uriPattern = "$baseWebUri/$storeRoute/{$storeIdArg}" },
+            navDeepLink { uriPattern = "$baseAppUri/$storeRoute/{$storeIdArg}" }
+        ),
         arguments = listOf(
             navArgument(storeIdArg) { type = NavType.StringType },
         ),

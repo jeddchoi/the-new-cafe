@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 
 
-const val accountRoute = "account_route"
+const val accountRoute = "account"
 
 fun NavController.navigateToAccount(navOptions: NavOptions? = null) {
     this.navigate(accountRoute, navOptions)
@@ -18,8 +18,8 @@ fun NavGraphBuilder.accountScreen(baseWebUri: String, baseAppUri: String) {
     composable(
         route = accountRoute,
         deepLinks = listOf(
-            navDeepLink { uriPattern = "$baseWebUri/ACCOUNT" },
-            navDeepLink { uriPattern = "$baseAppUri/ACCOUNT" }
+            navDeepLink { uriPattern = "$baseWebUri/$accountRoute" },
+            navDeepLink { uriPattern = "$baseAppUri/$accountRoute" }
         )
     ) {
         AccountRoute()
