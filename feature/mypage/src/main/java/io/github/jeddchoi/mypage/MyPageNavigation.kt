@@ -1,11 +1,13 @@
 package io.github.jeddchoi.mypage
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.navigation.*
 import androidx.navigation.compose.composable
+import io.github.jeddchoi.ui.LogCompositions
 import java.util.*
 
-internal const val tabIdArg = "tabId"
+const val tabIdArg = "tabId"
 const val myPageRoute = "mypage"
 const val myPageRouteWithTabId = "$myPageRoute?$tabIdArg={$tabIdArg}"
 
@@ -30,6 +32,7 @@ fun NavController.navigateToMyPage(
     navOptions: NavOptions? = null,
     tab: MyPageTab? = null,
 ) {
+    Log.i("TAG", "Navigate to MyPage $tab")
     if (tab == null) this.navigate(myPageRoute, navOptions)
     else this.navigate("$myPageRoute?$tabIdArg=${tab.name}", navOptions)
 }
@@ -55,6 +58,7 @@ fun NavGraphBuilder.myPageScreen(
         ),
     ) { backStackEntry ->
 
+        LogCompositions(tag = "TAG", msg = "MyPage : backStackEntry = ${backStackEntry.arguments}")
         val navArg = backStackEntry.arguments?.getString(tabIdArg)?.uppercase(Locale.getDefault())
         val navTab = try {
             navArg?.let { MyPageTab.valueOf(it) }

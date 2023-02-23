@@ -55,7 +55,8 @@ fun CafeApp(
                 navController = appState.navController,
                 shouldHandleReselection = appState.shouldHandleReselection,
                 onHandleReselection = { appState.setHandleReselection(false) },
-                onBackClick = appState::onBackClick
+                onBackClick = appState::onBackClick,
+                onShowActionLog = appState::navigateToActionLog
             )
         }
     }

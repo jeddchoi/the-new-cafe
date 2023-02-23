@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import io.github.jeddchoi.account.accountRoute
 import io.github.jeddchoi.account.navigateToAccount
+import io.github.jeddchoi.mypage.MyPageTab
 import io.github.jeddchoi.mypage.myPageRoute
 import io.github.jeddchoi.mypage.myPageRouteWithTabId
 import io.github.jeddchoi.mypage.navigateToMyPage
@@ -83,8 +84,27 @@ class CafeAppState(
             TopLevelDestination.ORDER -> navController.navigateToOrderGraph(topLevelNavOptions)
             TopLevelDestination.MYPAGE -> navController.navigateToMyPage(topLevelNavOptions)
         }
-
     }
+
+    fun navigateToActionLog() {
+        val topLevelNavOptions = navOptions {
+            // Pop up to the start destination of the graph to
+            // avoid building up a large stack of destinations
+            // on the back stack as users select items
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            // Avoid multiple copies of the same destination when
+            // reselecting the same item
+            launchSingleTop = true
+            // Restore state when reselecting a previously selected item
+            restoreState = true
+        }
+
+        navController.navigateToMyPage(topLevelNavOptions, MyPageTab.ACTION_LOG)
+    }
+
+
 
     var shouldHandleReselection by mutableStateOf(false)
         private set

@@ -3,18 +3,12 @@ package io.github.jeddchoi.account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.jeddchoi.ui.UiState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 class AccountViewModel : ViewModel() {
 
     private val _uiState = flow {
-        delay(1000)
         emit(AccountUiStateData("Account"))
-        delay(1000)
-        emit(AccountUiStateData(" "))
-        delay(1000)
-        throw RuntimeException("Wow")
     }
 
 
@@ -29,6 +23,9 @@ class AccountViewModel : ViewModel() {
             SharingStarted.WhileSubscribed(5_000),
             UiState.Loading()
         )
+
+
+
 }
 
 

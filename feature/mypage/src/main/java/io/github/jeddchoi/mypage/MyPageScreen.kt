@@ -44,7 +44,7 @@ fun MyPageScreen(
 
 
     LaunchedEffect(navTab, shouldHandleReselection) {
-        Log.i("TAG", "navTab = $navTab, shouldHandleReselection = $shouldHandleReselection")
+        Log.i("TAG", "navTab = $navTab / reselection = $shouldHandleReselection")
         if (shouldHandleReselection) {
             myPageState.toggleTab()
             onHandleReselection()

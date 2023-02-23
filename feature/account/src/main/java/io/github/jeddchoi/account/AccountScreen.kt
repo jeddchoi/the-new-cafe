@@ -3,11 +3,13 @@ package io.github.jeddchoi.account
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -21,13 +23,13 @@ import io.github.jeddchoi.ui.UiState
 fun AccountRoute(
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
-
-    ) {
+    onShowActionLog: () -> Unit = {},
+) {
     LogCompositions(tag = "TAG", msg = "AccountRoute")
     val viewModel: AccountViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle(UiState.Loading())
 
-    AccountScreen(uiState)
+    AccountScreen(uiState, onShowActionLog = onShowActionLog)
 }
 
 
@@ -35,6 +37,7 @@ fun AccountRoute(
 fun AccountScreen(
     uiState: UiState<AccountUiStateData>,
     modifier: Modifier = Modifier,
+    onShowActionLog: () -> Unit = {},
 ) {
     LogCompositions(tag = "TAG", msg = "AccountScreen")
     Column(
@@ -48,11 +51,14 @@ fun AccountScreen(
             is UiState.Loading -> "LOADING ${uiState.data?.data}"
             is UiState.Success -> "SUCCESS 🎉 ${uiState.data.data}"
         }
-        LogCompositions(tag = "TAG", msg = "Column")
         Text(
             text = text,
             textAlign = TextAlign.Center
         )
+
+        Button(onClick = onShowActionLog) {
+            Text(text = stringResource(id = R.string.show_action_log))
+        }
     }
 }
 

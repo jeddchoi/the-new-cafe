@@ -20,9 +20,10 @@ const val appUri = "jeddchoi://thenewcafe"
 fun CafeNavHost(
     navController: NavHostController,
     shouldHandleReselection: Boolean,
+    modifier: Modifier = Modifier,
     onHandleReselection: () -> Unit,
     onBackClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
+    onShowActionLog: () -> Unit = {},
     startDestination: String = accountRoute,
 ) {
     LogCompositions(tag = "TAG", msg = "CafeNavHost")
@@ -34,6 +35,7 @@ fun CafeNavHost(
         accountScreen(
             baseWebUri = webUri,
             baseAppUri = appUri,
+            onShowActionLog = onShowActionLog,
         )
         orderGraph(
             baseWebUri = webUri,
