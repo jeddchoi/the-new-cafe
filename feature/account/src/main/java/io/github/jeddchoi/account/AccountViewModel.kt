@@ -11,12 +11,17 @@ class AccountViewModel : ViewModel() {
     private val _uiState = flow {
         delay(1000)
         emit(AccountUiStateData("Account"))
+        delay(1000)
+        emit(AccountUiStateData(" "))
+        delay(1000)
+        throw RuntimeException("Wow")
     }
 
 
     val uiState: StateFlow<UiState<AccountUiStateData>> =
-        _uiState.map<AccountUiStateData, UiState<AccountUiStateData>> {
-            UiState.Success(it)
+        _uiState.map {
+            if (it.data.isBlank()) UiState.Empty
+            else UiState.Success(it)
         }.catch {
             emit(UiState.Error(it))
         }.stateIn(
