@@ -5,9 +5,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.ShoppingBasket
+import androidx.compose.material.icons.filled.Store
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.DataUsage
 import androidx.compose.material.icons.rounded.ShoppingBasket
+import androidx.compose.material.icons.rounded.Store
 import androidx.compose.ui.graphics.vector.ImageVector
 
 object CafeIcons {
@@ -17,6 +19,8 @@ object CafeIcons {
     val Order_Filled = Icons.Filled.ShoppingBasket
     val MyPage = Icons.Rounded.DataUsage
     val MyPage_Filled = Icons.Filled.DataUsage
+    val Store = Icons.Rounded.Store
+    val Store_Filled = Icons.Filled.Store
 }
 
 /**

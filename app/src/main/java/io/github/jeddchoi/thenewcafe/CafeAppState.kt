@@ -33,6 +33,7 @@ class CafeAppState(
     val navController: NavHostController,
     val coroutineScope: CoroutineScope,
 ) {
+
     val currentDestination: NavDestination?
         @Composable get() = navController
             .currentBackStackEntryAsState().value?.destination
