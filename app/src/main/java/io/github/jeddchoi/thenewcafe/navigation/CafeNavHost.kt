@@ -11,6 +11,10 @@ import io.github.jeddchoi.order.orderGraph
 import io.github.jeddchoi.store.navigateToStore
 import io.github.jeddchoi.store.storeScreen
 
+
+val webUri = "https://www.example.com"
+val appUri = "jeddchoi://thenewcafe"
+
 @Composable
 fun CafeNavHost(
     navController: NavHostController,
@@ -25,7 +29,10 @@ fun CafeNavHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        accountScreen()
+        accountScreen(
+            baseWebUri = webUri,
+            baseAppUri = appUri,
+        )
         orderGraph(
             navigateToStore = { storeId ->
                 navController.navigateToStore(storeId)
@@ -35,6 +42,8 @@ fun CafeNavHost(
             }
         )
         myPageScreen(
+            baseWebUri = webUri,
+            baseAppUri = appUri,
             shouldHandleReselection = shouldHandleReselection,
             onHandleReselection = onHandleReselection
         )

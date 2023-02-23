@@ -8,8 +8,7 @@ internal const val tabIdArg = "tabId"
 const val myPageRoute = "mypage_route"
 const val myPageRouteWithTabId = "$myPageRoute?$tabIdArg={$tabIdArg}"
 
-val uri = "https://www.example.com"
-val appUri = "jeddchoi://thenewcafe"
+
 /**
  * Tabs which My page contains.
  * The order of these values will be order of tabs.
@@ -25,12 +24,6 @@ enum class MyPageTab(@StringRes val titleId: Int) {
 
 val myPageTabs = MyPageTab.values()
 
-//internal class MyPageArgs(val selectedTabId: String) {
-//    constructor(savedStateHandle: SavedStateHandle) : this(
-//        Uri.decode(checkNotNull(savedStateHandle[tabIdArg]))
-//    )
-//}
-
 
 fun NavController.navigateToMyPage(
     navOptions: NavOptions? = null,
@@ -41,6 +34,8 @@ fun NavController.navigateToMyPage(
 }
 
 fun NavGraphBuilder.myPageScreen(
+    baseWebUri: String,
+    baseAppUri: String,
     shouldHandleReselection: Boolean,
     onHandleReselection: () -> Unit,
     onBackClick: () -> Unit = {},
@@ -48,8 +43,8 @@ fun NavGraphBuilder.myPageScreen(
     composable(
         route = myPageRouteWithTabId,
         deepLinks = listOf(
-            navDeepLink { uriPattern = "$uri/{$tabIdArg}" },
-            navDeepLink { uriPattern = "$appUri/{$tabIdArg}" }
+            navDeepLink { uriPattern = "$baseWebUri/{$tabIdArg}" },
+            navDeepLink { uriPattern = "$baseAppUri/{$tabIdArg}" }
         ),
         arguments = listOf(
             navArgument(tabIdArg) {
