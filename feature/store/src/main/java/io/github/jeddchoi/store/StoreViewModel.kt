@@ -3,7 +3,7 @@ package io.github.jeddchoi.store
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.jeddchoi.ui.UiState
+import io.github.jeddchoi.ui.feature.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 

@@ -16,7 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.ui.LogCompositions
-import io.github.jeddchoi.ui.UiState
+import io.github.jeddchoi.ui.feature.UiState
 
 
 @Composable

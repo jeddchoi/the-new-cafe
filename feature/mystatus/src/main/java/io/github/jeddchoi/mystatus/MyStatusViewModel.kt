@@ -2,7 +2,7 @@ package io.github.jeddchoi.mystatus
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.jeddchoi.ui.UiState
+import io.github.jeddchoi.ui.feature.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 

@@ -10,5 +10,6 @@ android {
 dependencies {
     implementation(project(":core:designsystem"))
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.navigation.common)
     androidTestImplementation(project(":core:testing"))
 }

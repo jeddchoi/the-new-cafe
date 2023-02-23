@@ -18,6 +18,7 @@ fun NavController.navigateToAccount(navOptions: NavOptions? = null) {
     this.navigate(accountRoute, navOptions)
 }
 
+
 fun NavGraphBuilder.accountScreen(
     baseWebUri: String,
     baseAppUri: String,

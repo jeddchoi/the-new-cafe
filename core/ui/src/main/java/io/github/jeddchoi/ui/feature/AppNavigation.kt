@@ -1,12 +1,19 @@
 package io.github.jeddchoi.ui.feature
 
-import android.graphics.drawable.Icon
-
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavDeepLink
+import io.github.jeddchoi.designsystem.Icon
 
 
 interface AppNavigation {
-    val route: String
-    val selectedIcon : Icon
+    val selectedIcon: Icon
+    val unselectedIcon: Icon
+    val iconTextId: Int
+    val titleTextId: Int
+
+    fun route(arg: String? = null): String
+    val arguments: List<NamedNavArgument>
+    val deepLinks: List<NavDeepLink>
 }
 
 //interface RallyDestination {

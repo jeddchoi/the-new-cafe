@@ -5,7 +5,9 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 
 internal fun Project.configureKotlinAndroid(
     commonExtension: CommonExtension<*, *, *, *>,
@@ -16,6 +18,13 @@ internal fun Project.configureKotlinAndroid(
         defaultConfig {
             minSdk = 26
         }
+
+        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
+
 
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_11
@@ -38,7 +47,7 @@ internal fun Project.configureKotlinAndroid(
             )
 
             // Set JVM target to 11
-            jvmTarget = JavaVersion.VERSION_11.toString()
+            kotlinExtension.jvmToolchain(11)
         }
     }
 
