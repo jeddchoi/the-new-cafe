@@ -1,4 +1,4 @@
-package io.github.jeddchoi.ui
+package io.github.jeddchoi.ui.feature
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

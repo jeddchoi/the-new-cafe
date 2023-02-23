@@ -11,6 +11,8 @@ import io.github.jeddchoi.ui.LogCompositions
 
 const val accountRoute = "account"
 
+
+
 fun NavController.navigateToAccount(navOptions: NavOptions? = null) {
     Log.i("TAG", "Navigate to Account")
     this.navigate(accountRoute, navOptions)
