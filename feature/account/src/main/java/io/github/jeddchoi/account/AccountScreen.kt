@@ -1,14 +1,11 @@
 package io.github.jeddchoi.account
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -16,19 +13,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.ui.LogCompositions
 import io.github.jeddchoi.ui.UiState
 
-class Ref(var value: Int)
-
-// Note the inline function below which ensures that this function is essentially
-// copied at the call site to ensure that its logging only recompositions from the
-// original call site.
-@Composable
-inline fun LogCompositions(tag: String, msg: String) {
-    val ref = remember { Ref(0) }
-    SideEffect { ref.value++ }
-    Log.d(tag, "Compositions: $msg ${ref.value}")
-}
 
 @Composable
 fun AccountRoute(
