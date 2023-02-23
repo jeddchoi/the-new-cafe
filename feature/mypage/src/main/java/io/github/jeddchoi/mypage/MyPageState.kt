@@ -8,29 +8,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-//
-//class MyPageViewModel(
-//    savedStateHandle: SavedStateHandle
-//) : ViewModel() {
-//
-//    private val args = savedStateHandle.getStateFlow(tabIdArg, MyPageTab.MY_STATUS.name)
-//    private val _uiState: Flow<MyPageState> = args.map {
-//        MyPageState(it)
-//    }
-//
-//
-//    val uiState: StateFlow<UiState<MyPageState>>
-//        get() = _uiState.map<MyPageState, UiState<MyPageState>> {
-//            UiState.Success(it)
-//        }.catch {
-//            emit(UiState.Error(it))
-//        }.stateIn(
-//            viewModelScope,
-//            SharingStarted.WhileSubscribed(5_000),
-//            UiState.Loading()
-//        )
-//}
-
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun rememberMyPageState(
