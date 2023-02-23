@@ -7,13 +7,15 @@ import androidx.navigation.compose.NavHost
 import io.github.jeddchoi.account.accountRoute
 import io.github.jeddchoi.account.accountScreen
 import io.github.jeddchoi.mypage.myPageScreen
+import io.github.jeddchoi.order.orderGraph
 import io.github.jeddchoi.store.navigateToStore
 import io.github.jeddchoi.store.storeScreen
-import io.github.jeddchoi.order.orderGraph
 
 @Composable
 fun CafeNavHost(
     navController: NavHostController,
+    shouldHandleReselection: Boolean,
+    onHandleReselection: () -> Unit,
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     startDestination: String = accountRoute,
@@ -25,13 +27,16 @@ fun CafeNavHost(
     ) {
         accountScreen()
         orderGraph(
-            navigateToStore = {storeId ->
+            navigateToStore = { storeId ->
                 navController.navigateToStore(storeId)
             },
             nestedGraphs = {
                 storeScreen()
             }
         )
-        myPageScreen()
+        myPageScreen(
+            shouldHandleReselection = shouldHandleReselection,
+            onHandleReselection = onHandleReselection
+        )
     }
 }

@@ -1,9 +1,6 @@
 package io.github.jeddchoi.thenewcafe
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -13,6 +10,7 @@ import androidx.navigation.navOptions
 import io.github.jeddchoi.account.accountRoute
 import io.github.jeddchoi.account.navigateToAccount
 import io.github.jeddchoi.mypage.myPageRoute
+import io.github.jeddchoi.mypage.myPageRouteWithTabId
 import io.github.jeddchoi.mypage.navigateToMyPage
 import io.github.jeddchoi.order.navigateToOrderGraph
 import io.github.jeddchoi.order.orderRoute
@@ -40,11 +38,14 @@ class CafeAppState(
             .currentBackStackEntryAsState().value?.destination
 
     val currentTopLevelDestination: TopLevelDestination?
-        @Composable get() = when (currentDestination?.route) {
-            accountRoute -> TopLevelDestination.ACCOUNT
-            orderRoute -> TopLevelDestination.ORDER
-            myPageRoute -> TopLevelDestination.MYPAGE
-            else -> null
+        @Composable get() {
+            return when (currentDestination?.route) {
+                accountRoute -> TopLevelDestination.ACCOUNT
+                orderRoute -> TopLevelDestination.ORDER
+                myPageRoute -> TopLevelDestination.MYPAGE
+                myPageRouteWithTabId -> TopLevelDestination.MYPAGE
+                else -> null
+            }
         }
 
     /**
@@ -60,7 +61,9 @@ class CafeAppState(
      *
      * @param topLevelDestination: The destination the app needs to navigate to.
      */
-    fun navigateToTopLevelDestination(topLevelDestination: TopLevelDestination) {
+    fun navigateToTopLevelDestination(
+        topLevelDestination: TopLevelDestination,
+    ) {
         val topLevelNavOptions = navOptions {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
@@ -72,7 +75,7 @@ class CafeAppState(
             // reselecting the same item
             launchSingleTop = true
             // Restore state when reselecting a previously selected item
-            restoreState = true
+//            restoreState = true
         }
 
         when (topLevelDestination) {
@@ -83,7 +86,18 @@ class CafeAppState(
 
     }
 
+    var shouldHandleReselection by mutableStateOf(false)
+        private set
+
+
     fun onBackClick() {
         navController.popBackStack()
     }
+
+    fun setHandleReselection(shouldHandle: Boolean) {
+        shouldHandleReselection = shouldHandle
+    }
+
+
+
 }

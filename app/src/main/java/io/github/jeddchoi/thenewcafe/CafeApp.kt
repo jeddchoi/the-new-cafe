@@ -33,12 +33,16 @@ fun CafeApp(
             CafeBottomBar(
                 destinations = appState.topLevelDestinations,
                 onNavigateToDestination = appState::navigateToTopLevelDestination,
+                onReselection = appState::setHandleReselection,
                 currentDestination = appState.currentDestination,
             )
         },
-        topBar = {
+    ) { padding ->
+        Column(modifier = Modifier.padding(padding)) {
             val destination = appState.currentTopLevelDestination
+
             if (destination != null) {
+
                 CafeTopAppBar(
                     titleRes = destination.titleTextId,
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -46,10 +50,12 @@ fun CafeApp(
                     ),
                 )
             }
-        }
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            CafeNavHost(navController = appState.navController, onBackClick = appState::onBackClick)
+            CafeNavHost(
+                navController = appState.navController,
+                shouldHandleReselection = appState.shouldHandleReselection,
+                onHandleReselection = { appState.setHandleReselection(false) },
+                onBackClick = appState::onBackClick
+            )
         }
     }
 }
@@ -58,6 +64,7 @@ fun CafeApp(
 private fun CafeBottomBar(
     destinations: List<TopLevelDestination>,
     onNavigateToDestination: (TopLevelDestination) -> Unit,
+    onReselection: (Boolean) -> Unit,
     currentDestination: NavDestination?,
     modifier: Modifier = Modifier,
 ) {
@@ -68,7 +75,12 @@ private fun CafeBottomBar(
             val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
             CafeNavigationBarItem(
                 selected = selected,
-                onClick = { onNavigateToDestination(destination) },
+                onClick = {
+                    if (selected)
+                        onReselection(true)
+                    else
+                        onNavigateToDestination(destination)
+                },
                 icon = {
                     val icon = if (selected) {
                         destination.selectedIcon

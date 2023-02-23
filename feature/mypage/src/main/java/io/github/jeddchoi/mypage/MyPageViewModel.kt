@@ -1,35 +1,78 @@
 package io.github.jeddchoi.mypage
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import io.github.jeddchoi.ui.UiState
+import androidx.compose.runtime.*
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
+//
+//class MyPageViewModel(
+//    savedStateHandle: SavedStateHandle
+//) : ViewModel() {
+//
+//    private val args = savedStateHandle.getStateFlow(tabIdArg, MyPageTab.MY_STATUS.name)
+//    private val _uiState: Flow<MyPageState> = args.map {
+//        MyPageState(it)
+//    }
+//
+//
+//    val uiState: StateFlow<UiState<MyPageState>>
+//        get() = _uiState.map<MyPageState, UiState<MyPageState>> {
+//            UiState.Success(it)
+//        }.catch {
+//            emit(UiState.Error(it))
+//        }.stateIn(
+//            viewModelScope,
+//            SharingStarted.WhileSubscribed(5_000),
+//            UiState.Loading()
+//        )
+//}
 
-class MyPageViewModel(
-    savedStateHandle: SavedStateHandle,
-) : ViewModel() {
-    private val myPageArgs: MyPageArgs = MyPageArgs(savedStateHandle)
-
-    private val _uiState: Flow<MyPageUiStateData> = flow {
-        emit(MyPageUiStateData(myPageArgs.tabId))
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun rememberMyPageState(
+    pagerState: PagerState = rememberPagerState(),
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
+): MyPageState {
+    return remember(pagerState, coroutineScope) {
+        MyPageState(pagerState, coroutineScope)
     }
-
-
-    val uiState: StateFlow<UiState<MyPageUiStateData>>
-        get() = _uiState.map<MyPageUiStateData, UiState<MyPageUiStateData>> {
-            UiState.Success(it)
-        }.catch {
-            emit(UiState.Error(it))
-        }.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
-            UiState.Loading(MyPageUiStateData(myPageArgs.tabId))
-        )
 }
 
-data class MyPageUiStateData(
-    val tabId: String
-)
+@Stable
+@ExperimentalPagerApi
+class MyPageState(
+    val pagerState: PagerState,
+    private val coroutineScope: CoroutineScope
+) {
+    private val currentPageFlow =
+        snapshotFlow { pagerState.currentPage }.distinctUntilChanged().map {
+            myPageTabs[it]
+        }
+
+
+    val selectedTab: StateFlow<MyPageTab> = currentPageFlow.stateIn(
+        coroutineScope,
+        SharingStarted.WhileSubscribed(5_000),
+        MyPageTab.MY_STATUS
+    )
+
+    fun selectTab(destTab: MyPageTab) {
+        coroutineScope.launch {
+            pagerState.animateScrollToPage(destTab.ordinal)
+        }
+    }
+
+    fun toggleTab() {
+        val destTab = when (selectedTab.value) {
+            MyPageTab.MY_STATUS -> MyPageTab.ACTION_LOG
+            MyPageTab.ACTION_LOG -> MyPageTab.MY_STATUS
+        }
+
+        selectTab(destTab)
+    }
+}
 
