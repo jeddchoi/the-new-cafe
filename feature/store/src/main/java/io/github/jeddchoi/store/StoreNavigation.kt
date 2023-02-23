@@ -14,6 +14,7 @@ import io.github.jeddchoi.ui.feature.baseWebUri
 
 
 object StoreNavigation : AppNavigation {
+    override val name: String = "store"
     override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Store_Filled)
     override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Store)
 
@@ -22,7 +23,7 @@ object StoreNavigation : AppNavigation {
     @StringRes
     override val titleTextId: Int = R.string.store
 
-    override fun route(arg: String?): String = "store/{${arg ?: storeIdArg}}"
+    override fun route(arg: String?): String = "$name/{${arg ?: storeIdArg}}"
     const val storeIdArg = "storeId"
 
     override val arguments: List<NamedNavArgument> = listOf(

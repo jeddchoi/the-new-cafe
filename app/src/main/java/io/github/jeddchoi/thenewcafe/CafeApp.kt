@@ -13,8 +13,8 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import io.github.jeddchoi.designsystem.*
 import io.github.jeddchoi.thenewcafe.navigation.CafeNavHost
-import io.github.jeddchoi.thenewcafe.navigation.TopLevelDestination
 import io.github.jeddchoi.ui.LogCompositions
+import io.github.jeddchoi.ui.feature.AppNavigation
 
 /**
  * Single entry point of composable world
@@ -33,14 +33,16 @@ fun CafeApp(
         bottomBar = {
             CafeBottomBar(
                 destinations = appState.topLevelDestinations,
-                onNavigateToDestination = appState::navigateToTopLevelDestination,
+                onNavigateToDestination = {
+                    appState.navController.navigateToSingleTopDestination(it)
+                },
                 onReselection = appState::setHandleReselection,
                 currentDestination = appState.currentDestination,
             )
         },
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            val destination = appState.currentTopLevelDestination
+            val destination = appState.currentAppDestination
 
             if (destination != null) {
 
@@ -64,8 +66,8 @@ fun CafeApp(
 
 @Composable
 private fun CafeBottomBar(
-    destinations: List<TopLevelDestination>,
-    onNavigateToDestination: (TopLevelDestination) -> Unit,
+    destinations: List<AppNavigation>,
+    onNavigateToDestination: (AppNavigation) -> Unit,
     onReselection: (Boolean) -> Unit,
     currentDestination: NavDestination?,
     modifier: Modifier = Modifier,
@@ -107,7 +109,7 @@ private fun CafeBottomBar(
     }
 }
 
-private fun NavDestination?.isTopLevelDestinationInHierarchy(destination: TopLevelDestination) =
+private fun NavDestination?.isTopLevelDestinationInHierarchy(destination: AppNavigation) =
     this?.hierarchy?.any {
         it.route?.contains(destination.name, true) ?: false
     } ?: false

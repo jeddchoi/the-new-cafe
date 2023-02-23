@@ -8,6 +8,7 @@ const val baseWebUri = "https://www.example.com"
 const val baseAppUri = "jeddchoi://thenewcafe"
 
 interface AppNavigation {
+    val name: String
     val selectedIcon: Icon
     val unselectedIcon: Icon
     val iconTextId: Int

@@ -1,20 +1,18 @@
 package io.github.jeddchoi.thenewcafe
 
 import androidx.compose.runtime.*
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navOptions
 import io.github.jeddchoi.account.AccountNavigation
-import io.github.jeddchoi.account.navigateToAccount
 import io.github.jeddchoi.mypage.MyPageNavigation
 import io.github.jeddchoi.mypage.MyPageTab
-import io.github.jeddchoi.mypage.navigateToMyPage
 import io.github.jeddchoi.order.OrderNavigation
-import io.github.jeddchoi.order.navigateToOrderGraph
-import io.github.jeddchoi.thenewcafe.navigation.TopLevelDestination
+import io.github.jeddchoi.store.StoreNavigation
+import io.github.jeddchoi.ui.feature.AppNavigation
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -38,12 +36,13 @@ class CafeAppState(
         @Composable get() = navController
             .currentBackStackEntryAsState().value?.destination
 
-    val currentTopLevelDestination: TopLevelDestination?
+    val currentAppDestination: AppNavigation?
         @Composable get() {
             return when (currentDestination?.route) {
-                AccountNavigation.route() -> TopLevelDestination.ACCOUNT
-                OrderNavigation.route() -> TopLevelDestination.ORDER
-                MyPageNavigation.route() -> TopLevelDestination.MYPAGE
+                AccountNavigation.route() -> AccountNavigation
+                OrderNavigation.route() -> OrderNavigation
+                MyPageNavigation.route() -> MyPageNavigation
+                StoreNavigation.route() -> StoreNavigation
                 else -> null
             }
         }
@@ -52,57 +51,13 @@ class CafeAppState(
      * Map of top level destinations to be used in the TopBar, BottomBar and NavRail. The key is the
      * route.
      */
-    val topLevelDestinations: List<TopLevelDestination> = TopLevelDestination.values().asList()
+    val topLevelDestinations: List<AppNavigation> =
+        listOf(AccountNavigation, OrderNavigation, MyPageNavigation)
 
-    /**
-     * UI logic for navigating to a top level destination in the app. Top level destinations have
-     * only one copy of the destination of the back stack, and save and restore state whenever you
-     * navigate to and from it.
-     *
-     * @param topLevelDestination: The destination the app needs to navigate to.
-     */
-    fun navigateToTopLevelDestination(
-        topLevelDestination: TopLevelDestination,
-    ) {
-        val topLevelNavOptions = navOptions {
-            // Pop up to the start destination of the graph to
-            // avoid building up a large stack of destinations
-            // on the back stack as users select items
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true
-            }
-            // Avoid multiple copies of the same destination when
-            // reselecting the same item
-            launchSingleTop = true
-            // Restore state when reselecting a previously selected item
-            restoreState = true
-        }
-
-        when (topLevelDestination) {
-            TopLevelDestination.ACCOUNT -> navController.navigateToAccount(topLevelNavOptions)
-            TopLevelDestination.ORDER -> navController.navigateToOrderGraph(topLevelNavOptions)
-            TopLevelDestination.MYPAGE -> navController.navigateToMyPage(topLevelNavOptions)
-        }
-    }
 
     fun navigateToActionLog() {
-        val topLevelNavOptions = navOptions {
-            // Pop up to the start destination of the graph to
-            // avoid building up a large stack of destinations
-            // on the back stack as users select items
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true
-            }
-            // Avoid multiple copies of the same destination when
-            // reselecting the same item
-            launchSingleTop = true
-            // Restore state when reselecting a previously selected item
-            restoreState = true
-        }
-
-        navController.navigateToMyPage(topLevelNavOptions, MyPageTab.ACTION_LOG)
+        navController.navigateToSingleTopDestination(MyPageNavigation, MyPageTab.ACTION_LOG.name)
     }
-
 
 
     var shouldHandleReselection by mutableStateOf(false)
@@ -118,5 +73,39 @@ class CafeAppState(
     }
 
 
-
 }
+
+
+/**
+ * UI logic for navigating to a top level destination in the app. Top level destinations have
+ * only one copy of the destination of the back stack, and save and restore state whenever you
+ * navigate to and from it.
+ *
+ * @param appDestination: The destination the app needs to navigate to.
+ */
+fun NavController.navigateToSingleTopDestination(
+    appDestination: AppNavigation,
+    arg: String? = null
+) = this.navigate(route = appDestination.route(arg)) {
+    // Pop up to the start destination of the graph to
+    // avoid building up a large stack of destinations
+    // on the back stack as users select items
+    popUpTo(
+        this@navigateToSingleTopDestination.graph.findStartDestination().id
+    ) {
+        saveState = true
+    }
+    // Avoid multiple copies of the same destination when
+    // reselecting the same item
+    launchSingleTop = true
+    // Restore state when reselecting a previously selected item
+    restoreState = true
+}
+
+
+//        when (appDestination) {
+//            AccountNavigation -> navController.navigateToAccount(topLevelNavOptions)
+//            OrderNavigation -> navController.navigateToOrderGraph(topLevelNavOptions)
+//            MyPageNavigation -> navController.navigateToMyPage(topLevelNavOptions)
+//        }
+

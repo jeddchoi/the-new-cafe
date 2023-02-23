@@ -14,6 +14,8 @@ import io.github.jeddchoi.ui.feature.baseWebUri
 
 
 object OrderNavigation : AppNavigation {
+    override val name: String = "order"
+
     override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Order_Filled)
     override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Order)
 
@@ -22,7 +24,7 @@ object OrderNavigation : AppNavigation {
     @StringRes
     override val titleTextId: Int = R.string.order
 
-    override fun route(arg: String?): String = "order"
+    override fun route(arg: String?): String = name
     val routeGraph = "order_graph"
 
     override val arguments: List<NamedNavArgument> = listOf()

@@ -11,6 +11,8 @@ import io.github.jeddchoi.ui.feature.baseAppUri
 import io.github.jeddchoi.ui.feature.baseWebUri
 
 object AccountNavigation : AppNavigation {
+    override val name: String = "account"
+
     override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Account_Filled)
     override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Account)
 
@@ -19,7 +21,7 @@ object AccountNavigation : AppNavigation {
     @StringRes
     override val titleTextId: Int = R.string.account
 
-    override fun route(arg: String?): String = "account"
+    override fun route(arg: String?): String = name
 
     override val arguments: List<NamedNavArgument> = listOf()
     override val deepLinks: List<NavDeepLink> = listOf(

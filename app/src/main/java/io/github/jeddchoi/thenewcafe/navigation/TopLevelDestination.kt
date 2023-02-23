@@ -1,7 +1,11 @@
 package io.github.jeddchoi.thenewcafe.navigation
 
+import io.github.jeddchoi.account.AccountNavigation
 import io.github.jeddchoi.designsystem.CafeIcons
 import io.github.jeddchoi.designsystem.Icon
+import io.github.jeddchoi.mypage.MyPageNavigation
+import io.github.jeddchoi.order.OrderNavigation
+import io.github.jeddchoi.store.StoreNavigation
 import io.github.jeddchoi.thenewcafe.R
 
 /**
@@ -37,3 +41,5 @@ enum class TopLevelDestination(
         titleTextId = R.string.mypage
     )
 }
+
+val appNavigations = listOf(AccountNavigation, OrderNavigation, MyPageNavigation, StoreNavigation)

@@ -27,6 +27,8 @@ enum class MyPageTab(@StringRes val titleId: Int) {
 }
 
 object MyPageNavigation : AppNavigation {
+    override val name: String = "mypage"
+
     override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.MyPage_Filled)
     override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.MyPage)
 
@@ -37,7 +39,7 @@ object MyPageNavigation : AppNavigation {
     override val titleTextId: Int = R.string.mypage
 
     const val tabIdArg = "tabId"
-    override fun route(arg: String?): String = "mypage?$tabIdArg={${arg ?: tabIdArg}}"
+    override fun route(arg: String?): String = "$name?$tabIdArg={${arg ?: tabIdArg}}"
 
     override val arguments: List<NamedNavArgument> = listOf(
         navArgument(tabIdArg) {
