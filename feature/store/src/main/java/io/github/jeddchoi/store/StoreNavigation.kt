@@ -23,7 +23,7 @@ object StoreNavigation : AppNavigation {
     @StringRes
     override val titleTextId: Int = R.string.store
 
-    override fun route(arg: String?): String = "$name/{${arg ?: storeIdArg}}"
+    override fun route(arg: String?): String = "$name/${arg ?: "{$storeIdArg}"}"
     const val storeIdArg = "storeId"
 
     override val arguments: List<NamedNavArgument> = listOf(

@@ -1,5 +1,6 @@
 package io.github.jeddchoi.mypage
 
+import android.net.Uri
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.navigation.*
@@ -39,7 +40,7 @@ object MyPageNavigation : AppNavigation {
     override val titleTextId: Int = R.string.mypage
 
     const val tabIdArg = "tabId"
-    override fun route(arg: String?): String = "$name?$tabIdArg={${arg ?: tabIdArg}}"
+    override fun route(arg: String?): String = "$name?$tabIdArg=${arg ?: "{$tabIdArg}"}"
 
     override val arguments: List<NamedNavArgument> = listOf(
         navArgument(tabIdArg) {
@@ -77,14 +78,16 @@ fun NavGraphBuilder.myPageScreen(
         arguments = MyPageNavigation.arguments,
     ) { backStackEntry ->
 
-        LogCompositions(tag = "TAG", msg = "MyPage : backStackEntry = ${backStackEntry.arguments}")
-        val navArg = backStackEntry.arguments?.getString(tabIdArg)?.uppercase(Locale.getDefault())
+
+        val navArg = backStackEntry.arguments?.getString(tabIdArg)?.uppercase(Locale.getDefault())?.also {
+            backStackEntry.arguments?.putString(tabIdArg, "")
+        }
         val navTab = try {
             navArg?.let { MyPageTab.valueOf(it) }
         } catch (e: IllegalArgumentException) {
             null
         }
-
+        LogCompositions(tag = "TAG", msg = "MyPage : backStackEntry = ${backStackEntry.arguments?.getString(tabIdArg)}\n navArg = $navArg / navTab = $navTab\n savedHandle = ${Uri.decode(backStackEntry.savedStateHandle[tabIdArg])}")
 
         MyPageRoute(
             navTab = navTab,

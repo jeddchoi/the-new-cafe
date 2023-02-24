@@ -1,5 +1,6 @@
 package io.github.jeddchoi.thenewcafe
 
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -57,6 +58,7 @@ class CafeAppState(
 
     fun navigateToActionLog() {
         navController.navigateToSingleTopDestination(MyPageNavigation, MyPageTab.ACTION_LOG.name)
+        Log.e("TAG", " THIS : ${navController.currentBackStackEntry?.arguments?.getString(MyPageNavigation.tabIdArg)}")
     }
 
 
@@ -94,6 +96,7 @@ fun NavController.navigateToSingleTopDestination(
         this@navigateToSingleTopDestination.graph.findStartDestination().id
     ) {
         saveState = true
+
     }
     // Avoid multiple copies of the same destination when
     // reselecting the same item
