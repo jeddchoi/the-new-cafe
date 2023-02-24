@@ -1,4 +1,4 @@
-package io.github.jeddchoi.order
+package io.github.jeddchoi.store_list
 
 import android.util.Log
 import androidx.annotation.StringRes
@@ -13,8 +13,8 @@ import io.github.jeddchoi.ui.feature.baseWebUri
 
 
 
-object OrderNavigation : AppNavigation {
-    override val name: String = "order"
+object StoreListNavigation : AppNavigation {
+    override val name: String = "stores"
 
     override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Order_Filled)
     override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Order)
@@ -25,19 +25,21 @@ object OrderNavigation : AppNavigation {
     override val titleTextId: Int = R.string.order
 
     override fun route(arg: String?): String = name
-    val routeGraph = "order_graph"
+    val routeGraph = "order"
 
     override val arguments: List<NamedNavArgument> = listOf()
     override val deepLinks: List<NavDeepLink> = listOf(
         navDeepLink { uriPattern = "$baseWebUri/${route()}" },
-        navDeepLink { uriPattern = "$baseAppUri/${route()}" }
+        navDeepLink { uriPattern = "$baseAppUri/${route()}" },
+        navDeepLink { uriPattern = "$baseWebUri/${routeGraph}" },
+        navDeepLink { uriPattern = "$baseAppUri/${routeGraph}" }
     )
 }
 
 
 fun NavController.navigateToOrderGraph(navOptions: NavOptions? = null) {
     Log.i("TAG", "Navigate to Order")
-    this.navigate(OrderNavigation.routeGraph, navOptions)
+    this.navigate(StoreListNavigation.routeGraph, navOptions)
 }
 
 fun NavGraphBuilder.orderGraph(
@@ -45,15 +47,15 @@ fun NavGraphBuilder.orderGraph(
     nestedGraphs: NavGraphBuilder.() -> Unit,
 ) {
     navigation(
-        route = OrderNavigation.routeGraph,
-        startDestination = OrderNavigation.route(),
+        route = StoreListNavigation.routeGraph,
+        startDestination = StoreListNavigation.route(),
     ) {
         composable(
-            route = OrderNavigation.route(),
-            deepLinks = OrderNavigation.deepLinks
+            route = StoreListNavigation.route(),
+            deepLinks = StoreListNavigation.deepLinks
         ) {backStackEntry ->
-            LogCompositions(tag = "TAG", msg = "Order : backStackEntry = ${backStackEntry.arguments}")
-            OrderRoute(
+            LogCompositions(tag = "TAG", msg = "stores : backStackEntry = ${backStackEntry.arguments}")
+            StoreListRoute(
                 navigateToSeats = navigateToStore,
             )
         }

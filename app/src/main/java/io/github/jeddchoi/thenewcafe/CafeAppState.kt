@@ -11,8 +11,8 @@ import androidx.navigation.compose.rememberNavController
 import io.github.jeddchoi.account.AccountNavigation
 import io.github.jeddchoi.mypage.MyPageNavigation
 import io.github.jeddchoi.mypage.MyPageTab
-import io.github.jeddchoi.order.OrderNavigation
 import io.github.jeddchoi.store.StoreNavigation
+import io.github.jeddchoi.store_list.StoreListNavigation
 import io.github.jeddchoi.ui.feature.AppNavigation
 import kotlinx.coroutines.CoroutineScope
 
@@ -41,7 +41,7 @@ class CafeAppState(
         @Composable get() {
             return when (currentDestination?.route) {
                 AccountNavigation.route() -> AccountNavigation
-                OrderNavigation.route() -> OrderNavigation
+                StoreListNavigation.route() -> StoreListNavigation
                 MyPageNavigation.route() -> MyPageNavigation
                 StoreNavigation.route() -> StoreNavigation
                 else -> null
@@ -53,7 +53,7 @@ class CafeAppState(
      * route.
      */
     val topLevelDestinations: List<AppNavigation> =
-        listOf(AccountNavigation, OrderNavigation, MyPageNavigation)
+        listOf(AccountNavigation, StoreListNavigation, MyPageNavigation)
 
 
     fun navigateToActionLog() {
@@ -108,7 +108,7 @@ fun NavController.navigateToSingleTopDestination(
 
 //        when (appDestination) {
 //            AccountNavigation -> navController.navigateToAccount(topLevelNavOptions)
-//            OrderNavigation -> navController.navigateToOrderGraph(topLevelNavOptions)
+//            StoreListNavigation -> navController.navigateToOrderGraph(topLevelNavOptions)
 //            MyPageNavigation -> navController.navigateToMyPage(topLevelNavOptions)
 //        }
 

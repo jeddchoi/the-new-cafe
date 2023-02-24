@@ -43,7 +43,7 @@ android {
 dependencies {
 
     implementation(project(":feature:store"))
-    implementation(project(":feature:order"))
+    implementation(project(":feature:store_list"))
     implementation(project(":feature:account"))
     implementation(project(":feature:mypage"))
 

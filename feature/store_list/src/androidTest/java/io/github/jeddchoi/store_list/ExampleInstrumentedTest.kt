@@ -1,4 +1,4 @@
-package io.github.jeddchoi.order
+package io.github.jeddchoi.store_list
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
@@ -17,6 +17,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("io.github.jeddchoi.order", appContext.packageName)
+        assertEquals("io.github.jeddchoi.store_list", appContext.packageName)
     }
 }

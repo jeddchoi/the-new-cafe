@@ -1,4 +1,4 @@
-package io.github.jeddchoi.order
+package io.github.jeddchoi.store_list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,21 +16,21 @@ import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.ui.feature.UiState
 
 @Composable
-fun OrderRoute(
+fun StoreListRoute(
     navigateToSeats: (String) -> Unit,
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    val viewModel: OrderViewModel = viewModel()
+    val viewModel: StoreListViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    OrderScreen(uiState = uiState)
+    StoreListScreen(uiState = uiState)
 }
 
 
 @Composable
-fun OrderScreen(
-    uiState: UiState<OrderUiStateData>,
+fun StoreListScreen(
+    uiState: UiState<StoreListUiStateData>,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -54,10 +54,10 @@ fun OrderScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun OrderScreenPreview() {
+fun StoreListScreenPreview() {
     TheNewCafeTheme {
-        OrderScreen(
-            UiState.Success(OrderUiStateData("Hello!")),
+        StoreListScreen(
+            UiState.Success(StoreListUiStateData("Hello!")),
         )
     }
 }

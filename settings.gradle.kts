@@ -24,7 +24,7 @@ include(":app")
 
 include(":feature:account")
 include(":feature:store")
-include(":feature:order")
+include(":feature:store_list")
 include(":feature:mypage")
 include(":feature:actionlog")
 include(":feature:mystatus")

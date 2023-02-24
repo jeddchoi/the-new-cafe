@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "io.github.jeddchoi.order"
+    namespace = "io.github.jeddchoi.store_list"
 }
 
 dependencies {
