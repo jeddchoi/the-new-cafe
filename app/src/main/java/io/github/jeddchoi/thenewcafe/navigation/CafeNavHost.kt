@@ -7,10 +7,9 @@ import androidx.navigation.compose.NavHost
 import io.github.jeddchoi.account.AccountNavigation
 import io.github.jeddchoi.account.accountScreen
 import io.github.jeddchoi.mypage.myPageScreen
-import io.github.jeddchoi.store_list.orderGraph
 import io.github.jeddchoi.store.navigateToStore
 import io.github.jeddchoi.store.storeScreen
-import io.github.jeddchoi.ui.LogCompositions
+import io.github.jeddchoi.store_list.orderGraph
 
 
 
@@ -24,7 +23,6 @@ fun CafeNavHost(
     onShowActionLog: () -> Unit = {},
     startDestination: String = AccountNavigation.route(),
 ) {
-    LogCompositions(tag = "TAG", msg = "CafeNavHost")
     NavHost(
         navController = navController,
         startDestination = startDestination,

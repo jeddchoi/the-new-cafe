@@ -1,6 +1,5 @@
 package io.github.jeddchoi.mypage
 
-import android.net.Uri
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.navigation.*
@@ -8,7 +7,6 @@ import androidx.navigation.compose.composable
 import io.github.jeddchoi.designsystem.CafeIcons
 import io.github.jeddchoi.designsystem.Icon
 import io.github.jeddchoi.mypage.MyPageNavigation.tabIdArg
-import io.github.jeddchoi.ui.LogCompositions
 import io.github.jeddchoi.ui.feature.AppNavigation
 import io.github.jeddchoi.ui.feature.baseAppUri
 import io.github.jeddchoi.ui.feature.baseWebUri
@@ -87,7 +85,7 @@ fun NavGraphBuilder.myPageScreen(
         } catch (e: IllegalArgumentException) {
             null
         }
-        LogCompositions(tag = "TAG", msg = "MyPage : backStackEntry = ${backStackEntry.arguments?.getString(tabIdArg)}\n navArg = $navArg / navTab = $navTab\n savedHandle = ${Uri.decode(backStackEntry.savedStateHandle[tabIdArg])}")
+//        LogCompositions(tag = "TAG", msg = "MyPage : backStackEntry = ${backStackEntry.arguments?.getString(tabIdArg)}\n navArg = $navArg / navTab = $navTab\n savedHandle = ${Uri.decode(backStackEntry.savedStateHandle[tabIdArg])}")
 
         MyPageRoute(
             navTab = navTab,

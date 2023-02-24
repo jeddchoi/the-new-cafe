@@ -6,7 +6,6 @@ import androidx.navigation.*
 import androidx.navigation.compose.composable
 import io.github.jeddchoi.designsystem.CafeIcons
 import io.github.jeddchoi.designsystem.Icon
-import io.github.jeddchoi.ui.LogCompositions
 import io.github.jeddchoi.ui.feature.AppNavigation
 import io.github.jeddchoi.ui.feature.baseAppUri
 import io.github.jeddchoi.ui.feature.baseWebUri
@@ -54,7 +53,7 @@ fun NavGraphBuilder.orderGraph(
             route = StoreListNavigation.route(),
             deepLinks = StoreListNavigation.deepLinks
         ) {backStackEntry ->
-            LogCompositions(tag = "TAG", msg = "stores : backStackEntry = ${backStackEntry.arguments}")
+//            LogCompositions(tag = "TAG", msg = "stores : backStackEntry = ${backStackEntry.arguments}")
             StoreListRoute(
                 navigateToSeats = navigateToStore,
             )

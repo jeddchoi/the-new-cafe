@@ -27,7 +27,6 @@ fun CafeApp(
     modifier: Modifier = Modifier,
     appState: CafeAppState = rememberCafeAppState()
 ) {
-    LogCompositions(tag = "TAG", msg = "CafeApp")
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
@@ -77,6 +76,10 @@ private fun CafeBottomBar(
     ) {
         destinations.forEach { destination ->
             val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
+            LogCompositions(
+                tag = "TAG",
+                msg = "\ncurrent hierarchy : ${currentDestination?.hierarchy?.joinToString("\n->")}\ndestination : ${destination.name}\nselected = $selected"
+            )
             CafeNavigationBarItem(
                 selected = selected,
                 onClick = {
