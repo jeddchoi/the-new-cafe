@@ -22,12 +22,13 @@ import io.github.jeddchoi.ui.feature.UiState
 fun AccountRoute(
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
+    onShowMyStatus: () -> Unit = {},
     onShowActionLog: () -> Unit = {},
 ) {
     val viewModel: AccountViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle(UiState.Loading())
 
-    AccountScreen(uiState, onShowActionLog = onShowActionLog)
+    AccountScreen(uiState, onShowMyStatus = onShowMyStatus, onShowActionLog = onShowActionLog)
 }
 
 
@@ -35,6 +36,7 @@ fun AccountRoute(
 fun AccountScreen(
     uiState: UiState<AccountUiStateData>,
     modifier: Modifier = Modifier,
+    onShowMyStatus: () -> Unit = {},
     onShowActionLog: () -> Unit = {},
 ) {
     Column(
@@ -53,6 +55,9 @@ fun AccountScreen(
             textAlign = TextAlign.Center
         )
 
+        Button(onClick = onShowMyStatus) {
+            Text(text = stringResource(id = R.string.show_my_status))
+        }
         Button(onClick = onShowActionLog) {
             Text(text = stringResource(id = R.string.show_action_log))
         }

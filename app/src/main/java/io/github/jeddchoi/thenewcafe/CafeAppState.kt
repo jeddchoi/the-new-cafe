@@ -56,9 +56,33 @@ class CafeAppState(
         listOf(AccountNavigation, StoreListNavigation, MyPageNavigation)
 
 
+    fun navigateToMyStatus() {
+        navController.navigateToSingleTopDestination(MyPageNavigation,MyPageTab.MY_STATUS.name)
+        Log.e(
+            "TAG",
+            "${navController.currentBackStackEntry?.arguments?.getString(MyPageNavigation.tabIdArg)}"
+        )
+        Log.e(
+            "TAG",
+            navController.backQueue.joinToString("\n->") { "[${it.id}] ${it.destination} / ${it.arguments}" }
+        )
+    }
     fun navigateToActionLog() {
         navController.navigateToSingleTopDestination(MyPageNavigation, MyPageTab.ACTION_LOG.name)
-        Log.e("TAG", " THIS : ${navController.currentBackStackEntry?.arguments?.getString(MyPageNavigation.tabIdArg)}")
+
+
+//        navController.
+//        navController.navigateToSingleTopDestination(MyPageNavigation, MyPageTab.ACTION_LOG.name)
+
+
+        Log.e(
+            "TAG",
+            "${navController.currentBackStackEntry?.arguments?.getString(MyPageNavigation.tabIdArg)}"
+        )
+        Log.e(
+            "TAG",
+            navController.backQueue.joinToString("\n->") { "[${it.id}] ${it.destination} / ${it.arguments}" }
+        )
     }
 
 

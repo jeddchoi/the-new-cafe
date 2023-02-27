@@ -1,4 +1,5 @@
 <resources>
     <string name="show_action_log">Show Action Log</string>
     <string name="account">Account</string>
+    <string name="show_my_status">Show My Status</string>
 </resources>

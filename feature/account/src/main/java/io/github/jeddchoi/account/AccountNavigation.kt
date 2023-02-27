@@ -18,6 +18,7 @@ object AccountNavigation : AppNavigation {
 
     @StringRes
     override val iconTextId: Int = R.string.account
+
     @StringRes
     override val titleTextId: Int = R.string.account
 
@@ -38,6 +39,7 @@ fun NavController.navigateToAccount(navOptions: NavOptions? = null) {
 
 
 fun NavGraphBuilder.accountScreen(
+    onShowMyStatus: () -> Unit = {},
     onShowActionLog: () -> Unit = {},
 ) {
 
@@ -45,6 +47,6 @@ fun NavGraphBuilder.accountScreen(
         route = AccountNavigation.route(),
         deepLinks = AccountNavigation.deepLinks
     ) { _ ->
-        AccountRoute(onShowActionLog = onShowActionLog)
+        AccountRoute(onShowMyStatus = onShowMyStatus, onShowActionLog = onShowActionLog)
     }
 }

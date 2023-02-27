@@ -77,8 +77,9 @@ fun NavGraphBuilder.myPageScreen(
     ) { backStackEntry ->
 
 
+
         val navArg = backStackEntry.arguments?.getString(tabIdArg)?.uppercase(Locale.getDefault())?.also {
-            backStackEntry.arguments?.putString(tabIdArg, "")
+//            backStackEntry.arguments?.remove(tabIdArg)
         }
         val navTab = try {
             navArg?.let { MyPageTab.valueOf(it) }

@@ -27,6 +27,7 @@ fun CafeApp(
     modifier: Modifier = Modifier,
     appState: CafeAppState = rememberCafeAppState()
 ) {
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
@@ -57,6 +58,7 @@ fun CafeApp(
                 shouldHandleReselection = appState.shouldHandleReselection,
                 onHandleReselection = { appState.setHandleReselection(false) },
                 onBackClick = appState::onBackClick,
+                onShowMyStatus = appState::navigateToMyStatus,
                 onShowActionLog = appState::navigateToActionLog
             )
         }
@@ -71,15 +73,16 @@ private fun CafeBottomBar(
     currentDestination: NavDestination?,
     modifier: Modifier = Modifier,
 ) {
+    LogCompositions(
+        tag = "TAG",
+        msg = "\ncurrent hierarchy : ${currentDestination?.hierarchy?.joinToString("\n->")}"
+    )
     CafeNavigationBar(
         modifier = modifier,
     ) {
         destinations.forEach { destination ->
             val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
-            LogCompositions(
-                tag = "TAG",
-                msg = "\ncurrent hierarchy : ${currentDestination?.hierarchy?.joinToString("\n->")}\ndestination : ${destination.name}\nselected = $selected"
-            )
+
             CafeNavigationBarItem(
                 selected = selected,
                 onClick = {
