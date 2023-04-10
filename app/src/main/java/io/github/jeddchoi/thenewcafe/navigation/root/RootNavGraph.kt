@@ -6,9 +6,9 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
+import io.github.jeddchoi.authentication.SigninNavigation
 import io.github.jeddchoi.authentication.authGraph
 import io.github.jeddchoi.authentication.navigateToAuth
-import io.github.jeddchoi.thenewcafe.navigation.main.MainNavigation
 import io.github.jeddchoi.thenewcafe.navigation.main.mainScreen
 
 @Composable
@@ -16,7 +16,7 @@ fun RootNavGraph(
     navController: NavHostController,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    startDestination: String = MainNavigation.route()
+    startDestination: String = SigninNavigation.routeGraph
 ) {
     NavHost(
         navController = navController,

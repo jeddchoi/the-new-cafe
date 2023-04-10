@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    RootScreen()
+                    RootScreen(startDestination = viewModel.startDestination.value)
                 }
             }
         }
