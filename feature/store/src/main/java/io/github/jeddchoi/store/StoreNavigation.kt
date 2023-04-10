@@ -2,18 +2,21 @@ package io.github.jeddchoi.store
 
 import android.net.Uri
 import androidx.annotation.StringRes
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import io.github.jeddchoi.designsystem.CafeIcons
 import io.github.jeddchoi.designsystem.Icon
 import io.github.jeddchoi.store.StoreNavigation.storeIdArg
-import io.github.jeddchoi.ui.feature.AppNavigation
+import io.github.jeddchoi.ui.feature.BottomNavigation
 import io.github.jeddchoi.ui.feature.baseAppUri
 import io.github.jeddchoi.ui.feature.baseWebUri
 
 
-object StoreNavigation : AppNavigation {
+object StoreNavigation : BottomNavigation {
     override val name: String = "stores"
     override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Store_Filled)
     override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Store)
@@ -56,6 +59,8 @@ fun NavGraphBuilder.storeScreen(
         deepLinks = StoreNavigation.deepLinks,
         arguments = StoreNavigation.arguments,
     ) {
-        StoreRoute(onBackClick = onBackClick)
+        val viewModel: StoreViewModel = viewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        StoreScreen(uiState = uiState)
     }
 }

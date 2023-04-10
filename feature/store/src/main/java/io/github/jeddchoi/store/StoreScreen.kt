@@ -15,18 +15,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.ui.feature.UiState
 
-@Composable
-fun StoreRoute(
-    onBackClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
-
-    ) {
-    val viewModel: StoreViewModel = viewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    StoreScreen(uiState = uiState)
-}
-
 
 @Composable
 fun StoreScreen(

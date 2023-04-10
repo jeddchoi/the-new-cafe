@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":feature:authentication")
+
+
 
 
 
@@ -28,6 +31,7 @@ include(":feature:store_list")
 include(":feature:mypage")
 include(":feature:actionlog")
 include(":feature:mystatus")
+include(":feature:authentication")
 
 
 include(":core:ui")

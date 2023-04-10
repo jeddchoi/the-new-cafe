@@ -8,25 +8,22 @@ const val baseWebUri = "https://www.example.com"
 const val baseAppUri = "jeddchoi://thenewcafe"
 
 interface AppNavigation {
-    val name: String
-    val selectedIcon: Icon
-    val unselectedIcon: Icon
-    val iconTextId: Int
     val titleTextId: Int
 
+    // routing
+    val name: String
     fun route(arg: String? = null): String
     val arguments: List<NamedNavArgument>
     val deepLinks: List<NavDeepLink>
 }
 
-//interface RallyDestination {
-//    val icon: ImageVector
-//    val route: String
-//}
 
-//enum class TopLevelDestination(
-//    val selectedIcon: Icon,
-//    val unselectedIcon: Icon,
-//    val iconTextId: Int,
-//    val titleTextId: Int,
-//)
+interface BottomNavigation : AppNavigation {
+    val selectedIcon: Icon
+    val unselectedIcon: Icon
+    val iconTextId: Int
+}
+
+interface GraphStartNavigation {
+    val routeGraph: String
+}

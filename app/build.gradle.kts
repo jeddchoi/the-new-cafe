@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":feature:store_list"))
     implementation(project(":feature:account"))
     implementation(project(":feature:mypage"))
+    implementation(project(":feature:authentication"))
 
     implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))

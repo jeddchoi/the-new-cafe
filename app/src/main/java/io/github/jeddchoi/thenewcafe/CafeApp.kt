@@ -1,123 +1,39 @@
 package io.github.jeddchoi.thenewcafe
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import io.github.jeddchoi.designsystem.*
-import io.github.jeddchoi.thenewcafe.navigation.CafeNavHost
-import io.github.jeddchoi.ui.LogCompositions
-import io.github.jeddchoi.ui.feature.AppNavigation
+import io.github.jeddchoi.thenewcafe.navigation.AppNavHost
+import io.github.jeddchoi.ui.feature.BottomNavigation
 
 /**
  * Single entry point of composable world
  *
  * @param appState : state holder of app
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeApp(
     modifier: Modifier = Modifier,
     appState: CafeAppState = rememberCafeAppState()
 ) {
-
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        bottomBar = {
-            CafeBottomBar(
-                destinations = appState.topLevelDestinations,
-                onNavigateToDestination = {
-                    appState.navController.navigateToSingleTopDestination(it)
-                },
-                onReselection = appState::setHandleReselection,
-                currentDestination = appState.currentDestination,
-            )
-        },
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            val destination = appState.currentAppDestination
-
-            if (destination != null) {
-
-                CafeTopAppBar(
-                    titleRes = destination.titleTextId,
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color.Transparent,
-                    ),
-                )
-            }
-            CafeNavHost(
-                navController = appState.navController,
-                shouldHandleReselection = appState.shouldHandleReselection,
-                onHandleReselection = { appState.setHandleReselection(false) },
-                onBackClick = appState::onBackClick,
-                onShowMyStatus = appState::navigateToMyStatus,
-                onShowActionLog = appState::navigateToActionLog
-            )
-        }
-    }
-}
-
-@Composable
-private fun CafeBottomBar(
-    destinations: List<AppNavigation>,
-    onNavigateToDestination: (AppNavigation) -> Unit,
-    onReselection: (Boolean) -> Unit,
-    currentDestination: NavDestination?,
-    modifier: Modifier = Modifier,
-) {
-    LogCompositions(
-        tag = "TAG",
-        msg = "\ncurrent hierarchy : ${currentDestination?.hierarchy?.joinToString("\n->")}"
-    )
-    CafeNavigationBar(
+    Box(
         modifier = modifier,
+        contentAlignment = Alignment.Center
     ) {
-        destinations.forEach { destination ->
-            val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
+        // TODO: Add lottie animation
 
-            CafeNavigationBarItem(
-                selected = selected,
-                onClick = {
-                    if (selected)
-                        onReselection(true)
-                    else
-                        onNavigateToDestination(destination)
-                },
-                icon = {
-                    val icon = if (selected) {
-                        destination.selectedIcon
-                    } else {
-                        destination.unselectedIcon
-                    }
-                    when (icon) {
-                        is Icon.ImageVectorIcon -> Icon(
-                            imageVector = icon.imageVector,
-                            contentDescription = null,
-                        )
-
-                        is Icon.DrawableResourceIcon -> Icon(
-                            painter = painterResource(id = icon.id),
-                            contentDescription = null,
-                        )
-                    }
-                },
-                label = { Text(stringResource(destination.iconTextId)) },
-            )
-        }
+        AppNavHost(
+            navController = appState.navController,
+            onBackClick = appState::onBackClick
+        )
     }
 }
 
-private fun NavDestination?.isTopLevelDestinationInHierarchy(destination: AppNavigation) =
-    this?.hierarchy?.any {
-        it.route?.contains(destination.name, true) ?: false
-    } ?: false
+
+fun NavDestination?.isTopLevelDestinationInHierarchy(destination: BottomNavigation) =
+    this?.hierarchy?.any { it.route?.contains(destination.name, true) ?: false } ?: false
 
 

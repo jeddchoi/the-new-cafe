@@ -40,9 +40,6 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 //                add("implementation", libs.findLibrary("coil.kt").get())
 //                add("implementation", libs.findLibrary("coil.kt.compose").get())
 //
-                add("implementation", libs.findLibrary("androidx.hilt.navigation.compose").get())
-                add("implementation", libs.findLibrary("androidx.lifecycle.runtimeCompose").get())
-                add("implementation", libs.findLibrary("androidx.lifecycle.viewModelCompose").get())
 
                 add("implementation", libs.findLibrary("kotlinx.coroutines.android").get())
             }

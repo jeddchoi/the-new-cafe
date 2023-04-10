@@ -5,12 +5,13 @@ import androidx.lifecycle.viewModelScope
 import io.github.jeddchoi.ui.feature.UiState
 import kotlinx.coroutines.flow.*
 
-class AccountViewModel : ViewModel() {
+internal class AccountViewModel(
+
+) : ViewModel() {
 
     private val _uiState = flow {
         emit(AccountUiStateData("Account"))
     }
-
 
     val uiState: StateFlow<UiState<AccountUiStateData>> =
         _uiState.map {
@@ -23,12 +24,12 @@ class AccountViewModel : ViewModel() {
             SharingStarted.WhileSubscribed(5_000),
             UiState.Loading()
         )
+    fun signOut() {
 
-
-
+    }
 }
 
 
-data class AccountUiStateData(
+internal data class AccountUiStateData(
     val data: String
 )

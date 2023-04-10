@@ -15,17 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.ui.feature.UiState
 
-@Composable
-fun StoreListRoute(
-    navigateToSeats: (String) -> Unit,
-    onBackClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
-) {
-    val viewModel: StoreListViewModel = viewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    StoreListScreen(uiState = uiState)
-}
 
 
 @Composable

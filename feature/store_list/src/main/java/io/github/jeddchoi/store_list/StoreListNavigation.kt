@@ -1,31 +1,27 @@
 package io.github.jeddchoi.store_list
 
-import android.util.Log
 import androidx.annotation.StringRes
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import io.github.jeddchoi.designsystem.CafeIcons
 import io.github.jeddchoi.designsystem.Icon
-import io.github.jeddchoi.ui.feature.AppNavigation
+import io.github.jeddchoi.ui.feature.BottomNavigation
+import io.github.jeddchoi.ui.feature.GraphStartNavigation
 import io.github.jeddchoi.ui.feature.baseAppUri
 import io.github.jeddchoi.ui.feature.baseWebUri
 
 
-
-object StoreListNavigation : AppNavigation {
-    override val name: String = "stores"
-
-    override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Order_Filled)
-    override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Order)
-
-    @StringRes
-    override val iconTextId: Int = R.string.order
+object StoreListNavigation : BottomNavigation, GraphStartNavigation {
     @StringRes
     override val titleTextId: Int = R.string.order
 
+    // routing
+    override val name: String = "stores"
+    override val routeGraph = "order"
     override fun route(arg: String?): String = name
-    val routeGraph = "order"
-
     override val arguments: List<NamedNavArgument> = listOf()
     override val deepLinks: List<NavDeepLink> = listOf(
         navDeepLink { uriPattern = "$baseWebUri/${route()}" },
@@ -33,17 +29,26 @@ object StoreListNavigation : AppNavigation {
         navDeepLink { uriPattern = "$baseWebUri/${routeGraph}" },
         navDeepLink { uriPattern = "$baseAppUri/${routeGraph}" }
     )
+
+    // bottom navigation
+    override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Order_Filled)
+    override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Order)
+    @StringRes
+    override val iconTextId: Int = R.string.order
+
 }
 
 
-fun NavController.navigateToOrderGraph(navOptions: NavOptions? = null) {
-    Log.i("TAG", "Navigate to Order")
+fun NavController.navigateToOrder(navOptions: NavOptions? = null) {
     this.navigate(StoreListNavigation.routeGraph, navOptions)
 }
 
 fun NavGraphBuilder.orderGraph(
+    onNavigateToSignIn: () -> Unit,
     navigateToStore: (String) -> Unit,
+    navigateToMyStatus: () -> Unit,
     nestedGraphs: NavGraphBuilder.() -> Unit,
+    onBackClick: () -> Unit,
 ) {
     navigation(
         route = StoreListNavigation.routeGraph,
@@ -52,11 +57,11 @@ fun NavGraphBuilder.orderGraph(
         composable(
             route = StoreListNavigation.route(),
             deepLinks = StoreListNavigation.deepLinks
-        ) {backStackEntry ->
-//            LogCompositions(tag = "TAG", msg = "stores : backStackEntry = ${backStackEntry.arguments}")
-            StoreListRoute(
-                navigateToSeats = navigateToStore,
-            )
+        ) {
+            val viewModel: StoreListViewModel = viewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            StoreListScreen(uiState = uiState)
         }
         nestedGraphs()
     }

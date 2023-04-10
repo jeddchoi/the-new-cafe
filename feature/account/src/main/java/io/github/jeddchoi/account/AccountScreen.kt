@@ -1,46 +1,38 @@
 package io.github.jeddchoi.account
 
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.ui.feature.UiState
 
 
 @Composable
-fun AccountRoute(
-    onBackClick: () -> Unit = {},
-    modifier: Modifier = Modifier,
-    onShowMyStatus: () -> Unit = {},
-    onShowActionLog: () -> Unit = {},
-) {
-    val viewModel: AccountViewModel = viewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle(UiState.Loading())
-
-    AccountScreen(uiState, onShowMyStatus = onShowMyStatus, onShowActionLog = onShowActionLog)
-}
-
-
-@Composable
-fun AccountScreen(
+internal fun AccountScreen(
     uiState: UiState<AccountUiStateData>,
+    onNavigateToSignIn: () -> Unit,
+    onSignOut: () -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onShowMyStatus: () -> Unit = {},
-    onShowActionLog: () -> Unit = {},
+    lazyListState: LazyListState = rememberLazyListState()
 ) {
+
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .scrollable(lazyListState, Orientation.Vertical),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -55,18 +47,19 @@ fun AccountScreen(
             textAlign = TextAlign.Center
         )
 
-        Button(onClick = onShowMyStatus) {
-            Text(text = stringResource(id = R.string.show_my_status))
+        Button(onClick = onNavigateToSignIn) {
+            Text(text = stringResource(id = R.string.navigate_to_sign_in))
         }
-        Button(onClick = onShowActionLog) {
-            Text(text = stringResource(id = R.string.show_action_log))
+        Button(onClick = onSignOut) {
+            Text(text = stringResource(id = R.string.sign_out))
         }
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
-fun AccountScreenPreview() {
+internal fun AccountScreenPreview() {
     TheNewCafeTheme {
 //        AccountScreen(
 ////            UiState.Success(AccountUiStateData("Hello!")),
