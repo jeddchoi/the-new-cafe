@@ -8,10 +8,10 @@ import androidx.navigation.*
 import androidx.navigation.compose.composable
 import io.github.jeddchoi.designsystem.CafeIcons
 import io.github.jeddchoi.designsystem.Icon
+import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseAppUri
+import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseWebUri
 import io.github.jeddchoi.ui.feature.BottomNavigation
 import io.github.jeddchoi.ui.feature.UiState
-import io.github.jeddchoi.ui.feature.baseAppUri
-import io.github.jeddchoi.ui.feature.baseWebUri
 
 /**
  * Account navigation constants

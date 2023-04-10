@@ -8,8 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import io.github.jeddchoi.thenewcafe.R
 import io.github.jeddchoi.ui.feature.AppNavigation
-import io.github.jeddchoi.ui.feature.baseAppUri
-import io.github.jeddchoi.ui.feature.baseWebUri
+import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseAppUri
+import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseWebUri
 
 object MainNavigation : AppNavigation {
     override val name: String = "main"
@@ -26,17 +26,12 @@ object MainNavigation : AppNavigation {
 
 }
 
-fun NavGraphBuilder.mainScreen(
-    onBackClick: () -> Unit,
-) {
+fun NavGraphBuilder.mainScreen() {
     composable(
         route = MainNavigation.route(),
         deepLinks = MainNavigation.deepLinks,
     ) {
         val mainState = rememberMainState()
-        MainScreen(
-            mainState = mainState,
-            onBackClick = onBackClick,
-        )
+        MainScreen(mainState = mainState)
     }
 }

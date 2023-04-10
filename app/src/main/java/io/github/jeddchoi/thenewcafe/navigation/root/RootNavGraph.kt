@@ -16,16 +16,15 @@ fun RootNavGraph(
     navController: NavHostController,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    needToRedirectSignIn: Boolean = false,
+    startDestination: String = MainNavigation.route()
 ) {
     NavHost(
         navController = navController,
-        startDestination = if (needToRedirectSignIn) SigninNavigation.name else MainNavigation.name,
+        startDestination = startDestination,
         modifier = modifier,
+    ) {
 
-        ) {
 
-        // TODO: change placeholder
         navigation(
             route = SigninNavigation.routeGraph,
             startDestination = SigninNavigation.route(),
@@ -38,7 +37,7 @@ fun RootNavGraph(
             }
         }
 
-        mainScreen(onBackClick)
+        mainScreen()
     }
 }
 

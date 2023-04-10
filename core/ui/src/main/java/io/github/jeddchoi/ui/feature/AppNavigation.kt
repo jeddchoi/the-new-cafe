@@ -1,11 +1,10 @@
 package io.github.jeddchoi.ui.feature
 
+import androidx.core.net.toUri
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavDeepLink
 import io.github.jeddchoi.designsystem.Icon
 
-const val baseWebUri = "https://www.example.com"
-const val baseAppUri = "jeddchoi://thenewcafe"
 
 interface AppNavigation {
     val titleTextId: Int
@@ -15,6 +14,12 @@ interface AppNavigation {
     fun route(arg: String? = null): String
     val arguments: List<NamedNavArgument>
     val deepLinks: List<NavDeepLink>
+
+    companion object {
+        val baseWebUri = "https://io.github.jeddchoi.thenewcafe".toUri()
+        val baseAppUri = "app://io.github.jeddchoi.thenewcafe".toUri()
+
+    }
 }
 
 
