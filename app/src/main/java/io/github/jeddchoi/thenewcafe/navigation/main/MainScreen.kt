@@ -19,6 +19,7 @@ import io.github.jeddchoi.ui.feature.BottomNavigation
 @Composable
 fun MainScreen(
     mainState: MainState,
+    navigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -38,6 +39,7 @@ fun MainScreen(
             onBackClick = {
                 mainState.navController.popBackStack()
             },
+            navigateToSignIn = navigateToSignIn,
             modifier = modifier.padding(padding)
         )
     }

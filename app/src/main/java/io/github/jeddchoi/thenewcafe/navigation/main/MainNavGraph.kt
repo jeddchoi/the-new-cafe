@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import io.github.jeddchoi.account.AccountNavigation
 import io.github.jeddchoi.account.accountScreen
-import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.mypage.myPageScreen
 import io.github.jeddchoi.mypage.navigateToMyPage
 import io.github.jeddchoi.store.navigateToStore
@@ -19,6 +18,7 @@ import io.github.jeddchoi.store_list.orderGraph
 fun MainNavGraph(
     navController: NavHostController,
     onBackClick: () -> Unit,
+    navigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
     startDestination: String = AccountNavigation.route(),
 ) {
@@ -29,15 +29,11 @@ fun MainNavGraph(
         modifier = modifier,
     ) {
         accountScreen(
-            onNavigateToSignIn = {
-                navController.navigateToAuth()
-            },
+            onNavigateToSignIn = navigateToSignIn,
             onBackClick = onBackClick,
         )
         orderGraph(
-            onNavigateToSignIn = {
-//                    navController.navigateToSignIn(needToRedirectSignIn)
-            },
+            onNavigateToSignIn = navigateToSignIn,
             navigateToStore = { storeId ->
                 navController.navigateToStore(storeId)
             },
@@ -48,9 +44,7 @@ fun MainNavGraph(
             onBackClick = onBackClick
         )
         myPageScreen(
-            onNavigateToSignIn = {
-//                    navController.navigateToSignIn(needToRedirectSignIn)
-            },
+            onNavigateToSignIn = navigateToSignIn,
             navigateToStoreList = {
                 navController.navigateToOrder()
             },

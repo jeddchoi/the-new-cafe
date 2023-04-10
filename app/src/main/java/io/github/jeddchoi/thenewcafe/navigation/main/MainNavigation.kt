@@ -26,12 +26,12 @@ object MainNavigation : AppNavigation {
 
 }
 
-fun NavGraphBuilder.mainScreen() {
+fun NavGraphBuilder.mainScreen(navigateToSignIn: () -> Unit) {
     composable(
         route = MainNavigation.route(),
         deepLinks = MainNavigation.deepLinks,
     ) {
         val mainState = rememberMainState()
-        MainScreen(mainState = mainState)
+        MainScreen(mainState = mainState, navigateToSignIn = navigateToSignIn)
     }
 }
