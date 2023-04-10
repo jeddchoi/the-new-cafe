@@ -89,7 +89,7 @@ fun NavGraphBuilder.myPageScreen(
         arguments = MyPageNavigation.arguments,
     ) { backStackEntry ->
         MyPageScreen(
-            selectedTab = MyPageNavigation.Args(backStackEntry.savedStateHandle).tab,
+            navigateTab = MyPageNavigation.Args(backStackEntry.savedStateHandle).tab,
         )
     }
 }

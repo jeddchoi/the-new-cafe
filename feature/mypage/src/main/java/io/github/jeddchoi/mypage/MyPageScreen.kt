@@ -7,6 +7,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -20,10 +21,23 @@ import kotlinx.coroutines.launch
 @Composable
 fun MyPageScreen(
     modifier: Modifier = Modifier,
-    selectedTab: MyPageNavigation.Tab = MyPageNavigation.Tab.MY_STATUS,
+    navigateTab: MyPageNavigation.Tab = MyPageNavigation.Tab.MY_STATUS,
     pagerState: PagerState = rememberPagerState(),
 ) {
     val coroutineScope = rememberCoroutineScope()
+    var selectedTab by rememberSaveable {
+        mutableStateOf(navigateTab)
+    }
+
+    LaunchedEffect(pagerState) {
+        // Collect from the a snapshotFlow reading the currentPage
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            // Do something with each page change, for example:
+            // viewModel.sendPageSelectedEvent(page)
+            selectedTab = MyPageNavigation.tabs[page]
+        }
+    }
+
     Column(
         modifier
             .fillMaxSize()
@@ -44,13 +58,12 @@ fun MyPageScreen(
                     onClick = {
                         // Animate to the selected page when clicked
                         coroutineScope.launch {
-                            pagerState.animateScrollToPage(selectedTab.ordinal)
+                            pagerState.animateScrollToPage(tab.ordinal)
                         }
                     }
                 )
             }
         }
-
         HorizontalPager(
             state = pagerState,
             pageCount = MyPageNavigation.tabs.size,
@@ -58,11 +71,12 @@ fun MyPageScreen(
             contentPadding = PaddingValues(16.dp),
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) { pageIndex ->
 
             // Our content for each page
             when (MyPageNavigation.tabs[pageIndex]) {
+
                 MyPageNavigation.Tab.MY_STATUS -> MyStatusRoute()
                 MyPageNavigation.Tab.ACTION_LOG -> ActionLogRoute()
             }
