@@ -2,8 +2,10 @@ package io.github.jeddchoi.thenewcafe.navigation.root
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navOptions
 import io.github.jeddchoi.authentication.authGraph
 import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.thenewcafe.navigation.main.MainNavigation
@@ -27,7 +29,12 @@ fun RootNavGraph(
         }
 
         mainScreen {
-            navController.navigateToAuth()
+            navController.navigateToAuth(navOptions = navOptions {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            })
         }
     }
 }
