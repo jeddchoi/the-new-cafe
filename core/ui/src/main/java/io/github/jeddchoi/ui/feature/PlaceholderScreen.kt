@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe.navigation
+package io.github.jeddchoi.ui.feature
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text

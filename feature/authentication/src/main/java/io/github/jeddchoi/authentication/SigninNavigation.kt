@@ -1,13 +1,13 @@
 package io.github.jeddchoi.authentication
 
 import androidx.annotation.StringRes
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import io.github.jeddchoi.ui.feature.AppNavigation
 import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseAppUri
 import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseWebUri
 import io.github.jeddchoi.ui.feature.GraphStartNavigation
+import io.github.jeddchoi.ui.feature.PlaceholderScreen
 
 object SigninNavigation : AppNavigation, GraphStartNavigation {
     @StringRes
@@ -32,8 +32,8 @@ fun NavController.navigateToAuth(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.authGraph(
-    nestedGraphs: NavGraphBuilder.() -> Unit,
     onBackClick: () -> Unit,
+    nestedGraphs: NavGraphBuilder.() -> Unit,
 ) {
     navigation(
         route = SigninNavigation.routeGraph,
@@ -43,10 +43,7 @@ fun NavGraphBuilder.authGraph(
             route = SigninNavigation.route(),
             deepLinks = SigninNavigation.deepLinks
         ) {
-            val viewModel: AuthViewModel = viewModel()
-//            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-
+            PlaceholderScreen(title = "Sign In")
         }
         nestedGraphs()
     }
