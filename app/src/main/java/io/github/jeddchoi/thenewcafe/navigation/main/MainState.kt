@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe.home
+package io.github.jeddchoi.thenewcafe.navigation.main
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -21,18 +21,18 @@ import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
-fun rememberHomeState(
+fun rememberMainState(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     navController: NavHostController = rememberNavController(),
-): HomeState {
+): MainState {
     return remember(navController, coroutineScope) {
-        HomeState(navController, coroutineScope)
+        MainState(navController, coroutineScope)
     }
 }
 
 
 @Stable
-class HomeState(
+class MainState(
     val navController: NavHostController,
     private val coroutineScope: CoroutineScope,
 ) {

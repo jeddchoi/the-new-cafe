@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe
+package io.github.jeddchoi.thenewcafe.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.thenewcafe.navigation.root.RootScreen
 
 
 /**
@@ -27,7 +28,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CafeApp()
+                    RootScreen()
                 }
             }
         }

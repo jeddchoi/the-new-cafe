@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe.home
+package io.github.jeddchoi.thenewcafe.navigation.main
 
 import androidx.annotation.StringRes
 import androidx.navigation.NamedNavArgument
@@ -11,8 +11,8 @@ import io.github.jeddchoi.ui.feature.AppNavigation
 import io.github.jeddchoi.ui.feature.baseAppUri
 import io.github.jeddchoi.ui.feature.baseWebUri
 
-object HomeNavigation : AppNavigation {
-    override val name: String = "home"
+object MainNavigation : AppNavigation {
+    override val name: String = "main"
 
     @StringRes
     override val titleTextId: Int = R.string.app_name
@@ -26,16 +26,16 @@ object HomeNavigation : AppNavigation {
 
 }
 
-fun NavGraphBuilder.homeScreen(
+fun NavGraphBuilder.mainScreen(
     onBackClick: () -> Unit,
 ) {
     composable(
-        route = HomeNavigation.route(),
-        deepLinks = HomeNavigation.deepLinks,
+        route = MainNavigation.route(),
+        deepLinks = MainNavigation.deepLinks,
     ) {
-        val homeState = rememberHomeState()
-        HomeScreen(
-            homeState = homeState,
+        val mainState = rememberMainState()
+        MainScreen(
+            mainState = mainState,
             onBackClick = onBackClick,
         )
     }

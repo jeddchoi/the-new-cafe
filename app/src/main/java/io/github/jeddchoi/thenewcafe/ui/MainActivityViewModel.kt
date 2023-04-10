@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe
+package io.github.jeddchoi.thenewcafe.ui
 
 import androidx.lifecycle.ViewModel
 

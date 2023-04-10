@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe.home
+package io.github.jeddchoi.thenewcafe.navigation.main
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,34 +11,34 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
 import io.github.jeddchoi.designsystem.CafeNavigationBar
 import io.github.jeddchoi.designsystem.CafeNavigationBarItem
 import io.github.jeddchoi.designsystem.CafeTopAppBar
 import io.github.jeddchoi.designsystem.Icon
-import io.github.jeddchoi.thenewcafe.isTopLevelDestinationInHierarchy
 import io.github.jeddchoi.ui.feature.BottomNavigation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
-    homeState: HomeState,
+fun MainScreen(
+    mainState: MainState,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         bottomBar = {
-            CafeBottomBar(
-                bottomNavigations = homeState.bottomNavigations,
-                currentDestination = homeState.currentDestination,
+            BottomBar(
+                bottomNavigations = mainState.bottomNavigations,
+                currentDestination = mainState.currentDestination,
                 selectBottomNav = {
-                    homeState.onNavigateToBottomNav(it)
+                    mainState.onNavigateToBottomNav(it)
                 },
             )
         },
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            val destination = homeState.currentTopLevelBottomNav
+            val destination = mainState.currentTopLevelBottomNav
 
             // if the top level destination is not null, we're in the home screen
             if (destination != null) {
@@ -49,8 +49,8 @@ fun HomeScreen(
                     ),
                 )
             }
-            HomeNavHost(
-                navController = homeState.navController,
+            MainNavGraph(
+                navController = mainState.navController,
                 onBackClick = onBackClick,
             )
         }
@@ -58,7 +58,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun CafeBottomBar(
+private fun BottomBar(
     bottomNavigations: List<BottomNavigation>,
     currentDestination: NavDestination?,
     selectBottomNav: (BottomNavigation) -> Unit,
@@ -100,3 +100,8 @@ private fun CafeBottomBar(
         }
     }
 }
+
+fun NavDestination?.isTopLevelDestinationInHierarchy(destination: BottomNavigation) =
+    this?.hierarchy?.any { it.route?.contains(destination.name, true) ?: false } ?: false
+
+
