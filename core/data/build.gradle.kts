@@ -1,5 +1,6 @@
 plugins {
     id("jeddchoi.android.library")
+    id("jeddchoi.android.hilt")
 }
 
 android {
