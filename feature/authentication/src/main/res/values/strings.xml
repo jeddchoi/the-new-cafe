@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="auth">Log In</string>
+    <string name="sign_in">Sign In</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="email_invalid_msg">Email is invalid</string>
+    <string name="password">Password</string>
+    <string name="password_invalid_msg">Password is invalid</string>
+    <string name="done">Done</string>
+    <string name="some_inputs_invalid_msg">Some values you entered are not valid</string>
+    <string name="new_user">New User?</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="password_isnt_same">Your password and confirmation password must match</string>
+    <string name="first_name">First name</string>
+    <string name="name_invalid">Name is invalid</string>
+    <string name="last_name">Last name</string>
 </resources>

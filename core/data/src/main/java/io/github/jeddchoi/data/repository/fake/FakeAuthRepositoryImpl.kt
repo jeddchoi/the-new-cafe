@@ -2,8 +2,9 @@ package io.github.jeddchoi.data.repository.fake
 
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.model.User
+import javax.inject.Inject
 
-class FakeAuthRepositoryImpl : AuthRepository {
+class FakeAuthRepositoryImpl @Inject constructor() : AuthRepository {
     private var currentUser: User? = null
 
     override suspend fun signInWithEmail(email: String, password: String): Result<Unit> {
@@ -13,7 +14,12 @@ class FakeAuthRepositoryImpl : AuthRepository {
         return Result.success(Unit)
     }
 
-    override suspend fun registerWithEmail(email: String, firstName: String, lastName: String, password: String): Result<Unit> {
+    override suspend fun registerWithEmail(
+        email: String,
+        firstName: String,
+        lastName: String,
+        password: String
+    ): Result<Unit> {
         // 이메일과 비밀번호로 사용자를 등록하는 가짜 로직을 작성합니다.
         // 성공한 경우에는 currentUser에 등록한 사용자 정보를 저장합니다.
         currentUser = User(email, firstName, lastName)

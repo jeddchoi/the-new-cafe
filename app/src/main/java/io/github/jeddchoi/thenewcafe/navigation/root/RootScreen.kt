@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.github.jeddchoi.authentication.SigninNavigation
+import io.github.jeddchoi.authentication.SignInNavigation
 
 /**
  * Single entry point of composable world
@@ -15,7 +15,7 @@ import io.github.jeddchoi.authentication.SigninNavigation
 fun RootScreen(
     modifier: Modifier = Modifier,
     rootState: RootState = rememberRootState(),
-    startDestination: String = SigninNavigation.routeGraph,
+    startDestination: String = SignInNavigation.routeGraph,
 ) {
     Box(
         modifier = modifier,
