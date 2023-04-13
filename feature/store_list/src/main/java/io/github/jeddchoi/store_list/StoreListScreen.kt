@@ -5,13 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.ui.feature.UiState
 
@@ -29,7 +26,7 @@ fun StoreListScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val text = when (uiState) {
-            UiState.Empty -> "EMPTY"
+            UiState.EmptyResult -> "EMPTY"
             is UiState.Error -> "ERROR : ${uiState.exception.message}"
             is UiState.Loading -> "LOADING ${uiState.data?.data}"
             is UiState.Success -> "SUCCESS 🎉 ${uiState.data.data}"

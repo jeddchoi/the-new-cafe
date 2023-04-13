@@ -15,7 +15,7 @@ internal class AccountViewModel(
 
     val uiState: StateFlow<UiState<AccountUiStateData>> =
         _uiState.map {
-            if (it.data.isBlank()) UiState.Empty
+            if (it.data.isBlank()) UiState.EmptyResult
             else UiState.Success(it)
         }.catch {
             emit(UiState.Error(it))

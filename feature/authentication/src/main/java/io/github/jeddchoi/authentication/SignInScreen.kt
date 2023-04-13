@@ -27,7 +27,7 @@ fun SignInScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     when (uiState) {
-        UiState.Empty -> {
+        UiState.EmptyResult -> {
 
         }
         is UiState.Error -> {
@@ -73,9 +73,9 @@ fun SignInScreen(
                 onPrimaryButtonClick = {
                     Log.i("SignInScreen", "email : ${data.email}, password : ${data.password}")
                 },
-                isError = !data.isEmailValid || !data.isPasswordValid,
+                isError = !data.canSignIn,
                 errorMsg = stringResource(R.string.some_inputs_invalid_msg),
-                didUserInputDone = data.email.isNotEmpty() && data.password.isNotEmpty(),
+                userInfoComplete = data.signInInfoComplete,
                 optionalTitle = stringResource(R.string.new_user),
                 optionalButtonClick = navigateToRegisterClick,
                 optionalButtonText = stringResource(R.string.register),

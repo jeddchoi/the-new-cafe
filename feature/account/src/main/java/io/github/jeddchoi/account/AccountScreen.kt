@@ -37,7 +37,7 @@ internal fun AccountScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val text = when (uiState) {
-            UiState.Empty -> "EMPTY"
+            UiState.EmptyResult -> "EMPTY"
             is UiState.Error -> "ERROR : ${uiState.exception.message}"
             is UiState.Loading -> "LOADING ${uiState.data?.data}"
             is UiState.Success -> "SUCCESS 🎉 ${uiState.data.data}"

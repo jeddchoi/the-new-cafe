@@ -3,21 +3,25 @@ package io.github.jeddchoi.authentication
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.util.AuthInputValidator
 import io.github.jeddchoi.ui.feature.UiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authInputValidator: AuthInputValidator
+    private val authInputValidator: AuthInputValidator,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthScreenData())
 
     val uiState: StateFlow<UiState<AuthScreenData>> =
         _uiState
-//            .onStart { delay(4_000) }
+            .onStart { delay(4_000) }
             .map<AuthScreenData, UiState<AuthScreenData>> {
                 UiState.Success(it)
             }.catch {
@@ -61,6 +65,29 @@ class AuthViewModel @Inject constructor(
     fun onPasswordForgotClick() {
 
     }
+
+    fun onSignIn() {
+        viewModelScope.launch {
+            val result = authRepository.signInWithEmail(_uiState.value.email, _uiState.value.password)
+            if (result.isSuccess) {
+
+            } else {
+
+            }
+        }
+
+    }
+
+    fun onRegister() {
+        viewModelScope.launch {
+            val result = authRepository.registerWithEmail(_uiState.value.email, _uiState.value.firstName, _uiState.value.lastName, _uiState.value.password)
+            if (result.isSuccess) {
+
+            } else {
+
+            }
+        }
+    }
 }
 
 
@@ -75,8 +102,13 @@ data class AuthScreenData(
     val isLastNameValid: Boolean = false,
     val isPasswordValid: Boolean = false,
     val doPasswordsMatch: Boolean = false,
+    val isSignInSuccessful: Boolean = false,
+    val isRegisterSuccessful: Boolean = false
 ) {
     val canSignIn = isEmailValid && isPasswordValid
     val canRegister =
         isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && doPasswordsMatch
+
+    val signInInfoComplete = email.isNotEmpty() && password.isNotEmpty()
+    val registerInfoComplete = email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()
 }

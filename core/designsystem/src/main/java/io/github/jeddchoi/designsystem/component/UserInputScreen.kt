@@ -29,7 +29,7 @@ fun UserInputScreen(
     onBackClick: () -> Unit = {},
     isError: Boolean = false,
     errorMsg: String = "",
-    didUserInputDone: Boolean = false,
+    userInfoComplete: Boolean = false,
     optionalTitle: String = "",
     optionalButtonClick: () -> Unit = {},
     optionalButtonText: String = "",
@@ -115,7 +115,7 @@ fun UserInputScreen(
                             .fillMaxWidth()
                     )
 
-                    if (isError && didUserInputDone) {
+                    if (isError && userInfoComplete) {
                         Text(
                             text = errorMsg,
                             style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.error)
@@ -166,7 +166,7 @@ fun UserInputOneByOneScreenPreview() {
             },
             isError = !isEmailValid || !isPasswordValid,
             errorMsg = "Some input is invalid",
-            didUserInputDone = email.isNotEmpty() && password.isNotEmpty(),
+            userInfoComplete = email.isNotEmpty() && password.isNotEmpty(),
         )
     }
 }
