@@ -8,11 +8,13 @@ import dagger.hilt.components.SingletonComponent
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.fake.FakeAuthRepositoryImpl
 import io.github.jeddchoi.data.util.AuthInputValidator
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
 
+    @Singleton
     @Binds
     abstract fun bindsAuthRepository(
         authRepository: FakeAuthRepositoryImpl,

@@ -1,5 +1,6 @@
 package io.github.jeddchoi.authentication
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -117,6 +118,11 @@ class AuthViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(isBusy = false)
             }
         }
+    }
+
+
+    init {
+        Log.i("Auth", System.identityHashCode(authRepository).toString() )
     }
 }
 

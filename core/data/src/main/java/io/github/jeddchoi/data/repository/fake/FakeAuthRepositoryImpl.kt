@@ -3,6 +3,8 @@ package io.github.jeddchoi.data.repository.fake
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.model.User
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class FakeAuthRepositoryImpl @Inject constructor() : AuthRepository {
@@ -48,9 +50,9 @@ class FakeAuthRepositoryImpl @Inject constructor() : AuthRepository {
         return currentUser != null
     }
 
-    override fun getCurrentUserId(): String? {
+    override fun getCurrentUser(): Flow<User?> {
         // currentUser가 null이 아닌 경우에는 사용자 ID를 반환합니다.
-        return currentUser?.id
+        return flow { emit(currentUser) }
     }
 
     override suspend fun sendPasswordResetEmail(email: String): Result<Unit> {

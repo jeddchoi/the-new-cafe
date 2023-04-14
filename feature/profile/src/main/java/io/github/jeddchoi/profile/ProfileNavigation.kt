@@ -2,8 +2,8 @@ package io.github.jeddchoi.profile
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import io.github.jeddchoi.designsystem.CafeIcons
@@ -64,7 +64,7 @@ fun NavGraphBuilder.profileScreen(
         route = ProfileNavigation.route(),
         deepLinks = ProfileNavigation.deepLinks
     ) {
-        val viewModel: ProfileViewModel = viewModel()
+        val viewModel: ProfileViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle(UiState.InitialLoading)
 
         ProfileScreen(
