@@ -1,4 +1,4 @@
-package io.github.jeddchoi.account
+package io.github.jeddchoi.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,15 +7,15 @@ import io.github.jeddchoi.ui.model.Message
 import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.flow.*
 
-internal class AccountViewModel(
+internal class ProfileViewModel(
 
 ) : ViewModel() {
 
     private val _uiState = flow {
-        emit(AccountUiStateData("Account"))
+        emit(ProfileUiStateData("Profile"))
     }
 
-    val uiState: StateFlow<UiState<AccountUiStateData>> =
+    val uiState: StateFlow<UiState<ProfileUiStateData>> =
         _uiState.map {
             if (it.data.isBlank()) UiState.EmptyResult
             else UiState.Success(it)
@@ -33,7 +33,7 @@ internal class AccountViewModel(
 }
 
 
-internal data class AccountUiStateData(
+internal data class ProfileUiStateData(
     val data: String,
     override val isBusy: Boolean = false,
     override val canContinue: Boolean = true,
@@ -43,5 +43,5 @@ internal data class AccountUiStateData(
         isBusy: Boolean,
         canContinue: Boolean,
         messages: List<Message>
-    ): FeedbackState = AccountUiStateData(data, isBusy, canContinue, messages)
+    ): FeedbackState = ProfileUiStateData(data, isBusy, canContinue, messages)
 }

@@ -44,7 +44,7 @@ dependencies {
 
     implementation(project(":feature:store"))
     implementation(project(":feature:store_list"))
-    implementation(project(":feature:account"))
+    implementation(project(":feature:profile"))
     implementation(project(":feature:mypage"))
     implementation(project(":feature:authentication"))
 

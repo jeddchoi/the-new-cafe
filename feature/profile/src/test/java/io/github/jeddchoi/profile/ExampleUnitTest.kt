@@ -1,4 +1,4 @@
-package io.github.jeddchoi.account
+package io.github.jeddchoi.profile
 
 import org.junit.Test
 

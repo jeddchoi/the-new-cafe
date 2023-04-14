@@ -1,4 +1,4 @@
-package io.github.jeddchoi.account
+package io.github.jeddchoi.profile
 
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
@@ -20,8 +20,8 @@ import io.github.jeddchoi.ui.model.UiState
 
 
 @Composable
-internal fun AccountScreen(
-    uiState: UiState<AccountUiStateData>,
+internal fun ProfileScreen(
+    uiState: UiState<ProfileUiStateData>,
     onNavigateToSignIn: () -> Unit,
     onSignOut: () -> Unit,
     onBackClick: () -> Unit,
@@ -59,10 +59,10 @@ internal fun AccountScreen(
 
 @Preview(showBackground = true)
 @Composable
-internal fun AccountScreenPreview() {
+internal fun ProfileScreenPreview() {
     TheNewCafeTheme {
 //        AccountScreen(
-////            UiState.Success(AccountUiStateData("Hello!")),
+////            UiState.Success(ProfileUiStateData("Hello!")),
 //        )
     }
 }

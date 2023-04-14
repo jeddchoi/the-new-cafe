@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "io.github.jeddchoi.account"
+    namespace = "io.github.jeddchoi.profile"
 }
 
 dependencies {

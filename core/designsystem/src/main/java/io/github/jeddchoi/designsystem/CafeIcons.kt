@@ -10,8 +10,8 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
 object CafeIcons {
-    val Account = Icons.Rounded.AccountCircle
-    val Account_Filled = Icons.Filled.AccountCircle
+    val Profile = Icons.Rounded.AccountCircle
+    val Profile_Filled = Icons.Filled.AccountCircle
     val Order = Icons.Rounded.ShoppingBasket
     val Order_Filled = Icons.Filled.ShoppingBasket
     val MyPage = Icons.Rounded.DataUsage

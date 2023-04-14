@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 rootProject.name = "The New Cafe"
 include(":app")
 
-include(":feature:account")
+include(":feature:profile")
 include(":feature:store")
 include(":feature:store_list")
 include(":feature:mypage")

@@ -10,8 +10,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import io.github.jeddchoi.account.AccountNavigation
-import io.github.jeddchoi.account.navigateToAccount
+import io.github.jeddchoi.profile.ProfileNavigation
+import io.github.jeddchoi.profile.navigateToProfile
 import io.github.jeddchoi.mypage.MyPageNavigation
 import io.github.jeddchoi.mypage.navigateToMyPage
 import io.github.jeddchoi.store_list.StoreListNavigation
@@ -42,7 +42,7 @@ class MainState(
 
     val currentTopLevelBottomNav: BottomNavigation?
         @Composable get() = when (currentDestination?.route) {
-            AccountNavigation.route() -> AccountNavigation
+            ProfileNavigation.route() -> ProfileNavigation
             StoreListNavigation.route() -> StoreListNavigation
             MyPageNavigation.route() -> MyPageNavigation
             else -> null
@@ -53,7 +53,7 @@ class MainState(
      * route.
      */
     val bottomNavigations: List<BottomNavigation> =
-        listOf(AccountNavigation, StoreListNavigation, MyPageNavigation)
+        listOf(ProfileNavigation, StoreListNavigation, MyPageNavigation)
 
 
     fun onNavigateToBottomNav(bottomNavigation: BottomNavigation) {
@@ -72,7 +72,7 @@ class MainState(
         }
 
         when (bottomNavigation) {
-            is AccountNavigation -> navController.navigateToAccount(bottomNavOptions)
+            is ProfileNavigation -> navController.navigateToProfile(bottomNavOptions)
             is StoreListNavigation -> navController.navigateToOrder(bottomNavOptions)
             is MyPageNavigation -> navController.navigateToMyPage(bottomNavOptions)
         }

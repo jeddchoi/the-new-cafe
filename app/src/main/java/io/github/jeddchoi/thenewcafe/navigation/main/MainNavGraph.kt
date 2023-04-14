@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import io.github.jeddchoi.account.AccountNavigation
-import io.github.jeddchoi.account.accountScreen
+import io.github.jeddchoi.profile.ProfileNavigation
+import io.github.jeddchoi.profile.profileScreen
 import io.github.jeddchoi.mypage.myPageScreen
 import io.github.jeddchoi.mypage.navigateToMyPage
 import io.github.jeddchoi.store.navigateToStore
@@ -20,7 +20,7 @@ fun MainNavGraph(
     onBackClick: () -> Unit,
     navigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
-    startDestination: String = AccountNavigation.route(),
+    startDestination: String = ProfileNavigation.route(),
 ) {
 
     NavHost(
@@ -28,7 +28,7 @@ fun MainNavGraph(
         startDestination = startDestination,
         modifier = modifier,
     ) {
-        accountScreen(
+        profileScreen(
             onNavigateToSignIn = navigateToSignIn,
             onBackClick = onBackClick,
         )

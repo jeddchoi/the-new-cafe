@@ -1,4 +1,4 @@
-package io.github.jeddchoi.account
+package io.github.jeddchoi.profile
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
@@ -14,16 +14,16 @@ import io.github.jeddchoi.ui.feature.BottomNavigation
 import io.github.jeddchoi.ui.model.UiState
 
 /**
- * Account navigation constants
+ * Profile navigation constants
  */
-object AccountNavigation : BottomNavigation {
+object ProfileNavigation : BottomNavigation {
 
     @StringRes
-    override val titleTextId: Int = R.string.account
+    override val titleTextId: Int = R.string.profile
 
 
     // routing
-    override val name: String = "account"
+    override val name: String = "profile"
     override fun route(arg: String?): String = name
 
     override val arguments: List<NamedNavArgument> = listOf()
@@ -33,41 +33,41 @@ object AccountNavigation : BottomNavigation {
     )
 
     // bottom navigation
-    override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Account_Filled)
-    override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Account)
+    override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Profile_Filled)
+    override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Profile)
     @StringRes
-    override val iconTextId: Int = R.string.account
+    override val iconTextId: Int = R.string.profile
 }
 
 /**
- * Navigate to account
+ * Navigate to profile
  *
  * @param navOptions
  */
-fun NavController.navigateToAccount(navOptions: NavOptions? = null) {
-    this.navigate(AccountNavigation.route(), navOptions)
+fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
+    this.navigate(ProfileNavigation.route(), navOptions)
 }
 
 /**
- * Bridge to Account screen
+ * Bridge to Profile screen
  *
  * @param onNavigateToSignIn
  * @param onBackClick
  * @receiver
  * @receiver
  */
-fun NavGraphBuilder.accountScreen(
+fun NavGraphBuilder.profileScreen(
     onNavigateToSignIn: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     composable(
-        route = AccountNavigation.route(),
-        deepLinks = AccountNavigation.deepLinks
+        route = ProfileNavigation.route(),
+        deepLinks = ProfileNavigation.deepLinks
     ) {
-        val viewModel: AccountViewModel = viewModel()
+        val viewModel: ProfileViewModel = viewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle(UiState.InitialLoading)
 
-        AccountScreen(
+        ProfileScreen(
             uiState = uiState,
             onNavigateToSignIn = onNavigateToSignIn,
             onSignOut = { viewModel.signOut() },

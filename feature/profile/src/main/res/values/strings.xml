@@ -1,6 +1,6 @@
 <resources>
     <string name="show_action_log">Show Action Log</string>
-    <string name="account">Account</string>
+    <string name="profile">Profile</string>
     <string name="show_my_status">Show My Status</string>
     <string name="navigate_to_sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
