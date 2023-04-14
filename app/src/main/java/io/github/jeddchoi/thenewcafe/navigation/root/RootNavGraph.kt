@@ -27,7 +27,9 @@ fun RootNavGraph(
 
         authGraph(navController = navController, onBackClick = onBackClick, navigateToMain = {
             navController.navigateToMain(navOptions = navOptions {
-                popUpTo(navController.graph.findStartDestination().id)
+                popUpTo(navController.graph.findStartDestination().id) {
+                    inclusive = true
+                }
                 launchSingleTop = true
             })
         })
