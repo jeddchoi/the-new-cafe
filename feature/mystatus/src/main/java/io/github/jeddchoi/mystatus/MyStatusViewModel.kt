@@ -9,7 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 
-class MyStatusViewModel : ViewModel() {
+internal class MyStatusViewModel : ViewModel() {
 
     private val _uiState: Flow<MyStatusUiStateData> = flow {
         delay(1000)
@@ -30,7 +30,7 @@ class MyStatusViewModel : ViewModel() {
 }
 
 
-data class MyStatusUiStateData(
+internal data class MyStatusUiStateData(
     val data: String,
     override val isBusy: Boolean = false,
     override val canContinue: Boolean = true,

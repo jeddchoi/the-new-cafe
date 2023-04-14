@@ -19,7 +19,7 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignInScreen(
+internal fun SignInScreen(
     viewModel: AuthViewModel,
     onBackClick: () -> Unit,
     navigateToMain: () -> Unit,
@@ -98,9 +98,9 @@ fun SignInScreen(
 }
 
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun SignInScreenPreview() {
+private fun SignInScreenPreview() {
     TheNewCafeTheme {
         SignInScreen(
             viewModel = hiltViewModel(),
@@ -114,8 +114,3 @@ fun SignInScreenPreview() {
 
 }
 
-inline fun <reified T> Any?.tryCast(block: T.() -> Unit) {
-    if (this is T) {
-        block()
-    }
-}

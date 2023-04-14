@@ -8,7 +8,7 @@ import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
-class ActionLogViewModel : ViewModel() {
+internal class ActionLogViewModel : ViewModel() {
 
     private val _uiState: Flow<ActionLogUiStateData> = flow {
         delay(1000)
@@ -29,7 +29,7 @@ class ActionLogViewModel : ViewModel() {
 }
 
 
-data class ActionLogUiStateData(
+internal data class ActionLogUiStateData(
     val data: String,
     override val isBusy: Boolean = false,
     override val canContinue: Boolean = true,

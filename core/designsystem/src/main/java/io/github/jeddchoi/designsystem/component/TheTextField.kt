@@ -156,7 +156,7 @@ fun TheTextField(
 
 @Preview(showBackground = true)
 @Composable
-fun TheTextFieldPreview() {
+private fun TheTextFieldPreview() {
     TheNewCafeTheme {
 
         Column {

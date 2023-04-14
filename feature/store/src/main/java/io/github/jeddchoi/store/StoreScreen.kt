@@ -14,7 +14,7 @@ import io.github.jeddchoi.ui.model.UiState
 
 
 @Composable
-fun StoreScreen(
+internal fun StoreScreen(
     uiState: UiState<SeatsUiStateData>,
     modifier: Modifier = Modifier,
 ) {
@@ -39,7 +39,7 @@ fun StoreScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun StoreScreenPreview() {
+private fun StoreScreenPreview() {
     TheNewCafeTheme {
         StoreScreen(
             UiState.Success(SeatsUiStateData("Hello!")),

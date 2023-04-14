@@ -29,7 +29,7 @@ fun ActionLogRoute(
 
 
 @Composable
-fun ActionLogScreen(
+internal fun ActionLogScreen(
     uiState: UiState<ActionLogUiStateData>,
     modifier: Modifier = Modifier,
 ) {
@@ -54,7 +54,7 @@ fun ActionLogScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun ActionLogScreenPreview() {
+private fun ActionLogScreenPreview() {
     TheNewCafeTheme {
         ActionLogScreen(
             UiState.Success(ActionLogUiStateData("Hello!")),

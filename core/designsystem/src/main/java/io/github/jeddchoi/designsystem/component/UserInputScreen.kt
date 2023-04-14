@@ -131,9 +131,9 @@ fun UserInputScreen(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun UserInputOneByOneScreenPreview() {
+private fun UserInputOneByOneScreenPreview() {
     TheNewCafeTheme {
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }

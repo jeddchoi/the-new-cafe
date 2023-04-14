@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(
+internal class AuthViewModel @Inject constructor(
     private val authInputValidator: AuthInputValidator,
     private val authRepository: AuthRepository
 ) : ViewModel() {
@@ -127,7 +127,7 @@ class AuthViewModel @Inject constructor(
 }
 
 
-data class AuthScreenData(
+internal data class AuthScreenData(
     val email: String = "",
     val firstName: String = "",
     val lastName: String = "",

@@ -29,7 +29,7 @@ fun MyStatusRoute(
 
 
 @Composable
-fun MyStatusScreen(
+internal fun MyStatusScreen(
     uiState: UiState<MyStatusUiStateData>,
     modifier: Modifier = Modifier,
 ) {
@@ -54,7 +54,7 @@ fun MyStatusScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun MyStatusScreenPreview() {
+private fun MyStatusScreenPreview() {
     TheNewCafeTheme {
         MyStatusScreen(
             UiState.Success(MyStatusUiStateData("Hello!")),

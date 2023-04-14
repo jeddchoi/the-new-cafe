@@ -5,9 +5,12 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +22,7 @@ import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.ui.model.UiState
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProfileScreen(
     uiState: UiState<ProfileUiStateData>,
@@ -29,6 +33,16 @@ internal fun ProfileScreen(
     lazyListState: LazyListState = rememberLazyListState()
 ) {
 
+    Column(modifier = Modifier) {
+        MediumTopAppBar(
+            modifier = Modifier.fillMaxWidth(),
+            title = {
+                Text(text = stringResource(id = R.string.profile))
+            }
+        )
+
+
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -59,7 +73,7 @@ internal fun ProfileScreen(
 
 @Preview(showBackground = true)
 @Composable
-internal fun ProfileScreenPreview() {
+private fun ProfileScreenPreview() {
     TheNewCafeTheme {
 //        AccountScreen(
 ////            UiState.Success(ProfileUiStateData("Hello!")),

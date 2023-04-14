@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MyPageScreen(
+internal fun MyPageScreen(
     modifier: Modifier = Modifier,
     navigateTab: MyPageNavigation.Tab = MyPageNavigation.Tab.MY_STATUS,
     pagerState: PagerState = rememberPagerState(),

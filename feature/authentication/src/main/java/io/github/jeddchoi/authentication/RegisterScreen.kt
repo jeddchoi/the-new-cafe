@@ -18,7 +18,7 @@ import io.github.jeddchoi.ui.model.UiState
 
 
 @Composable
-fun RegisterScreen(
+internal fun RegisterScreen(
     viewModel: AuthViewModel,
     onBackClick: () -> Unit,
     navigateToMain: () -> Unit,
@@ -115,7 +115,7 @@ fun RegisterScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun RegisterScreenPreview() {
+private fun RegisterScreenPreview() {
     TheNewCafeTheme {
         RegisterScreen(viewModel = hiltViewModel(), onBackClick = {}, navigateToSignInClick = {}, navigateToMain = {})
     }

@@ -9,7 +9,7 @@ import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
-class StoreViewModel(
+internal class StoreViewModel(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val storeArgs: StoreArgs = StoreArgs(savedStateHandle)
@@ -33,7 +33,7 @@ class StoreViewModel(
 }
 
 
-data class SeatsUiStateData(
+internal data class SeatsUiStateData(
     val data: String,
     override val isBusy: Boolean = false,
     override val canContinue: Boolean = true,
