@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.util.AuthInputValidator
-import io.github.jeddchoi.ui.feature.UiState
+import io.github.jeddchoi.ui.model.*
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,20 +19,11 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AuthScreenData())
+    private val _uiState: MutableStateFlow<AuthScreenData> = MutableStateFlow(AuthScreenData())
 
     val uiState: StateFlow<UiState<AuthScreenData>> =
-        _uiState
-            .onStart { delay(4_000) }
-            .map<AuthScreenData, UiState<AuthScreenData>> {
-                UiState.Success(it)
-            }.catch {
-                emit(UiState.Error(it))
-            }.stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5_000),
-                UiState.Loading()
-            )
+        _uiState.onStart { delay(4_000) }
+            .asUiState(viewModelScope)
 
 
     fun onEmailChange(email: String) {
@@ -67,24 +60,61 @@ class AuthViewModel @Inject constructor(
     }
 
     fun onSignIn() {
-        viewModelScope.launch {
-            val result = authRepository.signInWithEmail(_uiState.value.email, _uiState.value.password)
+        val email = _uiState.value.email
+        val password = _uiState.value.password
+
+        launchOneShotJob {
+            val result = authRepository.signInWithEmail(email, password)
             if (result.isSuccess) {
-
+                _uiState.value = _uiState.value.copy(isSignInSuccessful = true)
             } else {
-
+                _uiState.value =
+                    _uiState.value.copy(isSignInSuccessful = false, canContinue = false)
             }
         }
-
     }
 
     fun onRegister() {
-        viewModelScope.launch {
-            val result = authRepository.registerWithEmail(_uiState.value.email, _uiState.value.firstName, _uiState.value.lastName, _uiState.value.password)
+        val email = _uiState.value.email
+        val firstName = _uiState.value.firstName
+        val lastName = _uiState.value.lastName
+        val password = _uiState.value.password
+
+        launchOneShotJob {
+            val result = authRepository.registerWithEmail(email, firstName, lastName, password)
             if (result.isSuccess) {
-
+                _uiState.value = _uiState.value.copy(isRegisterSuccessful = true)
             } else {
+                _uiState.value =
+                    _uiState.value.copy(isRegisterSuccessful = false, canContinue = false)
+            }
+        }
+    }
 
+
+    private fun launchOneShotJob(
+        job: suspend () -> Unit
+    ) {
+        _uiState.value = _uiState.value.copy(isBusy = true)
+        viewModelScope.launch {
+            try {
+                job()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    canContinue = false,
+                    messages = _uiState.value.messages.plus(
+                        Message(
+                            titleId = R.string.error,
+                            content = e.message ?: e.stackTraceToString(),
+                            severity = Severity.ERROR,
+                            action = listOf(Action(R.string.retry) {
+                                launchOneShotJob(job)
+                            }),
+                        )
+                    )
+                )
+            } finally {
+                _uiState.value = _uiState.value.copy(isBusy = false)
             }
         }
     }
@@ -103,12 +133,39 @@ data class AuthScreenData(
     val isPasswordValid: Boolean = false,
     val doPasswordsMatch: Boolean = false,
     val isSignInSuccessful: Boolean = false,
-    val isRegisterSuccessful: Boolean = false
-) {
-    val canSignIn = isEmailValid && isPasswordValid
-    val canRegister =
-        isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && doPasswordsMatch
+    val isRegisterSuccessful: Boolean = false,
+    override val isBusy: Boolean = false,
+    override val canContinue: Boolean = true,
+    override val messages: List<Message> = emptyList()
+) : FeedbackState {
 
     val signInInfoComplete = email.isNotEmpty() && password.isNotEmpty()
-    val registerInfoComplete = email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()
+    val isValidInfoToSignIn = isEmailValid && isPasswordValid
+
+    val registerInfoComplete =
+        email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()
+    val isValidInfoToRegister =
+        isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && doPasswordsMatch
+
+    override fun copy(
+        isBusy: Boolean,
+        canContinue: Boolean,
+        messages: List<Message>
+    ): AuthScreenData = AuthScreenData(
+        email,
+        firstName,
+        lastName,
+        password,
+        confirmPassword,
+        isEmailValid,
+        isFirstNameValid,
+        isLastNameValid,
+        isPasswordValid,
+        doPasswordsMatch,
+        isSignInSuccessful,
+        isRegisterSuccessful,
+        isBusy,
+        canContinue,
+        messages
+    )
 }

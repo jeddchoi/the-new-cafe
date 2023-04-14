@@ -12,8 +12,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.*
+import io.github.jeddchoi.ui.LogCompositions
 import io.github.jeddchoi.ui.feature.LoadingScreen
-import io.github.jeddchoi.ui.feature.UiState
+import io.github.jeddchoi.ui.model.UiState
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,10 +22,12 @@ import java.util.*
 fun SignInScreen(
     viewModel: AuthViewModel,
     onBackClick: () -> Unit,
+    navigateToMain: () -> Unit,
     navigateToRegisterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
 
     when (uiState) {
         UiState.EmptyResult -> {
@@ -33,11 +36,13 @@ fun SignInScreen(
         is UiState.Error -> {
 
         }
-        is UiState.Loading -> {
+        is UiState.InitialLoading -> {
             LoadingScreen()
         }
         is UiState.Success -> {
             val data = (uiState as UiState.Success<AuthScreenData>).data
+
+            LogCompositions(tag = "SignIn", msg = data.toString())
             UserInputScreen(
                 title = stringResource(R.string.sign_in),
                 onBackClick = onBackClick,
@@ -72,14 +77,22 @@ fun SignInScreen(
                 buttonText = stringResource(R.string.sign_in),
                 onPrimaryButtonClick = {
                     Log.i("SignInScreen", "email : ${data.email}, password : ${data.password}")
+                    viewModel.onSignIn()
                 },
-                isError = !data.canSignIn,
-                errorMsg = stringResource(R.string.some_inputs_invalid_msg),
+                canContinue = data.isValidInfoToSignIn && data.canContinue && !data.isBusy,
+                isBusy = data.isBusy,
+                errorMsg = if (data.isValidInfoToSignIn) null else stringResource(R.string.some_inputs_invalid_msg),
                 userInfoComplete = data.signInInfoComplete,
                 optionalTitle = stringResource(R.string.new_user),
                 optionalButtonClick = navigateToRegisterClick,
                 optionalButtonText = stringResource(R.string.register),
             )
+
+            LaunchedEffect(data.isSignInSuccessful) {
+                if (data.isSignInSuccessful) {
+                    navigateToMain()
+                }
+            }
         }
     }
 }
@@ -91,10 +104,18 @@ fun SignInScreenPreview() {
     TheNewCafeTheme {
         SignInScreen(
             viewModel = hiltViewModel(),
-            onBackClick = {  },
+            onBackClick = { },
             navigateToRegisterClick = {
 
-            })
+            },
+            navigateToMain = {}
+        )
     }
 
+}
+
+inline fun <reified T> Any?.tryCast(block: T.() -> Unit) {
+    if (this is T) {
+        block()
+    }
 }

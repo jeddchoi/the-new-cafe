@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
-import io.github.jeddchoi.ui.feature.UiState
+import io.github.jeddchoi.ui.model.UiState
 
 
 @Composable
@@ -26,7 +26,7 @@ fun StoreScreen(
         val text = when (uiState) {
             UiState.EmptyResult -> "EMPTY"
             is UiState.Error -> "ERROR : ${uiState.exception.message}"
-            is UiState.Loading -> "LOADING ${uiState.data?.data}"
+            is UiState.InitialLoading -> "LOADING"
             is UiState.Success -> "SUCCESS 🎉 ${uiState.data.data}"
         }
 

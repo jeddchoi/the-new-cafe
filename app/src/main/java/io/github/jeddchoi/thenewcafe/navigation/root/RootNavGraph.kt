@@ -10,6 +10,7 @@ import io.github.jeddchoi.authentication.SignInNavigation
 import io.github.jeddchoi.authentication.authGraph
 import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.thenewcafe.navigation.main.mainScreen
+import io.github.jeddchoi.thenewcafe.navigation.main.navigateToMain
 
 @Composable
 fun RootNavGraph(
@@ -24,7 +25,12 @@ fun RootNavGraph(
         modifier = modifier,
     ) {
 
-        authGraph(navController = navController, onBackClick = onBackClick)
+        authGraph(navController = navController, onBackClick = onBackClick, navigateToMain = {
+            navController.navigateToMain(navOptions = navOptions {
+                popUpTo(navController.graph.findStartDestination().id)
+                launchSingleTop = true
+            })
+        })
 
         mainScreen {
             navController.navigateToAuth(navOptions = navOptions {

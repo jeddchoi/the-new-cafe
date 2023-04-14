@@ -2,6 +2,7 @@ package io.github.jeddchoi.authentication
 
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -13,13 +14,14 @@ import io.github.jeddchoi.designsystem.component.GeneralTextField
 import io.github.jeddchoi.designsystem.component.PasswordField
 import io.github.jeddchoi.designsystem.component.UserInputScreen
 import io.github.jeddchoi.ui.feature.LoadingScreen
-import io.github.jeddchoi.ui.feature.UiState
+import io.github.jeddchoi.ui.model.UiState
 
 
 @Composable
 fun RegisterScreen(
     viewModel: AuthViewModel,
     onBackClick: () -> Unit,
+    navigateToMain: () -> Unit,
     navigateToSignInClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -32,7 +34,7 @@ fun RegisterScreen(
         is UiState.Error -> {
 
         }
-        is UiState.Loading -> {
+        is UiState.InitialLoading -> {
             LoadingScreen()
         }
         is UiState.Success -> {
@@ -91,15 +93,21 @@ fun RegisterScreen(
                 buttonText = stringResource(R.string.register),
                 onPrimaryButtonClick = {
                     Log.i("SignInScreen", "email : ${data.email}, password : ${data.password}")
+                    viewModel.onRegister()
                 },
-                isError = !data.canRegister,
-                errorMsg = stringResource(R.string.some_inputs_invalid_msg),
+                canContinue = data.isValidInfoToRegister && data.canContinue && !data.isBusy,
+                isBusy = data.isBusy,
+                errorMsg = if (data.isValidInfoToRegister) null else stringResource(R.string.some_inputs_invalid_msg),
                 userInfoComplete = data.registerInfoComplete,
-
                 optionalTitle = stringResource(R.string.already_have_an_account),
                 optionalButtonClick = navigateToSignInClick,
                 optionalButtonText = stringResource(R.string.sign_in),
             )
+            LaunchedEffect(data.isRegisterSuccessful) {
+                if (data.isRegisterSuccessful) {
+                    navigateToMain()
+                }
+            }
         }
     }
 }
@@ -109,6 +117,6 @@ fun RegisterScreen(
 @Composable
 fun RegisterScreenPreview() {
     TheNewCafeTheme {
-        RegisterScreen(viewModel = hiltViewModel(), onBackClick = {}, navigateToSignInClick = {})
+        RegisterScreen(viewModel = hiltViewModel(), onBackClick = {}, navigateToSignInClick = {}, navigateToMain = {})
     }
 }

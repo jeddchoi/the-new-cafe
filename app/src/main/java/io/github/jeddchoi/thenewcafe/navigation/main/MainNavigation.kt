@@ -1,11 +1,8 @@
 package io.github.jeddchoi.thenewcafe.navigation.main
 
 import androidx.annotation.StringRes
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavDeepLink
-import androidx.navigation.NavGraphBuilder
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navDeepLink
 import io.github.jeddchoi.thenewcafe.R
 import io.github.jeddchoi.ui.feature.AppNavigation
 import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseAppUri
@@ -24,6 +21,10 @@ object MainNavigation : AppNavigation {
         navDeepLink { uriPattern = "$baseAppUri/${route()}" }
     )
 
+}
+
+fun NavController.navigateToMain(navOptions: NavOptions? = null) {
+    this.navigate(MainNavigation.route(), navOptions)
 }
 
 fun NavGraphBuilder.mainScreen(navigateToSignIn: () -> Unit) {

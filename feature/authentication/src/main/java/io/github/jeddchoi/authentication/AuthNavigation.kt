@@ -53,6 +53,7 @@ fun NavController.navigateToRegister(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.authGraph(
     navController: NavHostController,
     onBackClick: () -> Unit,
+    navigateToMain: () -> Unit,
 ) {
     navigation(
         route = SignInNavigation.routeGraph,
@@ -69,12 +70,14 @@ fun NavGraphBuilder.authGraph(
             SignInScreen(
                 viewModel = authViewModel,
                 onBackClick = onBackClick,
+                navigateToMain = navigateToMain,
                 navigateToRegisterClick = {
                     navController.navigateToRegister(navOptions {
                         popUpTo(SignInNavigation.route())
                         launchSingleTop = true
                     })
-                }
+                },
+
             )
         }
 
@@ -96,7 +99,8 @@ fun NavGraphBuilder.authGraph(
                         }
                         launchSingleTop = true
                     })
-                }
+                },
+                navigateToMain = navigateToMain,
             )
         }
 

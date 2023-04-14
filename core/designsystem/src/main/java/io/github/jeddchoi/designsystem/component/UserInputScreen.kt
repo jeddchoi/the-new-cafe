@@ -23,12 +23,13 @@ fun UserInputScreen(
     title: String,
     inputFields: @Composable ColumnScope.(Modifier) -> Unit,
     buttonText: String,
+    isBusy: Boolean,
     onPrimaryButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
     existBackStack: Boolean = false,
     onBackClick: () -> Unit = {},
-    isError: Boolean = false,
-    errorMsg: String = "",
+    canContinue: Boolean = true,
+    errorMsg: String? = null,
     userInfoComplete: Boolean = false,
     optionalTitle: String = "",
     optionalButtonClick: () -> Unit = {},
@@ -69,7 +70,8 @@ fun UserInputScreen(
 //                    val bringIntoViewRequester = remember { BringIntoViewRequester() }
 //                    val coroutineScope = rememberCoroutineScope()
 
-                    inputFields(Modifier
+                    inputFields(
+                        Modifier
 //                        .bringIntoViewRequester(bringIntoViewRequester)
 //                        .onFocusChanged {
 //                            if (it.isFocused) {
@@ -105,22 +107,24 @@ fun UserInputScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    PrimaryButton(
-                        enabled = !isError,
-                        buttonText = buttonText,
-                        onClick = {
-                            onPrimaryButtonClick()
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    )
-
-                    if (isError && userInfoComplete) {
+                    if (errorMsg != null && userInfoComplete) {
                         Text(
                             text = errorMsg,
                             style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.error)
                         )
                     }
+
+
+                    PrimaryButton(
+                        enabled = canContinue,
+                        buttonText = buttonText,
+                        onClick = {
+                            onPrimaryButtonClick()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        isBusy = isBusy
+                    )
                 }
             }
         }
@@ -164,9 +168,10 @@ fun UserInputOneByOneScreenPreview() {
             onPrimaryButtonClick = {
                 Log.i("SignInScreen", "email : $email, password : $password")
             },
-            isError = !isEmailValid || !isPasswordValid,
+            canContinue = !isEmailValid || !isPasswordValid,
             errorMsg = "Some input is invalid",
             userInfoComplete = email.isNotEmpty() && password.isNotEmpty(),
+            isBusy = true
         )
     }
 }

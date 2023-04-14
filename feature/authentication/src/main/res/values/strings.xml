@@ -16,4 +16,6 @@
     <string name="first_name">First name</string>
     <string name="name_invalid">Name is invalid</string>
     <string name="last_name">Last name</string>
+    <string name="retry">Retry</string>
+    <string name="error">Error</string>
 </resources>

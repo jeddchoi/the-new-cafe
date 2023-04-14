@@ -11,7 +11,7 @@ import io.github.jeddchoi.designsystem.Icon
 import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseAppUri
 import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseWebUri
 import io.github.jeddchoi.ui.feature.BottomNavigation
-import io.github.jeddchoi.ui.feature.UiState
+import io.github.jeddchoi.ui.model.UiState
 
 /**
  * Account navigation constants
@@ -65,7 +65,7 @@ fun NavGraphBuilder.accountScreen(
         deepLinks = AccountNavigation.deepLinks
     ) {
         val viewModel: AccountViewModel = viewModel()
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle(UiState.Loading())
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle(UiState.InitialLoading)
 
         AccountScreen(
             uiState = uiState,

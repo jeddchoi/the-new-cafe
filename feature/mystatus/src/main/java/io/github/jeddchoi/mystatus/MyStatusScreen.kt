@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
-import io.github.jeddchoi.ui.feature.UiState
+import io.github.jeddchoi.ui.model.UiState
 
 @Composable
 fun MyStatusRoute(
@@ -41,7 +41,7 @@ fun MyStatusScreen(
         val text = when (uiState) {
             UiState.EmptyResult -> "EMPTY"
             is UiState.Error -> "ERROR : ${uiState.exception.message}"
-            is UiState.Loading -> "LOADING ${uiState.data?.data}"
+            is UiState.InitialLoading -> "LOADING"
             is UiState.Success -> "SUCCESS 🎉 ${uiState.data.data}"
         }
 

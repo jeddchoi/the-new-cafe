@@ -2,7 +2,9 @@ package io.github.jeddchoi.actionlog
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.github.jeddchoi.ui.feature.UiState
+import io.github.jeddchoi.ui.model.FeedbackState
+import io.github.jeddchoi.ui.model.Message
+import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
@@ -22,11 +24,20 @@ class ActionLogViewModel : ViewModel() {
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
-            UiState.Loading()
+            UiState.InitialLoading
         )
 }
 
 
 data class ActionLogUiStateData(
-    val data: String
-)
+    val data: String,
+    override val isBusy: Boolean = false,
+    override val canContinue: Boolean = true,
+    override val messages: List<Message> = emptyList()
+) : FeedbackState {
+    override fun copy(
+        isBusy: Boolean,
+        canContinue: Boolean,
+        messages: List<Message>
+    ): ActionLogUiStateData = ActionLogUiStateData(data, isBusy, canContinue, messages)
+}
