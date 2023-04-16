@@ -2,10 +2,8 @@ package io.github.jeddchoi.profile
 
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
@@ -15,10 +13,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.CircularProfilePicture
 import io.github.jeddchoi.ui.model.UiState
 
 
@@ -33,14 +33,23 @@ internal fun ProfileScreen(
     lazyListState: LazyListState = rememberLazyListState()
 ) {
 
-    Column(modifier = Modifier) {
-        MediumTopAppBar(
-            modifier = Modifier.fillMaxWidth(),
-            title = {
-                Text(text = stringResource(id = R.string.profile))
-            }
-        )
+    LazyColumn(
+        modifier = Modifier,
+    ) {
+        item {
+            MediumTopAppBar(
+                modifier = Modifier.fillMaxWidth(),
+                title = {
+                    Text(text = stringResource(id = R.string.profile))
+                }
+            )
+        }
 
+        item {
+            CircularProfilePicture(image = painterResource(id = R.drawable.sample_avatar))
+        }
+        item {
+        }
 
     }
     Column(
@@ -54,7 +63,7 @@ internal fun ProfileScreen(
             UiState.EmptyResult -> "EMPTY"
             is UiState.Error -> "ERROR : ${uiState.exception.message}"
             is UiState.InitialLoading -> "LOADING"
-            is UiState.Success -> "SUCCESS 🎉 ${uiState.data.data}"
+            is UiState.Success -> "SUCCESS 🎉 ${uiState.data.firstName}"
         }
         Text(
             text = text,
@@ -69,6 +78,8 @@ internal fun ProfileScreen(
         }
     }
 }
+
+
 
 
 @Preview(showBackground = true)

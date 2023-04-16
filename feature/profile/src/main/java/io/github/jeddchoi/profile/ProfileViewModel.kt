@@ -19,7 +19,7 @@ internal class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ProfileUiStateData(""))
+    private val _uiState = MutableStateFlow(ProfileUiStateData("", "", false, 0))
 
     val uiState: StateFlow<UiState<ProfileUiStateData>> = _uiState.asUiState(viewModelScope)
 
@@ -31,7 +31,7 @@ internal class ProfileViewModel @Inject constructor(
         Log.i("Auth", System.identityHashCode(authRepository).toString() )
         viewModelScope.launch {
             authRepository.getCurrentUser().collect() {
-                _uiState.value = _uiState.value.copy(data = it?.toString() ?: "Not logged in")
+                _uiState.value = _uiState.value.copy(firstName = it?.toString() ?: "Not logged in")
             }
         }
     }
@@ -39,7 +39,10 @@ internal class ProfileViewModel @Inject constructor(
 
 
 internal data class ProfileUiStateData(
-    val data: String,
+    val firstName: String,
+    val uid: String,
+    val isOnline: Boolean,
+    val lastSignInTime: Long,
     override val isBusy: Boolean = false,
     override val canContinue: Boolean = true,
     override val messages: List<Message> = emptyList()
@@ -48,5 +51,5 @@ internal data class ProfileUiStateData(
         isBusy: Boolean,
         canContinue: Boolean,
         messages: List<Message>
-    ): FeedbackState = ProfileUiStateData(data, isBusy, canContinue, messages)
+    ): FeedbackState = ProfileUiStateData(firstName, uid, isOnline, lastSignInTime, isBusy, canContinue, messages)
 }
