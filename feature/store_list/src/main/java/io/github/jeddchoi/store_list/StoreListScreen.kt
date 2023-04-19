@@ -3,6 +3,7 @@ package io.github.jeddchoi.store_list
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,6 +17,7 @@ import io.github.jeddchoi.ui.model.UiState
 @Composable
 internal fun StoreListScreen(
     uiState: UiState<StoreListUiStateData>,
+    reserveSeat: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -34,6 +36,10 @@ internal fun StoreListScreen(
             text = text,
             textAlign = TextAlign.Center
         )
+
+        Button(onClick = reserveSeat) {
+            Text("Reserve Seat")
+        }
     }
 }
 

@@ -61,7 +61,9 @@ fun NavGraphBuilder.orderGraph(
             val viewModel: StoreListViewModel = viewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            StoreListScreen(uiState = uiState)
+            StoreListScreen(uiState = uiState, {
+                viewModel.reserveSeat()
+            })
         }
         nestedGraphs()
     }

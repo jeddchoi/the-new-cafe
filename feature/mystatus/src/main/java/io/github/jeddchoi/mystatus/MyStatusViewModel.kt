@@ -8,7 +8,6 @@ import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
-
 internal class MyStatusViewModel : ViewModel() {
 
     private val _uiState: Flow<MyStatusUiStateData> = flow {

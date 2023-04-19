@@ -1,14 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":core:firebase")
-
-
-include(":feature:authentication")
-
-
-
-
-
 pluginManagement {
     includeBuild("buildlogic")
     repositories {
@@ -35,7 +26,6 @@ include(":feature:mypage")
 include(":feature:actionlog")
 include(":feature:mystatus")
 include(":feature:authentication")
-
 
 include(":core:ui")
 include(":core:data")

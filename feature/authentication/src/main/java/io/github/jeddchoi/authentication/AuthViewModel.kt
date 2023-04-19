@@ -35,13 +35,9 @@ internal class AuthViewModel @Inject constructor(
 
     fun onFirstNameChange(firstName: String) {
         val isNameValid = authInputValidator.isNameValid(firstName)
-        _uiState.value = _uiState.value.copy(firstName = firstName, isFirstNameValid = isNameValid)
+        _uiState.value = _uiState.value.copy(displayName = firstName, isFirstNameValid = isNameValid)
     }
 
-    fun onLastNameChange(lastName: String) {
-        val isNameValid = authInputValidator.isNameValid(lastName)
-        _uiState.value = _uiState.value.copy(lastName = lastName, isLastNameValid = isNameValid)
-    }
 
     fun onPasswordChange(password: String, isRegister: Boolean = false) {
         val isPasswordValid =
@@ -77,12 +73,11 @@ internal class AuthViewModel @Inject constructor(
 
     fun onRegister() {
         val email = _uiState.value.email
-        val firstName = _uiState.value.firstName
-        val lastName = _uiState.value.lastName
+        val displayName = _uiState.value.displayName
         val password = _uiState.value.password
 
         launchOneShotJob {
-            val result = authRepository.registerWithEmail(email, firstName, lastName, password)
+            val result = authRepository.registerWithEmail(email, displayName, password)
             if (result.isSuccess) {
                 _uiState.value = _uiState.value.copy(isRegisterSuccessful = true)
             } else {
@@ -129,13 +124,11 @@ internal class AuthViewModel @Inject constructor(
 
 internal data class AuthScreenData(
     val email: String = "",
-    val firstName: String = "",
-    val lastName: String = "",
+    val displayName: String = "",
     val password: String = "",
     val confirmPassword: String = "",
     val isEmailValid: Boolean = false,
     val isFirstNameValid: Boolean = false,
-    val isLastNameValid: Boolean = false,
     val isPasswordValid: Boolean = false,
     val doPasswordsMatch: Boolean = false,
     val isSignInSuccessful: Boolean = false,
@@ -149,9 +142,9 @@ internal data class AuthScreenData(
     val isValidInfoToSignIn = isEmailValid && isPasswordValid
 
     val registerInfoComplete =
-        email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()
+        email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && displayName.isNotEmpty()
     val isValidInfoToRegister =
-        isEmailValid && isFirstNameValid && isLastNameValid && isPasswordValid && doPasswordsMatch
+        isEmailValid && isFirstNameValid && isPasswordValid && doPasswordsMatch
 
     override fun copy(
         isBusy: Boolean,
@@ -159,13 +152,11 @@ internal data class AuthScreenData(
         messages: List<Message>
     ): AuthScreenData = AuthScreenData(
         email,
-        firstName,
-        lastName,
+        displayName,
         password,
         confirmPassword,
         isEmailValid,
         isFirstNameValid,
-        isLastNameValid,
         isPasswordValid,
         doPasswordsMatch,
         isSignInSuccessful,

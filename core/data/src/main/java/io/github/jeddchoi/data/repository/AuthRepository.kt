@@ -17,12 +17,11 @@ interface AuthRepository {
      * Attempts to register the user with the given email and password.
      *
      * @param email The user's email.
-     * @param firstName The user's first name.
-     * @param lastName The user's last name.
+     * @param displayName The user's first name.
      * @param password The user's password.
      * @return A [Result] object indicating success or failure of the signup attempt.
      */
-    suspend fun registerWithEmail(email: String, firstName: String, lastName:String, password: String): Result<Unit>
+    suspend fun registerWithEmail(email: String, displayName: String, password: String): Result<Unit>
 
     /**
      * Attempts to sign the user in with Google Sign-In.
@@ -42,6 +41,11 @@ interface AuthRepository {
      * Returns true if a user is currently signed in, false otherwise.
      */
     fun isUserSignedIn(): Boolean
+
+    /**
+     * Get current user id
+     */
+    fun getUserId(): String?
 
     /**
      * Returns the currently signed-in user, or null if no user is signed in.

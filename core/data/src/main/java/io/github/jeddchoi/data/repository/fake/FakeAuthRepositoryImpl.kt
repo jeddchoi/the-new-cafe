@@ -14,20 +14,19 @@ class FakeAuthRepositoryImpl @Inject constructor() : AuthRepository {
         // 이메일과 비밀번호로 인증하는 가짜 로직을 작성합니다.
         // 성공한 경우에는 currentUser에 로그인한 사용자 정보를 저장합니다.
         delay(4_000)
-        currentUser = User(email, "John", "Doe")
+        currentUser = User(email, "John")
         return Result.success(Unit)
     }
 
     override suspend fun registerWithEmail(
         email: String,
-        firstName: String,
-        lastName: String,
+        displayName: String,
         password: String
     ): Result<Unit> {
         // 이메일과 비밀번호로 사용자를 등록하는 가짜 로직을 작성합니다.
         // 성공한 경우에는 currentUser에 등록한 사용자 정보를 저장합니다.
         delay(4_000)
-        currentUser = User(email, firstName, lastName)
+        currentUser = User(email, displayName)
         return Result.success(Unit)
     }
 
@@ -35,7 +34,7 @@ class FakeAuthRepositoryImpl @Inject constructor() : AuthRepository {
         // Google Sign-In으로 인증하는 가짜 로직을 작성합니다.
         // 성공한 경우에는 currentUser에 로그인한 사용자 정보를 저장합니다.
         delay(4_000)
-        currentUser = User("johndoe@gmail.com", "John", "Doe")
+        currentUser = User("johndoe@gmail.com", "John")
         return Result.success(Unit)
     }
 
@@ -48,6 +47,10 @@ class FakeAuthRepositoryImpl @Inject constructor() : AuthRepository {
     override fun isUserSignedIn(): Boolean {
         // currentUser가 null이 아닌 경우에는 사용자가 로그인한 상태입니다.
         return currentUser != null
+    }
+
+    override fun getUserId(): String? {
+        return currentUser?.id
     }
 
     override fun getCurrentUser(): Flow<User?> {
