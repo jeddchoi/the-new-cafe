@@ -47,9 +47,9 @@ internal fun RegisterScreen(
 
                     GeneralTextField(
                         value = data.displayName,
-                        onValueChange = { viewModel.onFirstNameChange(it) },
-                        placeholderMsg = stringResource(R.string.first_name),
-                        isError = !data.isFirstNameValid,
+                        onValueChange = { viewModel.onDisplayNameChange(it) },
+                        placeholderMsg = stringResource(R.string.display_name),
+                        isError = !data.isDisplayNameValid,
                         errorMsg = stringResource(R.string.name_invalid),
                         modifier = inputFieldsModifier
                     )

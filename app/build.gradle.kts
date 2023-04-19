@@ -31,6 +31,7 @@ android {
     buildTypes {
         val debug by getting {
             applicationIdSuffix = AppBuildType.DEBUG.applicationIdSuffix
+
         }
         val release by getting {
             isMinifyEnabled = true

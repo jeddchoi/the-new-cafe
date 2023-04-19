@@ -33,9 +33,9 @@ internal class AuthViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(email = email, isEmailValid = isEmailValid)
     }
 
-    fun onFirstNameChange(firstName: String) {
-        val isNameValid = authInputValidator.isNameValid(firstName)
-        _uiState.value = _uiState.value.copy(displayName = firstName, isFirstNameValid = isNameValid)
+    fun onDisplayNameChange(displayName: String) {
+        val isNameValid = authInputValidator.isNameValid(displayName)
+        _uiState.value = _uiState.value.copy(displayName = displayName, isDisplayNameValid = isNameValid)
     }
 
 
@@ -96,6 +96,7 @@ internal class AuthViewModel @Inject constructor(
             try {
                 job()
             } catch (e: Exception) {
+                Log.e("Auth", e.stackTraceToString())
                 _uiState.value = _uiState.value.copy(
                     canContinue = false,
                     messages = _uiState.value.messages.plus(
@@ -128,7 +129,7 @@ internal data class AuthScreenData(
     val password: String = "",
     val confirmPassword: String = "",
     val isEmailValid: Boolean = false,
-    val isFirstNameValid: Boolean = false,
+    val isDisplayNameValid: Boolean = false,
     val isPasswordValid: Boolean = false,
     val doPasswordsMatch: Boolean = false,
     val isSignInSuccessful: Boolean = false,
@@ -144,7 +145,7 @@ internal data class AuthScreenData(
     val registerInfoComplete =
         email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && displayName.isNotEmpty()
     val isValidInfoToRegister =
-        isEmailValid && isFirstNameValid && isPasswordValid && doPasswordsMatch
+        isEmailValid && isDisplayNameValid && isPasswordValid && doPasswordsMatch
 
     override fun copy(
         isBusy: Boolean,
@@ -156,7 +157,7 @@ internal data class AuthScreenData(
         password,
         confirmPassword,
         isEmailValid,
-        isFirstNameValid,
+        isDisplayNameValid,
         isPasswordValid,
         doPasswordsMatch,
         isSignInSuccessful,

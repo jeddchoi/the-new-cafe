@@ -13,7 +13,7 @@
     <string name="already_have_an_account">Already have an account?</string>
     <string name="confirm_password">Confirm password</string>
     <string name="password_isnt_same">Your password and confirmation password must match</string>
-    <string name="first_name">First name</string>
+    <string name="display_name">Name</string>
     <string name="name_invalid">Name is invalid</string>
     <string name="last_name">Last name</string>
     <string name="retry">Retry</string>

@@ -31,7 +31,7 @@ internal class ProfileViewModel @Inject constructor(
         Log.i("Auth", System.identityHashCode(authRepository).toString() )
         viewModelScope.launch {
             authRepository.getCurrentUser().collect() {
-                _uiState.value = _uiState.value.copy(firstName = it?.toString() ?: "Not logged in")
+                _uiState.value = _uiState.value.copy(displayName = it?.toString() ?: "Not logged in")
             }
         }
     }
@@ -39,7 +39,7 @@ internal class ProfileViewModel @Inject constructor(
 
 
 internal data class ProfileUiStateData(
-    val firstName: String,
+    val displayName: String,
     val uid: String,
     val isOnline: Boolean,
     val lastSignInTime: Long,
@@ -51,5 +51,5 @@ internal data class ProfileUiStateData(
         isBusy: Boolean,
         canContinue: Boolean,
         messages: List<Message>
-    ): FeedbackState = ProfileUiStateData(firstName, uid, isOnline, lastSignInTime, isBusy, canContinue, messages)
+    ): FeedbackState = ProfileUiStateData(displayName, uid, isOnline, lastSignInTime, isBusy, canContinue, messages)
 }

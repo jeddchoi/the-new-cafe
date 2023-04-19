@@ -2,8 +2,8 @@ package io.github.jeddchoi.store_list
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import io.github.jeddchoi.designsystem.CafeIcons
@@ -58,7 +58,7 @@ fun NavGraphBuilder.orderGraph(
             route = StoreListNavigation.route(),
             deepLinks = StoreListNavigation.deepLinks
         ) {
-            val viewModel: StoreListViewModel = viewModel()
+            val viewModel: StoreListViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             StoreListScreen(uiState = uiState, {
