@@ -35,6 +35,7 @@ object ProfileNavigation : BottomNavigation {
     // bottom navigation
     override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Profile_Filled)
     override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Profile)
+
     @StringRes
     override val iconTextId: Int = R.string.profile
 }
@@ -70,7 +71,10 @@ fun NavGraphBuilder.profileScreen(
         ProfileScreen(
             uiState = uiState,
             onNavigateToSignIn = onNavigateToSignIn,
-            onSignOut = { viewModel.signOut() },
+            onSignOut = {
+                viewModel.signOut()
+                onNavigateToSignIn()
+            },
             onBackClick = onBackClick,
         )
     }

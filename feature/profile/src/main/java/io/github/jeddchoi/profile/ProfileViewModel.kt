@@ -1,6 +1,5 @@
 package io.github.jeddchoi.profile
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,13 +23,14 @@ internal class ProfileViewModel @Inject constructor(
     val uiState: StateFlow<UiState<ProfileUiStateData>> = _uiState.asUiState(viewModelScope)
 
     fun signOut() {
-
+        viewModelScope.launch {
+            authRepository.logout()
+        }
     }
 
     init {
-        Log.i("Auth", System.identityHashCode(authRepository).toString() )
         viewModelScope.launch {
-            authRepository.getCurrentUser().collect() {
+            authRepository.getCurrentUser().collect {
                 _uiState.value = _uiState.value.copy(displayName = it?.toString() ?: "Not logged in")
             }
         }

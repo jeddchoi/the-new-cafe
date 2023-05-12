@@ -2,6 +2,7 @@ package io.github.jeddchoi.data.firebase
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
+import com.google.firebase.database.FirebaseDatabase
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.model.User
 import kotlinx.coroutines.channels.awaitClose
@@ -13,7 +14,8 @@ import javax.inject.Singleton
 
 @Singleton
 class FirebaseAuthRepositoryImpl @Inject constructor(
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val database: FirebaseDatabase,
 ) : AuthRepository {
     override suspend fun signInWithEmail(email: String, password: String): Result<Unit> {
         auth.signInWithEmailAndPassword(email, password).await()
@@ -25,9 +27,17 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
         displayName: String,
         password: String
     ): Result<Unit> {
-        auth.createUserWithEmailAndPassword(email, password).await()
-        userProfileChangeRequest {
-            this.displayName = displayName
+        val result = auth.createUserWithEmailAndPassword(email, password).await()
+        val createdUser = result?.user
+        if (createdUser != null) {
+            val request = userProfileChangeRequest {
+                this.displayName = displayName
+            }
+            createdUser.updateProfile(request).await()
+            // TODO: fix this
+//            database.reference.child("users").child(createdUser.uid).setValue(UserStatus(
+//
+//            )).await()
         }
         return Result.success(Unit)
     }

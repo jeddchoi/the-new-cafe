@@ -1,5 +1,6 @@
 package io.github.jeddchoi.store_list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,7 +9,6 @@ import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.ui.model.FeedbackState
 import io.github.jeddchoi.ui.model.Message
 import io.github.jeddchoi.ui.model.UiState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,10 +18,7 @@ internal class StoreListViewModel @Inject constructor(
     private val seatRepository: SeatRepository,
 ) : ViewModel() {
 
-    private val _uiState: Flow<StoreListUiStateData> = flow {
-        delay(1000)
-        emit(StoreListUiStateData("Stores"))
-    }
+    private val _uiState = MutableStateFlow(StoreListUiStateData(""))
 
 
     val uiState: StateFlow<UiState<StoreListUiStateData>> =
@@ -36,8 +33,37 @@ internal class StoreListViewModel @Inject constructor(
         )
 
     fun reserveSeat() {
-        viewModelScope.launch {
+        launchOneShotJob {
             seatRepository.reserveSeat(SeatPosition("store_1", "section_1", "seat_1"), 100)
+        }
+    }
+
+    private fun launchOneShotJob(
+        job: suspend () -> Unit
+    ) {
+//        _uiState.value = _uiState.value.copy(isBusy = true)
+        viewModelScope.launch {
+            try {
+                job()
+            } catch (e: Exception) {
+                Log.e("StoreList", e.stackTraceToString())
+                Log.e("StoreList", e.message ?: "")
+//                _uiState.value = _uiState.value.copy(
+//                    canContinue = false,
+//                    messages = _uiState.value.messages.plus(
+//                        Message(
+//                            titleId = R.string.error,
+//                            content = e.message ?: e.stackTraceToString(),
+//                            severity = Severity.ERROR,
+//                            action = listOf(Action(R.string.retry) {
+//                                launchOneShotJob(job)
+//                            }),
+//                        )
+//                    )
+//                )
+            } finally {
+//                _uiState.value = _uiState.value.copy(isBusy = false)
+            }
         }
     }
 }

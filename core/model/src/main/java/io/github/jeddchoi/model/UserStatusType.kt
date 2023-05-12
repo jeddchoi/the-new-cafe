@@ -1,5 +1,6 @@
 package io.github.jeddchoi.model
 
+
 enum class UserStatusType {
     None,
     Reserved,
