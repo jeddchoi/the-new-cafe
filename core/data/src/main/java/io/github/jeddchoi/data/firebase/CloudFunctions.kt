@@ -15,7 +15,7 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
-const val CLOUD_FUNCTION_ON_USER_STATUS_CHANGE_REQUEST = "userStatusChange"
+const val CLOUD_FUNCTION_RESERVE_SEAT = "OnCall-reserveSeat"
 
 @Singleton
 class CloudFunctions @Inject constructor(
@@ -23,13 +23,13 @@ class CloudFunctions @Inject constructor(
 ) {
 
     suspend fun reserveSeat(uid: String, seatPosition: SeatPosition, durationInSeconds: Int): String {
-        return functions.getHttpsCallable(CLOUD_FUNCTION_ON_USER_STATUS_CHANGE_REQUEST).call(
+        return functions.getHttpsCallable(CLOUD_FUNCTION_RESERVE_SEAT).call(
             Json.encodeToString(
                 UserStatusChange(
                     prevStatus = UserStatusType.None,
                     targetStatus = UserStatusType.Reserved,
                     cause = UserStatusChangeCause.UserAction,
-                    requestTimestamp = Clock.System.now(),
+                    requestTimestamp = Clock.System.now().epochSeconds,
                     seatPos = seatPosition,
                     durationInSeconds = durationInSeconds,
                 )

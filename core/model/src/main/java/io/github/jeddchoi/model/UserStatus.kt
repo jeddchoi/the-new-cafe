@@ -1,20 +1,23 @@
 package io.github.jeddchoi.model
 
-import kotlinx.datetime.Instant
+import kotlinx.datetime.Clock
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class UserStatus(
-    val lastStatus: UserStatusType,
-    val status: UserStatusType,
-    val cause: UserStatusChangeCause,
-    val updatedAt: Instant,
-    val seatPos: SeatPosition?,
-    val occupyExpirationInfo: TimerTaskInfo?,
-    val currentStatusExpirationInfo: TimerTaskInfo?,
+    val lastStatus: UserStatusType = UserStatusType.None,
+    val status: UserStatusType = UserStatusType.None,
+    val cause: UserStatusChangeCause = UserStatusChangeCause.UserAction,
+    val updateTimestamp: Long = Clock.System.now().epochSeconds,
+    val seatPos: SeatPosition? = null,
+    val occupyExpirationInfo: TimerTaskInfo? = null,
+    val currentStatusExpirationInfo: TimerTaskInfo? = null,
 )
 
+@Serializable
 data class TimerTaskInfo(
-    val endTime: Instant,
-    val startTime: Instant,
-    val timerTaskName: String,
+    val endTimestamp: Long = Clock.System.now().epochSeconds,
+    val startTimestamp: Long = Clock.System.now().epochSeconds,
+    val timerTaskName: String = "",
 )
 
