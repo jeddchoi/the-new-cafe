@@ -27,6 +27,8 @@ module.exports = {
     rules: {
         "quotes": ["error", "double"],
         "import/no-unresolved": 0,
+        "require-jsdoc": ["off"], // TODO: remove this
         "indent": ["error", 4],
+        "max-len": ["off"],
     },
 };
