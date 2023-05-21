@@ -25,6 +25,7 @@ export const helloWorld =
 export const reserveSeat =
     onCall<UserSeatUpdateRequest, Promise<boolean>>(reserveSeatHandler);
 
+// test: linear.app
 export const countSeatChange =
     onDocumentWritten(
         {
