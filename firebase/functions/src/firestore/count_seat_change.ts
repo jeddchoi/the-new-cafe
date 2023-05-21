@@ -1,29 +1,26 @@
-import * as functions from "firebase-functions";
-import {ISeatExternal} from "../model/Seat";
+import {logger} from "firebase-functions";
+import {FirestoreEvent, DocumentSnapshot, Change} from "firebase-functions/v2/firestore";
 import {FieldValue} from "firebase-admin/firestore";
+import {ISeatExternal} from "../model/Seat";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
-import {Change} from "firebase-functions/lib/common/change";
-import {DocumentSnapshot} from "firebase-functions/lib/v1/providers/firestore";
 
 
 export const countSeatChangeHandler = async (
-    change: Change<DocumentSnapshot>,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    context: functions.EventContext<{ storeId: string, sectionId: string, seatId: string }>,
+    event: FirestoreEvent<Change<DocumentSnapshot> | undefined, {storeId: string, sectionId: string, seatId: string}>
 ) => {
-    const beforeSeat = change.before.data() as ISeatExternal | null;
-    const afterSeat = change.after.data() as ISeatExternal | null;
-    const sectionRef = change.after.ref.parent.parent ?? throwFunctionsHttpsError("not-found", "section not found");
+    const beforeSeat = event.data?.before?.data() as ISeatExternal | null;
+    const afterSeat = event.data?.after?.data() as ISeatExternal | null;
+    const sectionRef = event.data?.after?.ref?.parent?.parent ?? throwFunctionsHttpsError("not-found", "section not found");
     let totalSeatsInc: number;
     let availableSeatsInc: number;
-    if (change.after.exists && !change.before.exists) { // 없다가 생기면
+    if (event.data?.after?.exists && !event.data?.before?.exists) { // 없다가 생기면
         totalSeatsInc = 1;
         if (afterSeat?.isAvailable === true) {
             availableSeatsInc = 1;
         } else {
             availableSeatsInc = 0;
         }
-    } else if (!change.after.exists && change.before.exists) { // 있다가 없으면
+    } else if (!event.data?.after?.exists && event.data?.before?.exists) { // 있다가 없으면
         totalSeatsInc = -1;
         if (beforeSeat?.isAvailable === true) {
             availableSeatsInc = -1;
@@ -46,6 +43,6 @@ export const countSeatChangeHandler = async (
         totalSeats: FieldValue.increment(totalSeatsInc),
         totalAvailableSeats: FieldValue.increment(availableSeatsInc),
     });
-    functions.logger.info(`[Seat ${change.after.id}] Counter updated.: ${availableSeatsInc}/${totalSeatsInc}`);
+    logger.info(`[Seat ${event.data?.after?.id}] Counter updated.: ${availableSeatsInc}/${totalSeatsInc}`);
     return null;
 };

@@ -1,10 +1,14 @@
-import * as functions from "firebase-functions";
-import * as express from "express";
+import {logger, https} from "firebase-functions";
+import {Response} from "express";
+import {defineString, projectID} from "firebase-functions/params";
 
+const taskQueueName = defineString("TASKS_QUEUE_NAME");
+const taskLocation = defineString("MY_TASKS_LOCATION");
 export const helloWorldHandler = (
-    request: functions.https.Request,
-    response: express.Response
+    request: https.Request,
+    response: Response
 ) => {
-    functions.logger.info("Hello logs!", {structuredData: true});
-    response.send("Hello from Firebase!");
+    logger.info("Hello logs!", {structuredData: true},);
+    response.send(`Hello from Firebase! : ${projectID}`);
 };
+

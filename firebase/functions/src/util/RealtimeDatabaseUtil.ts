@@ -1,21 +1,22 @@
-import * as admin from "firebase-admin";
-import * as functions from "firebase-functions";
+import {logger} from "firebase-functions";
+import {database} from "firebase-admin";
 import {throwFunctionsHttpsError} from "./functions_helper";
 import {IUserStatusExternal, UserStatus} from "../model/UserStatus";
 import {IUserStatusChangeExternal, UserStatusChange} from "../model/UserStatusChange";
+
 
 export const REFERENCE_USER_STATUS_NAME = "user_status";
 export const REFERENCE_USER_HISTORY_NAME = "user_history";
 
 export type TransactionResult = {
     committed: boolean;
-    snapshot: admin.database.DataSnapshot;
+    snapshot: database.DataSnapshot;
 };
 
 export default class RealtimeDatabaseUtil {
-    static db: admin.database.Database = admin.database();
+    static db: database.Database = database();
 
-    static getUserStatus(uid: string): admin.database.Reference {
+    static getUserStatus(uid: string): database.Reference {
         return this.db.ref(REFERENCE_USER_STATUS_NAME).child(uid);
     }
 
@@ -26,20 +27,20 @@ export default class RealtimeDatabaseUtil {
         });
     }
 
-    static updateUserStatusData(userId: string, transactionUpdate: (existing: any) => any): Promise<TransactionResult> {
+    static updateUserStatusData(userId: string, transactionUpdate: (existing: IUserStatusExternal | undefined) => IUserStatusExternal | undefined): Promise<TransactionResult> {
         return this.getUserStatus(userId).transaction(transactionUpdate, (error, committed, snapshot) => {
             if (error) {
                 throwFunctionsHttpsError("internal", `[${userId}] Error updating user status`);
             } else if (!committed) {
-                functions.logger.warn(`[${userId}] Not committed updating user status`);
+                logger.warn(`[${userId}] Not committed updating user status`);
             } else {
-                functions.logger.info(`[${userId}] User updated successfully!`);
+                logger.info(`[${userId}] User updated successfully!`);
             }
-            functions.logger.log(`[${userId}] UserStatus : `);
+            logger.log(`[${userId}] UserStatus : ${JSON.stringify(UserStatus.fromExternal(userId, snapshot?.val()))}`);
         });
     }
 
-    static getUserHistory(userId: string): admin.database.Reference {
+    static getUserHistory(userId: string): database.Reference {
         return this.db.ref(REFERENCE_USER_HISTORY_NAME).child(userId);
     }
 

@@ -1,7 +1,11 @@
-import * as functions from "firebase-functions";
-import * as admin from "firebase-admin";
-
-admin.initializeApp();
+import {initializeApp} from "firebase-admin/app";
+initializeApp();
+import {defineString} from "firebase-functions/params";
+const functionRegion = defineString("MY_FUNCTIONS_LOCATION");
+import {setGlobalOptions} from "firebase-functions/v2";
+setGlobalOptions({region: functionRegion});
+import {onRequest, onCall} from "firebase-functions/v2/https";
+import {onDocumentWritten} from "firebase-functions/v2/firestore";
 
 import {helloWorldHandler} from "./on-request/hello_world";
 import {reserveSeatHandler} from "./on-call/on_reserve";
@@ -12,25 +16,27 @@ import {
 } from "./util/FirestoreUtil";
 import {countSeatChangeHandler} from "./firestore/count_seat_change";
 import {countSectionChangeHandler} from "./firestore/count_section_change";
+import {UserSeatUpdateRequest} from "./model/UserSeatUpdateRequest";
+
+export const helloWorld =
+    onRequest(helloWorldHandler);
 
 
-export const helloWorld = functions
-    // .runWith({})
-    .region("us-central1")
-    .https.onRequest(helloWorldHandler);
+export const reserveSeat =
+    onCall<UserSeatUpdateRequest, Promise<boolean>>(reserveSeatHandler);
 
+export const countSeatChange =
+    onDocumentWritten(
+        {
+            document: `${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}/${COLLECTION_GROUP_SEAT_NAME}/{seatId}`
+        },
+        countSeatChangeHandler);
 
-export const reserveSeat = functions
-    .region("us-central1")
-    .https.onCall(reserveSeatHandler);
+export const countSectionChange =
+    onDocumentWritten(
+        {
+            document: `${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}`,
+        },
+        countSectionChangeHandler
+    );
 
-
-export const countSeatChange = functions
-    .region("us-central1").firestore
-    .document(`${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}/${COLLECTION_GROUP_SEAT_NAME}/{seatId}`)
-    .onWrite(countSeatChangeHandler);
-
-export const countSectionChange = functions
-    .region("us-central1").firestore
-    .document(`${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}`)
-    .onWrite(countSectionChangeHandler);

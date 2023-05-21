@@ -1,4 +1,4 @@
-import * as functions from "firebase-functions";
+import {logger, https} from "firebase-functions";
 import {FunctionsErrorCode} from "firebase-functions/lib/common/providers/https";
 
 /**
@@ -7,6 +7,6 @@ import {FunctionsErrorCode} from "firebase-functions/lib/common/providers/https"
  * @param {string} errorMessage
  */
 export function throwFunctionsHttpsError(code: FunctionsErrorCode, errorMessage: string): never {
-    functions.logger.error(errorMessage);
-    throw new functions.https.HttpsError(code, errorMessage);
+    logger.error(errorMessage);
+    throw new https.HttpsError(code, errorMessage);
 }
