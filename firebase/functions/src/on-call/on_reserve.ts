@@ -27,12 +27,8 @@ export const reserveSeatHandler = (
 
     promises.push(UserStatusHandler.reserveSeat(
         request.auth?.uid,
-        request.data.seatPosition.storeId,
-        request.data.seatPosition.sectionId,
-        request.data.seatPosition.seatId,
-    ).then((result) => {
-        return result.committed;
-    }));
+        request.data.seatPosition,
+    ));
 
     return Promise.all(promises).then((results) => {
         return results.every((result) => result);
