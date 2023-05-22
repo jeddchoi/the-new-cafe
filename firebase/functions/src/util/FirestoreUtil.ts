@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import {Store, storeConverter} from "../model/Store";
 import {Section, sectionConverter} from "../model/Section";
 import {Seat, seatConverter, SeatStatusType} from "../model/Seat";
+import {ISeatPosition} from "../model/UserStatus";
 
 
 export const COLLECTION_GROUP_STORE_NAME = "stores";
@@ -36,26 +37,24 @@ export default class FirestoreUtil {
             .then((value) => value.data());
     }
 
-    static getSeat(storeId: string, sectionId: string, seatId: string): admin.firestore.DocumentReference {
-        return this.getSection(storeId, sectionId)
-            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatId);
+    static getSeat(seatPosition: ISeatPosition): admin.firestore.DocumentReference {
+        return this.getSection(seatPosition.storeId, seatPosition.sectionId)
+            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatPosition.seatId);
     }
 
-    static getSeatData(storeId: string, sectionId: string, seatId: string): Promise<Seat | undefined> {
-        return this.getSeat(storeId, sectionId, seatId)
+    static getSeatData(seatPosition: ISeatPosition): Promise<Seat | undefined> {
+        return this.getSeat(seatPosition)
             .withConverter(seatConverter).get()
             .then((value) => value.data());
     }
 
     static updateSeat(
-        storeId: string,
-        sectionId: string,
-        seatId: string,
+        seatPosition: ISeatPosition,
         status: SeatStatusType,
         isAvailable: boolean,
         uid: string | undefined = undefined,
     ): Promise<void> {
-        return this.getSeat(storeId, sectionId, seatId)
+        return this.getSeat(seatPosition)
             .withConverter(seatConverter).update({
                 currentUserId: uid,
                 status: status,
@@ -63,3 +62,4 @@ export default class FirestoreUtil {
             }).then();
     }
 }
+

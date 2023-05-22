@@ -3,11 +3,15 @@ import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import UserStatusHandler from "../handler/UserStatusHandler";
+import {logger} from "firebase-functions";
+import SeatStatusHandler from "../handler/SeatStatusHandler";
 
 export const reserveSeatHandler = (
     request: CallableRequest<UserSeatUpdateRequest>,
 ): Promise<boolean> => {
-    if (request.data.targetStatusType === UserStatusType.Reserved) {
+    logger.info("=================reserveSeat==================", {request: request.data});
+
+    if (request.data.targetStatusType !== UserStatusType.Reserved) {
         throwFunctionsHttpsError("invalid-argument", `Wrong status type : ${request.data.targetStatusType}`);
     }
     if (!request.data.seatPosition) {
@@ -16,17 +20,26 @@ export const reserveSeatHandler = (
     if (!request.data.until && !request.data.durationInSeconds) {
         throwFunctionsHttpsError("invalid-argument", "Until or durationInSeconds is not provided");
     }
-    if (!request.auth) {
-        throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
-    }
+    // TODO: validate auth(not simulated)
+    // if (!request.auth) {
+    //     throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
+    // }
 
-    return UserStatusHandler.reserveSeat(
+    const promises = [];
+
+    promises.push(SeatStatusHandler.reserveSeat(
+        // request.auth?.uid,
         "87qDBiucwAaEbfV195l1vBTzeMVY",
-        "4Hsrozz5rv4QC1N4HNPs",
-        "vRmTtQs1RghW7ELm2k4C",
-        "PjYgs4phmL0EP4f13qkN",
-    ).then((result) => {
-        return result.committed;
+        request.data.seatPosition,
+    ));
+    promises.push(UserStatusHandler.reserveSeat(
+        // request.auth?.uid,
+        "87qDBiucwAaEbfV195l1vBTzeMVY",
+        request.data.seatPosition,
+    ));
+
+    return Promise.all(promises).then((results) => {
+        return results.every((result) => result);
     });
 };
 

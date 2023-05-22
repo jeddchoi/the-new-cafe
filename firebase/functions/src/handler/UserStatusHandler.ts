@@ -1,12 +1,20 @@
 import {logger} from "firebase-functions";
 import {defineInt} from "firebase-functions/params";
-import RealtimeDatabaseUtil, {TransactionResult} from "../util/RealtimeDatabaseUtil";
-import {ITimerTask, IUserStatusExternal, UserStatusChangeReason, UserStatusType} from "../model/UserStatus";
+import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
+import {
+    ISeatPosition,
+    ITimerTask,
+    IUserStatusExternal,
+    UserStatusChangeReason,
+    UserStatusType,
+} from "../model/UserStatus";
+import {StatusHandler} from "./StatusHandler";
+
 
 const timeReserveDurationInSeconds = defineInt("TIME_RESERVE_DURATION_IN_SECONDS");
 
-export default class UserStatusHandler {
-    static reserveSeat(userId: string, storeId:string, sectionId: string, seatId: string): Promise<TransactionResult> {
+const UserStatusHandler: StatusHandler = class StatusHandler {
+    static reserveSeat(userId: string, seatPosition: ISeatPosition): Promise<boolean> {
         const installedAt = Date.now();
         const fireAt = installedAt + timeReserveDurationInSeconds.value() * 1000;
 
@@ -21,17 +29,18 @@ export default class UserStatusHandler {
                 status: UserStatusType.Reserved,
                 statusUpdatedAt: installedAt,
                 statusUpdatedBy: UserStatusChangeReason.UserAction,
-                seatPosition: {
-                    storeId,
-                    sectionId,
-                    seatId,
-                },
+                seatPosition: seatPosition,
                 currentTimer: <ITimerTask>{
                     timerTaskName: "",
                     installedAt: installedAt,
                     fireAt: fireAt,
                 },
             };
+        }).then((result) => {
+            return result.committed;
         });
     }
-}
+};
+
+export default UserStatusHandler;
+
