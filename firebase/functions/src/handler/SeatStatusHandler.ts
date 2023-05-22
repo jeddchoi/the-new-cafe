@@ -1,10 +1,13 @@
 import {StatusHandler} from "./StatusHandler";
 import {ISeatPosition} from "../model/UserStatus";
+import FirestoreUtil from "../util/FirestoreUtil";
+import {SeatStatusType} from "../model/Seat";
 
 
 const SeatStatusHandler: StatusHandler = class StatusHandler {
     static reserveSeat(userId: string, seatPosition: ISeatPosition): Promise<boolean> {
-        return Promise.resolve(true);
+        return FirestoreUtil.updateSeat(seatPosition, SeatStatusType.Reserved, false, userId)
+            .then(() => true);
     }
 };
 
