@@ -3,10 +3,13 @@ import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import UserStatusHandler from "../handler/UserStatusHandler";
+import {logger} from "firebase-functions";
 
 export const reserveSeatHandler = (
     request: CallableRequest<UserSeatUpdateRequest>,
 ): Promise<boolean> => {
+    logger.info("reserveSeat", {request});
+
     if (request.data.targetStatusType === UserStatusType.Reserved) {
         throwFunctionsHttpsError("invalid-argument", `Wrong status type : ${request.data.targetStatusType}`);
     }
@@ -20,13 +23,19 @@ export const reserveSeatHandler = (
         throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
     }
 
-    return UserStatusHandler.reserveSeat(
-        "87qDBiucwAaEbfV195l1vBTzeMVY",
-        "4Hsrozz5rv4QC1N4HNPs",
-        "vRmTtQs1RghW7ELm2k4C",
-        "PjYgs4phmL0EP4f13qkN",
+    const promises = [];
+
+    promises.push(UserStatusHandler.reserveSeat(
+        request.auth?.uid,
+        request.data.seatPosition.storeId,
+        request.data.seatPosition.sectionId,
+        request.data.seatPosition.seatId,
     ).then((result) => {
         return result.committed;
+    }));
+
+    return Promise.all(promises).then((results) => {
+        return results.every((result) => result);
     });
 };
 
