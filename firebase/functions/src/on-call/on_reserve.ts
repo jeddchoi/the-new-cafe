@@ -3,7 +3,7 @@ import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import UserStatusHandler from "../handler/UserStatusHandler";
-import {logger} from "firebase-functions";
+import {logger} from "firebase-functions/v2";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
 
 export const reserveSeatHandler = (

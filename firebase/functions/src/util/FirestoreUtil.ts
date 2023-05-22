@@ -1,4 +1,4 @@
-import * as admin from "firebase-admin";
+import {getFirestore, Firestore, DocumentReference} from "firebase-admin/firestore";
 import {Store, storeConverter} from "../model/Store";
 import {Section, sectionConverter} from "../model/Section";
 import {Seat, seatConverter, SeatStatusType} from "../model/Seat";
@@ -13,9 +13,9 @@ export const COLLECTION_GROUP_SEAT_NAME = "seats";
  * Utility class for Firestore
  */
 export default class FirestoreUtil {
-    static db: admin.firestore.Firestore = admin.firestore();
+    static db: Firestore = getFirestore();
 
-    static getStore(storeId: string): admin.firestore.DocumentReference {
+    static getStore(storeId: string): DocumentReference {
         return this.db
             .collection(COLLECTION_GROUP_STORE_NAME).doc(storeId);
     }
@@ -26,7 +26,7 @@ export default class FirestoreUtil {
             .then((value) => value.data());
     }
 
-    static getSection(storeId: string, sectionId: string): admin.firestore.DocumentReference {
+    static getSection(storeId: string, sectionId: string): DocumentReference {
         return this.getStore(storeId)
             .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId);
     }
@@ -37,7 +37,7 @@ export default class FirestoreUtil {
             .then((value) => value.data());
     }
 
-    static getSeat(seatPosition: ISeatPosition): admin.firestore.DocumentReference {
+    static getSeat(seatPosition: ISeatPosition): DocumentReference {
         return this.getSection(seatPosition.storeId, seatPosition.sectionId)
             .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatPosition.seatId);
     }

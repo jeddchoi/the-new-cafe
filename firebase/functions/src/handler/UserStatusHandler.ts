@@ -1,4 +1,4 @@
-import {logger} from "firebase-functions";
+import {logger} from "firebase-functions/v2";
 import {defineInt} from "firebase-functions/params";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {
