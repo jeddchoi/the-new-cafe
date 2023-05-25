@@ -1,17 +1,22 @@
 import {CloudTasksClient, protos} from "@google-cloud/tasks";
-import {logger} from "firebase-functions";
 import {defineString, projectID} from "firebase-functions/params";
+import {logger} from "firebase-functions";
 import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
+
+
+const tasksQueueName = defineString("TASKS_QUEUE_NAME");
+const tasksLocation = defineString("LOCATION_TASKS");
+const gServiceAccountEmail = defineString("G_SERVICE_ACCOUNT_EMAIL");
 
 export class CloudTasksUtil {
     private static _client = new CloudTasksClient();
     private readonly _tasksBaseUrl: string;
 
     constructor(
-        private readonly _tasksQueueName: string,
-        private readonly _tasksLocation: string,
-        private readonly _gServiceAccountEmail: string,
-        private readonly _projectID: string
+        private readonly _tasksQueueName: string = tasksQueueName.value(),
+        private readonly _tasksLocation: string = tasksLocation.value(),
+        private readonly _gServiceAccountEmail: string = gServiceAccountEmail.value(),
+        private readonly _projectID: string = projectID.value(),
     ) {
         this._tasksBaseUrl = `https://${_tasksLocation}-${_projectID}.cloudfunctions.net`;
     }
@@ -31,6 +36,8 @@ export class CloudTasksUtil {
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
         // Construct the fully qualified queue name.
         const parent = CloudTasksUtil._client.queuePath(this._projectID, this._tasksLocation, this._tasksQueueName);
+        const taskPath = CloudTasksUtil._client.taskPath(this._projectID, this._tasksLocation, this._tasksQueueName, "TASK");
+        logger.log(`taskPath = ${taskPath}`);
         const task = this.createTaskObject(
             `${this._tasksBaseUrl}${path}`,
             this._gServiceAccountEmail,
@@ -73,10 +80,4 @@ export class CloudTasksUtil {
     }
 }
 
-const cloudTasksUtil = new CloudTasksUtil(
-    defineString("TASKS_QUEUE_NAME").value(),
-    defineString("MY_TASKS_LOCATION").value(),
-    defineString("G_SERVICE_ACCOUNT_EMAIL").value(),
-    projectID.value(),
-);
-export default cloudTasksUtil;
+export default CloudTasksUtil;

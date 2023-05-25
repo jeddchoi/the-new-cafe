@@ -6,7 +6,7 @@ export const helloWorldHandler = (
     request: https.Request,
     response: Response
 ) => {
-    logger.info("Hello logs!", {structuredData: JSON.stringify(request.body)},);
-    response.send(`Hello from Firebase! : ${projectID.value()}`);
+    logger.info(`Timer Ended : ${new Date().toISOString()}`, {structuredData: JSON.stringify(request.body)},);
+    response.send(`${projectID.value()}`);
 };
 
