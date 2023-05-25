@@ -1,6 +1,7 @@
 import {CloudTasksClient, protos} from "@google-cloud/tasks";
 import {logger} from "firebase-functions";
 import {defineString, projectID} from "firebase-functions/params";
+import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
 
 export class CloudTasksUtil {
     private static _client = new CloudTasksClient();
@@ -14,9 +15,18 @@ export class CloudTasksUtil {
     ) {
         this._tasksBaseUrl = `https://${_tasksLocation}-${_projectID}.cloudfunctions.net`;
     }
+
+    public reserveUserSeatUpdate(
+        request: UserSeatUpdateRequest,
+        invokeFnPath: string,
+        scheduleTimeInSeconds: number,
+    ): Promise<protos.google.cloud.tasks.v2.ITask> {
+        return this.createHttpTaskWithSchedule(request, invokeFnPath, scheduleTimeInSeconds);
+    }
+
     private createHttpTaskWithSchedule(
-        path: string,
         payload = {}, // The task HTTP request body
+        path: string,
         scheduleTimeInSeconds: number, // The schedule time in seconds
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
         // Construct the fully qualified queue name.
