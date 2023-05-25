@@ -1,4 +1,4 @@
-import {firestore} from "firebase-admin";
+import {QueryDocumentSnapshot, FirestoreDataConverter, DocumentData} from "firebase-admin/firestore";
 
 enum SeatStatusType {
     None,
@@ -39,8 +39,8 @@ class Seat implements ISeat {
 }
 
 
-const seatConverter: firestore.FirestoreDataConverter<Seat> = {
-    toFirestore(seat: Seat): firestore.DocumentData {
+const seatConverter: FirestoreDataConverter<Seat> = {
+    toFirestore(seat: Seat): DocumentData {
         return {
             name: seat.name,
             status: seat.status,
@@ -49,7 +49,7 @@ const seatConverter: firestore.FirestoreDataConverter<Seat> = {
         };
     },
     fromFirestore(
-        snapshot: firestore.QueryDocumentSnapshot<ISeatExternal>
+        snapshot: QueryDocumentSnapshot<ISeatExternal>
     ): Seat {
         const data = snapshot.data();
         return new Seat(snapshot.id,

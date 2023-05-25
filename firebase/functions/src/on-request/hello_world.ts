@@ -1,14 +1,12 @@
-import {logger, https} from "firebase-functions";
+import {logger, https} from "firebase-functions/v2";
 import {Response} from "express";
-import {defineString, projectID} from "firebase-functions/params";
+import {projectID} from "firebase-functions/params";
 
-const taskQueueName = defineString("TASKS_QUEUE_NAME");
-const taskLocation = defineString("MY_TASKS_LOCATION");
 export const helloWorldHandler = (
     request: https.Request,
     response: Response
 ) => {
-    logger.info("Hello logs!", {structuredData: true},);
-    response.send(`Hello from Firebase! : ${projectID}`);
+    logger.info(`Timer Ended : ${new Date().toISOString()}`, {structuredData: JSON.stringify(request.body)},);
+    response.send(`${projectID.value()}`);
 };
 

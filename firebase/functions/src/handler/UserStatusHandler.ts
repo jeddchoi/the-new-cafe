@@ -1,4 +1,4 @@
-import {logger} from "firebase-functions";
+import {logger} from "firebase-functions/v2";
 import {defineInt} from "firebase-functions/params";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {
@@ -8,17 +8,10 @@ import {
     UserStatusChangeReason,
     UserStatusType,
 } from "../model/UserStatus";
-import {StatusHandler} from "./StatusHandler";
 
-
-const timeReserveDurationInSeconds = defineInt("TIME_RESERVE_DURATION_IN_SECONDS");
-
-const UserStatusHandler: StatusHandler = class StatusHandler {
-    static reserveSeat(userId: string, seatPosition: ISeatPosition): Promise<boolean> {
-        const installedAt = Date.now();
-        const fireAt = installedAt + timeReserveDurationInSeconds.value() * 1000;
-
-        logger.debug(`reserve seat ${new Date(installedAt).toISOString()} ${new Date(fireAt).toISOString()}`);
+class UserStatusHandler {
+    static reserveSeat(userId: string, seatPosition: ISeatPosition, requestedAt: number, fireAt: number, timerTaskName: string): Promise<boolean> {
+        logger.debug(`reserve seat ${new Date(requestedAt).toISOString()} ${new Date(fireAt).toISOString()} ${timerTaskName}`);
         return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
             const existingStatus = existing as IUserStatusExternal | undefined;
             if (existingStatus && existingStatus.status !== UserStatusType.None) {
@@ -27,12 +20,12 @@ const UserStatusHandler: StatusHandler = class StatusHandler {
             return <IUserStatusExternal>{
                 lastStatus: UserStatusType.None,
                 status: UserStatusType.Reserved,
-                statusUpdatedAt: installedAt,
+                statusUpdatedAt: requestedAt,
                 statusUpdatedBy: UserStatusChangeReason.UserAction,
                 seatPosition: seatPosition,
                 currentTimer: <ITimerTask>{
-                    timerTaskName: "",
-                    installedAt: installedAt,
+                    timerTaskName: timerTaskName,
+                    installedAt: requestedAt,
                     fireAt: fireAt,
                 },
             };
@@ -40,7 +33,7 @@ const UserStatusHandler: StatusHandler = class StatusHandler {
             return result.committed;
         });
     }
-};
+}
 
 export default UserStatusHandler;
 

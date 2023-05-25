@@ -1,10 +1,11 @@
 import {CallableRequest} from "firebase-functions/v2/https";
 import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
-import {UserStatusType} from "../model/UserStatus";
-import {throwFunctionsHttpsError} from "../util/functions_helper";
+import {UserStatusChangeReason, UserStatusType} from "../model/UserStatus";
+import {getEta, throwFunctionsHttpsError} from "../util/functions_helper";
 import UserStatusHandler from "../handler/UserStatusHandler";
-import {logger} from "firebase-functions";
+import {logger} from "firebase-functions/v2";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
+import {CloudTasksUtil} from "../util/CloudTasksUtil";
 
 export const reserveSeatHandler = (
     request: CallableRequest<UserSeatUpdateRequest>,
@@ -12,13 +13,10 @@ export const reserveSeatHandler = (
     logger.info("=================reserveSeat==================", {request: request.data});
 
     if (request.data.targetStatusType !== UserStatusType.Reserved) {
-        throwFunctionsHttpsError("invalid-argument", `Wrong status type : ${request.data.targetStatusType}`);
+        throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${request.data.targetStatusType}`);
     }
     if (!request.data.seatPosition) {
         throwFunctionsHttpsError("invalid-argument", "Seat position is not provided");
-    }
-    if (!request.data.until && !request.data.durationInSeconds) {
-        throwFunctionsHttpsError("invalid-argument", "Until or durationInSeconds is not provided");
     }
     // TODO: validate auth(not simulated)
     // if (!request.auth) {
@@ -27,16 +25,36 @@ export const reserveSeatHandler = (
 
     const promises = [];
 
+    const requestedAt = new Date().getTime();
+    const eta = getEta(requestedAt, request.data.durationInSeconds, request.data.until);
+    const seatPosition = request.data.seatPosition;
+    const timer = new CloudTasksUtil();
+
     promises.push(SeatStatusHandler.reserveSeat(
         // request.auth?.uid,
         "87qDBiucwAaEbfV195l1vBTzeMVY",
-        request.data.seatPosition,
+        seatPosition,
     ));
-    promises.push(UserStatusHandler.reserveSeat(
-        // request.auth?.uid,
-        "87qDBiucwAaEbfV195l1vBTzeMVY",
-        request.data.seatPosition,
-    ));
+    promises.push(timer.reserveUserSeatUpdate(
+        <UserSeatUpdateRequest>{
+            targetStatusType: UserStatusType.None,
+            reason: UserStatusChangeReason.Timeout,
+        },
+        "/helloWorld",
+        Math.round(eta / 1000), // eta in millisec
+    ).then((task) => {
+        if (!task.name) {
+            throwFunctionsHttpsError("internal", "Timer task failed to start");
+        }
+        return UserStatusHandler.reserveSeat(
+            // request.auth?.uid,
+            "87qDBiucwAaEbfV195l1vBTzeMVY",
+            seatPosition,
+            requestedAt,
+            eta,
+            task.name
+        );
+    }));
 
     return Promise.all(promises).then((results) => {
         return results.every((result) => result);
