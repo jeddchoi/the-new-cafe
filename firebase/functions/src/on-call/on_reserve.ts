@@ -7,7 +7,7 @@ import {CloudTasksUtil} from "../util/CloudTasksUtil";
 import UserStatusHandler from "../handler/UserStatusHandler";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
 
-export function extracted(request: UserSeatUpdateRequest): Promise<boolean> {
+export function onReserve(request: UserSeatUpdateRequest): Promise<boolean> {
     logger.info("=================reserveSeat==================", {request: request});
 
     // Validate request
@@ -72,7 +72,4 @@ export function extracted(request: UserSeatUpdateRequest): Promise<boolean> {
 
 export const reserveSeatHandler = (
     request: CallableRequest<UserSeatUpdateRequest>,
-): Promise<boolean> => {
-    return extracted(request.data);
-};
-
+): Promise<boolean> => onReserve(request.data);

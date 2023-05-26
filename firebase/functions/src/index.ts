@@ -12,7 +12,7 @@ import {onRequest, onCall} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
 
 import {helloWorldHandler} from "./on-request/hello_world";
-import {extracted, reserveSeatHandler} from "./on-call/on_reserve";
+import {onReserve, reserveSeatHandler} from "./on-call/on_reserve";
 import {
     COLLECTION_GROUP_SEAT_NAME,
     COLLECTION_GROUP_SECTION_NAME,
@@ -39,8 +39,10 @@ export const helloWorld =
 export const timeoutOnReserve =
     onRequest(timeoutOnReserveHandler);
 
-export const test = onRequest((req, res) => {
-    return extracted(
+
+// Test functions
+export const testReserveSeat = onRequest((req, res) => {
+    return onReserve(
         new UserSeatUpdateRequest(
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             1,
@@ -55,6 +57,10 @@ export const test = onRequest((req, res) => {
             res.sendStatus(500);
         }
     });
+});
+
+export const testCancelReservation = onRequest((req, res) => {
+   return
 });
 
 // Triggered functions
