@@ -1,5 +1,7 @@
 import {initializeApp} from "firebase-admin/app";
 
+initializeApp();
+
 // const functionRegion = defineString("MY_FUNCTIONS_LOCATION");
 // setGlobalOptions({region: functionRegion.value()});
 import {onCall, onRequest} from "firebase-functions/v2/https";
@@ -18,9 +20,6 @@ import {UserSeatUpdateRequest} from "./model/UserSeatUpdateRequest";
 import {timeoutOnReserveHandler} from "./on-request/timeout_on_reserve";
 import {cancelReservationHandler, onCancelReservation} from "./on-call/on_cancel_reservation";
 import {UserStatusChangeReason, UserStatusType} from "./model/UserStatus";
-
-initializeApp();
-
 
 // Callable functions
 export const reserveSeat =
