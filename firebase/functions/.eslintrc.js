@@ -30,5 +30,9 @@ module.exports = {
         "require-jsdoc": ["off"], // TODO: remove this
         "indent": ["error", 4],
         "max-len": ["off"],
+        "no-trailing-spaces": ["error", { // TODO: remove this
+            "skipBlankLines": true,
+            "ignoreComments": true,
+        }],
     },
 };

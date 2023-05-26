@@ -29,9 +29,26 @@ class UserStatusHandler {
                     fireAt: fireAt,
                 },
             };
-        }).then((result) => {
-            return result.committed;
-        });
+        }).then((result) => result.committed);
+    }
+
+    static cancelReservation(userId: string, requestedAt: number, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
+        logger.debug(`cancel reservation ${new Date(requestedAt).toISOString()}`);
+        return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
+            const existingStatus = existing as IUserStatusExternal | undefined;
+            if (existingStatus && existingStatus.status !== UserStatusType.Reserved) {
+                return;
+            }
+            return <IUserStatusExternal>{
+                lastStatus: UserStatusType.Reserved,
+                status: UserStatusType.None,
+                statusUpdatedAt: requestedAt,
+                statusUpdatedBy: statusUpdatedBy,
+                seatPosition: null,
+                usageTimer: null,
+                currentTimer: null,
+            };
+        }).then((result) => result.committed);
     }
 }
 

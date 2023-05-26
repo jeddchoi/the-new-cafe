@@ -29,7 +29,7 @@ export class CloudTasksUtil {
         return this.createHttpTaskWithSchedule(request, invokeFnPath, scheduleTimeInSeconds);
     }
 
-    private createHttpTaskWithSchedule(
+    public createHttpTaskWithSchedule(
         payload = {}, // The task HTTP request body
         path: string,
         scheduleTimeInSeconds: number, // The schedule time in seconds
@@ -46,7 +46,7 @@ export class CloudTasksUtil {
         );
 
         // Send create task request.
-        return CloudTasksUtil._client.createTask({parent, task})
+        return CloudTasksUtil._client.createTask({parent, task}, {maxRetries: 1})
             .then(([response]) => {
                 logger.info(`Created task ${response.name}`);
                 return response;
