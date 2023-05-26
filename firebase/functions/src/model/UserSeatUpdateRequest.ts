@@ -2,11 +2,12 @@ import {ISeatPosition, UserStatusChangeReason, UserStatusType} from "./UserStatu
 
 export class UserSeatUpdateRequest {
     constructor(
+        readonly userId: string,
         readonly targetStatusType: UserStatusType,
         readonly reason: UserStatusChangeReason,
-        readonly seatPosition: ISeatPosition | undefined,
-        readonly durationInSeconds: number | undefined,
-        readonly until: number | undefined,
+        readonly seatPosition?: ISeatPosition | undefined,
+        readonly durationInSeconds?: number | undefined,
+        readonly until?: number | undefined,
     ) {
     }
 }

@@ -1,21 +1,20 @@
+import {logger} from "firebase-functions/v2";
 import {CallableRequest} from "firebase-functions/v2/https";
 import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
 import {UserStatusChangeReason, UserStatusType} from "../model/UserStatus";
 import {getEta, throwFunctionsHttpsError} from "../util/functions_helper";
-import UserStatusHandler from "../handler/UserStatusHandler";
-import {logger} from "firebase-functions/v2";
-import SeatStatusHandler from "../handler/SeatStatusHandler";
 import {CloudTasksUtil} from "../util/CloudTasksUtil";
+import UserStatusHandler from "../handler/UserStatusHandler";
+import SeatStatusHandler from "../handler/SeatStatusHandler";
 
-export const reserveSeatHandler = (
-    request: CallableRequest<UserSeatUpdateRequest>,
-): Promise<boolean> => {
-    logger.info("=================reserveSeat==================", {request: request.data});
+export function extracted(request: UserSeatUpdateRequest): Promise<boolean> {
+    logger.info("=================reserveSeat==================", {request: request});
 
-    if (request.data.targetStatusType !== UserStatusType.Reserved) {
-        throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${request.data.targetStatusType}`);
+    // Validate request
+    if (request.targetStatusType !== UserStatusType.Reserved) {
+        throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${request.targetStatusType}`);
     }
-    if (!request.data.seatPosition) {
+    if (!request.seatPosition) {
         throwFunctionsHttpsError("invalid-argument", "Seat position is not provided");
     }
     // TODO: validate auth(not simulated)
@@ -26,21 +25,29 @@ export const reserveSeatHandler = (
     const promises = [];
 
     const requestedAt = new Date().getTime();
-    const eta = getEta(requestedAt, request.data.durationInSeconds, request.data.until);
-    const seatPosition = request.data.seatPosition;
+    const eta = getEta(requestedAt, request.durationInSeconds, request.until);
+    const seatPosition = request.seatPosition;
     const timer = new CloudTasksUtil();
 
+    // 1. Handle seat status change
     promises.push(SeatStatusHandler.reserveSeat(
         // request.auth?.uid,
-        "87qDBiucwAaEbfV195l1vBTzeMVY",
+        "sI2wbdRqYtdgArsq678BFSGDwr43",
         seatPosition,
     ));
+
+    // 2. Start timer and handle user status change
     promises.push(timer.reserveUserSeatUpdate(
-        <UserSeatUpdateRequest>{
-            targetStatusType: UserStatusType.None,
-            reason: UserStatusChangeReason.Timeout,
-        },
-        "/helloWorld",
+        new UserSeatUpdateRequest(
+            // userId: request.auth?.uid,
+            "sI2wbdRqYtdgArsq678BFSGDwr43",
+            UserStatusType.None,
+            UserStatusChangeReason.Timeout,
+            seatPosition,
+            undefined,
+            eta
+        ),
+        "/timeoutOnReserve",
         Math.round(eta / 1000), // eta in millisec
     ).then((task) => {
         if (!task.name) {
@@ -48,7 +55,7 @@ export const reserveSeatHandler = (
         }
         return UserStatusHandler.reserveSeat(
             // request.auth?.uid,
-            "87qDBiucwAaEbfV195l1vBTzeMVY",
+            "sI2wbdRqYtdgArsq678BFSGDwr43",
             seatPosition,
             requestedAt,
             eta,
@@ -56,8 +63,16 @@ export const reserveSeatHandler = (
         );
     }));
 
+    // 3. TODO: handle user history update
+
     return Promise.all(promises).then((results) => {
         return results.every((result) => result);
     });
+}
+
+export const reserveSeatHandler = (
+    request: CallableRequest<UserSeatUpdateRequest>,
+): Promise<boolean> => {
+    return extracted(request.data);
 };
 

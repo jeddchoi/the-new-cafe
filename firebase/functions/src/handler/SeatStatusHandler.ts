@@ -8,6 +8,10 @@ class SeatStatusHandler {
         return FirestoreUtil.updateSeat(seatPosition, SeatStatusType.Reserved, false, userId)
             .then(() => true);
     }
+
+    static cancelReservation(userId: string, seatPosition: ISeatPosition): Promise<boolean> {
+        return FirestoreUtil.updateSeat(seatPosition, SeatStatusType.None, true, userId).then(() => true);
+    }
 }
 
 export default SeatStatusHandler;
