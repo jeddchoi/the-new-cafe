@@ -8,7 +8,7 @@ const tasksQueueName = defineString("TASKS_QUEUE_NAME");
 const tasksLocation = defineString("LOCATION_TASKS");
 const gServiceAccountEmail = defineString("G_SERVICE_ACCOUNT_EMAIL");
 
-export class CloudTasksUtil {
+export default class CloudTasksUtil {
     private static _client = new CloudTasksClient();
     private readonly _tasksBaseUrl: string;
 
@@ -29,7 +29,13 @@ export class CloudTasksUtil {
         return this.createHttpTaskWithSchedule(request, invokeFnPath, scheduleTimeInSeconds);
     }
 
-    public createHttpTaskWithSchedule(
+    public cancelTimer(
+        timerTaskName: string,
+    ): Promise<boolean> {
+        return CloudTasksUtil._client.deleteTask({name: timerTaskName}).then(() => true);
+    }
+
+    private createHttpTaskWithSchedule(
         payload = {}, // The task HTTP request body
         path: string,
         scheduleTimeInSeconds: number, // The schedule time in seconds
@@ -79,5 +85,3 @@ export class CloudTasksUtil {
         };
     }
 }
-
-export default CloudTasksUtil;
