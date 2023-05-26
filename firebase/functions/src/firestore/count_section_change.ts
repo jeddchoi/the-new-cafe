@@ -1,4 +1,4 @@
-import {logger} from "firebase-functions";
+import {logger} from "firebase-functions/v2";
 import {FirestoreEvent, Change, DocumentSnapshot} from "firebase-functions/v2/firestore";
 import {FieldValue} from "firebase-admin/firestore";
 import {ISectionExternal} from "../model/Section";

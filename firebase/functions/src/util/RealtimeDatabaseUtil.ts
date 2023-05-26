@@ -1,5 +1,5 @@
-import {logger} from "firebase-functions";
-import {database} from "firebase-admin";
+import {logger} from "firebase-functions/v2";
+import {getDatabase, DataSnapshot, Database, Reference} from "firebase-admin/database";
 import {throwFunctionsHttpsError} from "./functions_helper";
 import {IUserStatusExternal, UserStatus} from "../model/UserStatus";
 import {IUserStatusChangeExternal, UserStatusChange} from "../model/UserStatusChange";
@@ -10,13 +10,13 @@ export const REFERENCE_USER_HISTORY_NAME = "user_history";
 
 export type TransactionResult = {
     committed: boolean;
-    snapshot: database.DataSnapshot;
+    snapshot: DataSnapshot;
 };
 
 export default class RealtimeDatabaseUtil {
-    static db: database.Database = database();
+    static db: Database = getDatabase();
 
-    static getUserStatus(uid: string): database.Reference {
+    static getUserStatus(uid: string): Reference {
         return this.db.ref(REFERENCE_USER_STATUS_NAME).child(uid);
     }
 
@@ -40,7 +40,7 @@ export default class RealtimeDatabaseUtil {
         });
     }
 
-    static getUserHistory(userId: string): database.Reference {
+    static getUserHistory(userId: string): Reference {
         return this.db.ref(REFERENCE_USER_HISTORY_NAME).child(userId);
     }
 

@@ -1,4 +1,4 @@
-import {firestore} from "firebase-admin";
+import {FirestoreDataConverter, DocumentData, QueryDocumentSnapshot} from "firebase-admin/firestore";
 
 interface IStore {
     uid: string,
@@ -27,8 +27,8 @@ class Store implements IStore {
 }
 
 
-const storeConverter: firestore.FirestoreDataConverter<Store> = {
-    toFirestore(store: Store): firestore.DocumentData {
+const storeConverter: FirestoreDataConverter<Store> = {
+    toFirestore(store: Store): DocumentData {
         return {
             name: store.name,
             totalSeats: store.totalSeats,
@@ -37,7 +37,7 @@ const storeConverter: firestore.FirestoreDataConverter<Store> = {
         };
     },
     fromFirestore(
-        snapshot: firestore.QueryDocumentSnapshot<IStoreExternal>
+        snapshot: QueryDocumentSnapshot<IStoreExternal>
     ): Store {
         const data = snapshot.data();
         return new Store(snapshot.id,

@@ -1,4 +1,4 @@
-import {firestore} from "firebase-admin";
+import {FirestoreDataConverter, DocumentData, QueryDocumentSnapshot} from "firebase-admin/firestore";
 
 interface ISection {
     uid: string,
@@ -26,8 +26,8 @@ class Section implements ISection {
 }
 
 
-const sectionConverter: firestore.FirestoreDataConverter<Section> = {
-    toFirestore(section: Section): firestore.DocumentData {
+const sectionConverter: FirestoreDataConverter<Section> = {
+    toFirestore(section: Section): DocumentData {
         return {
             name: section.name,
             totalSeats: section.totalSeats,
@@ -35,7 +35,7 @@ const sectionConverter: firestore.FirestoreDataConverter<Section> = {
         };
     },
     fromFirestore(
-        snapshot: firestore.QueryDocumentSnapshot<ISectionExternal>
+        snapshot: QueryDocumentSnapshot<ISectionExternal>
     ): Section {
         const data = snapshot.data();
         return new Section(snapshot.id, data.name, snapshot.ref.parent.id, data.totalSeats, data.totalAvailableSeats);
