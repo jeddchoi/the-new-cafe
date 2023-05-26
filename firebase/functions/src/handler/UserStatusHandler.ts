@@ -1,10 +1,9 @@
 import {logger} from "firebase-functions/v2";
-import {defineInt} from "firebase-functions/params";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {
     ISeatPosition,
     ITimerTask,
-    IUserStatusExternal, UserStatus,
+    IUserStatusExternal,
     UserStatusChangeReason,
     UserStatusType,
 } from "../model/UserStatus";

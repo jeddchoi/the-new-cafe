@@ -1,6 +1,6 @@
 import {CallableRequest} from "firebase-functions/v2/https";
 import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
-import {logger} from "firebase-functions/lib/v2";
+import {logger} from "firebase-functions/v2";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
@@ -34,7 +34,7 @@ export function onCancelReservation(request: UserSeatUpdateRequest): Promise<boo
             return true;
         }
         return timer.cancelTimer(userStatus.currentTimer?.timerTaskName);
-    }).then((result) => {
+    }).then(() => {
         return UserStatusHandler.cancelReservation(
             request.userId,
             requestedAt,
