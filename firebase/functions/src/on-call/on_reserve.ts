@@ -3,7 +3,7 @@ import {CallableRequest} from "firebase-functions/v2/https";
 import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
 import {UserStatusChangeReason, UserStatusType} from "../model/UserStatus";
 import {getEta, throwFunctionsHttpsError} from "../util/functions_helper";
-import {CloudTasksUtil} from "../util/CloudTasksUtil";
+import CloudTasksUtil from "../util/CloudTasksUtil";
 import UserStatusHandler from "../handler/UserStatusHandler";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
 

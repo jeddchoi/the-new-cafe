@@ -8,7 +8,7 @@ const tasksQueueName = defineString("TASKS_QUEUE_NAME");
 const tasksLocation = defineString("LOCATION_TASKS");
 const gServiceAccountEmail = defineString("G_SERVICE_ACCOUNT_EMAIL");
 
-export class CloudTasksUtil {
+export default class CloudTasksUtil {
     private static _client = new CloudTasksClient();
     private readonly _tasksBaseUrl: string;
 
@@ -85,5 +85,3 @@ export class CloudTasksUtil {
         };
     }
 }
-
-export default CloudTasksUtil;
