@@ -12,6 +12,30 @@ class SeatStatusHandler {
     static cancelReservation(userId: string, seatPosition: ISeatPosition): Promise<boolean> {
         return FirestoreUtil.updateSeat(seatPosition, SeatStatusType.None, true, userId).then(() => true);
     }
+
+    static occupySeat(userId: string, seatPosition: ISeatPosition): Promise<boolean> {
+        return FirestoreUtil.updateSeat(seatPosition, SeatStatusType.Occupied, false, userId).then(() => true);
+    }
+
+    static stopUsingSeat(userId: string, seatPosition: ISeatPosition): Promise<boolean> {
+        return FirestoreUtil.updateSeat(seatPosition, SeatStatusType.None, true, userId).then(() => true);
+    }
+
+    static leaveSeat(userId: string, seatPosition: ISeatPosition): Promise<boolean> {
+        return FirestoreUtil.updateSeat(seatPosition, SeatStatusType.Away, false, userId).then(() => true);
+    }
+
+    static returnToSeat(userId: string, seatPosition: ISeatPosition): Promise<boolean> {
+        return FirestoreUtil.updateSeat(seatPosition, SeatStatusType.Occupied, false, userId).then(() => true);
+    }
+
+    static restrictSeat(seatPosition: ISeatPosition): Promise<boolean> {
+        return FirestoreUtil.updateSeat(seatPosition, SeatStatusType.Restricted, false, undefined).then(()=> true);
+    }
+
+    static unrestrictSeat(seatPosition: ISeatPosition): Promise<boolean> {
+        return FirestoreUtil.updateSeat(seatPosition, SeatStatusType.None, false, undefined).then(()=> true);
+    }
 }
 
 export default SeatStatusHandler;
