@@ -59,9 +59,6 @@ export const testReserveSeat = onRequest((req, res) => {
     });
 });
 
-export const testCancelReservation = onRequest((req, res) => {
-   return
-});
 
 // Triggered functions
 export const countSeatChange =
