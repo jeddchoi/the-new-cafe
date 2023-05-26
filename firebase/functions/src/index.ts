@@ -1,14 +1,8 @@
 import {initializeApp} from "firebase-admin/app";
 
-initializeApp();
-import {defineString} from "firebase-functions/params";
-
 // const functionRegion = defineString("MY_FUNCTIONS_LOCATION");
-import {logger, setGlobalOptions} from "firebase-functions/v2";
-
-
 // setGlobalOptions({region: functionRegion.value()});
-import {onRequest, onCall} from "firebase-functions/v2/https";
+import {onCall, onRequest} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
 
 import {helloWorldHandler} from "./on-request/hello_world";
@@ -22,7 +16,11 @@ import {countSeatChangeHandler} from "./firestore/count_seat_change";
 import {countSectionChangeHandler} from "./firestore/count_section_change";
 import {UserSeatUpdateRequest} from "./model/UserSeatUpdateRequest";
 import {timeoutOnReserveHandler} from "./on-request/timeout_on_reserve";
-import {cancelReservationHandler} from "./on-call/on_cancel_reservation";
+import {cancelReservationHandler, onCancelReservation} from "./on-call/on_cancel_reservation";
+import {UserStatusChangeReason, UserStatusType} from "./model/UserStatus";
+
+initializeApp();
+
 
 // Callable functions
 export const reserveSeat =
@@ -45,8 +43,8 @@ export const testReserveSeat = onRequest((req, res) => {
     return onReserve(
         new UserSeatUpdateRequest(
             "sI2wbdRqYtdgArsq678BFSGDwr43",
-            1,
-            0,
+            UserStatusType.Reserved,
+            UserStatusChangeReason.UserAction,
             {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             100
         )
@@ -59,6 +57,23 @@ export const testReserveSeat = onRequest((req, res) => {
     });
 });
 
+
+export const testCancelReservation = onRequest((req, res) => {
+    return onCancelReservation(
+        new UserSeatUpdateRequest(
+            "sI2wbdRqYtdgArsq678BFSGDwr43",
+            UserStatusType.None,
+            UserStatusChangeReason.UserAction,
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+        )
+    ).then((result) => {
+        if (result) {
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(500);
+        }
+    });
+});
 
 // Triggered functions
 export const countSeatChange =

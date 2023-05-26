@@ -4,7 +4,7 @@ import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {
     ISeatPosition,
     ITimerTask,
-    IUserStatusExternal,
+    IUserStatusExternal, UserStatus,
     UserStatusChangeReason,
     UserStatusType,
 } from "../model/UserStatus";

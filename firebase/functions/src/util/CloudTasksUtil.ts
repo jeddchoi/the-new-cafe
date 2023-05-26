@@ -29,7 +29,13 @@ export class CloudTasksUtil {
         return this.createHttpTaskWithSchedule(request, invokeFnPath, scheduleTimeInSeconds);
     }
 
-    public createHttpTaskWithSchedule(
+    public cancelTimer(
+        timerTaskName: string,
+    ): Promise<boolean> {
+        return CloudTasksUtil._client.deleteTask({name: timerTaskName}).then(() => true);
+    }
+
+    private createHttpTaskWithSchedule(
         payload = {}, // The task HTTP request body
         path: string,
         scheduleTimeInSeconds: number, // The schedule time in seconds

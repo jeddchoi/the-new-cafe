@@ -8,7 +8,7 @@ import UserStatusHandler from "../handler/UserStatusHandler";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
 
 export function onReserve(request: UserSeatUpdateRequest): Promise<boolean> {
-    logger.info("=================reserveSeat==================", {request: request});
+    logger.info("================= reserveSeat ==================", {request: request});
 
     // Validate request
     if (request.targetStatusType !== UserStatusType.Reserved) {
@@ -22,7 +22,7 @@ export function onReserve(request: UserSeatUpdateRequest): Promise<boolean> {
     //     throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
     // }
 
-    const promises = [];
+    const promises: Promise<boolean>[] = [];
 
     const requestedAt = new Date().getTime();
     const eta = getEta(requestedAt, request.durationInSeconds, request.until);
