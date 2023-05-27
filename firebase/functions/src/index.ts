@@ -23,6 +23,7 @@ import {occupySeatHandler} from "./on-call/on_occupy_seat";
 
 import {helloWorldHandler} from "./on-request/hello_world";
 import {timeoutOnReserveHandler} from "./on-request/timeout_on_reserve";
+import {timeoutOnReachUsageLimitHandler} from "./on-request/timeout_on_reach_usage_limit";
 
 import {countSeatChangeHandler} from "./firestore/count_seat_change";
 import {countSectionChangeHandler} from "./firestore/count_section_change";
@@ -50,6 +51,8 @@ export const helloWorld =
 export const timeoutOnReserve =
     onRequest(timeoutOnReserveHandler);
 
+export const timeoutOnReachUsageLimit =
+    onRequest(timeoutOnReachUsageLimitHandler);
 
 // Test functions
 export const testReserveSeat = onRequest((req, res) => {
