@@ -4,9 +4,8 @@ initializeApp();
 
 // const functionRegion = defineString("MY_FUNCTIONS_LOCATION");
 // setGlobalOptions({region: functionRegion.value()});
-import {onCall, onRequest} from "firebase-functions/v2/https";
+import {onCall, onRequest, CallableRequest} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
-import {CallableRequest} from "firebase-functions/lib/v2/providers/https";
 
 import {
     COLLECTION_GROUP_SEAT_NAME,

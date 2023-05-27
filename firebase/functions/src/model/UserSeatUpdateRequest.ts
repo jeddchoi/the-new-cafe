@@ -5,7 +5,7 @@ export class UserSeatUpdateRequest {
         readonly userId: string,
         readonly targetStatusType: UserStatusType,
         readonly reason: UserStatusChangeReason,
-        readonly seatPosition?: ISeatPosition | undefined,
+        readonly seatPosition: ISeatPosition,
         readonly durationInSeconds?: number | undefined,
         readonly until?: number | undefined,
     ) {

@@ -1,11 +1,11 @@
-import {https, logger} from "firebase-functions/lib/v2";
+import {https, logger} from "firebase-functions/v2";
 import {Response} from "express";
 import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import UserStatusHandler from "../handler/UserStatusHandler";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
-import {projectID} from "firebase-functions/lib/params";
+import {projectID} from "firebase-functions/params";
 
 
 export const timeoutOnReachUsageLimitHandler = (

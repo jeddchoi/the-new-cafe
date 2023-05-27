@@ -20,10 +20,6 @@ export const timeoutOnReserveHandler = (
         throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${userSeatUpdateRequest.targetStatusType}`);
     }
 
-    if (!userSeatUpdateRequest.seatPosition) {
-        throwFunctionsHttpsError("invalid-argument", "Seat position is not provided");
-    }
-
     if (!userSeatUpdateRequest.until) {
         throwFunctionsHttpsError("invalid-argument", "Until is not provided");
     }

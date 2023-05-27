@@ -1,5 +1,5 @@
 import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
-import {logger} from "firebase-functions/lib/v2";
+import {logger} from "firebase-functions/v2";
 import {UserStatusChangeReason, UserStatusType} from "../model/UserStatus";
 import {getEta, throwFunctionsHttpsError} from "../util/functions_helper";
 import CloudTasksUtil from "../util/CloudTasksUtil";
