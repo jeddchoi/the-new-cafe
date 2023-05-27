@@ -27,6 +27,8 @@ export function onCancelReservation(request: UserSeatUpdateRequest): Promise<boo
     const promises: Promise<boolean>[] = [];
     const requestedAt = new Date().getTime();
     const timer = new CloudTasksUtil();
+    const seatPosition = request.seatPosition;
+
 
     // 1. Stop timer and handle user status change
     promises.push(RealtimeDatabaseUtil.getUserStatusData(request.userId).then((userStatus) => {
@@ -37,6 +39,7 @@ export function onCancelReservation(request: UserSeatUpdateRequest): Promise<boo
     }).then(() => {
         return UserStatusHandler.cancelReservation(
             request.userId,
+            seatPosition,
             requestedAt,
             request.reason
         );
