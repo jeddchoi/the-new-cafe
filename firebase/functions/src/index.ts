@@ -108,7 +108,6 @@ export const timeoutOnReachUsageLimit =
     onRequest(timeoutOnReachUsageLimitHandler);
 
 
-
 // Triggered functions
 export const countSeatChange =
     onDocumentWritten(
