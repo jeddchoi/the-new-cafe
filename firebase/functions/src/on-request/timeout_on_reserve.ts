@@ -34,6 +34,7 @@ export const timeoutOnReserveHandler = (
     promises.push(UserStatusHandler.cancelReservation(
         // request.auth?.uid,
         "sI2wbdRqYtdgArsq678BFSGDwr43",
+        userSeatUpdateRequest.seatPosition,
         userSeatUpdateRequest.until,
         userSeatUpdateRequest.reason,
     ));
