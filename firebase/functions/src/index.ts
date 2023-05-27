@@ -103,6 +103,23 @@ export const stopUsingSeat =
         request: CallableRequest<UserSeatUpdateRequest>,
     ): Promise<boolean> => stopUsingSeatHandler(request.data));
 
+
+export const testStopUsingSeat = onRequest((req, res) => {
+    return stopUsingSeatHandler(
+        new UserSeatUpdateRequest(
+            "sI2wbdRqYtdgArsq678BFSGDwr43",
+            UserStatusType.None,
+            UserStatusChangeReason.UserAction,
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+        )
+    ).then((result) => {
+        if (result) {
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(500);
+        }
+    });
+});
 // HTTP functions
 export const helloWorld =
     onRequest(helloWorldHandler);
