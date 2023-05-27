@@ -8,7 +8,7 @@ import UserStatusHandler from "../handler/UserStatusHandler";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import CloudTasksUtil from "../util/CloudTasksUtil";
 
-export function onCancelReservation(request: UserSeatUpdateRequest): Promise<boolean> {
+export function cancelReservationHandler(request: UserSeatUpdateRequest): Promise<boolean> {
     logger.info("================= cancelReservation ==================", {request: request});
 
     // Validate request
@@ -57,7 +57,3 @@ export function onCancelReservation(request: UserSeatUpdateRequest): Promise<boo
         return results.every((result) => result);
     });
 }
-
-export const cancelReservationHandler = (
-    request: CallableRequest<UserSeatUpdateRequest>,
-): Promise<boolean> => onCancelReservation(request.data);

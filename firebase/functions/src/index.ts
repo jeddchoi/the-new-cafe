@@ -6,28 +6,42 @@ initializeApp();
 // setGlobalOptions({region: functionRegion.value()});
 import {onCall, onRequest} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
+import {CallableRequest} from "firebase-functions/lib/v2/providers/https";
 
-import {helloWorldHandler} from "./on-request/hello_world";
-import {onReserve, reserveSeatHandler} from "./on-call/on_reserve";
 import {
     COLLECTION_GROUP_SEAT_NAME,
     COLLECTION_GROUP_SECTION_NAME,
     COLLECTION_GROUP_STORE_NAME,
 } from "./util/FirestoreUtil";
+
+import {UserStatusChangeReason, UserStatusType} from "./model/UserStatus";
+import {UserSeatUpdateRequest} from "./model/UserSeatUpdateRequest";
+
+import {reserveSeatHandler} from "./on-call/on_reserve";
+import {cancelReservationHandler} from "./on-call/on_cancel_reservation";
+import {occupySeatHandler} from "./on-call/on_occupy_seat";
+
+import {helloWorldHandler} from "./on-request/hello_world";
+import {timeoutOnReserveHandler} from "./on-request/timeout_on_reserve";
+
 import {countSeatChangeHandler} from "./firestore/count_seat_change";
 import {countSectionChangeHandler} from "./firestore/count_section_change";
-import {UserSeatUpdateRequest} from "./model/UserSeatUpdateRequest";
-import {timeoutOnReserveHandler} from "./on-request/timeout_on_reserve";
-import {cancelReservationHandler, onCancelReservation} from "./on-call/on_cancel_reservation";
-import {UserStatusChangeReason, UserStatusType} from "./model/UserStatus";
 
 // Callable functions
 export const reserveSeat =
-    onCall<UserSeatUpdateRequest, Promise<boolean>>(reserveSeatHandler);
+    onCall<UserSeatUpdateRequest, Promise<boolean>>((
+        request: CallableRequest<UserSeatUpdateRequest>,
+    ): Promise<boolean> => reserveSeatHandler(request.data));
 
 export const cancelReservation =
-    onCall<UserSeatUpdateRequest, Promise<boolean>>(cancelReservationHandler);
+    onCall<UserSeatUpdateRequest, Promise<boolean>>((
+        request: CallableRequest<UserSeatUpdateRequest>,
+    ): Promise<boolean> => cancelReservationHandler(request.data));
 
+export const occupySeat =
+    onCall<UserSeatUpdateRequest, Promise<boolean>>((
+        request: CallableRequest<UserSeatUpdateRequest>,
+    ): Promise<boolean> => occupySeatHandler(request.data));
 
 // HTTP functions
 export const helloWorld =
@@ -39,7 +53,7 @@ export const timeoutOnReserve =
 
 // Test functions
 export const testReserveSeat = onRequest((req, res) => {
-    return onReserve(
+    return reserveSeatHandler(
         new UserSeatUpdateRequest(
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             UserStatusType.Reserved,
@@ -58,7 +72,7 @@ export const testReserveSeat = onRequest((req, res) => {
 
 
 export const testCancelReservation = onRequest((req, res) => {
-    return onCancelReservation(
+    return cancelReservationHandler(
         new UserSeatUpdateRequest(
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             UserStatusType.None,
