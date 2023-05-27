@@ -1,14 +1,15 @@
 import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
-import {logger} from "firebase-functions/v2";
+import {logger} from "firebase-functions/lib/v2";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
-import SeatStatusHandler from "../handler/SeatStatusHandler";
-import UserStatusHandler from "../handler/UserStatusHandler";
-import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import CloudTasksUtil from "../util/CloudTasksUtil";
+import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
+import UserStatusHandler from "../handler/UserStatusHandler";
+import SeatStatusHandler from "../handler/SeatStatusHandler";
 
-export function cancelReservationHandler(request: UserSeatUpdateRequest): Promise<boolean> {
-    logger.info("================= cancelReservation ==================", {request: request});
+
+export function stopUsingSeatHandler(request: UserSeatUpdateRequest): Promise<boolean> {
+    logger.info("================= stopUsingSeat ==================", {request: request});
 
     // Validate request
     if (request.targetStatusType !== UserStatusType.None) {

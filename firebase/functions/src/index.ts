@@ -20,6 +20,7 @@ import {UserSeatUpdateRequest} from "./model/UserSeatUpdateRequest";
 import {reserveSeatHandler} from "./on-call/on_reserve";
 import {cancelReservationHandler} from "./on-call/on_cancel_reservation";
 import {occupySeatHandler} from "./on-call/on_occupy_seat";
+import {stopUsingSeatHandler} from "./on-call/on_stop_using_seat";
 
 import {helloWorldHandler} from "./on-request/hello_world";
 import {timeoutOnReserveHandler} from "./on-request/timeout_on_reserve";
@@ -96,6 +97,12 @@ export const testOccupySeat = onRequest((req, res) => {
         }
     });
 });
+
+
+export const stopUsingSeat =
+    onCall<UserSeatUpdateRequest, Promise<boolean>>((
+        request: CallableRequest<UserSeatUpdateRequest>,
+    ): Promise<boolean> => stopUsingSeatHandler(request.data));
 
 // HTTP functions
 export const helloWorld =
