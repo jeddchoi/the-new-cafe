@@ -2,13 +2,14 @@ import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
 import {logger} from "firebase-functions/v2";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
-import SeatStatusHandler from "../handler/SeatStatusHandler";
-import UserStatusHandler from "../handler/UserStatusHandler";
-import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import CloudTasksUtil from "../util/CloudTasksUtil";
+import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
+import UserStatusHandler from "../handler/UserStatusHandler";
+import SeatStatusHandler from "../handler/SeatStatusHandler";
 
-export function cancelReservationHandler(request: UserSeatUpdateRequest): Promise<boolean> {
-    logger.info("================= cancelReservation ==================", {request: request});
+
+export function stopUsingSeatHandler(request: UserSeatUpdateRequest): Promise<boolean> {
+    logger.info("================= stopUsingSeat ==================", {request: request});
 
     // Validate request
     if (request.targetStatusType !== UserStatusType.None) {
@@ -27,12 +28,24 @@ export function cancelReservationHandler(request: UserSeatUpdateRequest): Promis
 
     // 1. Stop timer and handle user status change
     promises.push(RealtimeDatabaseUtil.getUserStatusData(request.userId).then((userStatus) => {
-        if (!userStatus.currentTimer) {
+        if (!userStatus.currentTimer && !userStatus.usageTimer) {
             return true;
         }
-        return timer.cancelTimer(userStatus.currentTimer?.timerTaskName);
-    }).then(() => {
-        return UserStatusHandler.cancelReservation(
+        const proms = [];
+        if (userStatus.currentTimer) {
+            proms.push(timer.cancelTimer(userStatus.currentTimer?.timerTaskName));
+        }
+        if (userStatus.usageTimer) {
+            proms.push(timer.cancelTimer(userStatus.usageTimer?.timerTaskName));
+        }
+        return Promise.all(proms).then((results) => {
+            return results.every((result) => result);
+        });
+    }).then((result) => {
+        if (result) {
+            logger.debug("all timers stopped successfully");
+        }
+        return UserStatusHandler.stopUsingSeat(
             request.userId,
             request.seatPosition,
             requestedAt,
@@ -41,7 +54,7 @@ export function cancelReservationHandler(request: UserSeatUpdateRequest): Promis
     }));
 
     // 2. Handle seat status change
-    promises.push(SeatStatusHandler.cancelReservation(
+    promises.push(SeatStatusHandler.stopUsingSeat(
         request.userId,
         request.seatPosition,
     ));

@@ -13,9 +13,6 @@ export function reserveSeatHandler(request: UserSeatUpdateRequest): Promise<bool
     if (request.targetStatusType !== UserStatusType.Reserved) {
         throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${request.targetStatusType}`);
     }
-    if (!request.seatPosition) {
-        throwFunctionsHttpsError("invalid-argument", "Seat position is not provided");
-    }
     // TODO: validate auth(not simulated)
     // if (!request.auth) {
     //     throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
@@ -25,14 +22,13 @@ export function reserveSeatHandler(request: UserSeatUpdateRequest): Promise<bool
 
     const requestedAt = new Date().getTime();
     const eta = getEta(requestedAt, request.durationInSeconds, request.until);
-    const seatPosition = request.seatPosition;
     const timer = new CloudTasksUtil();
 
     // 1. Handle seat status change
     promises.push(SeatStatusHandler.reserveSeat(
         // request.auth?.uid,
         "sI2wbdRqYtdgArsq678BFSGDwr43",
-        seatPosition,
+        request.seatPosition,
     ));
 
     // 2. Start timer and handle user status change
@@ -42,7 +38,7 @@ export function reserveSeatHandler(request: UserSeatUpdateRequest): Promise<bool
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             UserStatusType.None,
             UserStatusChangeReason.Timeout,
-            seatPosition,
+            request.seatPosition,
             undefined,
             eta
         ),
@@ -55,7 +51,7 @@ export function reserveSeatHandler(request: UserSeatUpdateRequest): Promise<bool
         return UserStatusHandler.reserveSeat(
             // request.auth?.uid,
             "sI2wbdRqYtdgArsq678BFSGDwr43",
-            seatPosition,
+            request.seatPosition,
             requestedAt,
             eta,
             task.name
