@@ -16,19 +16,14 @@ import {
 import {UserStatusChangeReason, UserStatusType} from "./model/UserStatus";
 import {UserSeatUpdateRequest} from "./model/UserSeatUpdateRequest";
 
-import {reserveSeatHandler} from "./on-call/on_reserve";
-import {cancelReservationHandler} from "./on-call/on_cancel_reservation";
-import {occupySeatHandler} from "./on-call/on_occupy_seat";
-import {stopUsingSeatHandler} from "./on-call/on_stop_using_seat";
-
-import {helloWorldHandler} from "./on-request/hello_world";
-import {timeoutOnReserveHandler} from "./on-request/timeout_on_reserve";
-import {timeoutOnReachUsageLimitHandler} from "./on-request/timeout_on_reach_usage_limit";
-
-import {countSeatChangeHandler} from "./firestore/count_seat_change";
-import {countSectionChangeHandler} from "./firestore/count_section_change";
 
 // Callable functions
+import {reserveSeatHandler} from "./handle_request/on_reserve";
+import {cancelReservationHandler} from "./handle_request/on_cancel_reservation";
+import {occupySeatHandler} from "./handle_request/on_occupy_seat";
+import {stopUsingSeatHandler} from "./handle_request/on_stop_using_seat";
+import {goVacantHandler} from "./handle_request/on_go_vacant";
+
 export const reserveSeat =
     onCall<UserSeatUpdateRequest, Promise<boolean>>((
         request: CallableRequest<UserSeatUpdateRequest>,
@@ -97,6 +92,28 @@ export const testOccupySeat = onRequest((req, res) => {
     });
 });
 
+export const goVacant =
+    onCall<UserSeatUpdateRequest, Promise<boolean>>((
+        request: CallableRequest<UserSeatUpdateRequest>,
+    ): Promise<boolean> => goVacantHandler(request.data));
+
+export const testGoVacant = onRequest((req, res) => {
+    return goVacantHandler(
+        new UserSeatUpdateRequest(
+            "sI2wbdRqYtdgArsq678BFSGDwr43",
+            UserStatusType.Occupied,
+            UserStatusChangeReason.UserAction,
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+            1000,
+        )
+    ).then((result) => {
+        if (result) {
+            res.sendStatus(200);
+        } else {
+            res.sendStatus(500);
+        }
+    });
+});
 
 export const stopUsingSeat =
     onCall<UserSeatUpdateRequest, Promise<boolean>>((
@@ -120,7 +137,14 @@ export const testStopUsingSeat = onRequest((req, res) => {
         }
     });
 });
+
+
 // HTTP functions
+import {helloWorldHandler} from "./handle_timeout/hello_world";
+import {timeoutOnReserveHandler} from "./handle_timeout/timeout_on_reserve";
+import {timeoutOnReachUsageLimitHandler} from "./handle_timeout/timeout_on_reach_usage_limit";
+import {timeoutOnVacantHandler} from "./handle_timeout/timeout_on_vacant";
+
 export const helloWorld =
     onRequest(helloWorldHandler);
 
@@ -131,7 +155,13 @@ export const timeoutOnReachUsageLimit =
     onRequest(timeoutOnReachUsageLimitHandler);
 
 
+export const timeoutOnVacant =
+    onRequest(timeoutOnVacantHandler);
+
 // Triggered functions
+import {countSeatChangeHandler} from "./firestore/count_seat_change";
+import {countSectionChangeHandler} from "./firestore/count_section_change";
+
 export const countSeatChange =
     onDocumentWritten(
         {
