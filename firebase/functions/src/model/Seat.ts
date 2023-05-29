@@ -1,4 +1,5 @@
 import {QueryDocumentSnapshot, FirestoreDataConverter, DocumentData} from "firebase-admin/firestore";
+import {throwFunctionsHttpsError} from "../util/functions_helper";
 
 enum SeatStatusType {
     None,
@@ -53,7 +54,7 @@ const seatConverter: FirestoreDataConverter<Seat> = {
     ): Seat {
         const data = snapshot.data();
         return new Seat(snapshot.id,
-            snapshot.ref.parent.parent!.id,
+            snapshot.ref.parent.parent?.id ?? throwFunctionsHttpsError("internal", "Section doesn't exist"),
             snapshot.ref.parent.id,
             data.name,
             data.status,

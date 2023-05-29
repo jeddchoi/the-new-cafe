@@ -2,8 +2,6 @@ import {initializeApp} from "firebase-admin/app";
 
 initializeApp();
 
-// const functionRegion = defineString("MY_FUNCTIONS_LOCATION");
-// setGlobalOptions({region: functionRegion.value()});
 import {onCall, onRequest, CallableRequest} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
 
