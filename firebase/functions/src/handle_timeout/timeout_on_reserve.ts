@@ -1,7 +1,6 @@
 import {https, logger} from "firebase-functions/v2";
 import {Response} from "express";
 import {projectID} from "firebase-functions/params";
-import {UserActionRequest} from "../model/request/UserActionRequest";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import SeatStatusHandler from "../handler/SeatStatusHandler";

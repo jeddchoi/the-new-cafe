@@ -1,6 +1,5 @@
 import {https, logger} from "firebase-functions/v2";
 import {Response} from "express";
-import {UserActionRequest} from "../model/request/UserActionRequest";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import UserStatusHandler from "../handler/UserStatusHandler";

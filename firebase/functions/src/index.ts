@@ -13,7 +13,7 @@ import {
     COLLECTION_GROUP_STORE_NAME,
 } from "./util/FirestoreUtil";
 
-import {UserStatusChangeReason, UserStatusType} from "./model/UserStatus";
+import {UserStatusType} from "./model/UserStatus";
 import {UserActionRequest} from "./model/request/UserActionRequest";
 
 /**
@@ -219,9 +219,6 @@ export const timeoutOnVacant =
 
 import {countSeatChangeHandler} from "./firestore/count_seat_change";
 import {countSectionChangeHandler} from "./firestore/count_section_change";
-import {https, logger} from "firebase-functions/lib/v2";
-import {Response} from "express";
-import {projectID} from "firebase-functions/lib/params";
 import {throwFunctionsHttpsError} from "./util/functions_helper";
 
 export const countSeatChange =
