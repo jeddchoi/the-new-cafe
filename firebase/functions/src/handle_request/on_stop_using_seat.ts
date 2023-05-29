@@ -1,4 +1,4 @@
-import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
+import {UserActionRequest} from "../model/request/UserActionRequest";
 import {logger} from "firebase-functions/v2";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
@@ -8,21 +8,16 @@ import UserStatusHandler from "../handler/UserStatusHandler";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
 
 
-export function stopUsingSeatHandler(request: UserSeatUpdateRequest): Promise<boolean> {
-    logger.info("================= stopUsingSeat ==================", {request: request});
+export function stopUsingSeatHandler(request: UserActionRequest): Promise<boolean> {
+    logger.info("================= Stop Using Seat ==================", {request: request});
 
     // Validate request
     if (request.targetStatusType !== UserStatusType.None) {
         throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${request.targetStatusType}`);
     }
-    // TODO: validate auth(not simulated)
-    // if (!request.auth) {
-    //     throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
-    // }
 
 
     const promises: Promise<boolean>[] = [];
-    const requestedAt = new Date().getTime();
     const timer = new CloudTasksUtil();
 
 
@@ -48,7 +43,7 @@ export function stopUsingSeatHandler(request: UserSeatUpdateRequest): Promise<bo
         return UserStatusHandler.stopUsingSeat(
             request.userId,
             request.seatPosition,
-            requestedAt,
+            request.requestedAt,
             request.reason
         );
     }));

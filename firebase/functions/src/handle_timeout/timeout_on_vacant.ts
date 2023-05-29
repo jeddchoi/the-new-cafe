@@ -1,45 +1,48 @@
-import {https, logger} from "firebase-functions/lib/v2";
+import {https, logger} from "firebase-functions/v2";
 import {Response} from "express";
-import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
+import {projectID} from "firebase-functions/params";
 import {UserStatusType} from "../model/UserStatus";
-import {throwFunctionsHttpsError} from "../util/functions_helper";
+import {TimeoutRequest} from "../model/request/TimeoutRequest";
 import UserStatusHandler from "../handler/UserStatusHandler";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
-import {projectID} from "firebase-functions/lib/params";
+import CloudTasksUtil from "../util/CloudTasksUtil";
+import {throwFunctionsHttpsError} from "../util/functions_helper";
+import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 
-// TODO: fix this
 export const timeoutOnVacantHandler = (
     request: https.Request,
     response: Response
 ) => {
-    const userSeatUpdateRequest = request.body as UserSeatUpdateRequest;
-    logger.info(`cancel reservation : ${new Date().toISOString()}`, {structuredData: JSON.stringify(userSeatUpdateRequest)},);
+    const timeoutRequest = TimeoutRequest.fromPaylod(request.body);
+    logger.info(`Timeout on Vacant : ${timeoutRequest.toString()}`);
 
     // Validate request
-    if (userSeatUpdateRequest.targetStatusType !== UserStatusType.None) {
-        throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${userSeatUpdateRequest.targetStatusType}`);
-    }
-
-    if (!userSeatUpdateRequest.until) {
-        throwFunctionsHttpsError("invalid-argument", "Until is not provided");
+    if (timeoutRequest.targetStatusType !== UserStatusType.None) {
+        throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${timeoutRequest.targetStatusType}`);
     }
 
     const promises = [];
+    const timer = new CloudTasksUtil();
 
-    // 1. Handle user status change
-    promises.push(UserStatusHandler.cancelReservation(
-        // request.auth?.uid,
-        "sI2wbdRqYtdgArsq678BFSGDwr43",
-        userSeatUpdateRequest.seatPosition,
-        userSeatUpdateRequest.until,
-        userSeatUpdateRequest.reason,
-    ));
+    // 1. Stop usage timer and handle user status change
+    promises.push(RealtimeDatabaseUtil.getUserStatusData(timeoutRequest.userId).then((userStatus) => {
+        if (!userStatus.usageTimer) {
+            return true;
+        }
+        return timer.cancelTimer(userStatus.usageTimer?.timerTaskName);
+    }).then(() => {
+        return UserStatusHandler.stopUsingSeat(
+            timeoutRequest.userId,
+            timeoutRequest.seatPosition,
+            timeoutRequest.requestedAt,
+            timeoutRequest.reason,
+        );
+    }));
 
     // 2. Handle seat status change
-    promises.push(SeatStatusHandler.cancelReservation(
-        // request.auth?.uid,
-        "sI2wbdRqYtdgArsq678BFSGDwr43",
-        userSeatUpdateRequest.seatPosition,
+    promises.push(SeatStatusHandler.stopUsingSeat(
+        timeoutRequest.userId,
+        timeoutRequest.seatPosition,
     ));
 
     // 3. TODO: Handle user history update

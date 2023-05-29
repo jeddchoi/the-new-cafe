@@ -1,25 +1,27 @@
-import {logger} from "firebase-functions/v2";
 import {UserActionRequest} from "../model/request/UserActionRequest";
+import {logger} from "firebase-functions/v2";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import CloudTasksUtil from "../util/CloudTasksUtil";
-import UserStatusHandler from "../handler/UserStatusHandler";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
+import UserStatusHandler from "../handler/UserStatusHandler";
 import {TimeoutRequest} from "../model/request/TimeoutRequest";
 
-export function reserveSeatHandler(request: UserActionRequest): Promise<boolean> {
-    logger.info("================= Reserve Seat ==================", {request: request});
+
+export function goTaskHandler(request: UserActionRequest): Promise<boolean> {
+    logger.info("================= Go Task ==================", {request: request});
 
     // Validate request
-    if (request.targetStatusType !== UserStatusType.Reserved) {
+    if (request.targetStatusType !== UserStatusType.OnTask) {
         throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${request.targetStatusType}`);
     }
 
     const promises: Promise<boolean>[] = [];
+
     const timer = new CloudTasksUtil();
 
     // 1. Handle seat status change
-    promises.push(SeatStatusHandler.reserveSeat(
+    promises.push(SeatStatusHandler.leaveSeat(
         request.userId,
         request.seatPosition,
     ));
@@ -29,20 +31,20 @@ export function reserveSeatHandler(request: UserActionRequest): Promise<boolean>
         new TimeoutRequest(
             request.seatPosition,
             request.userId,
-            UserStatusType.None,
+            UserStatusType.Vacant,
             100,
         ),
-        "/timeoutOnReserve",
+        "/timeoutOnTask",
     ).then((task) => {
         if (!task.name) {
             throwFunctionsHttpsError("internal", "Timer task failed to start");
         }
-        return UserStatusHandler.reserveSeat(
+        return UserStatusHandler.onTask(
             request.userId,
             request.seatPosition,
             request.requestedAt,
             request.until,
-            task.name
+            task.name,
         );
     }));
 
