@@ -22,8 +22,7 @@ export function goVacantHandler(request: UserActionRequest): Promise<boolean> {
 
     // 1. Handle seat status change
     promises.push(SeatStatusHandler.leaveSeat(
-        // request.auth?.uid,
-        "sI2wbdRqYtdgArsq678BFSGDwr43",
+        request.userId,
         request.seatPosition,
     ));
 
@@ -31,8 +30,7 @@ export function goVacantHandler(request: UserActionRequest): Promise<boolean> {
     promises.push(timer.reserveUserSeatUpdate(
         new TimeoutRequest(
             request.seatPosition,
-            // userId: request.auth?.uid,
-            "sI2wbdRqYtdgArsq678BFSGDwr43",
+            request.userId,
             UserStatusType.None,
             100,
         ),
@@ -42,8 +40,7 @@ export function goVacantHandler(request: UserActionRequest): Promise<boolean> {
             throwFunctionsHttpsError("internal", "Timer task failed to start");
         }
         return UserStatusHandler.goVacant(
-            // request.auth?.uid,
-            "sI2wbdRqYtdgArsq678BFSGDwr43",
+            request.userId,
             request.seatPosition,
             request.requestedAt,
             request.until,

@@ -198,6 +198,7 @@ import {helloWorldHandler} from "./handle_timeout/hello_world";
 import {timeoutOnReserveHandler} from "./handle_timeout/timeout_on_reserve";
 import {timeoutOnReachUsageLimitHandler} from "./handle_timeout/timeout_on_reach_usage_limit";
 import {timeoutOnVacantHandler} from "./handle_timeout/timeout_on_vacant";
+import {timeoutOnTaskHandler} from "./handle_timeout/timeout_on_task";
 
 export const helloWorld =
     onRequest(helloWorldHandler);
@@ -212,6 +213,8 @@ export const timeoutOnReachUsageLimit =
 export const timeoutOnVacant =
     onRequest(timeoutOnVacantHandler);
 
+export const timeoutOnTask =
+    onRequest(timeoutOnTaskHandler);
 
 /**
  * Triggered functions

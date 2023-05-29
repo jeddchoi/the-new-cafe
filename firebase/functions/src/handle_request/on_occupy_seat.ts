@@ -22,17 +22,15 @@ export function occupySeatHandler(request: UserActionRequest): Promise<boolean> 
 
     // 1. Handle seat status change
     promises.push(SeatStatusHandler.occupySeat(
-        // request.auth?.uid,
-        "sI2wbdRqYtdgArsq678BFSGDwr43",
+        request.userId,
         request.seatPosition,
     ));
 
     // 2. Start timer and handle user status change
     promises.push(timer.reserveUserSeatUpdate(
         new TimeoutRequest(
-            // userId: request.auth?.uid,
             request.seatPosition,
-            "sI2wbdRqYtdgArsq678BFSGDwr43",
+            request.userId,
             UserStatusType.None,
             100,
         ),
@@ -42,8 +40,7 @@ export function occupySeatHandler(request: UserActionRequest): Promise<boolean> 
             throwFunctionsHttpsError("internal", "Timer task failed to start");
         }
         return UserStatusHandler.occupySeat(
-            // request.auth?.uid,
-            "sI2wbdRqYtdgArsq678BFSGDwr43",
+            request.userId,
             request.seatPosition,
             request.requestedAt,
             request.until,
