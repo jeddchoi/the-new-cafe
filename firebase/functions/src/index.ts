@@ -14,11 +14,11 @@ import {
 } from "./util/FirestoreUtil";
 
 import {UserStatusChangeReason, UserStatusType} from "./model/UserStatus";
-import {UserSeatUpdateRequest} from "./model/UserSeatUpdateRequest";
+import {UserActionRequest} from "./model/request/UserActionRequest";
 
 /**
  * Callable functions
-  */
+ */
 
 import {reserveSeatHandler} from "./handle_request/on_reserve";
 import {cancelReservationHandler} from "./handle_request/on_cancel_reservation";
@@ -29,17 +29,21 @@ import {goTaskHandler} from "./handle_request/on_go_task";
 
 
 export const reserveSeat =
-    onCall<UserSeatUpdateRequest, Promise<boolean>>((
-        request: CallableRequest<UserSeatUpdateRequest>,
-    ): Promise<boolean> => reserveSeatHandler(request.data));
+    onCall<UserActionRequest, Promise<boolean>>((
+        request: CallableRequest<UserActionRequest>,
+    ): Promise<boolean> => {
+        if (request.auth === undefined) {
+            throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
+        }
+        return reserveSeatHandler(request.data);
+    });
 
 export const testReserveSeat = onRequest((req, res) => {
     return reserveSeatHandler(
-        new UserSeatUpdateRequest(
+        new UserActionRequest(
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             UserStatusType.Reserved,
-            UserStatusChangeReason.UserAction,
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             100
         )
     ).then((result) => {
@@ -52,17 +56,21 @@ export const testReserveSeat = onRequest((req, res) => {
 });
 
 export const cancelReservation =
-    onCall<UserSeatUpdateRequest, Promise<boolean>>((
-        request: CallableRequest<UserSeatUpdateRequest>,
-    ): Promise<boolean> => cancelReservationHandler(request.data));
+    onCall<UserActionRequest, Promise<boolean>>((
+        request: CallableRequest<UserActionRequest>,
+    ): Promise<boolean> => {
+        if (request.auth === undefined) {
+            throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
+        }
+        return cancelReservationHandler(request.data);
+    });
 
 export const testCancelReservation = onRequest((req, res) => {
     return cancelReservationHandler(
-        new UserSeatUpdateRequest(
+        new UserActionRequest(
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             UserStatusType.None,
-            UserStatusChangeReason.UserAction,
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
         )
     ).then((result) => {
         if (result) {
@@ -74,17 +82,21 @@ export const testCancelReservation = onRequest((req, res) => {
 });
 
 export const occupySeat =
-    onCall<UserSeatUpdateRequest, Promise<boolean>>((
-        request: CallableRequest<UserSeatUpdateRequest>,
-    ): Promise<boolean> => occupySeatHandler(request.data));
+    onCall<UserActionRequest, Promise<boolean>>((
+        request: CallableRequest<UserActionRequest>,
+    ): Promise<boolean> => {
+        if (request.auth === undefined) {
+            throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
+        }
+        return occupySeatHandler(request.data);
+    });
 
 export const testOccupySeat = onRequest((req, res) => {
     return occupySeatHandler(
-        new UserSeatUpdateRequest(
+        new UserActionRequest(
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             UserStatusType.Occupied,
-            UserStatusChangeReason.UserAction,
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             1000,
         )
     ).then((result) => {
@@ -97,18 +109,22 @@ export const testOccupySeat = onRequest((req, res) => {
 });
 
 export const stopUsingSeat =
-    onCall<UserSeatUpdateRequest, Promise<boolean>>((
-        request: CallableRequest<UserSeatUpdateRequest>,
-    ): Promise<boolean> => stopUsingSeatHandler(request.data));
+    onCall<UserActionRequest, Promise<boolean>>((
+        request: CallableRequest<UserActionRequest>,
+    ): Promise<boolean> => {
+        if (request.auth === undefined) {
+            throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
+        }
+        return stopUsingSeatHandler(request.data);
+    });
 
 
 export const testStopUsingSeat = onRequest((req, res) => {
     return stopUsingSeatHandler(
-        new UserSeatUpdateRequest(
+        new UserActionRequest(
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             UserStatusType.None,
-            UserStatusChangeReason.UserAction,
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
         )
     ).then((result) => {
         if (result) {
@@ -120,17 +136,21 @@ export const testStopUsingSeat = onRequest((req, res) => {
 });
 
 export const goVacant =
-    onCall<UserSeatUpdateRequest, Promise<boolean>>((
-        request: CallableRequest<UserSeatUpdateRequest>,
-    ): Promise<boolean> => goVacantHandler(request.data));
+    onCall<UserActionRequest, Promise<boolean>>((
+        request: CallableRequest<UserActionRequest>,
+    ): Promise<boolean> => {
+        if (request.auth === undefined) {
+            throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
+        }
+        return goVacantHandler(request.data);
+    });
 
 export const testGoVacant = onRequest((req, res) => {
     return goVacantHandler(
-        new UserSeatUpdateRequest(
+        new UserActionRequest(
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             UserStatusType.Occupied,
-            UserStatusChangeReason.UserAction,
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             100,
         )
     ).then((result) => {
@@ -143,18 +163,22 @@ export const testGoVacant = onRequest((req, res) => {
 });
 
 export const goTask =
-    onCall<UserSeatUpdateRequest, Promise<boolean>>((
-        request: CallableRequest<UserSeatUpdateRequest>,
-    ): Promise<boolean> => goTaskHandler(request.data));
+    onCall<UserActionRequest, Promise<boolean>>((
+        request: CallableRequest<UserActionRequest>,
+    ): Promise<boolean> => {
+        if (request.auth === undefined) {
+            throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
+        }
+        return goTaskHandler(request.data);
+    });
 
 
 export const testGoTask = onRequest((req, res) => {
     return goTaskHandler(
-        new UserSeatUpdateRequest(
+        new UserActionRequest(
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             UserStatusType.OnTask,
-            UserStatusChangeReason.UserAction,
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             100,
         )
     ).then((result) => {
@@ -168,7 +192,7 @@ export const testGoTask = onRequest((req, res) => {
 
 /**
  * HTTP functions
-  */
+ */
 
 import {helloWorldHandler} from "./handle_timeout/hello_world";
 import {timeoutOnReserveHandler} from "./handle_timeout/timeout_on_reserve";
@@ -191,10 +215,14 @@ export const timeoutOnVacant =
 
 /**
  * Triggered functions
-  */
+ */
 
 import {countSeatChangeHandler} from "./firestore/count_seat_change";
 import {countSectionChangeHandler} from "./firestore/count_section_change";
+import {https, logger} from "firebase-functions/lib/v2";
+import {Response} from "express";
+import {projectID} from "firebase-functions/lib/params";
+import {throwFunctionsHttpsError} from "./util/functions_helper";
 
 export const countSeatChange =
     onDocumentWritten(

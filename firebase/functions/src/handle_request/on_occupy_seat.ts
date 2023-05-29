@@ -1,28 +1,23 @@
-import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
+import {UserActionRequest} from "../model/request/UserActionRequest";
 import {logger} from "firebase-functions/v2";
-import {UserStatusChangeReason, UserStatusType} from "../model/UserStatus";
-import {getEta, throwFunctionsHttpsError} from "../util/functions_helper";
+import {UserStatusType} from "../model/UserStatus";
+import {throwFunctionsHttpsError} from "../util/functions_helper";
 import CloudTasksUtil from "../util/CloudTasksUtil";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
 import UserStatusHandler from "../handler/UserStatusHandler";
+import {TimeoutRequest} from "../model/request/TimeoutRequest";
 
 
-export function occupySeatHandler(request: UserSeatUpdateRequest): Promise<boolean> {
-    logger.info("================= occupySeat ==================", {request: request});
+export function occupySeatHandler(request: UserActionRequest): Promise<boolean> {
+    logger.info("================= Occupy Seat ==================", {request: request});
 
     // Validate request
     if (request.targetStatusType !== UserStatusType.Occupied) {
         throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${request.targetStatusType}`);
     }
-    // TODO: validate auth(not simulated)
-    // if (!request.auth) {
-    //     throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
-    // }
 
     const promises: Promise<boolean>[] = [];
 
-    const requestedAt = new Date().getTime();
-    const eta = getEta(requestedAt, request.durationInSeconds, request.until);
     const timer = new CloudTasksUtil();
 
     // 1. Handle seat status change
@@ -34,17 +29,14 @@ export function occupySeatHandler(request: UserSeatUpdateRequest): Promise<boole
 
     // 2. Start timer and handle user status change
     promises.push(timer.reserveUserSeatUpdate(
-        new UserSeatUpdateRequest(
+        new TimeoutRequest(
             // userId: request.auth?.uid,
+            request.seatPosition,
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             UserStatusType.None,
-            UserStatusChangeReason.Timeout,
-            request.seatPosition,
-            undefined,
-            eta
+            100,
         ),
         "/timeoutOnReachUsageLimit",
-        Math.round(eta / 1000), // eta in millisec
     ).then((task) => {
         if (!task.name) {
             throwFunctionsHttpsError("internal", "Timer task failed to start");
@@ -53,8 +45,8 @@ export function occupySeatHandler(request: UserSeatUpdateRequest): Promise<boole
             // request.auth?.uid,
             "sI2wbdRqYtdgArsq678BFSGDwr43",
             request.seatPosition,
-            requestedAt,
-            eta,
+            request.requestedAt,
+            request.until,
             task.name
         );
     }));

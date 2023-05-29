@@ -1,45 +1,41 @@
 import {https, logger} from "firebase-functions/v2";
 import {Response} from "express";
 import {projectID} from "firebase-functions/params";
-import {UserSeatUpdateRequest} from "../model/UserSeatUpdateRequest";
+import {UserActionRequest} from "../model/request/UserActionRequest";
 import {UserStatusType} from "../model/UserStatus";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import SeatStatusHandler from "../handler/SeatStatusHandler";
 import UserStatusHandler from "../handler/UserStatusHandler";
+import {TimeoutRequest} from "../model/request/TimeoutRequest";
 
 
 export const timeoutOnReserveHandler = (
     request: https.Request,
     response: Response
 ) => {
-    const userSeatUpdateRequest = request.body as UserSeatUpdateRequest;
-    logger.info(`cancel reservation : ${new Date().toISOString()}`, {structuredData: JSON.stringify(userSeatUpdateRequest)},);
+    const timeoutRequest = TimeoutRequest.fromPaylod(request.body);
+    logger.info(`Timeout on Reservation : ${timeoutRequest.toString()}`);
 
     // Validate request
-    if (userSeatUpdateRequest.targetStatusType !== UserStatusType.None) {
-        throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${userSeatUpdateRequest.targetStatusType}`);
+    if (timeoutRequest.targetStatusType !== UserStatusType.None) {
+        throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${timeoutRequest.targetStatusType}`);
     }
 
-    if (!userSeatUpdateRequest.until) {
-        throwFunctionsHttpsError("invalid-argument", "Until is not provided");
-    }
 
     const promises = [];
 
     // 1. Handle user status change
     promises.push(UserStatusHandler.cancelReservation(
-        // request.auth?.uid,
-        "sI2wbdRqYtdgArsq678BFSGDwr43",
-        userSeatUpdateRequest.seatPosition,
-        userSeatUpdateRequest.until,
-        userSeatUpdateRequest.reason,
+        timeoutRequest.userId,
+        timeoutRequest.seatPosition,
+        timeoutRequest.requestedAt,
+        timeoutRequest.reason,
     ));
 
     // 2. Handle seat status change
     promises.push(SeatStatusHandler.cancelReservation(
-        // request.auth?.uid,
-        "sI2wbdRqYtdgArsq678BFSGDwr43",
-        userSeatUpdateRequest.seatPosition,
+        timeoutRequest.userId,
+        timeoutRequest.seatPosition,
     ));
 
     // 3. TODO: Handle user history update
