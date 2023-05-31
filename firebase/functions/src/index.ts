@@ -38,11 +38,13 @@ export const reserveSeat =
 
 export const testReserveSeat = onRequest((req, res) => {
     return reserveSeatHandler(
-        new UserActionRequest(
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+        UserActionRequest.newInstance(
             "sI2wbdRqYtdgArsq678BFSGDwr43",
+            undefined,
             UserStatusType.Reserved,
-            100
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+            100,
+            undefined,
         )
     ).then((result) => {
         if (result) {
@@ -65,10 +67,13 @@ export const cancelReservation =
 
 export const testCancelReservation = onRequest((req, res) => {
     return cancelReservationHandler(
-        new UserActionRequest(
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+        UserActionRequest.newInstance(
             "sI2wbdRqYtdgArsq678BFSGDwr43",
+            undefined,
             UserStatusType.None,
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+            undefined,
+            undefined,
         )
     ).then((result) => {
         if (result) {
@@ -91,11 +96,13 @@ export const occupySeat =
 
 export const testOccupySeat = onRequest((req, res) => {
     return occupySeatHandler(
-        new UserActionRequest(
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+        UserActionRequest.newInstance(
             "sI2wbdRqYtdgArsq678BFSGDwr43",
+            undefined,
             UserStatusType.Occupied,
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             1000,
+            undefined,
         )
     ).then((result) => {
         if (result) {
@@ -119,10 +126,13 @@ export const stopUsingSeat =
 
 export const testStopUsingSeat = onRequest((req, res) => {
     return stopUsingSeatHandler(
-        new UserActionRequest(
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+        UserActionRequest.newInstance(
             "sI2wbdRqYtdgArsq678BFSGDwr43",
+            undefined,
             UserStatusType.None,
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+            undefined,
+            undefined,
         )
     ).then((result) => {
         if (result) {
@@ -145,11 +155,13 @@ export const goVacant =
 
 export const testGoVacant = onRequest((req, res) => {
     return goVacantHandler(
-        new UserActionRequest(
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+        UserActionRequest.newInstance(
             "sI2wbdRqYtdgArsq678BFSGDwr43",
-            UserStatusType.Occupied,
+            undefined,
+            UserStatusType.Vacant,
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             100,
+            undefined,
         )
     ).then((result) => {
         if (result) {
@@ -173,11 +185,13 @@ export const goTask =
 
 export const testGoTask = onRequest((req, res) => {
     return goTaskHandler(
-        new UserActionRequest(
-            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
+        UserActionRequest.newInstance(
             "sI2wbdRqYtdgArsq678BFSGDwr43",
+            undefined,
             UserStatusType.OnTask,
+            {"storeId": "i9sAij5mVBijR85hgraE", "sectionId": "FMLYWLzKmiou1PTcrFR8", "seatId": "ZlblGsMYd7IlO1DEho4H"},
             100,
+            undefined,
         )
     ).then((result) => {
         if (result) {

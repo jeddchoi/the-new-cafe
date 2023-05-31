@@ -2,6 +2,7 @@ import {CloudTasksClient, protos} from "@google-cloud/tasks";
 import {defineString, projectID} from "firebase-functions/params";
 import {logger} from "firebase-functions";
 import {TimeoutRequest} from "../model/request/TimeoutRequest";
+import {throwFunctionsHttpsError} from "./functions_helper";
 
 
 const tasksQueueName = defineString("TASKS_QUEUE_NAME");
@@ -25,13 +26,17 @@ export default class CloudTasksUtil {
         request: TimeoutRequest,
         invokeFnPath: string,
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
-        return this.createHttpTaskWithSchedule(request, invokeFnPath, Math.round(request.until / 1000));
+        return this.createHttpTaskWithSchedule(request, invokeFnPath, Math.round(request.startStatusAt / 1000));
     }
 
     public cancelTimer(
         timerTaskName: string,
     ): Promise<boolean> {
-        return CloudTasksUtil._client.deleteTask({name: timerTaskName}).then(() => true);
+        return CloudTasksUtil._client.deleteTask({name: timerTaskName})
+            .catch((err) => {
+                logger.warn(`Deletion task(${timerTaskName}) failed. maybe already consumed`, err);
+            })
+            .then(() => true);
     }
 
     private createHttpTaskWithSchedule(
@@ -41,10 +46,8 @@ export default class CloudTasksUtil {
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
         // Construct the fully qualified queue name.
         const parent = CloudTasksUtil._client.queuePath(this._projectID, this._tasksLocation, this._tasksQueueName);
-        const taskPath = CloudTasksUtil._client.taskPath(this._projectID, this._tasksLocation, this._tasksQueueName, `${path}/${payload.userId}`);
-        logger.log(`taskPath = ${taskPath}`);
         const task = this.createTaskObject(
-            `${this._tasksBaseUrl}${path}`,
+            `${this._tasksBaseUrl}/${path}`,
             this._gServiceAccountEmail,
             payload,
             scheduleTimeInSeconds

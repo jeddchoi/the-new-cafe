@@ -12,7 +12,8 @@ export const timeoutOnReserveHandler = (
     request: https.Request,
     response: Response
 ) => {
-    const timeoutRequest = TimeoutRequest.fromPaylod(request.body);
+    logger.info(`request.body = ${JSON.stringify(request.body)}`);
+    const timeoutRequest = TimeoutRequest.fromPayload(request.body);
     logger.info(`Timeout on Reservation : ${timeoutRequest.toString()}`);
 
     // Validate request
@@ -27,7 +28,7 @@ export const timeoutOnReserveHandler = (
     promises.push(UserStatusHandler.cancelReservation(
         timeoutRequest.userId,
         timeoutRequest.seatPosition,
-        timeoutRequest.requestedAt,
+        timeoutRequest.startStatusAt,
         timeoutRequest.reason,
     ));
 

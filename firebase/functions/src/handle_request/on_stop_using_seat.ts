@@ -43,7 +43,7 @@ export function stopUsingSeatHandler(request: UserActionRequest): Promise<boolea
         return UserStatusHandler.stopUsingSeat(
             request.userId,
             request.seatPosition,
-            request.requestedAt,
+            request.startStatusAt,
             request.reason
         );
     }));

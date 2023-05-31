@@ -7,48 +7,59 @@ import {
     UserStatusChangeReason,
     UserStatusType,
 } from "../model/UserStatus";
+import {isEqual} from "lodash";
 
 class UserStatusHandler {
-    static reserveSeat(userId: string, seatPosition: ISeatPosition, requestedAt: number, fireAt: number, timerTaskName: string): Promise<boolean> {
-        logger.debug(`[UserStatusHandler] Reserve Seat / ${JSON.stringify(seatPosition)} (${new Date(requestedAt).toISOString()} ~ ${new Date(fireAt).toISOString()}) / ${timerTaskName}`);
+    static reserveSeat(userId: string, seatPosition: ISeatPosition, startStatusAt: number, keepStatusUntil: number, timerTaskName: string): Promise<boolean> {
+        logger.debug(`[UserStatusHandler] Reserve Seat / ${JSON.stringify(seatPosition)} (${new Date(startStatusAt).toISOString()} ~ ${new Date(keepStatusUntil).toISOString()}) / ${timerTaskName}`);
         return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
-            const existingStatus = existing as IUserStatusExternal | undefined;
-            if (existingStatus && existingStatus.status !== UserStatusType.None) {
+            logger.debug(`HERE = ${JSON.stringify(existing)}`);
+            if (!existing) {
+                logger.debug("return null");
+                return null;
+            }
+            if (existing.status !== UserStatusType.None) {
+                logger.debug(`UserStatusType(${existing.status}) of existing user status is not ${UserStatusType[UserStatusType.None]}`);
                 return;
             }
             return <IUserStatusExternal>{
-                lastStatus: existingStatus?.status ?? UserStatusType.None,
+                lastStatus: existing.status,
                 status: UserStatusType.Reserved,
-                statusUpdatedAt: requestedAt,
+                statusUpdatedAt: startStatusAt,
                 statusUpdatedBy: UserStatusChangeReason.UserAction,
                 seatPosition: seatPosition,
                 currentTimer: <ITimerTask>{
                     timerTaskName: timerTaskName,
-                    installedAt: requestedAt,
-                    fireAt: fireAt,
+                    startStatusAt: startStatusAt,
+                    keepStatusUntil,
                 },
                 usageTimer: null,
             };
         }).then((result) => result.committed);
     }
 
-    static cancelReservation(userId: string, seatPosition: ISeatPosition, requestedAt: number, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
-        logger.debug(`[UserStatusHandler] Cancel Reservation / ${JSON.stringify(seatPosition)} (${new Date(requestedAt).toISOString()} ~ ) / ${statusUpdatedBy.toString()}`);
+    static cancelReservation(userId: string, seatPosition: ISeatPosition, startStatusAt: number, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
+        logger.debug(`[UserStatusHandler] Cancel Reservation / ${JSON.stringify(seatPosition)} (${new Date(startStatusAt).toISOString()} ~ ) / ${statusUpdatedBy.toString()}`);
         return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
-            const existingStatus = existing as IUserStatusExternal | undefined;
-            if (!existingStatus) {
+            logger.debug(`HERE = ${JSON.stringify(existing)}`);
+            if (!existing) {
+                logger.debug("return null");
+                return null;
+            }
+
+            if (existing.status !== UserStatusType.Reserved) {
+                logger.debug(`UserStatusType(${existing.status}) of existing user status is not ${UserStatusType[UserStatusType.Reserved]}`);
                 return;
             }
-            if (existingStatus.status !== UserStatusType.Reserved) {
-                return;
-            }
-            if (existingStatus.seatPosition !== seatPosition) {
+
+            if (!isEqual(existing.seatPosition, seatPosition)) {
+                logger.debug(`Seat position(${seatPosition.storeId}/${seatPosition.sectionId}/${seatPosition.seatId}) of existing user status is not same as one(${existing.seatPosition?.storeId}/${existing.seatPosition?.sectionId}/${existing.seatPosition?.seatId}) of request`);
                 return;
             }
             return <IUserStatusExternal>{
-                lastStatus: existingStatus.status,
+                lastStatus: existing.status,
                 status: UserStatusType.None,
-                statusUpdatedAt: requestedAt,
+                statusUpdatedAt: startStatusAt,
                 statusUpdatedBy: statusUpdatedBy,
                 seatPosition: null,
                 currentTimer: null,
@@ -57,55 +68,61 @@ class UserStatusHandler {
         }).then((result) => result.committed);
     }
 
-    static occupySeat(userId: string, seatPosition: ISeatPosition, requestedAt: number, fireAt: number, timerTaskName: string): Promise<boolean> {
-        logger.debug(`[UserStatusHandler] Occupy Seat / ${JSON.stringify(seatPosition)} (${new Date(requestedAt).toISOString()} ~ ${new Date(fireAt).toISOString()}) / ${timerTaskName}`);
+    static occupySeat(userId: string, seatPosition: ISeatPosition, startStatusAt: number, keepStatusUntil: number, timerTaskName: string): Promise<boolean> {
+        logger.debug(`[UserStatusHandler] Occupy Seat / ${JSON.stringify(seatPosition)} (${new Date(startStatusAt).toISOString()} ~ ${new Date(keepStatusUntil).toISOString()}) / ${timerTaskName}`);
         return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
-            const existingStatus = existing as IUserStatusExternal | undefined;
-            if (!existingStatus) {
+            logger.debug(`HERE = ${JSON.stringify(existing)}`);
+            if (!existing) {
+                logger.debug("return null");
+                return null;
+            }
+            if (existing.status !== UserStatusType.Reserved) {
+                logger.debug(`UserStatusType(${existing.status}) of existing user status is not ${UserStatusType[UserStatusType.Reserved]}`);
                 return;
             }
-            if (existingStatus.status !== UserStatusType.Reserved) {
-                return;
-            }
-            if (existingStatus.seatPosition !== seatPosition) {
+            if (!isEqual(existing.seatPosition, seatPosition)) {
+                logger.debug(`Seat position(${seatPosition.storeId}/${seatPosition.sectionId}/${seatPosition.seatId}) of existing user status is not same as one(${existing.seatPosition?.storeId}/${existing.seatPosition?.sectionId}/${existing.seatPosition?.seatId}) of request`);
                 return;
             }
 
             return <IUserStatusExternal>{
-                lastStatus: existingStatus.status,
+                lastStatus: existing.status,
                 status: UserStatusType.Occupied,
-                statusUpdatedAt: requestedAt,
+                statusUpdatedAt: startStatusAt,
                 statusUpdatedBy: UserStatusChangeReason.UserAction,
                 seatPosition: seatPosition,
                 currentTimer: null,
                 usageTimer: <ITimerTask>{
                     timerTaskName: timerTaskName,
-                    installedAt: requestedAt,
-                    fireAt: fireAt,
+                    startStatusAt,
+                    keepStatusUntil,
                 },
             };
         }).then((result) => result.committed);
     }
 
 
-    static stopUsingSeat(userId: string, seatPosition: ISeatPosition, requestedAt: number, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
-        logger.debug(`[UserStatusHandler] Stop Using Seat / ${JSON.stringify(seatPosition)} (${new Date(requestedAt).toISOString()} ~ ) / ${statusUpdatedBy.toString()}`);
+    static stopUsingSeat(userId: string, seatPosition: ISeatPosition, startStatusAt: number, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
+        logger.debug(`[UserStatusHandler] Stop Using Seat / ${JSON.stringify(seatPosition)} (${new Date(startStatusAt).toISOString()} ~ ) / ${statusUpdatedBy.toString()}`);
         return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
-            const existingStatus = existing as IUserStatusExternal | undefined;
-            if (!existingStatus) {
-                return;
+            logger.debug(`HERE = ${JSON.stringify(existing)}`);
+            if (!existing) {
+                logger.debug("return null");
+                return null;
             }
             const availableStatuses = [UserStatusType.Occupied, UserStatusType.Vacant, UserStatusType.OnTask];
-            if (!availableStatuses.includes(existingStatus.status)) {
+            if (!availableStatuses.includes(existing.status)) {
+                logger.debug(`UserStatusType(${existing.status}) of existing user status doesn't belong to ${availableStatuses.map((value) => UserStatusType[value]).join(", ")}`);
                 return;
             }
-            if (existingStatus.seatPosition !== seatPosition) {
+            if (!isEqual(existing.seatPosition, seatPosition)) {
+                logger.debug(`Seat position(${seatPosition.storeId}/${seatPosition.sectionId}/${seatPosition.seatId}) of existing user status is not same as one(${existing.seatPosition?.storeId}/${existing.seatPosition?.sectionId}/${existing.seatPosition?.seatId}) of request`);
                 return;
             }
             return <IUserStatusExternal>{
-                lastStatus: existingStatus.status,
+                lastStatus: existing.status,
                 status: UserStatusType.None,
-                statusUpdatedAt: requestedAt,
+                statusUpdatedAt: startStatusAt,
                 statusUpdatedBy: statusUpdatedBy,
                 seatPosition: null,
                 currentTimer: null,
@@ -114,132 +131,145 @@ class UserStatusHandler {
         }).then((result) => result.committed);
     }
 
-    static goVacant(userId: string, seatPosition: ISeatPosition, requestedAt: number, fireAt: number, timerTaskName: string, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
-        logger.debug(`[UserStatusHandler] Go Vacant / ${JSON.stringify(seatPosition)} (${new Date(requestedAt).toISOString()} ~ ${new Date(fireAt).toISOString()}) / ${timerTaskName} / ${statusUpdatedBy.toString()}`);
+    static goVacant(userId: string, seatPosition: ISeatPosition, startStatusAt: number, keepStatusUntil: number, timerTaskName: string, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
+        logger.debug(`[UserStatusHandler] Go Vacant / ${JSON.stringify(seatPosition)} (${new Date(startStatusAt).toISOString()} ~ ${new Date(keepStatusUntil).toISOString()}) / ${timerTaskName} / ${statusUpdatedBy.toString()}`);
         return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
-            const existingStatus = existing as IUserStatusExternal | undefined;
-            if (!existingStatus) {
-                return;
+            logger.debug(`HERE = ${JSON.stringify(existing)}`);
+            if (!existing) {
+                logger.debug("return null");
+                return null;
             }
             const availableStatuses = [UserStatusType.Occupied, UserStatusType.OnTask];
-            if (!availableStatuses.includes(existingStatus.status)) {
+            if (!availableStatuses.includes(existing.status)) {
+                logger.debug(`UserStatusType(${existing.status}) of existing user status doesn't belong to ${availableStatuses.map((value) => UserStatusType[value]).join(", ")}`);
                 return;
             }
-            if (existingStatus.seatPosition !== seatPosition) {
+            if (!isEqual(existing.seatPosition, seatPosition)) {
+                logger.debug(`Seat position(${seatPosition.storeId}/${seatPosition.sectionId}/${seatPosition.seatId}) of existing user status is not same as one(${existing.seatPosition?.storeId}/${existing.seatPosition?.sectionId}/${existing.seatPosition?.seatId}) of request`);
                 return;
             }
             return <IUserStatusExternal>{
-                lastStatus: existingStatus.status,
+                lastStatus: existing.status,
                 status: UserStatusType.Vacant,
-                statusUpdatedAt: requestedAt,
+                statusUpdatedAt: startStatusAt,
                 statusUpdatedBy: statusUpdatedBy,
                 seatPosition: seatPosition,
                 currentTimer: <ITimerTask>{
                     timerTaskName: timerTaskName,
-                    installedAt: requestedAt,
-                    fireAt: fireAt,
+                    startStatusAt,
+                    keepStatusUntil,
                 },
-                usageTimer: existingStatus.usageTimer,
+                usageTimer: existing.usageTimer,
             };
         }).then((result) => result.committed);
     }
 
-    static onTask(userId: string, seatPosition: ISeatPosition, requestedAt: number, fireAt: number, timerTaskName: string): Promise<boolean> {
-        logger.debug(`[UserStatusHandler] On Task / ${JSON.stringify(seatPosition)} (${new Date(requestedAt).toISOString()} ~ ${new Date(fireAt).toISOString()}) / ${timerTaskName}`);
+    static onTask(userId: string, seatPosition: ISeatPosition, startStatusAt: number, keepStatusUntil: number, timerTaskName: string): Promise<boolean> {
+        logger.debug(`[UserStatusHandler] On Task / ${JSON.stringify(seatPosition)} (${new Date(startStatusAt).toISOString()} ~ ${new Date(keepStatusUntil).toISOString()}) / ${timerTaskName}`);
         return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
-            const existingStatus = existing as IUserStatusExternal | undefined;
-            if (!existingStatus) {
-                return;
+            logger.debug(`HERE = ${JSON.stringify(existing)}`);
+            if (!existing) {
+                logger.debug("return null");
+                return null;
             }
             const availableStatuses = [UserStatusType.Occupied, UserStatusType.Vacant];
-            if (!availableStatuses.includes(existingStatus.status)) {
+            if (!availableStatuses.includes(existing.status)) {
+                logger.debug(`UserStatusType(${existing.status}) of existing user status doesn't belong to ${availableStatuses.map((value) => UserStatusType[value]).join(", ")}`);
                 return;
             }
-            if (existingStatus.seatPosition !== seatPosition) {
+            if (!isEqual(existing.seatPosition, seatPosition)) {
+                logger.debug(`Seat position(${seatPosition.storeId}/${seatPosition.sectionId}/${seatPosition.seatId}) of existing user status is not same as one(${existing.seatPosition?.storeId}/${existing.seatPosition?.sectionId}/${existing.seatPosition?.seatId}) of request`);
                 return;
             }
             return <IUserStatusExternal>{
-                lastStatus: existingStatus.status,
+                lastStatus: existing.status,
                 status: UserStatusType.OnTask,
-                statusUpdatedAt: requestedAt,
+                statusUpdatedAt: startStatusAt,
                 statusUpdatedBy: UserStatusChangeReason.UserAction,
                 seatPosition: seatPosition,
                 currentTimer: <ITimerTask>{
                     timerTaskName: timerTaskName,
-                    installedAt: requestedAt,
-                    fireAt: fireAt,
+                    startStatusAt,
+                    keepStatusUntil,
                 },
-                usageTimer: existingStatus.usageTimer,
+                usageTimer: existing.usageTimer,
             };
         }).then((result) => result.committed);
     }
 
-    static returnToSeat(userId: string, seatPosition: ISeatPosition, requestedAt: number, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
-        logger.debug(`[UserStatusHandler] Return to Seat / ${JSON.stringify(seatPosition)} (${new Date(requestedAt).toISOString()} ~ ) / ${statusUpdatedBy.toString()}`);
+    static returnToSeat(userId: string, seatPosition: ISeatPosition, startStatusAt: number, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
+        logger.debug(`[UserStatusHandler] Return to Seat / ${JSON.stringify(seatPosition)} (${new Date(startStatusAt).toISOString()} ~ ) / ${statusUpdatedBy.toString()}`);
         return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
-            const existingStatus = existing as IUserStatusExternal | undefined;
-            if (!existingStatus) {
-                return;
+            logger.debug(`HERE = ${JSON.stringify(existing)}`);
+            if (!existing) {
+                logger.debug("return null");
+                return null;
             }
             const availableStatuses = [UserStatusType.Vacant, UserStatusType.OnTask];
-            if (!availableStatuses.includes(existingStatus.status)) {
+            if (!availableStatuses.includes(existing.status)) {
+                logger.debug(`UserStatusType(${existing.status}) of existing user status doesn't belong to ${availableStatuses.map((value) => UserStatusType[value]).join(", ")}`);
                 return;
             }
-            if (existingStatus.seatPosition !== seatPosition) {
+            if (!isEqual(existing.seatPosition, seatPosition)) {
+                logger.debug(`Seat position(${seatPosition.storeId}/${seatPosition.sectionId}/${seatPosition.seatId}) of existing user status is not same as one(${existing.seatPosition?.storeId}/${existing.seatPosition?.sectionId}/${existing.seatPosition?.seatId}) of request`);
                 return;
             }
             return <IUserStatusExternal>{
-                lastStatus: existingStatus.status,
+                lastStatus: existing.status,
                 status: UserStatusType.Occupied,
-                statusUpdatedAt: requestedAt,
+                statusUpdatedAt: startStatusAt,
                 statusUpdatedBy: statusUpdatedBy,
                 seatPosition: seatPosition,
                 currentTimer: null,
-                usageTimer: existingStatus.usageTimer,
+                usageTimer: existing.usageTimer,
             };
         }).then((result) => result.committed);
     }
 
-    static blockUser(userId: string, requestedAt: number, fireAt: number, timerTaskName: string) : Promise<boolean> {
-        logger.debug(`[UserStatusHandler] Block User / (${new Date(requestedAt).toISOString()} ~ ${new Date(fireAt).toISOString()}) / ${timerTaskName}`);
+    static blockUser(userId: string, startStatusAt: number, keepStatusUntil: number, timerTaskName: string): Promise<boolean> {
+        logger.debug(`[UserStatusHandler] Block User / (${new Date(startStatusAt).toISOString()} ~ ${new Date(keepStatusUntil).toISOString()}) / ${timerTaskName}`);
         return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
-            const existingStatus = existing as IUserStatusExternal | undefined;
-            if (!existingStatus) {
-                return;
+            logger.debug(`HERE = ${JSON.stringify(existing)}`);
+            if (!existing) {
+                logger.debug("return null");
+                return null;
             }
-            if (existingStatus.status === UserStatusType.Blocked) {
+            if (existing.status === UserStatusType.Blocked) {
+                logger.debug(`UserStatusType(${existing.status}) of existing user status is ${UserStatusType[UserStatusType.Blocked]}`);
                 return;
             }
             return <IUserStatusExternal>{
-                lastStatus: existingStatus.status,
+                lastStatus: existing.status,
                 status: UserStatusType.Blocked,
-                statusUpdatedAt: requestedAt,
+                statusUpdatedAt: startStatusAt,
                 statusUpdatedBy: UserStatusChangeReason.Admin,
                 seatPosition: null,
                 currentTimer: <ITimerTask>{
                     timerTaskName: timerTaskName,
-                    installedAt: requestedAt,
-                    fireAt: fireAt,
+                    startStatusAt,
+                    keepStatusUntil,
                 },
                 usageTimer: null,
             };
         }).then((result) => result.committed);
     }
 
-    static unblockUser(userId: string, seatPosition: ISeatPosition, requestedAt: number, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
-        logger.debug(`[UserStatusHandler] Unblock User / ${JSON.stringify(seatPosition)} (${new Date(requestedAt).toISOString()} ~ ) / ${statusUpdatedBy.toString()}`);
+    static unblockUser(userId: string, seatPosition: ISeatPosition, startStatusAt: number, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
+        logger.debug(`[UserStatusHandler] Unblock User / ${JSON.stringify(seatPosition)} (${new Date(startStatusAt).toISOString()} ~ ) / ${statusUpdatedBy.toString()}`);
         return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
-            const existingStatus = existing as IUserStatusExternal | undefined;
-            if (!existingStatus) {
-                return;
+            logger.debug(`HERE = ${JSON.stringify(existing)}`);
+            if (!existing) {
+                logger.debug("return null");
+                return null;
             }
-            if (existingStatus.status === UserStatusType.Blocked) {
+            if (existing.status !== UserStatusType.Blocked) {
+                logger.debug(`UserStatusType(${existing.status}) of existing user status is NOT ${UserStatusType[UserStatusType.Blocked]}`);
                 return;
             }
             return <IUserStatusExternal>{
-                lastStatus: existingStatus.status,
+                lastStatus: existing.status,
                 status: UserStatusType.None,
-                statusUpdatedAt: requestedAt,
+                statusUpdatedAt: startStatusAt,
                 statusUpdatedBy: statusUpdatedBy,
                 seatPosition: null,
                 currentTimer: null,

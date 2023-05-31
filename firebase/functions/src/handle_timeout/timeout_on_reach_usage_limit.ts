@@ -14,7 +14,7 @@ export const timeoutOnReachUsageLimitHandler = (
     request: https.Request,
     response: Response
 ) => {
-    const timeoutRequest = TimeoutRequest.fromPaylod(request.body);
+    const timeoutRequest = TimeoutRequest.fromPayload(request.body);
     logger.info(`Reached Usage Limit : ${timeoutRequest.toString()}`);
 
     // Validate request
@@ -36,7 +36,7 @@ export const timeoutOnReachUsageLimitHandler = (
             return UserStatusHandler.stopUsingSeat(
                 timeoutRequest.userId,
                 timeoutRequest.seatPosition,
-                timeoutRequest.requestedAt,
+                timeoutRequest.startStatusAt,
                 timeoutRequest.reason,
             );
         }));

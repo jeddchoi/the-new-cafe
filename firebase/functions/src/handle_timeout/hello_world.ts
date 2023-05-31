@@ -8,7 +8,7 @@ export const helloWorldHandler = (
     request: https.Request,
     response: Response
 ) => {
-    const data = UserActionRequest.fromPaylod(request.body);
+    const data = UserActionRequest.fromPayload(request.body);
     logger.info(`Hello World! : ${data.toString()}`);
     response.send(`${projectID.value()}`);
 };

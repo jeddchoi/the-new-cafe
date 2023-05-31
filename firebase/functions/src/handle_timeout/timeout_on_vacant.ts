@@ -13,7 +13,7 @@ export const timeoutOnVacantHandler = (
     request: https.Request,
     response: Response
 ) => {
-    const timeoutRequest = TimeoutRequest.fromPaylod(request.body);
+    const timeoutRequest = TimeoutRequest.fromPayload(request.body);
     logger.info(`Timeout on Vacant : ${timeoutRequest.toString()}`);
 
     // Validate request
@@ -34,7 +34,7 @@ export const timeoutOnVacantHandler = (
         return UserStatusHandler.stopUsingSeat(
             timeoutRequest.userId,
             timeoutRequest.seatPosition,
-            timeoutRequest.requestedAt,
+            timeoutRequest.startStatusAt,
             timeoutRequest.reason,
         );
     }));

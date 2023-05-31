@@ -21,8 +21,8 @@ interface ISeatPosition {
 
 interface ITimerTask {
     timerTaskName: string;
-    installedAt: number;
-    fireAt: number;
+    startStatusAt: number;
+    keepStatusUntil: number;
 }
 
 interface IUserStatus {
@@ -60,7 +60,8 @@ class UserStatus implements IUserStatus {
     }
 
     static fromExternal(uid: string, val: IUserStatusExternal): UserStatus {
-        return new UserStatus(uid,
+        return new UserStatus(
+            uid,
             val.lastStatus,
             val.status,
             new Date(val.statusUpdatedAt),
@@ -68,6 +69,13 @@ class UserStatus implements IUserStatus {
             val.seatPosition,
             val.usageTimer,
             val.currentTimer);
+    }
+
+    toString() {
+        const properties = Object.entries(this)
+            .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+            .join(", ");
+        return `UserStatus { ${properties} }`;
     }
 }
 

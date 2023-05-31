@@ -1,38 +1,70 @@
 import {ISeatPosition, UserStatusChangeReason, UserStatusType} from "../UserStatus";
-import {Request} from "./Request";
+import {DeadlineInfo, getDeadline, Request} from "./Request";
+import {logger} from "firebase-functions/v2";
+
 
 export class UserActionRequest extends Request {
-    static fromPaylod(payload: {
+    static fromPayload(payload: {
         userId: string,
+        createdAt: number,
+        startStatusAt: number,
+        deadlineInfo: DeadlineInfo | undefined,
         targetStatusType: UserStatusType,
+        reason: UserStatusChangeReason,
         seatPosition: ISeatPosition,
-        durationInSeconds?: number | undefined,
-        until?: number | undefined,
     }): UserActionRequest {
+        logger.info(`fromPayload = ${JSON.stringify(payload)}`);
         return new UserActionRequest(
-            payload.seatPosition,
             payload.userId,
+            payload.createdAt,
+            payload.startStatusAt,
+            payload.deadlineInfo,
             payload.targetStatusType,
-            payload.durationInSeconds,
-            payload.until,
+            payload.reason,
+            payload.seatPosition,
         );
     }
 
-    constructor(
-        readonly seatPosition: ISeatPosition,
+    static newInstance(
         userId: string,
+        startStatusAt: number | undefined,
         targetStatusType: UserStatusType,
-        durationInSeconds?: number | undefined,
-        until?: number | undefined,
+        seatPosition: ISeatPosition,
+        durationInSeconds ?: number,
+        keepStatusUntil ?: number,
+    ): UserActionRequest {
+        const current = new Date().getTime();
+        const startingTime = startStatusAt ?? current;
+        const deadlineInfo = getDeadline(startingTime, durationInSeconds, keepStatusUntil);
+
+        return new UserActionRequest(
+            userId,
+            current,
+            startingTime,
+            deadlineInfo,
+            targetStatusType,
+            UserStatusChangeReason.UserAction,
+            seatPosition,
+        );
+    }
+
+    private constructor(
+        readonly userId: string,
+        readonly createdAt: number,
+        readonly startStatusAt: number,
+        readonly deadlineInfo: DeadlineInfo | undefined,
+        readonly targetStatusType: UserStatusType,
+        readonly reason: UserStatusChangeReason,
+        readonly seatPosition: ISeatPosition,
     ) {
-        super(userId, targetStatusType, UserStatusChangeReason.UserAction, durationInSeconds, until);
+        super(userId, createdAt, startStatusAt, deadlineInfo, targetStatusType, reason);
     }
 
     toString() {
         const properties = Object.entries(this)
             .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
             .join(", ");
-        return `UserActionRequest ${new Date(this.requestedAt).toISOString()} { ${properties} }`;
+        return `UserActionRequest ${new Date(this.createdAt).toISOString()} { ${properties} }`;
     }
 }
 

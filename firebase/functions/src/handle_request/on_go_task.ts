@@ -16,9 +16,13 @@ export function goTaskHandler(request: UserActionRequest): Promise<boolean> {
         throwFunctionsHttpsError("invalid-argument", `Wrong target status type : ${request.targetStatusType}`);
     }
 
-    const promises: Promise<boolean>[] = [];
+    if (request.deadlineInfo === undefined) {
+        throwFunctionsHttpsError("invalid-argument", "Deadline info is undefined");
+    }
 
+    const promises: Promise<boolean>[] = [];
     const timer = new CloudTasksUtil();
+    const keepStatusUntil = request.deadlineInfo?.keepStatusUntil;
 
     // 1. Handle seat status change
     promises.push(SeatStatusHandler.leaveSeat(
@@ -28,13 +32,15 @@ export function goTaskHandler(request: UserActionRequest): Promise<boolean> {
 
     // 2. Start timer and handle user status change
     promises.push(timer.reserveUserSeatUpdate(
-        new TimeoutRequest(
-            request.seatPosition,
+        TimeoutRequest.newInstance(
             request.userId,
+            keepStatusUntil,
             UserStatusType.Vacant,
+            request.seatPosition,
             100,
+            undefined,
         ),
-        "/timeoutOnTask",
+        "timeoutOnTask",
     ).then((task) => {
         if (!task.name) {
             throwFunctionsHttpsError("internal", "Timer task failed to start");
@@ -42,8 +48,8 @@ export function goTaskHandler(request: UserActionRequest): Promise<boolean> {
         return UserStatusHandler.onTask(
             request.userId,
             request.seatPosition,
-            request.requestedAt,
-            request.until,
+            request.startStatusAt,
+            keepStatusUntil,
             task.name,
         );
     }));

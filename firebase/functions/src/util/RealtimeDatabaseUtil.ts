@@ -27,7 +27,7 @@ export default class RealtimeDatabaseUtil {
         });
     }
 
-    static updateUserStatusData(userId: string, transactionUpdate: (existing: IUserStatusExternal | undefined) => IUserStatusExternal | undefined): Promise<TransactionResult> {
+    static updateUserStatusData(userId: string, transactionUpdate: (existing: IUserStatusExternal | undefined | null) => IUserStatusExternal | undefined | null): Promise<TransactionResult> {
         return this.getUserStatus(userId).transaction(transactionUpdate, (error, committed, snapshot) => {
             if (error) {
                 throwFunctionsHttpsError("internal", `[${userId}] Error updating user status`);
@@ -36,8 +36,7 @@ export default class RealtimeDatabaseUtil {
             } else {
                 logger.info(`[${userId}] User updated successfully!`);
             }
-            logger.log(`[${userId}] UserStatus : ${JSON.stringify(UserStatus.fromExternal(userId, snapshot?.val()))}`);
-        });
+        }, true);
     }
 
     static getUserHistory(userId: string): Reference {

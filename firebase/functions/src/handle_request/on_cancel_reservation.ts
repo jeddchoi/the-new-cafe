@@ -30,7 +30,7 @@ export function cancelReservationHandler(request: UserActionRequest): Promise<bo
         return UserStatusHandler.cancelReservation(
             request.userId,
             request.seatPosition,
-            request.requestedAt,
+            request.startStatusAt,
             request.reason
         );
     }));
