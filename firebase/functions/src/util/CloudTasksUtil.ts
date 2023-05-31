@@ -12,6 +12,7 @@ const gServiceAccountEmail = defineString("G_SERVICE_ACCOUNT_EMAIL");
 export default class CloudTasksUtil {
     private static _client = new CloudTasksClient();
     private readonly _tasksBaseUrl: string;
+    private readonly _parent: string;
 
     constructor(
         private readonly _tasksQueueName: string = tasksQueueName.value(),
@@ -20,6 +21,7 @@ export default class CloudTasksUtil {
         private readonly _projectID: string = projectID.value(),
     ) {
         this._tasksBaseUrl = `https://${_tasksLocation}-${_projectID}.cloudfunctions.net`;
+        this._parent = CloudTasksUtil._client.queuePath(this._projectID, this._tasksLocation, this._tasksQueueName);
     }
 
     public startTimer(
@@ -39,13 +41,34 @@ export default class CloudTasksUtil {
             .then(() => true);
     }
 
+    public addExtraTime(
+        timerTaskName: string,
+        previousScheduleTime: number,
+        extraTimeInSeconds: number,
+    ) {
+        return CloudTasksUtil._client.getTask({name: timerTaskName}).then(async ([task]) => {
+            await this.cancelTimer(timerTaskName);
+
+            return CloudTasksUtil._client.createTask({
+                parent: this._parent,
+                task: <protos.google.cloud.tasks.v2.ITask>{
+                    httpRequest: task.httpRequest,
+                    scheduleTime: Math.round(previousScheduleTime / 1000) + extraTimeInSeconds,
+                },
+            }, {maxRetries: 1});
+        }).then(([response]) => {
+            logger.info(`Changed task schedule time: ${response.name}, ${response.scheduleTime?.seconds}`);
+            return response;
+        });
+    }
+
     private createHttpTaskWithSchedule(
         payload: TimeoutRequest,
         path: string,
         scheduleTimeInSeconds: number, // The schedule time in seconds
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
         // Construct the fully qualified queue name.
-        const parent = CloudTasksUtil._client.queuePath(this._projectID, this._tasksLocation, this._tasksQueueName);
+
         const task = this.createTaskObject(
             `${this._tasksBaseUrl}/${path}`,
             payload,
@@ -53,7 +76,7 @@ export default class CloudTasksUtil {
         );
 
         // Send create task request.
-        return CloudTasksUtil._client.createTask({parent, task}, {maxRetries: 1})
+        return CloudTasksUtil._client.createTask({parent: this._parent, task}, {maxRetries: 1})
             .then(([response]) => {
                 logger.info(`Created task ${response.name}`);
                 return response;
