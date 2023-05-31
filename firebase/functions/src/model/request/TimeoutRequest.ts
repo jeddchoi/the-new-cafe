@@ -11,6 +11,7 @@ export class TimeoutRequest extends Request {
         targetStatusType: UserStatusType,
         reason: UserStatusChangeReason,
         seatPosition: ISeatPosition,
+        invokeFunctionName: string,
     }): TimeoutRequest {
         logger.info(`fromPayload = ${JSON.stringify(payload)}`);
         return new TimeoutRequest(
@@ -21,6 +22,7 @@ export class TimeoutRequest extends Request {
             payload.targetStatusType,
             payload.reason,
             payload.seatPosition,
+            payload.invokeFunctionName,
         );
     }
 
@@ -29,6 +31,7 @@ export class TimeoutRequest extends Request {
         startStatusAt: number | undefined,
         targetStatusType: UserStatusType,
         seatPosition: ISeatPosition,
+        invokeFunctionName: string,
         durationInSeconds ?: number,
         keepStatusUntil ?: number,
     ): TimeoutRequest {
@@ -44,6 +47,7 @@ export class TimeoutRequest extends Request {
             targetStatusType,
             UserStatusChangeReason.Timeout,
             seatPosition,
+            invokeFunctionName,
         );
     }
 
@@ -55,6 +59,7 @@ export class TimeoutRequest extends Request {
         readonly targetStatusType: UserStatusType,
         readonly reason: UserStatusChangeReason,
         readonly seatPosition: ISeatPosition,
+        readonly invokeFunctionName: string,
     ) {
         super(userId, createdAt, startStatusAt, deadlineInfo, targetStatusType, reason);
     }

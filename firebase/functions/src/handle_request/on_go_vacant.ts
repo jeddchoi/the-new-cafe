@@ -37,10 +37,10 @@ export function goVacantHandler(request: UserActionRequest): Promise<boolean> {
             keepStatusUntil,
             UserStatusType.None,
             request.seatPosition,
+            "timeoutOnVacant",
             undefined,
             undefined,
         ),
-        "timeoutOnVacant",
     ).then((task) => {
         if (!task.name) {
             throwFunctionsHttpsError("internal", "Timer task failed to start");

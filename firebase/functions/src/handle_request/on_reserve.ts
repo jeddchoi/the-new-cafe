@@ -36,10 +36,10 @@ export function reserveSeatHandler(request: UserActionRequest): Promise<boolean>
             keepStatusUntil,
             UserStatusType.None,
             request.seatPosition,
+            "timeoutOnReserve",
             undefined,
             undefined,
         ),
-        "timeoutOnReserve",
     ).then((task) => {
         if (!task.name) {
             throwFunctionsHttpsError("internal", "Timer task failed to start");

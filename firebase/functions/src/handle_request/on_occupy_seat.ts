@@ -38,10 +38,10 @@ export function occupySeatHandler(request: UserActionRequest): Promise<boolean> 
             keepStatusUntil,
             UserStatusType.None,
             request.seatPosition,
+            "timeoutOnReachUsageLimit",
             undefined,
             undefined,
         ),
-        "timeoutOnReachUsageLimit",
     ).then((task) => {
         if (!task.name) {
             throwFunctionsHttpsError("internal", "Timer task failed to start");

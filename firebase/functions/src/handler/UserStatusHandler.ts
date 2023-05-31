@@ -8,35 +8,67 @@ import {
     UserStatusType,
 } from "../model/UserStatus";
 import {isEqual} from "lodash";
+import {UserActionRequest} from "../model/request/UserActionRequest";
 
 class UserStatusHandler {
-    static reserveSeat(userId: string, seatPosition: ISeatPosition, startStatusAt: number, keepStatusUntil: number, timerTaskName: string): Promise<boolean> {
-        logger.debug(`[UserStatusHandler] Reserve Seat / ${JSON.stringify(seatPosition)} (${new Date(startStatusAt).toISOString()} ~ ${new Date(keepStatusUntil).toISOString()}) / ${timerTaskName}`);
-        return RealtimeDatabaseUtil.updateUserStatusData(userId, (existing) => {
-            logger.debug(`HERE = ${JSON.stringify(existing)}`);
-            if (!existing) {
-                logger.debug("return null");
-                return null;
+    static updateUserStatus(
+        userActionRequest: UserActionRequest,
+        predicate: (existingUser: IUserStatusExternal) => boolean,
+        setNullToSeatPosition: boolean,
+        currentTimerTaskName: string | undefined | null,
+        usageTimerTaskName: string | undefined | null,
+    ) {
+        return RealtimeDatabaseUtil.updateUserStatusData(userActionRequest.userId, (existing) => {
+            if (!existing) { // handle null or undefined
+                logger.debug(`return ${existing}`);
+                return existing;
             }
-            if (existing.status !== UserStatusType.None) {
-                logger.debug(`UserStatusType(${existing.status}) of existing user status is not ${UserStatusType[UserStatusType.None]}`);
-                return;
+            if (!isEqual(existing.seatPosition, userActionRequest.seatPosition)) {
+                logger.debug("SeatPosition is not same as one of request.");
+                return; // not committed
             }
+            if (!predicate(existing)) {
+                logger.debug("Existing user status is not ready");
+                return; // not committed
+            }
+            let currentTimer;
+            if (currentTimerTaskName === null) {
+                currentTimer = null;
+            } else if (currentTimerTaskName === undefined) {
+                currentTimer = existing.currentTimer;
+            } else {
+                currentTimer = <ITimerTask>{
+                    timerTaskName: currentTimerTaskName,
+                    keepStatusUntil: userActionRequest.deadlineInfo?.keepStatusUntil,
+                    startStatusAt: userActionRequest.startStatusAt,
+                };
+            }
+
+            let usageTimer;
+            if (usageTimerTaskName === null) {
+                usageTimer = null;
+            } else if (usageTimerTaskName === undefined) {
+                usageTimer = existing.usageTimer;
+            } else {
+                usageTimer = <ITimerTask>{
+                    timerTaskName: usageTimerTaskName,
+                    keepStatusUntil: userActionRequest.deadlineInfo?.keepStatusUntil,
+                    startStatusAt: userActionRequest.startStatusAt,
+                };
+            }
+
             return <IUserStatusExternal>{
                 lastStatus: existing.status,
-                status: UserStatusType.Reserved,
-                statusUpdatedAt: startStatusAt,
-                statusUpdatedBy: UserStatusChangeReason.UserAction,
-                seatPosition: seatPosition,
-                currentTimer: <ITimerTask>{
-                    timerTaskName: timerTaskName,
-                    startStatusAt: startStatusAt,
-                    keepStatusUntil,
-                },
-                usageTimer: null,
+                status: userActionRequest.targetStatusType,
+                statusUpdatedAt: userActionRequest.startStatusAt,
+                statusUpdatedBy: userActionRequest.reason,
+                seatPosition: setNullToSeatPosition ? null : userActionRequest.seatPosition,
+                usageTimer,
+                currentTimer,
             };
         }).then((result) => result.committed);
     }
+
 
     static cancelReservation(userId: string, seatPosition: ISeatPosition, startStatusAt: number, statusUpdatedBy: UserStatusChangeReason): Promise<boolean> {
         logger.debug(`[UserStatusHandler] Cancel Reservation / ${JSON.stringify(seatPosition)} (${new Date(startStatusAt).toISOString()} ~ ) / ${statusUpdatedBy.toString()}`);

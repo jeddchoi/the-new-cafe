@@ -1,5 +1,27 @@
 import {UserStatusChangeReason, UserStatusType} from "../UserStatus";
 
+
+export enum TaskType {
+    StopCurrentTimer,
+    StopUsageTimer,
+    StartCurrentTimer,
+    StartUsageTimer,
+    UpdateUserStatus,
+    UpdateSeatStatus,
+}
+
+export enum RequestType {
+    ReserveSeat,
+    OccupySeat,
+    CancelReservation,
+    StopUsingSeat,
+    DoBusiness,
+
+}
+export const RequestTypeInfo = {
+
+};
+
 export interface DeadlineInfo {
     keepStatusUntil: number,
     durationInSeconds: number,

@@ -26,9 +26,8 @@ export default class CloudTasksUtil {
 
     public startTimer(
         request: TimeoutRequest,
-        invokeFnPath: string,
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
-        return this.createHttpTaskWithSchedule(request, invokeFnPath, Math.round(request.startStatusAt / 1000));
+        return this.createHttpTaskWithSchedule(request, request.invokeFunctionName, Math.round(request.startStatusAt / 1000));
     }
 
     public cancelTimer(

@@ -37,10 +37,10 @@ export function goTaskHandler(request: UserActionRequest): Promise<boolean> {
             keepStatusUntil,
             UserStatusType.Vacant,
             request.seatPosition,
+            "timeoutOnTask",
             100,
             undefined,
         ),
-        "timeoutOnTask",
     ).then((task) => {
         if (!task.name) {
             throwFunctionsHttpsError("internal", "Timer task failed to start");

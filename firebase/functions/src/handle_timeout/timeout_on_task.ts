@@ -42,10 +42,10 @@ export const timeoutOnTaskHandler = (
             keepStatusUntil,
             UserStatusType.None,
             timeoutRequest.seatPosition,
+            "timeoutOnVacant",
             undefined,
             undefined,
         ),
-        "timeoutOnVacant",
     ).then((task) => {
         if (!task.name) {
             throwFunctionsHttpsError("internal", "Timer task failed to start");
