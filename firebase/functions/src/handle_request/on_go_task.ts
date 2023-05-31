@@ -31,7 +31,7 @@ export function goTaskHandler(request: UserActionRequest): Promise<boolean> {
     ));
 
     // 2. Start timer and handle user status change
-    promises.push(timer.reserveUserSeatUpdate(
+    promises.push(timer.startTimer(
         TimeoutRequest.newInstance(
             request.userId,
             keepStatusUntil,

@@ -30,8 +30,9 @@ export function occupySeatHandler(request: UserActionRequest): Promise<boolean> 
         request.seatPosition,
     ));
 
-    // 2. Start timer and handle user status change
-    promises.push(timer.reserveUserSeatUpdate(
+    // 2. Stop abd start timer and handle user status change
+    // TODO: stop reservation timer
+    promises.push(timer.startTimer(
         TimeoutRequest.newInstance(
             request.userId,
             keepStatusUntil,

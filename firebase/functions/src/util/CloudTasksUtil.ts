@@ -22,7 +22,7 @@ export default class CloudTasksUtil {
         this._tasksBaseUrl = `https://${_tasksLocation}-${_projectID}.cloudfunctions.net`;
     }
 
-    public reserveUserSeatUpdate(
+    public startTimer(
         request: TimeoutRequest,
         invokeFnPath: string,
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
@@ -48,7 +48,6 @@ export default class CloudTasksUtil {
         const parent = CloudTasksUtil._client.queuePath(this._projectID, this._tasksLocation, this._tasksQueueName);
         const task = this.createTaskObject(
             `${this._tasksBaseUrl}/${path}`,
-            this._gServiceAccountEmail,
             payload,
             scheduleTimeInSeconds
         );
@@ -63,7 +62,6 @@ export default class CloudTasksUtil {
 
     private createTaskObject(
         url: string,
-        serviceAccountEmail: string,
         payload: object,
         scheduleTimeInSeconds: number,
     ): protos.google.cloud.tasks.v2.ITask {
@@ -73,7 +71,7 @@ export default class CloudTasksUtil {
                 httpMethod: "POST",
                 url,
                 oidcToken: {
-                    serviceAccountEmail,
+                    serviceAccountEmail: this._gServiceAccountEmail,
                     audience: new URL(url).origin,
                 },
                 body,

@@ -36,7 +36,7 @@ export const timeoutOnTaskHandler = (
     ));
 
     // 2. Start timer and handle user status change
-    promises.push(timer.reserveUserSeatUpdate(
+    promises.push(timer.startTimer(
         TimeoutRequest.newInstance(
             timeoutRequest.userId,
             keepStatusUntil,
