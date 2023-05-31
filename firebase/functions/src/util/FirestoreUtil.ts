@@ -49,17 +49,31 @@ export default class FirestoreUtil {
     }
 
     static updateSeat(
+        uid: string | undefined,
         seatPosition: ISeatPosition,
-        status: SeatStatusType,
+        targetStatus: SeatStatusType,
         isAvailable: boolean,
-        uid: string | undefined = undefined,
+        predicate: ((exisingSeat: Seat | undefined) => boolean),
     ): Promise<void> {
-        return this.getSeat(seatPosition)
-            .withConverter(seatConverter).update({
-                currentUserId: uid,
-                status: status,
-                isAvailable: isAvailable,
-            }).then();
+        const ref = this.getSeat(seatPosition).withConverter(seatConverter);
+        return ref.get().then((snapshot) => {
+            const seat = snapshot.data();
+            if (seat === undefined) return false;
+            return predicate(seat) &&
+                seat.seatId === seatPosition.seatId &&
+                seat.sectionId === seatPosition.sectionId &&
+                seat.storeId === seatPosition.storeId;
+        }).then((canUpdate) => {
+            if (canUpdate) {
+                return ref.update(<Seat>{
+                    currentUserId: uid,
+                    status: targetStatus,
+                    isAvailable,
+                }).then();
+            } else {
+                return Promise.resolve();
+            }
+        });
     }
 }
 
