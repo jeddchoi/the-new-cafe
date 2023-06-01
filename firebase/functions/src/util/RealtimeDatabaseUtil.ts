@@ -1,9 +1,7 @@
-import {logger} from "firebase-functions/v2";
 import {getDatabase, DataSnapshot, Database, Reference} from "firebase-admin/database";
 import {throwFunctionsHttpsError} from "./functions_helper";
 import {ITimerTask, IUserStatusExternal, UserStatus} from "../model/UserStatus";
 import {IUserStatusChangeExternal, UserStatusChange} from "../model/UserStatusChange";
-import {UserStatusChangeReason} from "../model/UserStatusChangeReason";
 
 
 export const REFERENCE_USER_STATUS_NAME = "user_status";
