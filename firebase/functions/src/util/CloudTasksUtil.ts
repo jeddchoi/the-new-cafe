@@ -1,9 +1,7 @@
 import {CloudTasksClient, protos} from "@google-cloud/tasks";
 import {defineString, projectID} from "firebase-functions/params";
 import {logger} from "firebase-functions";
-import {TimeoutRequest} from "../model/request/TimeoutRequest";
-import {throwFunctionsHttpsError} from "./functions_helper";
-
+import {MyRequest} from "../model/MyRequest";
 
 const tasksQueueName = defineString("TASKS_QUEUE_NAME");
 const tasksLocation = defineString("LOCATION_TASKS");
@@ -25,44 +23,43 @@ export default class CloudTasksUtil {
     }
 
     public startTimer(
-        request: TimeoutRequest,
+        futureRequest: MyRequest,
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
-        return this.createHttpTaskWithSchedule(request, request.invokeFunctionName, Math.round(request.startStatusAt / 1000));
+        return this.createHttpTaskWithSchedule(futureRequest, "onTimeout", Math.round(futureRequest.startStatusAt / 1000));
     }
 
     public cancelTimer(
         timerTaskName: string,
-    ): Promise<boolean> {
+    ): Promise<void> {
         return CloudTasksUtil._client.deleteTask({name: timerTaskName})
             .catch((err) => {
                 logger.warn(`Deletion task(${timerTaskName}) failed. maybe already consumed`, err);
-            })
-            .then(() => true);
+            }).then();
     }
 
-    public addExtraTime(
-        timerTaskName: string,
-        previousScheduleTime: number,
-        extraTimeInSeconds: number,
-    ) {
-        return CloudTasksUtil._client.getTask({name: timerTaskName}).then(async ([task]) => {
-            await this.cancelTimer(timerTaskName);
-
-            return CloudTasksUtil._client.createTask({
-                parent: this._parent,
-                task: <protos.google.cloud.tasks.v2.ITask>{
-                    httpRequest: task.httpRequest,
-                    scheduleTime: Math.round(previousScheduleTime / 1000) + extraTimeInSeconds,
-                },
-            }, {maxRetries: 1});
-        }).then(([response]) => {
-            logger.info(`Changed task schedule time: ${response.name}, ${response.scheduleTime?.seconds}`);
-            return response;
-        });
-    }
+    // public addExtraTime(
+    //     timerTaskName: string,
+    //     previousScheduleTime: number,
+    //     extraTimeInSeconds: number,
+    // ) {
+    //     return CloudTasksUtil._client.getTask({name: timerTaskName}).then(async ([task]) => {
+    //         await this.cancelTimer(timerTaskName);
+    //
+    //         return CloudTasksUtil._client.createTask({
+    //             parent: this._parent,
+    //             task: <protos.google.cloud.tasks.v2.ITask>{
+    //                 httpRequest: task.httpRequest,
+    //                 scheduleTime: Math.round(previousScheduleTime / 1000) + extraTimeInSeconds,
+    //             },
+    //         }, {maxRetries: 1});
+    //     }).then(([response]) => {
+    //         logger.info(`Changed task schedule time: ${response.name}, ${response.scheduleTime?.seconds}`);
+    //         return response;
+    //     });
+    // }
 
     private createHttpTaskWithSchedule(
-        payload: TimeoutRequest,
+        payload: MyRequest,
         path: string,
         scheduleTimeInSeconds: number, // The schedule time in seconds
     ): Promise<protos.google.cloud.tasks.v2.ITask> {

@@ -1,11 +1,53 @@
+import {SeatStatusType} from "./Seat";
+import {RequestType} from "./MyRequest";
+
 enum UserStatusType {
     None,
     Reserved,
     Occupied,
-    Vacant,
-    OnTask,
+    Away,
+    OnBusiness,
     Blocked,
 }
+
+const StatusInfo: {
+    [key in UserStatusType]: {
+        requestTypeIfTimeout: RequestType,
+        defaultTimeoutAfterInSeconds: number | undefined,
+        seatStatus: SeatStatusType,
+    }
+} = {
+    [UserStatusType.None]: {
+        requestTypeIfTimeout: RequestType.NoOp,
+        defaultTimeoutAfterInSeconds: undefined,
+        seatStatus: SeatStatusType.None,
+    },
+    [UserStatusType.Reserved]: {
+        requestTypeIfTimeout: RequestType.TimeoutOnReserve,
+        defaultTimeoutAfterInSeconds: 100,
+        seatStatus: SeatStatusType.Reserved,
+    },
+    [UserStatusType.Occupied]: {
+        requestTypeIfTimeout: RequestType.TimeoutOnUse,
+        defaultTimeoutAfterInSeconds: 100,
+        seatStatus: SeatStatusType.Occupied,
+    },
+    [UserStatusType.Away]: {
+        requestTypeIfTimeout: RequestType.TimeoutOnAway,
+        defaultTimeoutAfterInSeconds: 100,
+        seatStatus: SeatStatusType.Away,
+    },
+    [UserStatusType.OnBusiness]: {
+        requestTypeIfTimeout: RequestType.TimeoutOnBusiness,
+        defaultTimeoutAfterInSeconds: 100,
+        seatStatus: SeatStatusType.Away,
+    },
+    [UserStatusType.Blocked]: {
+        requestTypeIfTimeout: RequestType.Unblock,
+        defaultTimeoutAfterInSeconds: 100,
+        seatStatus: SeatStatusType.None,
+    },
+};
 
 enum UserStatusChangeReason {
     UserAction,
@@ -81,6 +123,7 @@ class UserStatus implements IUserStatus {
 
 export {
     UserStatus,
+    StatusInfo,
     UserStatusType,
     UserStatusChangeReason,
     ISeatPosition,

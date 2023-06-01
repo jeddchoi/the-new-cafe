@@ -1,7 +1,7 @@
 import {logger} from "firebase-functions/v2";
 import {getDatabase, DataSnapshot, Database, Reference} from "firebase-admin/database";
 import {throwFunctionsHttpsError} from "./functions_helper";
-import {IUserStatusExternal, UserStatus} from "../model/UserStatus";
+import {ITimerTask, IUserStatusExternal, UserStatus} from "../model/UserStatus";
 import {IUserStatusChangeExternal, UserStatusChange} from "../model/UserStatusChange";
 
 
@@ -38,6 +38,11 @@ export default class RealtimeDatabaseUtil {
             }
         }, true);
     }
+
+    static updateUserTimerTask(userId:string, timer: "currentTimer" | "usageTimer", timerTaskInfo: ITimerTask) {
+        return this.getUserStatus(userId).child(timer).update(timerTaskInfo);
+    }
+
 
     static getUserHistory(userId: string): Reference {
         return this.db.ref(REFERENCE_USER_HISTORY_NAME).child(userId);
