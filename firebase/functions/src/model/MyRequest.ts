@@ -43,8 +43,6 @@ export class MyRequest {
         readonly seatPosition: ISeatPosition | undefined,
     ) {
     }
-
-    toString = () => JSON.stringify(this, null, " ");
 }
 
 

@@ -21,7 +21,7 @@ export async function requestHandler(
         logger.debug("Don't do anything");
         return Promise.resolve();
     }
-    logger.debug(`Handling request ... ${request.toString()}`);
+    logger.debug(`Handling request ... ${JSON.stringify(request)}`);
     const requestInfo = RequestTypeInfo[request.requestType];
     logger.debug(`[Request Info] ${JSON.stringify(requestInfo)}`);
 
