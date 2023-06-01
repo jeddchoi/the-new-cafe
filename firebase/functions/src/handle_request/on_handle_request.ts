@@ -1,11 +1,17 @@
 import {logger} from "firebase-functions/v2";
-import {ITimerTask, IUserStatusExternal, StatusInfo, UserStatusChangeReason, UserStatusType} from "../model/UserStatus";
+import {ITimerTask, IUserStatusExternal} from "../model/UserStatus";
+import {Seat, SeatStatusType} from "../model/Seat";
+import {RequestTypeInfo} from "../model/RequestTypeInfo";
+import {StatusInfo} from "../model/StatusInfo";
+import {TaskType} from "../model/TaskType";
+import {RequestType} from "../model/RequestType";
+import {UserStatusType} from "../model/UserStatusType";
+import {UserStatusChangeReason} from "../model/UserStatusChangeReason";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import CloudTasksUtil from "../util/CloudTasksUtil";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
-import {MyRequest, RequestType, RequestTypeInfo, TaskType} from "../model/MyRequest";
+import {MyRequest} from "../model/MyRequest";
 import FirestoreUtil from "../util/FirestoreUtil";
-import {Seat, SeatStatusType} from "../model/Seat";
 
 
 export async function requestHandler(
@@ -39,12 +45,15 @@ export async function requestHandler(
     const timer = new CloudTasksUtil();
     let promise = Promise.resolve();
     requestInfo.tasks.forEach((taskType) => {
+        logger.info(`[Task #${TaskType[taskType]}]`);
         switch (taskType) {
             case TaskType.StopCurrentTimer:
                 promise = promise.then(() => {
                     if (existingUserStatus.currentTimer) {
+                        logger.debug("Cancel current timer");
                         return timer.cancelTimer(existingUserStatus.currentTimer?.timerTaskName);
                     } else {
+                        logger.debug("No current timer");
                         return Promise.resolve();
                     }
                 });
@@ -52,8 +61,10 @@ export async function requestHandler(
             case TaskType.StopUsageTimer:
                 promise = promise.then(() => {
                     if (existingUserStatus.usageTimer) {
+                        logger.debug("Cancel usage timer");
                         return timer.cancelTimer(existingUserStatus.usageTimer?.timerTaskName);
                     } else {
+                        logger.debug("No usage timer");
                         return Promise.resolve();
                     }
                 });
@@ -64,6 +75,7 @@ export async function requestHandler(
                     if (request.deadlineInfo !== undefined) {
                         let timeoutRequest: MyRequest;
                         if (requestInfo.targetStatus !== "Existing Status") {
+                            logger.debug("Start new timer : targetStatus is not Existing Status");
                             timeoutRequest = MyRequest.newInstance(
                                 StatusInfo[requestInfo.targetStatus].requestTypeIfTimeout,
                                 request.userId,
@@ -73,6 +85,7 @@ export async function requestHandler(
                                 StatusInfo[requestInfo.targetStatus].defaultTimeoutAfterInSeconds
                             );
                         } else {
+                            logger.debug("Start new timer : targetStatus is Existing Status");
                             timeoutRequest = MyRequest.newInstance(
                                 StatusInfo[existingUserStatus.status].requestTypeIfTimeout,
                                 request.userId,
@@ -112,7 +125,7 @@ export async function requestHandler(
                             status: requestInfo.targetStatus,
                             statusUpdatedAt: request.startStatusAt,
                             statusUpdatedBy: request.reason,
-                            seatPosition: requestInfo.requireSeatPosition === "Request" ? request.seatPosition : (requestInfo.targetStatus === UserStatusType.None ? undefined : existing.seatPosition),
+                            seatPosition: requestInfo.requireSeatPosition === "Request" ? request.seatPosition : (requestInfo.targetStatus === UserStatusType.None ? null : existing.seatPosition),
                             usageTimer: existing.usageTimer,
                             currentTimer: existing.currentTimer,
                         };
@@ -122,6 +135,7 @@ export async function requestHandler(
             case TaskType.UpdateSeatStatus:
                 promise = promise.then(() => {
                     if (request.seatPosition && requestInfo.targetStatus !== "Existing Status") {
+                        logger.debug("Update seat status");
                         const targetSeatStatus = StatusInfo[requestInfo.targetStatus].seatStatus;
                         return FirestoreUtil.updateSeat(
                             request.seatPosition,
@@ -130,13 +144,17 @@ export async function requestHandler(
                             targetSeatStatus === SeatStatusType.None,
                         );
                     } else {
+                        logger.debug("Don't update seat status");
                         return Promise.resolve();
                     }
                 });
                 break;
         }
     });
+
+    return await promise;
 }
+
 //
 // function _onHandleUserActionRequest(
 //     request: UserActionRequest,

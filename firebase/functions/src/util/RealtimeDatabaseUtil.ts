@@ -28,7 +28,7 @@ export default class RealtimeDatabaseUtil {
     }
 
     static updateUserStatusData(userId: string, transactionUpdate: (existing: IUserStatusExternal | undefined | null) => IUserStatusExternal | undefined | null): Promise<TransactionResult> {
-        return this.getUserStatus(userId).transaction(transactionUpdate, (error, committed, snapshot) => {
+        return this.getUserStatus(userId).transaction(transactionUpdate, (error, committed) => {
             if (error) {
                 throwFunctionsHttpsError("internal", `[${userId}] Error updating user status`);
             } else if (!committed) {
