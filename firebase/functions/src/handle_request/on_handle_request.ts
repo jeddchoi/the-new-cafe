@@ -21,9 +21,13 @@ export async function requestHandler(
         logger.debug("Don't do anything");
         return Promise.resolve();
     }
-
+    logger.debug(`Handling request ... ${request.toString()}`);
     const requestInfo = RequestTypeInfo[request.requestType];
+    logger.debug(`[Request Info] ${JSON.stringify(requestInfo)}`);
+
     const existingUserStatus = await RealtimeDatabaseUtil.getUserStatusData(request.userId);
+    logger.debug(`[Exising Status] ${JSON.stringify(existingUserStatus)}`);
+
     if (!requestInfo.availablePriorStatus.includes(existingUserStatus.status)) {
         throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user status is ${UserStatusType[existingUserStatus.status]}`);
     }
@@ -37,9 +41,10 @@ export async function requestHandler(
     let usedSeat: Seat | undefined;
     if (existingUserStatus.seatPosition) {
         usedSeat = await FirestoreUtil.getSeatData(existingUserStatus.seatPosition);
-    }
-    if (existingUserStatus.seatPosition !== undefined && usedSeat?.currentUserId !== request.userId) {
-        throwFunctionsHttpsError("failed-precondition", `Something is corrupted. UserId(${request.userId}) of request is not same as current user id(${usedSeat?.currentUserId}) of used seat`);
+        logger.debug(`[Used Seat] ${JSON.stringify(usedSeat)}`);
+        if (usedSeat?.currentUserId !== request.userId) {
+            throwFunctionsHttpsError("failed-precondition", `Something is corrupted. UserId(${request.userId}) of request is not same as current user id(${usedSeat?.currentUserId}) of used seat`);
+        }
     }
 
     const timer = new CloudTasksUtil();
@@ -117,7 +122,9 @@ export async function requestHandler(
             case TaskType.UpdateUserStatus:
                 promise = promise.then(() => {
                     return RealtimeDatabaseUtil.updateUserStatusData(request.userId, (existing) => {
+                        logger.debug(`existing = ${JSON.stringify(existing)}`);
                         if (!existing) {
+                            logger.debug("return null");
                             return null;
                         }
                         return <IUserStatusExternal>{
@@ -126,8 +133,6 @@ export async function requestHandler(
                             statusUpdatedAt: request.startStatusAt,
                             statusUpdatedBy: request.reason,
                             seatPosition: requestInfo.requireSeatPosition === "Request" ? request.seatPosition : (requestInfo.targetStatus === UserStatusType.None ? null : existing.seatPosition),
-                            usageTimer: existing.usageTimer,
-                            currentTimer: existing.currentTimer,
                         };
                     }).then();
                 });
@@ -152,7 +157,7 @@ export async function requestHandler(
         }
     });
 
-    return await promise;
+    return promise;
 }
 
 //
