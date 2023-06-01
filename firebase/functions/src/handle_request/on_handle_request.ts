@@ -1,5 +1,5 @@
 import {logger} from "firebase-functions/v2";
-import {ITimerTask, IUserStatusExternal} from "../model/UserStatus";
+import {ITimerTask} from "../model/UserStatus";
 import {Seat, SeatStatusType} from "../model/Seat";
 import {RequestTypeInfo} from "../model/RequestTypeInfo";
 import {StatusInfo} from "../model/StatusInfo";
@@ -50,15 +50,21 @@ export async function requestHandler(
     const timer = new CloudTasksUtil();
     let promise = Promise.resolve();
     requestInfo.tasks.forEach((taskType) => {
-        logger.info(`[Task #${TaskType[taskType]}]`);
         switch (taskType) {
             case TaskType.StopCurrentTimer:
                 promise = promise.then(() => {
                     if (existingUserStatus.currentTimer) {
-                        logger.debug("Cancel current timer");
-                        return timer.cancelTimer(existingUserStatus.currentTimer?.timerTaskName);
+                        if (requestInfo.isTimeout) {
+                            logger.debug(`[Task #${TaskType[taskType]}] Remove current timer`);
+                            return RealtimeDatabaseUtil.removeUserTimerTask(request.userId, "currentTimer");
+                        } else {
+                            logger.debug(`[Task #${TaskType[taskType]}] Cancel current timer & Remove current timer`);
+                            return timer.cancelTimer(existingUserStatus.currentTimer?.timerTaskName).then(() => {
+                                return RealtimeDatabaseUtil.removeUserTimerTask(request.userId, "currentTimer");
+                            });
+                        }
                     } else {
-                        logger.debug("No current timer");
+                        logger.debug(`[Task #${TaskType[taskType]}] No current timer`);
                         return Promise.resolve();
                     }
                 });
@@ -66,10 +72,17 @@ export async function requestHandler(
             case TaskType.StopUsageTimer:
                 promise = promise.then(() => {
                     if (existingUserStatus.usageTimer) {
-                        logger.debug("Cancel usage timer");
-                        return timer.cancelTimer(existingUserStatus.usageTimer?.timerTaskName);
+                        if (requestInfo.isTimeout) {
+                            logger.debug(`[Task #${TaskType[taskType]}] Remove usage timer`);
+                            return RealtimeDatabaseUtil.removeUserTimerTask(request.userId, "usageTimer");
+                        } else {
+                            logger.debug(`[Task #${TaskType[taskType]}] Cancel usage timer & Remove usage timer`);
+                            return timer.cancelTimer(existingUserStatus.usageTimer?.timerTaskName).then(() => {
+                                return RealtimeDatabaseUtil.removeUserTimerTask(request.userId, "usageTimer");
+                            });
+                        }
                     } else {
-                        logger.debug("No usage timer");
+                        logger.debug(`[Task #${TaskType[taskType]}] No usage timer`);
                         return Promise.resolve();
                     }
                 });
@@ -80,7 +93,7 @@ export async function requestHandler(
                     if (request.deadlineInfo !== undefined) {
                         let timeoutRequest: MyRequest;
                         if (requestInfo.targetStatus !== "Existing Status") {
-                            logger.debug("Start new timer : targetStatus is not Existing Status");
+                            logger.debug(`[Task #${TaskType[taskType]}] Start new timer : targetStatus is not Existing Status`);
                             timeoutRequest = MyRequest.newInstance(
                                 StatusInfo[requestInfo.targetStatus].requestTypeIfTimeout,
                                 request.userId,
@@ -90,7 +103,7 @@ export async function requestHandler(
                                 StatusInfo[requestInfo.targetStatus].defaultTimeoutAfterInSeconds
                             );
                         } else {
-                            logger.debug("Start new timer : targetStatus is Existing Status");
+                            logger.debug(`[Task #${TaskType[taskType]}] Start new timer : targetStatus is Existing Status`);
                             timeoutRequest = MyRequest.newInstance(
                                 StatusInfo[existingUserStatus.status].requestTypeIfTimeout,
                                 request.userId,
@@ -121,35 +134,29 @@ export async function requestHandler(
                 break;
             case TaskType.UpdateUserStatus:
                 promise = promise.then(() => {
-                    return RealtimeDatabaseUtil.updateUserStatusData(request.userId, (existing) => {
-                        logger.debug(`existing = ${JSON.stringify(existing)}`);
-                        if (!existing) {
-                            logger.debug("return null");
-                            return null;
-                        }
-                        return <IUserStatusExternal>{
-                            lastStatus: existing.status,
-                            status: requestInfo.targetStatus,
-                            statusUpdatedAt: request.startStatusAt,
-                            statusUpdatedBy: request.reason,
-                            seatPosition: requestInfo.requireSeatPosition === "Request" ? request.seatPosition : (requestInfo.targetStatus === UserStatusType.None ? null : existing.seatPosition),
-                        };
+                    logger.debug(`[Task #${TaskType[taskType]}] Update user status`);
+                    return RealtimeDatabaseUtil.updateUserStatusData(request.userId, {
+                        lastStatus: existingUserStatus.status,
+                        status: requestInfo.targetStatus === "Existing Status" ? existingUserStatus.status : requestInfo.targetStatus,
+                        statusUpdatedAt: request.startStatusAt,
+                        statusUpdatedBy: request.reason,
+                        seatPosition: requestInfo.requireSeatPosition === "Request" ? request.seatPosition : (requestInfo.targetStatus === UserStatusType.None ? null : existingUserStatus.seatPosition),
                     }).then();
                 });
                 break;
             case TaskType.UpdateSeatStatus:
                 promise = promise.then(() => {
                     if (request.seatPosition && requestInfo.targetStatus !== "Existing Status") {
-                        logger.debug("Update seat status");
+                        logger.debug(`[Task #${TaskType[taskType]}] Update seat status`);
                         const targetSeatStatus = StatusInfo[requestInfo.targetStatus].seatStatus;
-                        return FirestoreUtil.updateSeat(
-                            request.seatPosition,
-                            (targetSeatStatus === SeatStatusType.None) ? undefined : request.userId,
-                            targetSeatStatus,
-                            targetSeatStatus === SeatStatusType.None,
-                        );
+                        return FirestoreUtil.updateSeat(request.seatPosition,
+                            {
+                                currentUserId: (targetSeatStatus === SeatStatusType.None) ? null : request.userId,
+                                status: targetSeatStatus,
+                                isAvailable: targetSeatStatus === SeatStatusType.None,
+                            });
                     } else {
-                        logger.debug("Don't update seat status");
+                        logger.debug(`[Task #${TaskType[taskType]}] Don't update seat status`);
                         return Promise.resolve();
                     }
                 });

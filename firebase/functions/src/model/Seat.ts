@@ -23,7 +23,7 @@ interface ISeatExternal {
     name: string,
     status: number,
     isAvailable: boolean,
-    currentUserId?: string,
+    currentUserId: string | null,
 }
 
 class Seat implements ISeat {
@@ -60,7 +60,7 @@ const seatConverter: FirestoreDataConverter<Seat> = {
             data.name,
             data.status,
             data.isAvailable,
-            data.currentUserId);
+            data.currentUserId ?? undefined);
     },
 };
 

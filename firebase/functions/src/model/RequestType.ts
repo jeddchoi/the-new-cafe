@@ -14,6 +14,7 @@ export enum RequestType {
     TimeoutOnUse,
     TimeoutOnBusiness,
     TimeoutOnAway,
+    TimeoutOnBlock,
     Block,
     Unblock,
     NoOp,

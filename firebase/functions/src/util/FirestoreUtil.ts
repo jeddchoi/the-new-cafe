@@ -1,7 +1,7 @@
 import {getFirestore, Firestore, DocumentReference} from "firebase-admin/firestore";
 import {Store, storeConverter} from "../model/Store";
 import {Section, sectionConverter} from "../model/Section";
-import {Seat, seatConverter, SeatStatusType} from "../model/Seat";
+import {ISeatExternal, Seat, seatConverter} from "../model/Seat";
 import {ISeatPosition} from "../model/UserStatus";
 
 
@@ -50,19 +50,10 @@ export default class FirestoreUtil {
 
     static updateSeat(
         seatPosition: ISeatPosition,
-        uid: string | undefined,
-        targetStatus: SeatStatusType,
-        isAvailable: boolean,
+        updateContent: { [key in keyof ISeatExternal]?: ISeatExternal[key] }
     ): Promise<void> {
         return this.getSeat(seatPosition)
-            .withConverter(seatConverter)
-            .update(
-                <Seat>{
-                    currentUserId: uid,
-                    status: targetStatus,
-                    isAvailable,
-                }
-            ).then();
+            .update(updateContent).then();
     }
 }
 

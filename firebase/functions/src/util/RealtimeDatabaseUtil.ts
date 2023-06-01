@@ -3,6 +3,7 @@ import {getDatabase, DataSnapshot, Database, Reference} from "firebase-admin/dat
 import {throwFunctionsHttpsError} from "./functions_helper";
 import {ITimerTask, IUserStatusExternal, UserStatus} from "../model/UserStatus";
 import {IUserStatusChangeExternal, UserStatusChange} from "../model/UserStatusChange";
+import {UserStatusChangeReason} from "../model/UserStatusChangeReason";
 
 
 export const REFERENCE_USER_STATUS_NAME = "user_status";
@@ -27,22 +28,26 @@ export default class RealtimeDatabaseUtil {
         });
     }
 
-    static updateUserStatusData(userId: string, transactionUpdate: (existing: IUserStatusExternal | undefined | null) => IUserStatusExternal | undefined | null): Promise<TransactionResult> {
-        return this.getUserStatus(userId).transaction(transactionUpdate, (error, committed) => {
-            if (error) {
-                throwFunctionsHttpsError("internal", `[${userId}] Error updating user status`);
-            } else if (!committed) {
-                logger.warn(`[${userId}] Not committed updating user status`);
-            } else {
-                logger.info(`[${userId}] User updated successfully!`);
-            }
-        }, true);
+    static updateUserStatusData(userId: string, updateContent: { [key in keyof IUserStatusExternal]?: IUserStatusExternal[key] }): Promise<void> {
+        return this.getUserStatus(userId).update(updateContent);
+        // return this.getUserStatus(userId).transaction(transactionUpdate, (error, committed) => {
+        //     if (error) {
+        //         throwFunctionsHttpsError("internal", `[${userId}] Error updating user status`);
+        //     } else if (!committed) {
+        //         logger.warn(`[${userId}] Not committed updating user status`);
+        //     } else {
+        //         logger.info(`[${userId}] User updated successfully!`);
+        //     }
+        // }, true);
     }
 
-    static updateUserTimerTask(userId:string, timer: "currentTimer" | "usageTimer", timerTaskInfo: ITimerTask) {
+    static updateUserTimerTask(userId: string, timer: "currentTimer" | "usageTimer", timerTaskInfo: ITimerTask) {
         return this.getUserStatus(userId).child(timer).update(timerTaskInfo);
     }
 
+    static removeUserTimerTask(userId: string, timer: "currentTimer" | "usageTimer") {
+        return this.getUserStatus(userId).child(timer).remove();
+    }
 
     static getUserHistory(userId: string): Reference {
         return this.db.ref(REFERENCE_USER_HISTORY_NAME).child(userId);
