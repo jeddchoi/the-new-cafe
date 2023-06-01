@@ -37,27 +37,6 @@ export default class CloudTasksUtil {
             }).then();
     }
 
-    // public addExtraTime(
-    //     timerTaskName: string,
-    //     previousScheduleTime: number,
-    //     extraTimeInSeconds: number,
-    // ) {
-    //     return CloudTasksUtil._client.getTask({name: timerTaskName}).then(async ([task]) => {
-    //         await this.cancelTimer(timerTaskName);
-    //
-    //         return CloudTasksUtil._client.createTask({
-    //             parent: this._parent,
-    //             task: <protos.google.cloud.tasks.v2.ITask>{
-    //                 httpRequest: task.httpRequest,
-    //                 scheduleTime: Math.round(previousScheduleTime / 1000) + extraTimeInSeconds,
-    //             },
-    //         }, {maxRetries: 1});
-    //     }).then(([response]) => {
-    //         logger.info(`Changed task schedule time: ${response.name}, ${response.scheduleTime?.seconds}`);
-    //         return response;
-    //     });
-    // }
-
     private createHttpTaskWithSchedule(
         payload: MyRequest,
         path: string,

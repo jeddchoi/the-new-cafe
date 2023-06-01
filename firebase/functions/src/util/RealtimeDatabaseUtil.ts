@@ -28,15 +28,6 @@ export default class RealtimeDatabaseUtil {
 
     static updateUserStatusData(userId: string, updateContent: { [key in keyof IUserStatusExternal]?: IUserStatusExternal[key] }): Promise<void> {
         return this.getUserStatus(userId).update(updateContent);
-        // return this.getUserStatus(userId).transaction(transactionUpdate, (error, committed) => {
-        //     if (error) {
-        //         throwFunctionsHttpsError("internal", `[${userId}] Error updating user status`);
-        //     } else if (!committed) {
-        //         logger.warn(`[${userId}] Not committed updating user status`);
-        //     } else {
-        //         logger.info(`[${userId}] User updated successfully!`);
-        //     }
-        // }, true);
     }
 
     static updateUserTimerTask(userId: string, timer: "currentTimer" | "usageTimer", timerTaskInfo: ITimerTask) {
