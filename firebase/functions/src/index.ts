@@ -17,8 +17,8 @@ import {
     COLLECTION_GROUP_SECTION_NAME,
     COLLECTION_GROUP_STORE_NAME,
 } from "./util/FirestoreUtil";
-import {countSeatChangeHandler} from "./firestore/count_seat_change";
-import {countSectionChangeHandler} from "./firestore/count_section_change";
+import {countSeatChangeHandler} from "./trigger/count_seat_change";
+import {countSectionChangeHandler} from "./trigger/count_section_change";
 
 /**
  * Callable functions
