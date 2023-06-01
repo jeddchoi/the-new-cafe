@@ -6,9 +6,6 @@ import {onDocumentWritten} from "firebase-functions/v2/firestore";
 import {Response} from "express";
 
 import {MyRequest} from "./model/MyRequest";
-import {RequestType} from "./model/RequestType";
-import {ISeatPosition} from "./model/UserStatus";
-import {UserStatusChangeReason} from "./model/UserStatusChangeReason";
 import {requestHandler} from "./handle_request/on_handle_request";
 import {throwFunctionsHttpsError} from "./util/functions_helper";
 
@@ -19,6 +16,7 @@ import {
 } from "./util/FirestoreUtil";
 import {countSeatChangeHandler} from "./trigger/count_seat_change";
 import {countSectionChangeHandler} from "./trigger/count_section_change";
+
 
 /**
  * Callable functions
@@ -48,31 +46,9 @@ export const onTimeout =
     });
 
 
-export const testReserveSeat = onRequest(async (req: Request, res: Response) => {
-    try {
-        await requestHandler(MyRequest.newInstance(
-            RequestType.ReserveSeat,
-            "sI2wbdRqYtdgArsq678BFSGDwr43",
-            UserStatusChangeReason.UserAction,
-            undefined,
-            <ISeatPosition>{
-                "storeId": "i9sAij5mVBijR85hgraE",
-                "sectionId": "FMLYWLzKmiou1PTcrFR8",
-                "seatId": "ZlblGsMYd7IlO1DEho4H",
-            },
-            50,
-        ));
-        res.status(200).send("Completed Successfully.");
-    } catch (e) {
-        res.status(500).send(`Some error occurred. ${e}`);
-    }
-});
-
 /**
  * Triggered functions
  */
-
-
 export const countSeatChange =
     onDocumentWritten(
         {
