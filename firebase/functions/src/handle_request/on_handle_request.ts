@@ -118,7 +118,7 @@ export async function requestHandler(
                 promise = promise.then(() => {
                     return RealtimeDatabaseUtil.updateUserStatusData(request.userId, (existing) => {
                         if (!existing) {
-                            return existing;
+                            return null;
                         }
                         return <IUserStatusExternal>{
                             lastStatus: existing.status,
