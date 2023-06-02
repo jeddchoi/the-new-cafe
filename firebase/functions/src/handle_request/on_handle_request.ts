@@ -7,11 +7,11 @@ import {TaskType} from "../model/TaskType";
 import {RequestType} from "../model/RequestType";
 import {UserStatusType} from "../model/UserStatusType";
 import {UserStatusChangeReason} from "../model/UserStatusChangeReason";
+import {MyRequest} from "../model/MyRequest";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import CloudTasksUtil from "../util/CloudTasksUtil";
-import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
-import {MyRequest} from "../model/MyRequest";
-import FirestoreUtil from "../util/FirestoreUtil";
+import UserStatusHandler from "../handler/UserStatusHandler";
+import SeatHandler from "../handler/SeatHandler";
 
 
 export async function requestHandler(
@@ -25,7 +25,7 @@ export async function requestHandler(
     const requestInfo = RequestTypeInfo[request.requestType];
     logger.debug(`[Request Info] ${JSON.stringify(requestInfo)}`);
 
-    const existingUserStatus = await RealtimeDatabaseUtil.getUserStatusData(request.userId);
+    const existingUserStatus = await UserStatusHandler.getUserStatusData(request.userId);
     logger.debug(`[Exising Status] ${JSON.stringify(existingUserStatus)}`);
 
     if (!requestInfo.availablePriorStatus.includes(existingUserStatus.status)) {
@@ -40,7 +40,7 @@ export async function requestHandler(
 
     let usedSeat: Seat | undefined;
     if (existingUserStatus.seatPosition) {
-        usedSeat = await FirestoreUtil.getSeatData(existingUserStatus.seatPosition);
+        usedSeat = await SeatHandler.getSeatData(existingUserStatus.seatPosition);
         logger.debug(`[Used Seat] ${JSON.stringify(usedSeat)}`);
         if (usedSeat?.currentUserId !== request.userId) {
             throwFunctionsHttpsError("failed-precondition", `Something is corrupted. UserId(${request.userId}) of request is not same as current user id(${usedSeat?.currentUserId}) of used seat`);
@@ -66,7 +66,7 @@ export async function requestHandler(
                         ret = ret.then(() => timer.cancelTimer(timerTaskNameToStop));
                     }
                     logger.debug(`[Task #${TaskType[taskType]}] Remove timer info of user status`);
-                    ret = ret.then(() => RealtimeDatabaseUtil.removeUserTimerTask(request.userId, taskType));
+                    ret = ret.then(() => UserStatusHandler.removeUserTimerTask(request.userId, taskType));
                     return ret;
                 });
                 break;
@@ -98,7 +98,7 @@ export async function requestHandler(
                         }
 
                         return timer.startTimer(timeoutRequest).then((task) => {
-                            return RealtimeDatabaseUtil.updateUserTimerTask(request.userId, taskType, <ITimerTask>{
+                            return UserStatusHandler.updateUserTimerTask(request.userId, taskType, <ITimerTask>{
                                 timerTaskName: task.name,
                                 startStatusAt: timeoutRequest.startStatusAt,
                                 keepStatusUntil: timeoutRequest.deadlineInfo?.keepStatusUntil,
@@ -112,7 +112,7 @@ export async function requestHandler(
             case TaskType.UpdateUserStatus:
                 promise = promise.then(() => {
                     logger.debug(`[Task #${TaskType[taskType]}] Update user status`);
-                    return RealtimeDatabaseUtil.updateUserStatusData(request.userId, {
+                    return UserStatusHandler.updateUserStatusData(request.userId, {
                         lastStatus: existingUserStatus.status,
                         status: requestInfo.targetStatus === "Existing Status" ? existingUserStatus.status : requestInfo.targetStatus,
                         statusUpdatedAt: request.startStatusAt,
@@ -126,7 +126,7 @@ export async function requestHandler(
                     if (request.seatPosition && requestInfo.targetStatus !== "Existing Status") {
                         logger.debug(`[Task #${TaskType[taskType]}] Update seat status`);
                         const targetSeatStatus = StatusInfo[requestInfo.targetStatus].seatStatus;
-                        return FirestoreUtil.updateSeat(request.seatPosition,
+                        return SeatHandler.updateSeat(request.seatPosition,
                             {
                                 currentUserId: (targetSeatStatus === SeatStatusType.None) ? null : request.userId,
                                 status: targetSeatStatus,

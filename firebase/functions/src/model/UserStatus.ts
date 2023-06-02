@@ -24,6 +24,10 @@ interface IUserStatus {
     currentTimer: ITimerTask | null;
 }
 
+const CURRENT_TIMER_PROPERTY_NAME = "currentTimer";
+const USAGE_TIMER_PROPERTY_NAME = "usageTimer";
+
+
 interface IUserStatusExternal {
     lastStatus: number;
     status: number;
@@ -73,4 +77,6 @@ export {
     ITimerTask,
     IUserStatus,
     IUserStatusExternal,
+    CURRENT_TIMER_PROPERTY_NAME,
+    USAGE_TIMER_PROPERTY_NAME,
 };
