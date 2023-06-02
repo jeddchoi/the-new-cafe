@@ -10,7 +10,7 @@ enum SeatStatusType {
 }
 
 interface ISeat {
-    uid: string,
+    seatId: string,
     storeId: string,
     sectionId: string,
     name: string,
@@ -23,14 +23,14 @@ interface ISeatExternal {
     name: string,
     status: number,
     isAvailable: boolean,
-    currentUserId?: string,
+    currentUserId: string | null,
 }
 
 class Seat implements ISeat {
     constructor(
-        readonly uid: string,
         readonly storeId: string,
         readonly sectionId: string,
+        readonly seatId: string,
         readonly name: string,
         readonly status: SeatStatusType,
         readonly isAvailable: boolean,
@@ -53,13 +53,14 @@ const seatConverter: FirestoreDataConverter<Seat> = {
         snapshot: QueryDocumentSnapshot<ISeatExternal>
     ): Seat {
         const data = snapshot.data();
-        return new Seat(snapshot.id,
-            snapshot.ref.parent.parent?.id ?? throwFunctionsHttpsError("internal", "Section doesn't exist"),
+        return new Seat(
+            snapshot.ref.parent.parent?.id ?? throwFunctionsHttpsError("internal", "store doesn't exist"),
             snapshot.ref.parent.id,
+            snapshot.id,
             data.name,
             data.status,
             data.isAvailable,
-            data.currentUserId);
+            data.currentUserId ?? undefined);
     },
 };
 

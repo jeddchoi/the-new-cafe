@@ -1,17 +1,5 @@
-enum UserStatusType {
-    None,
-    Reserved,
-    Occupied,
-    Vacant,
-    OnTask,
-    Blocked,
-}
-
-enum UserStatusChangeReason {
-    UserAction,
-    Timeout,
-    Admin,
-}
+import {UserStatusType} from "./UserStatusType";
+import {UserStatusChangeReason} from "./UserStatusChangeReason";
 
 interface ISeatPosition {
     storeId: string;
@@ -21,8 +9,8 @@ interface ISeatPosition {
 
 interface ITimerTask {
     timerTaskName: string;
-    installedAt: number;
-    fireAt: number;
+    startStatusAt: number;
+    keepStatusUntil: number;
 }
 
 interface IUserStatus {
@@ -35,6 +23,10 @@ interface IUserStatus {
     usageTimer: ITimerTask | null;
     currentTimer: ITimerTask | null;
 }
+
+const CURRENT_TIMER_PROPERTY_NAME = "currentTimer";
+const USAGE_TIMER_PROPERTY_NAME = "usageTimer";
+
 
 interface IUserStatusExternal {
     lastStatus: number;
@@ -60,7 +52,8 @@ class UserStatus implements IUserStatus {
     }
 
     static fromExternal(uid: string, val: IUserStatusExternal): UserStatus {
-        return new UserStatus(uid,
+        return new UserStatus(
+            uid,
             val.lastStatus,
             val.status,
             new Date(val.statusUpdatedAt),
@@ -69,14 +62,21 @@ class UserStatus implements IUserStatus {
             val.usageTimer,
             val.currentTimer);
     }
+
+    toString() {
+        const properties = Object.entries(this)
+            .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+            .join(", ");
+        return `UserStatus { ${properties} }`;
+    }
 }
 
 export {
     UserStatus,
-    UserStatusType,
-    UserStatusChangeReason,
     ISeatPosition,
     ITimerTask,
     IUserStatus,
     IUserStatusExternal,
+    CURRENT_TIMER_PROPERTY_NAME,
+    USAGE_TIMER_PROPERTY_NAME,
 };

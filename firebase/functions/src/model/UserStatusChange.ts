@@ -1,4 +1,6 @@
-import {ISeatPosition, UserStatusChangeReason, UserStatusType} from "./UserStatus";
+import {ISeatPosition} from "./UserStatus";
+import {UserStatusType} from "./UserStatusType";
+import {UserStatusChangeReason} from "./UserStatusChangeReason";
 
 interface IUserStatusChange {
     userId: string;

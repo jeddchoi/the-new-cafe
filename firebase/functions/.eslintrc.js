@@ -28,7 +28,7 @@ module.exports = {
         "quotes": ["error", "double"],
         "import/no-unresolved": 0,
         "require-jsdoc": ["off"], // TODO: remove this
-        "indent": ["error", 4],
+        "indent": ["error", 4, {"SwitchCase": 1}],
         "max-len": ["off"],
         "no-trailing-spaces": ["error", { // TODO: remove this
             "skipBlankLines": true,
