@@ -1,7 +1,8 @@
-import {getDatabase, DataSnapshot, Database, Reference} from "firebase-admin/database";
+import {Database, DataSnapshot, getDatabase, Reference} from "firebase-admin/database";
 import {throwFunctionsHttpsError} from "./functions_helper";
 import {ITimerTask, IUserStatusExternal, UserStatus} from "../model/UserStatus";
 import {IUserStatusChangeExternal, UserStatusChange} from "../model/UserStatusChange";
+import {TaskType} from "../model/TaskType";
 
 
 export const REFERENCE_USER_STATUS_NAME = "user_status";
@@ -11,6 +12,8 @@ export type TransactionResult = {
     committed: boolean;
     snapshot: DataSnapshot;
 };
+const CURRENT_TIMER_PROPERTY_NAME = "currentTimer";
+const USAGE_TIMER_PROPERTY_NAME = "usageTimer";
 
 export default class RealtimeDatabaseUtil {
     static db: Database = getDatabase();
@@ -30,12 +33,20 @@ export default class RealtimeDatabaseUtil {
         return this.getUserStatus(userId).update(updateContent);
     }
 
-    static updateUserTimerTask(userId: string, timer: "currentTimer" | "usageTimer", timerTaskInfo: ITimerTask) {
-        return this.getUserStatus(userId).child(timer).update(timerTaskInfo);
+    static updateUserTimerTask(userId: string, taskType: TaskType.StartCurrentTimer | TaskType.StartUsageTimer, timerTaskInfo: ITimerTask) {
+        if (taskType === TaskType.StartCurrentTimer) {
+            return this.getUserStatus(userId).child(CURRENT_TIMER_PROPERTY_NAME).update(timerTaskInfo);
+        } else {
+            return this.getUserStatus(userId).child(USAGE_TIMER_PROPERTY_NAME).update(timerTaskInfo);
+        }
     }
 
-    static removeUserTimerTask(userId: string, timer: "currentTimer" | "usageTimer") {
-        return this.getUserStatus(userId).child(timer).remove();
+    static removeUserTimerTask(userId: string, taskType: TaskType.StopCurrentTimer | TaskType.StopUsageTimer) {
+        if (taskType === TaskType.StopCurrentTimer) {
+            return this.getUserStatus(userId).child(CURRENT_TIMER_PROPERTY_NAME).remove();
+        } else {
+            return this.getUserStatus(userId).child(USAGE_TIMER_PROPERTY_NAME).remove();
+        }
     }
 
     static getUserHistory(userId: string): Reference {

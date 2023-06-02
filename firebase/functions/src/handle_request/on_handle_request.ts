@@ -52,39 +52,22 @@ export async function requestHandler(
     requestInfo.tasks.forEach((taskType) => {
         switch (taskType) {
             case TaskType.StopCurrentTimer:
-                promise = promise.then(() => {
-                    if (existingUserStatus.currentTimer) {
-                        if (requestInfo.isTimeout) {
-                            logger.debug(`[Task #${TaskType[taskType]}] Remove current timer`);
-                            return RealtimeDatabaseUtil.removeUserTimerTask(request.userId, "currentTimer");
-                        } else {
-                            logger.debug(`[Task #${TaskType[taskType]}] Cancel current timer & Remove current timer`);
-                            return timer.cancelTimer(existingUserStatus.currentTimer?.timerTaskName).then(() => {
-                                return RealtimeDatabaseUtil.removeUserTimerTask(request.userId, "currentTimer");
-                            });
-                        }
-                    } else {
-                        logger.debug(`[Task #${TaskType[taskType]}] No current timer`);
-                        return Promise.resolve();
-                    }
-                });
-                break;
             case TaskType.StopUsageTimer:
                 promise = promise.then(() => {
-                    if (existingUserStatus.usageTimer) {
-                        if (requestInfo.isTimeout) {
-                            logger.debug(`[Task #${TaskType[taskType]}] Remove usage timer`);
-                            return RealtimeDatabaseUtil.removeUserTimerTask(request.userId, "usageTimer");
-                        } else {
-                            logger.debug(`[Task #${TaskType[taskType]}] Cancel usage timer & Remove usage timer`);
-                            return timer.cancelTimer(existingUserStatus.usageTimer?.timerTaskName).then(() => {
-                                return RealtimeDatabaseUtil.removeUserTimerTask(request.userId, "usageTimer");
-                            });
-                        }
-                    } else {
-                        logger.debug(`[Task #${TaskType[taskType]}] No usage timer`);
-                        return Promise.resolve();
+                    let ret = Promise.resolve();
+                    const timerTaskNameToStop = taskType === TaskType.StopCurrentTimer ?
+                        existingUserStatus.currentTimer?.timerTaskName : existingUserStatus.usageTimer?.timerTaskName;
+                    if (!timerTaskNameToStop) {
+                        logger.debug(`[Task #${TaskType[taskType]}] No timer to stop`);
+                        return ret;
                     }
+                    if (!requestInfo.isTimeoutRequest) {
+                        logger.debug(`[Task #${TaskType[taskType]}] Cancel timer & Remove timer info of user status`);
+                        ret = ret.then(() => timer.cancelTimer(timerTaskNameToStop));
+                    }
+                    logger.debug(`[Task #${TaskType[taskType]}] Remove timer info of user status`);
+                    ret = ret.then(() => RealtimeDatabaseUtil.removeUserTimerTask(request.userId, taskType));
+                    return ret;
                 });
                 break;
             case TaskType.StartCurrentTimer:
@@ -92,7 +75,17 @@ export async function requestHandler(
                 promise = promise.then(() => {
                     if (request.deadlineInfo !== undefined) {
                         let timeoutRequest: MyRequest;
-                        if (requestInfo.targetStatus !== "Existing Status") {
+                        if (requestInfo.targetStatus === "Existing Status") {
+                            logger.debug(`[Task #${TaskType[taskType]}] Change existing timer with different deadline`);
+                            timeoutRequest = MyRequest.newInstance(
+                                StatusInfo[existingUserStatus.status].requestTypeIfTimeout,
+                                request.userId,
+                                UserStatusChangeReason.UserAction,
+                                request.startStatusAt,
+                                request.seatPosition,
+                                request.deadlineInfo?.keepStatusUntil,
+                            );
+                        } else {
                             logger.debug(`[Task #${TaskType[taskType]}] Start new timer : targetStatus is not Existing Status`);
                             timeoutRequest = MyRequest.newInstance(
                                 StatusInfo[requestInfo.targetStatus].requestTypeIfTimeout,
@@ -102,26 +95,10 @@ export async function requestHandler(
                                 request.seatPosition,
                                 StatusInfo[requestInfo.targetStatus].defaultTimeoutAfterInSeconds
                             );
-                        } else {
-                            logger.debug(`[Task #${TaskType[taskType]}] Start new timer : targetStatus is Existing Status`);
-                            timeoutRequest = MyRequest.newInstance(
-                                StatusInfo[existingUserStatus.status].requestTypeIfTimeout,
-                                request.userId,
-                                UserStatusChangeReason.UserAction,
-                                request.startStatusAt,
-                                request.seatPosition,
-                                request.deadlineInfo?.keepStatusUntil,
-                            );
                         }
 
                         return timer.startTimer(timeoutRequest).then((task) => {
-                            let timer: "currentTimer" | "usageTimer";
-                            if (taskType === TaskType.StartCurrentTimer) {
-                                timer = "currentTimer";
-                            } else {
-                                timer = "usageTimer";
-                            }
-                            return RealtimeDatabaseUtil.updateUserTimerTask(request.userId, timer, <ITimerTask>{
+                            return RealtimeDatabaseUtil.updateUserTimerTask(request.userId, taskType, <ITimerTask>{
                                 timerTaskName: task.name,
                                 startStatusAt: timeoutRequest.startStatusAt,
                                 keepStatusUntil: timeoutRequest.deadlineInfo?.keepStatusUntil,
