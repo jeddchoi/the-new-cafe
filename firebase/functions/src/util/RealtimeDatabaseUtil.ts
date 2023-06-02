@@ -1,7 +1,7 @@
 import {Database, DataSnapshot, getDatabase, Reference} from "firebase-admin/database";
 
-export const REFERENCE_USER_STATUS_NAME = "user_status";
-export const REFERENCE_USER_HISTORY_NAME = "user_history";
+const REFERENCE_USER_STATUS_NAME = "user_status";
+const REFERENCE_USER_HISTORY_NAME = "user_history";
 
 export type TransactionResult = {
     committed: boolean;
