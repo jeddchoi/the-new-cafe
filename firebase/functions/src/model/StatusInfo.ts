@@ -21,7 +21,7 @@ const StatusInfo: {
     },
     [UserStatusType.Occupied]: {
         requestTypeIfTimeout: RequestType.TimeoutOnUse,
-        defaultTimeoutAfterInSeconds: 100,
+        defaultTimeoutAfterInSeconds: 1000,
         seatStatus: SeatStatusType.Occupied,
     },
     [UserStatusType.Away]: {
@@ -36,7 +36,7 @@ const StatusInfo: {
     },
     [UserStatusType.Blocked]: {
         requestTypeIfTimeout: RequestType.Unblock,
-        defaultTimeoutAfterInSeconds: 100,
+        defaultTimeoutAfterInSeconds: 1000,
         seatStatus: SeatStatusType.None,
     },
 };
