@@ -28,12 +28,16 @@ export async function requestHandler(
     const existingUserStatus = await UserStatusHandler.getUserStatusData(request.userId);
     logger.debug(`[Exising Status] ${JSON.stringify(existingUserStatus)}`);
 
+    // Check if existing user status is valid
     if (!requestInfo.availablePriorStatus.includes(existingUserStatus.status)) {
         throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user status is ${UserStatusType[existingUserStatus.status]}`);
     }
+    // Check if required seat position is provided
+    // At this time, it is required only when reserving a seat
     if (requestInfo.requireSeatPosition === "Request" && request.seatPosition === undefined) {
         throwFunctionsHttpsError("invalid-argument", `${RequestType[request.requestType]} Request should be provided with seat position`);
     }
+    // Check if seat position of existing user status is provided when required
     if (requestInfo.requireSeatPosition === "Existing Status if not None" && existingUserStatus.status !== UserStatusType.None && existingUserStatus.seatPosition === undefined) {
         throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user seat position doesn't exist and status is not None`);
     }
@@ -104,7 +108,7 @@ export async function requestHandler(
                                 keepStatusUntil: timeoutRequest.deadlineInfo?.keepStatusUntil,
                             });
                         });
-                    } else {
+                    } else { // No deadline
                         return Promise.resolve();
                     }
                 });
