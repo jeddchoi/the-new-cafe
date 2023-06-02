@@ -47,22 +47,17 @@ export class MyRequest {
 
 
 export function getDeadline(startingTime: number, durationInSeconds: number | undefined, keepStatusUntil: number | undefined): DeadlineInfo | undefined {
-    if (durationInSeconds === undefined && keepStatusUntil === undefined) {
-        return undefined;
-    } else if (durationInSeconds !== undefined && keepStatusUntil === undefined) {
+    if (durationInSeconds !== undefined) {
         return <DeadlineInfo>{
             durationInSeconds,
             keepStatusUntil: startingTime + durationInSeconds * 1000,
         };
-    } else if (durationInSeconds === undefined && keepStatusUntil !== undefined) {
+    }
+    if (keepStatusUntil !== undefined) {
         return <DeadlineInfo>{
             durationInSeconds: Math.round((keepStatusUntil - startingTime) / 1000),
             keepStatusUntil,
         };
-    } else {
-        return <DeadlineInfo>{
-            durationInSeconds,
-            keepStatusUntil,
-        };
     }
+    return undefined;
 }
