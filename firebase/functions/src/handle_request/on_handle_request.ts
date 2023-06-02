@@ -15,7 +15,8 @@ import SeatHandler from "../handler/SeatHandler";
 
 
 export async function requestHandler(
-    request: MyRequest
+    request: MyRequest,
+    isTimeout: boolean,
 ): Promise<void> {
     if (request.requestType === RequestType.NoOp) {
         logger.debug("Don't do anything");
@@ -51,6 +52,7 @@ export async function requestHandler(
         }
     }
 
+
     const timer = new CloudTasksUtil();
     let promise = Promise.resolve();
     requestInfo.tasks.forEach((taskType) => {
@@ -65,7 +67,7 @@ export async function requestHandler(
                         logger.debug(`[Task #${TaskType[taskType]}] No timer to stop`);
                         return ret;
                     }
-                    if (!requestInfo.isTimeoutRequest) {
+                    if (!isTimeout) {
                         logger.debug(`[Task #${TaskType[taskType]}] Cancel timer & Remove timer info of user status`);
                         ret = ret.then(() => timer.cancelTimer(timerTaskNameToStop));
                     }
@@ -79,18 +81,18 @@ export async function requestHandler(
                 promise = promise.then(() => {
                     if (request.deadlineInfo !== undefined) {
                         let timeoutRequest: MyRequest;
+
                         if (requestInfo.targetStatus === "Existing Status") {
                             logger.debug(`[Task #${TaskType[taskType]}] Change existing timer with different deadline`);
                             timeoutRequest = MyRequest.newInstance(
                                 StatusInfo[existingUserStatus.status].requestTypeIfTimeout,
                                 request.userId,
-                                UserStatusChangeReason.UserAction,
-                                request.startStatusAt,
-                                request.seatPosition,
+                                UserStatusChangeReason.Timeout,
                                 request.deadlineInfo?.keepStatusUntil,
+                                request.seatPosition,
                             );
                         } else {
-                            logger.debug(`[Task #${TaskType[taskType]}] Start new timer : targetStatus is not Existing Status`);
+                            logger.debug(`[Task #${TaskType[taskType]}] Start new timer`);
                             timeoutRequest = MyRequest.newInstance(
                                 StatusInfo[requestInfo.targetStatus].requestTypeIfTimeout,
                                 request.userId,

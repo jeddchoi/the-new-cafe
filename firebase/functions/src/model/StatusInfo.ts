@@ -16,12 +16,12 @@ const StatusInfo: {
     },
     [UserStatusType.Reserved]: {
         requestTypeIfTimeout: RequestType.TimeoutOnReserve,
-        defaultTimeoutAfterInSeconds: 100,
+        defaultTimeoutAfterInSeconds: undefined,
         seatStatus: SeatStatusType.Reserved,
     },
     [UserStatusType.Occupied]: {
         requestTypeIfTimeout: RequestType.TimeoutOnUse,
-        defaultTimeoutAfterInSeconds: 1000,
+        defaultTimeoutAfterInSeconds: undefined,
         seatStatus: SeatStatusType.Occupied,
     },
     [UserStatusType.Away]: {
@@ -31,12 +31,12 @@ const StatusInfo: {
     },
     [UserStatusType.OnBusiness]: {
         requestTypeIfTimeout: RequestType.TimeoutOnBusiness,
-        defaultTimeoutAfterInSeconds: 100,
+        defaultTimeoutAfterInSeconds: undefined,
         seatStatus: SeatStatusType.Away,
     },
     [UserStatusType.Blocked]: {
         requestTypeIfTimeout: RequestType.Unblock,
-        defaultTimeoutAfterInSeconds: 1000,
+        defaultTimeoutAfterInSeconds: undefined,
         seatStatus: SeatStatusType.None,
     },
 };

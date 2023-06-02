@@ -28,7 +28,7 @@ export const onHandleRequest =
         if (request.auth === undefined) {
             throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
         }
-        return requestHandler(request.data);
+        return requestHandler(request.data, false);
     });
 
 /**
@@ -38,7 +38,7 @@ export const onHandleRequest =
 export const onTimeout =
     onRequest(async (req: Request, res: Response) => {
         try {
-            await requestHandler(req.body as MyRequest);
+            await requestHandler(req.body as MyRequest, true);
             res.status(200).send("Completed Successfully.");
         } catch (e) {
             res.status(500).send(`Some error occurred. ${e}`);
