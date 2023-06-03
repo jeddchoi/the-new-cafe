@@ -45,7 +45,7 @@ export async function requestHandler(
         logger.debug(`[Target Seat of Request] ${JSON.stringify(targetSeat)}`);
 
         if (requestInfo.requiredConditions.includes(RequestCondition.RequestSeatIsAvailable)) {
-            if (!targetSeat.isAvailable || !targetSeat.currentUserId || targetSeat.state !== SeatStateType.Empty) {
+            if (!targetSeat.isAvailable || targetSeat.currentUserId || targetSeat.state !== SeatStateType.Empty) {
                 throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when target seat is not available`);
             }
         }

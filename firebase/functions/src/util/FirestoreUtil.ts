@@ -23,6 +23,7 @@ export default class FirestoreUtil {
     }
 
     static getSeat(seatPosition: ISeatPosition): DocumentReference {
+
         return this.getSection(seatPosition.storeId, seatPosition.sectionId)
             .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatPosition.seatId);
     }
