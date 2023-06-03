@@ -2,8 +2,8 @@
   "name": "functions",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
-    "build": "tsc --noImplicitAny --strictNullChecks",
-    "build:watch": "tsc --watch --noImplicitAny --strictNullChecks",
+    "build": "tsc --build --clean && tsc --noImplicitAny --strictNullChecks",
+    "build:watch": "tsc --build --clean && tsc --watch --noImplicitAny --strictNullChecks",
     "serve": "npm run cleanup && npm run build && firebase emulators:start --only functions --debug",
     "shell": "npm run cleanup && npm run build && firebase functions:shell --debug",
     "cleanup": "kill-port --port 5001",
