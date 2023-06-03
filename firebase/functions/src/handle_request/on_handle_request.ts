@@ -1,6 +1,6 @@
 import {logger} from "firebase-functions/v2";
 import {ISeatPosition, ITimerTask} from "../model/UserState";
-import {SeatStateType} from "../model/Seat";
+import {Seat, SeatStateType} from "../model/Seat";
 import {RequestTypeInfo} from "../model/RequestTypeInfo";
 import {StateInfo} from "../model/StateInfo";
 import {TaskType} from "../model/TaskType";
@@ -35,38 +35,8 @@ export async function requestHandler(
         throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user state is ${UserStateType[existingUserState.state]}`);
     }
 
-    // Check if required seat position is provided
-    // TODO: At this time, it is required only when reserving a seat
-    if (requestInfo.requiredConditions.includes(RequestCondition.ProvidedSeatPositionInRequest)) {
-        if (!request.seatPosition) {
-            throwFunctionsHttpsError("invalid-argument", `${RequestType[request.requestType]} Request should be provided with seat position`);
-        }
-        const targetSeat = await SeatHandler.getSeatData(request.seatPosition) ?? throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when seat position doesn't exist`);
-        logger.debug(`[Target Seat of Request] ${JSON.stringify(targetSeat)}`);
-
-        if (requestInfo.requiredConditions.includes(RequestCondition.RequestSeatIsAvailable)) {
-            if (!targetSeat.isAvailable || targetSeat.currentUserId || targetSeat.state !== SeatStateType.Empty) {
-                throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when target seat is not available`);
-            }
-        }
-    }
-
-    // Check if seat position of existing user state is provided when required
-    if (requestInfo.requiredConditions.includes(RequestCondition.SeatPositionInExistingUserState)) {
-        if (!existingUserState.seatPosition) {
-            throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user seat position doesn't exist`);
-        }
-        const targetSeat = await SeatHandler.getSeatData(existingUserState.seatPosition) ?? throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when seat position doesn't exist`);
-        logger.debug(`[Target Seat of Existing State] ${JSON.stringify(targetSeat)}`);
-        if (requestInfo.requiredConditions.includes(RequestCondition.SeatOfExistingUserStateIsOccupiedByMe)) {
-            if (targetSeat.currentUserId !== request.userId || targetSeat.isAvailable) {
-                throwFunctionsHttpsError("failed-precondition", `Something is corrupted. UserId(${request.userId}) of request is not same as current user id(${targetSeat.currentUserId}) of used seat`);
-            }
-        }
-    }
-
     const timer = new CloudTasksUtil();
-    let promise = Promise.resolve();
+    let promise: Promise<boolean | void> = Promise.resolve();
     requestInfo.tasks.forEach((taskType) => {
         switch (taskType) {
             case TaskType.StopCurrentTimer:
@@ -143,31 +113,50 @@ export async function requestHandler(
                     if (requestInfo.targetState !== "Existing State") {
                         logger.debug(`[Task #${TaskType[taskType]}] Update seat state`);
                         const targetSeatState = StateInfo[requestInfo.targetState].seatState;
-                        let requiredSeatPosition: ISeatPosition | undefined;
-                        if (requestInfo.requiredConditions.includes(RequestCondition.ProvidedSeatPositionInRequest) && request.seatPosition) {
-                            requiredSeatPosition = request.seatPosition;
-                        }
-                        if (requestInfo.requiredConditions.includes(RequestCondition.SeatPositionInExistingUserState) && existingUserState.seatPosition) {
-                            requiredSeatPosition = existingUserState.seatPosition;
-                        }
-                        if (!requiredSeatPosition) {
-                            throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request should be provided with seat position or need seat position of existing user`);
-                        }
+                        let seatPosition: ISeatPosition | undefined;
+                        let predicate;
+                        if (requestInfo.requiredConditions.includes(RequestCondition.ProvidedSeatPositionInRequest)) {
+                            seatPosition = request.seatPosition ?? throwFunctionsHttpsError("invalid-argument", `${RequestType[request.requestType]} Request should be provided with seat position`);
 
-                        return SeatHandler.updateSeat(requiredSeatPosition,
-                            {
-                                currentUserId: (targetSeatState === SeatStateType.Empty) ? null : request.userId,
-                                state: targetSeatState,
-                                isAvailable: targetSeatState === SeatStateType.Empty,
+                            predicate = (existing: Seat | undefined) => {
+                                if (!existing) return false;
+                                if (requestInfo.requiredConditions.includes(RequestCondition.RequestSeatIsAvailable)) {
+                                    if (!existing.isAvailable || existing.currentUserId || existing.state !== SeatStateType.Empty) {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            };
+                        }
+                        if (requestInfo.requiredConditions.includes(RequestCondition.SeatPositionInExistingUserState)) {
+                            seatPosition = existingUserState.seatPosition ?? throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user seat position doesn't exist`);
+
+                            predicate = (existing: Seat | undefined) => {
+                                if (!existing) return false;
+                                if (requestInfo.requiredConditions.includes(RequestCondition.SeatOfExistingUserStateIsOccupiedByMe)) {
+                                    if (existing.currentUserId !== request.userId || existing.isAvailable) {
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            };
+                        }
+                        if (seatPosition && predicate) {
+                            return SeatHandler.transaction(seatPosition, predicate, (existing) => {
+                                return {
+                                    currentUserId: (targetSeatState === SeatStateType.Empty) ? null : request.userId,
+                                    state: targetSeatState,
+                                    isAvailable: targetSeatState === SeatStateType.Empty,
+                                };
                             });
-                    } else {
-                        logger.debug(`[Task #${TaskType[taskType]}] Don't update seat state`);
-                        return Promise.resolve();
+                        }
                     }
+                    logger.debug(`[Task #${TaskType[taskType]}] Don't update seat state`);
+                    return Promise.resolve(true);
                 });
                 break;
         }
     });
 
-    return promise;
+    return promise.then();
 }

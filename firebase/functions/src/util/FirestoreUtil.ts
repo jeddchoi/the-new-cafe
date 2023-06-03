@@ -1,5 +1,8 @@
-import {getFirestore, Firestore, DocumentReference} from "firebase-admin/firestore";
+import {getFirestore, Firestore, DocumentReference, UpdateData} from "firebase-admin/firestore";
 import {ISeatPosition} from "../model/UserState";
+import {Store, storeConverter} from "../model/Store";
+import {Seat, seatConverter} from "../model/Seat";
+import {Section, sectionConverter} from "../model/Section";
 
 
 export const COLLECTION_GROUP_STORE_NAME = "stores";
@@ -12,20 +15,30 @@ export const COLLECTION_GROUP_SEAT_NAME = "seats";
 export default class FirestoreUtil {
     static db: Firestore = getFirestore();
 
-    static getStore(storeId: string): DocumentReference {
-        return this.db
-            .collection(COLLECTION_GROUP_STORE_NAME).doc(storeId);
+    static getStoreDocRef(storeId: string): DocumentReference<Store> {
+        return FirestoreUtil.db.collection(COLLECTION_GROUP_STORE_NAME).doc(storeId).withConverter(storeConverter);
     }
 
-    static getSection(storeId: string, sectionId: string): DocumentReference {
-        return this.getStore(storeId)
-            .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId);
+    static getSectionDocRef(storeId: string, sectionId: string): DocumentReference<Section> {
+        return this.getStoreDocRef(storeId)
+            .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId).withConverter(sectionConverter);
     }
 
-    static getSeat(seatPosition: ISeatPosition): DocumentReference {
+    static getSeatDocRef(seatPosition: ISeatPosition): DocumentReference<Seat> {
+        return this.getSectionDocRef(seatPosition.storeId, seatPosition.sectionId)
+            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatPosition.seatId).withConverter(seatConverter);
+    }
 
-        return this.getSection(seatPosition.storeId, seatPosition.sectionId)
-            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatPosition.seatId);
+    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>): Promise<boolean> {
+        return this.db.runTransaction(async (t) => {
+            const data = (await t.get(docRef)).data();
+            if (!predicate(data)) {
+                return false;
+            }
+            const newContent = update(data);
+            t.update(docRef, newContent);
+            return true;
+        });
     }
 }
 
