@@ -22,7 +22,7 @@ export async function requestHandler(
         logger.debug("Don't do anything");
         return Promise.resolve();
     }
-    logger.debug(`Handling request ... ${JSON.stringify(request)}`);
+    logger.debug(`Handling request ... [isTimeout = ${isTimeout}] ${JSON.stringify(request)}`);
     const requestInfo = RequestTypeInfo[request.requestType];
     logger.debug(`[Request Info] ${JSON.stringify(requestInfo)}`);
 
@@ -30,7 +30,7 @@ export async function requestHandler(
     logger.debug(`[Exising Status] ${JSON.stringify(existingUserStatus)}`);
 
     // Check if existing user status is valid
-    if (!requestInfo.availablePriorStatus.includes(existingUserStatus.status)) {
+    if (!requestInfo.availablePriorUserStatus.includes(existingUserStatus.status)) {
         throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user status is ${UserStatusType[existingUserStatus.status]}`);
     }
     // Check if required seat position is provided
@@ -99,15 +99,14 @@ export async function requestHandler(
                                 UserStatusChangeReason.Timeout,
                                 request.deadlineInfo?.keepStatusUntil,
                                 request.seatPosition,
-                                StatusInfo[requestInfo.targetStatus].defaultTimeoutAfterInSeconds
                             );
                         }
 
                         return timer.startTimer(timeoutRequest).then((task) => {
                             return UserStatusHandler.updateUserTimerTask(request.userId, taskType, <ITimerTask>{
                                 timerTaskName: task.name,
-                                startStatusAt: timeoutRequest.startStatusAt,
-                                keepStatusUntil: timeoutRequest.deadlineInfo?.keepStatusUntil,
+                                startStatusAt: request.startStatusAt,
+                                keepStatusUntil: request.deadlineInfo?.keepStatusUntil,
                             });
                         });
                     } else { // No deadline

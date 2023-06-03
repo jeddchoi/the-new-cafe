@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import {initializeApp} from "firebase-admin/app";
 initializeApp();
 
@@ -16,6 +18,7 @@ import {
 } from "./util/FirestoreUtil";
 import {countSeatChangeHandler} from "./trigger/count_seat_change";
 import {countSectionChangeHandler} from "./trigger/count_section_change";
+import {logger} from "firebase-functions/v2";
 
 
 /**
@@ -39,12 +42,25 @@ export const onTimeout =
     onRequest(async (req: Request, res: Response) => {
         try {
             await requestHandler(req.body as MyRequest, true);
+            logger.info("Completed Successfully.");
             res.status(200).send("Completed Successfully.");
         } catch (e) {
+            logger.error("Some error occurred", e);
             res.status(500).send(`Some error occurred. ${e}`);
         }
     });
 
+export const test =
+    onRequest(async (req: Request, res: Response) => {
+        try {
+            await requestHandler(req.body as MyRequest, false);
+            logger.info("Completed Successfully.");
+            res.status(200).send("Completed Successfully.");
+        } catch (e) {
+            logger.error("Some error occurred", e);
+            res.status(500).send(`Some error occurred. ${e}`);
+        }
+    });
 
 /**
  * Triggered functions

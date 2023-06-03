@@ -18,6 +18,7 @@ export default class CloudTasksUtil {
         private readonly _gServiceAccountEmail: string = gServiceAccountEmail.value(),
         private readonly _projectID: string = projectID.value(),
     ) {
+        // noinspection SpellCheckingInspection
         this._tasksBaseUrl = `https://${_tasksLocation}-${_projectID}.cloudfunctions.net`;
         this._parent = CloudTasksUtil._client.queuePath(this._projectID, this._tasksLocation, this._tasksQueueName);
     }

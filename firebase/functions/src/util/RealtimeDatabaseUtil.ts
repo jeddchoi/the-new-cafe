@@ -1,12 +1,8 @@
-import {Database, DataSnapshot, getDatabase, Reference} from "firebase-admin/database";
+import {Database, getDatabase, Reference} from "firebase-admin/database";
 
 const REFERENCE_USER_STATUS_NAME = "user_status";
 const REFERENCE_USER_HISTORY_NAME = "user_history";
 
-export type TransactionResult = {
-    committed: boolean;
-    snapshot: DataSnapshot;
-};
 
 export default class RealtimeDatabaseUtil {
     static db: Database = getDatabase();
