@@ -1,4 +1,4 @@
-import {ISeatPosition} from "../model/UserStatus";
+import {ISeatPosition} from "../model/UserState";
 import {ISeatExternal, Seat, seatConverter} from "../model/Seat";
 import FirestoreUtil from "../util/FirestoreUtil";
 

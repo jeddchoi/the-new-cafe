@@ -1,10 +1,10 @@
-import {ISeatPosition} from "./UserStatus";
+import {ISeatPosition} from "./UserState";
 import {RequestType} from "./RequestType";
-import {UserStatusChangeReason} from "./UserStatusChangeReason";
+import {UserStateChangeReason} from "./UserStateChangeReason";
 
 
 export interface DeadlineInfo {
-    keepStatusUntil: number,
+    keepStateUntil: number,
     durationInSeconds: number,
 }
 
@@ -12,15 +12,15 @@ export class MyRequest {
     static newInstance(
         requestType: RequestType,
         userId: string,
-        reason: UserStatusChangeReason,
-        startStatusAt: number | undefined,
+        reason: UserStateChangeReason,
+        startStateAt: number | undefined,
         seatPosition: ISeatPosition | undefined,
         durationInSeconds ?: number,
-        keepStatusUntil ?: number,
+        keepStateUntil ?: number,
     ): MyRequest {
         const current = new Date().getTime();
-        const startingTime = startStatusAt ?? current;
-        const deadlineInfo = getDeadline(startingTime, durationInSeconds, keepStatusUntil);
+        const startingTime = startStateAt ?? current;
+        const deadlineInfo = getDeadline(startingTime, durationInSeconds, keepStateUntil);
 
         return new MyRequest(
             requestType,
@@ -37,8 +37,8 @@ export class MyRequest {
         readonly requestType: RequestType,
         readonly userId: string,
         readonly createdAt: number,
-        readonly startStatusAt: number,
-        readonly reason: UserStatusChangeReason,
+        readonly startStateAt: number,
+        readonly reason: UserStateChangeReason,
         readonly deadlineInfo: DeadlineInfo | undefined, // if undefined, no deadline
         readonly seatPosition: ISeatPosition | undefined,
     ) {
@@ -46,17 +46,17 @@ export class MyRequest {
 }
 
 
-export function getDeadline(startingTime: number, durationInSeconds: number | undefined, keepStatusUntil: number | undefined): DeadlineInfo | undefined {
+export function getDeadline(startingTime: number, durationInSeconds: number | undefined, keepStateUntil: number | undefined): DeadlineInfo | undefined {
     if (durationInSeconds !== undefined) {
         return <DeadlineInfo>{
             durationInSeconds,
-            keepStatusUntil: startingTime + durationInSeconds * 1000,
+            keepStateUntil: startingTime + durationInSeconds * 1000,
         };
     }
-    if (keepStatusUntil !== undefined) {
+    if (keepStateUntil !== undefined) {
         return <DeadlineInfo>{
-            durationInSeconds: Math.round((keepStatusUntil - startingTime) / 1000),
-            keepStatusUntil,
+            durationInSeconds: Math.round((keepStateUntil - startingTime) / 1000),
+            keepStateUntil,
         };
     }
     return undefined;

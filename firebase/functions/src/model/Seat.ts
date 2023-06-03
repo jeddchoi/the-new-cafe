@@ -1,8 +1,8 @@
 import {QueryDocumentSnapshot, FirestoreDataConverter, DocumentData} from "firebase-admin/firestore";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 
-enum SeatStatusType {
-    None,
+enum SeatStateType {
+    Empty,
     Reserved,
     Occupied,
     Away,
@@ -14,14 +14,14 @@ interface ISeat {
     storeId: string,
     sectionId: string,
     name: string,
-    status: SeatStatusType,
+    state: SeatStateType,
     isAvailable: boolean,
     currentUserId?: string,
 }
 
 interface ISeatExternal {
     name: string,
-    status: number,
+    state: number,
     isAvailable: boolean,
     currentUserId: string | null,
 }
@@ -32,7 +32,7 @@ class Seat implements ISeat {
         readonly sectionId: string,
         readonly seatId: string,
         readonly name: string,
-        readonly status: SeatStatusType,
+        readonly state: SeatStateType,
         readonly isAvailable: boolean,
         readonly currentUserId?: string,
     ) {
@@ -44,7 +44,7 @@ const seatConverter: FirestoreDataConverter<Seat> = {
     toFirestore(seat: Seat): DocumentData {
         return {
             name: seat.name,
-            status: seat.status,
+            state: seat.state,
             isAvailable: seat.isAvailable,
             currentUserId: seat.currentUserId,
         };
@@ -58,10 +58,10 @@ const seatConverter: FirestoreDataConverter<Seat> = {
             snapshot.ref.parent.id,
             snapshot.id,
             data.name,
-            data.status,
+            data.state,
             data.isAvailable,
             data.currentUserId ?? undefined);
     },
 };
 
-export {Seat, ISeat, ISeatExternal, SeatStatusType, seatConverter};
+export {Seat, ISeat, ISeatExternal, SeatStateType, seatConverter};

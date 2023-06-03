@@ -26,7 +26,7 @@ export default class CloudTasksUtil {
     public startTimer(
         futureRequest: MyRequest,
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
-        return this.createHttpTaskWithSchedule(futureRequest, "onTimeout", Math.round(futureRequest.startStatusAt / 1000));
+        return this.createHttpTaskWithSchedule(futureRequest, "onTimeout", Math.round(futureRequest.startStateAt / 1000));
     }
 
     public cancelTimer(

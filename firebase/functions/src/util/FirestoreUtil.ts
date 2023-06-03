@@ -1,5 +1,5 @@
 import {getFirestore, Firestore, DocumentReference} from "firebase-admin/firestore";
-import {ISeatPosition} from "../model/UserStatus";
+import {ISeatPosition} from "../model/UserState";
 
 
 export const COLLECTION_GROUP_STORE_NAME = "stores";

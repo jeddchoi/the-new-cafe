@@ -1,5 +1,5 @@
-import {UserStatusType} from "./UserStatusType";
-import {UserStatusChangeReason} from "./UserStatusChangeReason";
+import {UserStateType} from "./UserStateType";
+import {UserStateChangeReason} from "./UserStateChangeReason";
 
 interface ISeatPosition {
     storeId: string;
@@ -9,16 +9,16 @@ interface ISeatPosition {
 
 interface ITimerTask {
     timerTaskName: string;
-    startStatusAt: number;
-    keepStatusUntil: number;
+    startStateAt: number;
+    keepStateUntil: number;
 }
 
-interface IUserStatus {
+interface IUserState {
     uid: string;
-    lastStatus: UserStatusType;
-    status: UserStatusType;
-    statusUpdatedAt: Date;
-    statusUpdatedBy: UserStatusChangeReason;
+    lastState: UserStateType;
+    state: UserStateType;
+    stateUpdatedAt: Date;
+    stateUpdatedBy: UserStateChangeReason;
     seatPosition: ISeatPosition | null;
     usageTimer: ITimerTask | null;
     currentTimer: ITimerTask | null;
@@ -28,36 +28,36 @@ const CURRENT_TIMER_PROPERTY_NAME = "currentTimer";
 const USAGE_TIMER_PROPERTY_NAME = "usageTimer";
 
 
-interface IUserStatusExternal {
-    lastStatus: number;
-    status: number;
-    statusUpdatedAt: number;
-    statusUpdatedBy: number;
+interface IUserStateExternal {
+    lastState: number;
+    state: number;
+    stateUpdatedAt: number;
+    stateUpdatedBy: number;
     seatPosition: ISeatPosition | null;
     usageTimer: ITimerTask | null;
     currentTimer: ITimerTask | null;
 }
 
-class UserStatus implements IUserStatus {
+class UserState implements IUserState {
     constructor(
         readonly uid: string,
-        readonly lastStatus: UserStatusType,
-        readonly status: UserStatusType,
-        readonly statusUpdatedAt: Date,
-        readonly statusUpdatedBy: UserStatusChangeReason,
+        readonly lastState: UserStateType,
+        readonly state: UserStateType,
+        readonly stateUpdatedAt: Date,
+        readonly stateUpdatedBy: UserStateChangeReason,
         readonly seatPosition: ISeatPosition | null,
         readonly usageTimer: ITimerTask | null,
         readonly currentTimer: ITimerTask | null,
     ) {
     }
 
-    static fromExternal(uid: string, val: IUserStatusExternal): UserStatus {
-        return new UserStatus(
+    static fromExternal(uid: string, val: IUserStateExternal): UserState {
+        return new UserState(
             uid,
-            val.lastStatus,
-            val.status,
-            new Date(val.statusUpdatedAt),
-            val.statusUpdatedBy,
+            val.lastState,
+            val.state,
+            new Date(val.stateUpdatedAt),
+            val.stateUpdatedBy,
             val.seatPosition,
             val.usageTimer,
             val.currentTimer);
@@ -67,16 +67,16 @@ class UserStatus implements IUserStatus {
         const properties = Object.entries(this)
             .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
             .join(", ");
-        return `UserStatus { ${properties} }`;
+        return `UserState { ${properties} }`;
     }
 }
 
 export {
-    UserStatus,
+    UserState,
     ISeatPosition,
     ITimerTask,
-    IUserStatus,
-    IUserStatusExternal,
+    IUserState,
+    IUserStateExternal,
     CURRENT_TIMER_PROPERTY_NAME,
     USAGE_TIMER_PROPERTY_NAME,
 };
