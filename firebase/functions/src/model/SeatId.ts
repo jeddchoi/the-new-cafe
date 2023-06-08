@@ -1,4 +1,4 @@
-type SeatId = {
+interface SeatId {
     storeId: string;
     sectionId: string;
     seatId: string;
