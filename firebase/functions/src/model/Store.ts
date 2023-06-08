@@ -1,4 +1,4 @@
-import {FirestoreDataConverter, DocumentData, QueryDocumentSnapshot} from "firebase-admin/firestore";
+import {DocumentData, FirestoreDataConverter, QueryDocumentSnapshot} from "firebase-admin/firestore";
 
 interface IStore {
     uid: string,
@@ -6,6 +6,8 @@ interface IStore {
     totalSeats: number,
     totalAvailableSeats: number,
     totalSections: number,
+    acceptsReservation: boolean,
+    photoUrl: string,
 }
 
 interface IStoreExternal {
@@ -13,6 +15,8 @@ interface IStoreExternal {
     totalSeats: number,
     totalAvailableSeats: number,
     totalSections: number,
+    acceptsReservation: boolean,
+    photoUrl: string,
 }
 
 class Store implements IStore {
@@ -22,6 +26,8 @@ class Store implements IStore {
         readonly totalSeats: number,
         readonly totalAvailableSeats: number,
         readonly totalSections: number,
+        readonly acceptsReservation: boolean,
+        readonly photoUrl: string,
     ) {
     }
 }
@@ -29,11 +35,13 @@ class Store implements IStore {
 
 const storeConverter: FirestoreDataConverter<Store> = {
     toFirestore(store: Store): DocumentData {
-        return {
+        return <IStoreExternal>{
             name: store.name,
             totalSeats: store.totalSeats,
             totalAvailableSeats: store.totalAvailableSeats,
             totalSections: store.totalSections,
+            acceptsReservation: store.acceptsReservation,
+            photoUrl: store.photoUrl,
         };
     },
     fromFirestore(
@@ -44,7 +52,9 @@ const storeConverter: FirestoreDataConverter<Store> = {
             data.name,
             data.totalSeats,
             data.totalAvailableSeats,
-            data.totalSections
+            data.totalSections,
+            data.acceptsReservation,
+            data.photoUrl,
         );
     },
 };

@@ -13,3 +13,9 @@ function serializeSeatId(seat: SeatId): string {
 function deserializeSeatId(serializedSeat: string): SeatId {
     return JSON.parse(serializedSeat) as SeatId;
 }
+
+export {
+    SeatId,
+    serializeSeatId,
+    deserializeSeatId,
+};

@@ -121,7 +121,7 @@ export async function requestHandler(
                             predicate = (existing: Seat | undefined) => {
                                 if (!existing) return false;
                                 if (requestInfo.requiredConditions.includes(RequestCondition.RequestSeatIsAvailable)) {
-                                    if (!existing.isAvailable || existing.currentUserId || existing.state !== SeatStateType.Empty) {
+                                    if (!existing.isAvailable || existing.userId || existing.state !== SeatStateType.Empty) {
                                         return false;
                                     }
                                 }
@@ -134,7 +134,7 @@ export async function requestHandler(
                             predicate = (existing: Seat | undefined) => {
                                 if (!existing) return false;
                                 if (requestInfo.requiredConditions.includes(RequestCondition.SeatOfExistingUserStateIsOccupiedByMe)) {
-                                    if (existing.currentUserId !== request.userId || existing.isAvailable) {
+                                    if (existing.userId !== request.userId || existing.isAvailable) {
                                         return false;
                                     }
                                 }
@@ -144,7 +144,7 @@ export async function requestHandler(
                         if (seatPosition && predicate) {
                             return SeatHandler.transaction(seatPosition, predicate, (existing) => {
                                 return {
-                                    currentUserId: (targetSeatState === SeatStateType.Empty) ? null : request.userId,
+                                    userId: (targetSeatState === SeatStateType.Empty) ? null : request.userId,
                                     state: targetSeatState,
                                     isAvailable: targetSeatState === SeatStateType.Empty,
                                 };
