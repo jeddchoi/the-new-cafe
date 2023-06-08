@@ -1,5 +1,6 @@
 import {DocumentData, FirestoreDataConverter, QueryDocumentSnapshot} from "firebase-admin/firestore";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
+import {SeatId} from "./SeatId";
 
 enum SeatStateType {
     Empty,
@@ -10,9 +11,7 @@ enum SeatStateType {
 }
 
 interface ISeat {
-    seatId: string,
-    storeId: string,
-    sectionId: string,
+    seatId: SeatId,
     name: string,
     state: SeatStateType,
     isAvailable: boolean,
@@ -28,9 +27,7 @@ interface ISeatExternal {
 
 class Seat implements ISeat {
     constructor(
-        readonly storeId: string,
-        readonly sectionId: string,
-        readonly seatId: string,
+        readonly seatId: SeatId,
         readonly name: string,
         readonly state: SeatStateType,
         readonly isAvailable: boolean,
@@ -54,9 +51,11 @@ const seatConverter: FirestoreDataConverter<Seat> = {
     ): Seat {
         const data = snapshot.data();
         return new Seat(
-            snapshot.ref.parent.parent?.id ?? throwFunctionsHttpsError("internal", "store doesn't exist"),
-            snapshot.ref.parent.id,
-            snapshot.id,
+            {
+                storeId: snapshot.ref.parent.parent?.id ?? throwFunctionsHttpsError("internal", "store doesn't exist"),
+                sectionId: snapshot.ref.parent.id,
+                seatId: snapshot.id,
+            },
             data.name,
             data.state,
             data.isAvailable,
