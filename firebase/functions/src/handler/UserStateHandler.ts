@@ -1,4 +1,4 @@
-import {IUserStateExternal, UserState,} from "../model/UserState";
+import {IUserStateExternal, UserState} from "../model/UserState";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 
 
