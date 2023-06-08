@@ -2,12 +2,13 @@ import {DocumentReference, Firestore, getFirestore, UpdateData} from "firebase-a
 import {Store, storeConverter} from "../model/Store";
 import {Seat, seatConverter} from "../model/Seat";
 import {Section, sectionConverter} from "../model/Section";
-import {SeatId} from "../model/SeatId";
+import {
+    COLLECTION_GROUP_SEAT_NAME,
+    COLLECTION_GROUP_SECTION_NAME,
+    COLLECTION_GROUP_STORE_NAME,
+    SeatId,
+} from "../model/SeatId";
 
-
-export const COLLECTION_GROUP_STORE_NAME = "stores";
-export const COLLECTION_GROUP_SECTION_NAME = "sections";
-export const COLLECTION_GROUP_SEAT_NAME = "seats";
 
 /**
  * Utility class for Firestore

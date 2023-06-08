@@ -1,7 +1,7 @@
 import {
     CURRENT_TIMER_PROPERTY_NAME,
-    ITimerTask,
     IUserStateExternal,
+    TimerInfo,
     USAGE_TIMER_PROPERTY_NAME,
     UserState,
 } from "../model/UserState";
@@ -21,7 +21,7 @@ export default class UserStateHandler {
         return RealtimeDatabaseUtil.getUserState(userId).update(updateContent);
     }
 
-    static updateUserTimerTask(userId: string, taskType: TaskType.StartCurrentTimer | TaskType.StartUsageTimer, timerTaskInfo: ITimerTask) {
+    static updateUserTimerTask(userId: string, taskType: TaskType.StartCurrentTimer | TaskType.StartUsageTimer, timerTaskInfo: TimerInfo) {
         if (taskType === TaskType.StartCurrentTimer) {
             return RealtimeDatabaseUtil.getUserState(userId).child(CURRENT_TIMER_PROPERTY_NAME).update(timerTaskInfo);
         } else {

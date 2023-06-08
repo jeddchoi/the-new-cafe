@@ -1,8 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
 import {initializeApp} from "firebase-admin/app";
-initializeApp();
-
 import {CallableRequest, onCall, onRequest, Request} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
 import {Response} from "express";
@@ -11,14 +9,12 @@ import {MyRequest} from "./model/MyRequest";
 import {requestHandler} from "./handle_request/on_handle_request";
 import {throwFunctionsHttpsError} from "./util/functions_helper";
 
-import {
-    COLLECTION_GROUP_SEAT_NAME,
-    COLLECTION_GROUP_SECTION_NAME,
-    COLLECTION_GROUP_STORE_NAME,
-} from "./util/FirestoreUtil";
 import {countSeatChangeHandler} from "./trigger/count_seat_change";
 import {countSectionChangeHandler} from "./trigger/count_section_change";
 import {logger} from "firebase-functions/v2";
+import {COLLECTION_GROUP_SEAT_NAME, COLLECTION_GROUP_SECTION_NAME, COLLECTION_GROUP_STORE_NAME} from "./model/SeatId";
+
+initializeApp();
 
 
 /**

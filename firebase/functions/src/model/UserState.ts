@@ -2,21 +2,33 @@ import {UserStateType} from "./UserStateType";
 import {UserStateChangeReason} from "./UserStateChangeReason";
 import {SeatId} from "./SeatId";
 
-interface ITimerTask {
-    timerTaskName: string;
-    startStateAt: number;
-    keepStateUntil: number;
+interface TimerInfo {
+    endTime: number;
+    targetState: UserStateType;
+    taskName: string;
 }
 
-interface IUserState {
-    uid: string;
-    lastState: UserStateType;
+interface State {
+    reason: UserStateChangeReason;
+    seatId: string | null;
+    startTime: number;
     state: UserStateType;
-    stateUpdatedAt: Date;
-    stateUpdatedBy: UserStateChangeReason;
-    seatPosition: SeatId | null;
-    usageTimer: ITimerTask | null;
-    currentTimer: ITimerTask | null;
+    timer: TimerInfo | null;
+}
+
+interface OverallState extends State{
+    sessionId: string | null;
+}
+
+
+interface IUserState {
+    isOnline: boolean;
+    name: string;
+    status: {
+        overall: OverallState,
+        temporary: State
+    };
+    userId: string;
 }
 
 const CURRENT_TIMER_PROPERTY_NAME = "currentTimer";
@@ -24,38 +36,28 @@ const USAGE_TIMER_PROPERTY_NAME = "usageTimer";
 
 
 interface IUserStateExternal {
-    lastState: number;
-    state: number;
-    stateUpdatedAt: number;
-    stateUpdatedBy: number;
-    seatPosition: SeatId | null;
-    usageTimer: ITimerTask | null;
-    currentTimer: ITimerTask | null;
+    isOnline: boolean;
+    name: string;
+    status: {
+        overall: OverallState,
+        temporary: State
+    };
 }
 
 class UserState implements IUserState {
     constructor(
-        readonly uid: string,
-        readonly lastState: UserStateType,
-        readonly state: UserStateType,
-        readonly stateUpdatedAt: Date,
-        readonly stateUpdatedBy: UserStateChangeReason,
-        readonly seatPosition: SeatId | null,
-        readonly usageTimer: ITimerTask | null,
-        readonly currentTimer: ITimerTask | null,
+        readonly isOnline: boolean,
+        readonly name: string,
+        readonly status: {
+            overall: OverallState,
+            temporary: State
+        },
+        readonly userId: string,
     ) {
     }
 
     static fromExternal(uid: string, val: IUserStateExternal): UserState {
-        return new UserState(
-            uid,
-            val.lastState,
-            val.state,
-            new Date(val.stateUpdatedAt),
-            val.stateUpdatedBy,
-            val.seatPosition,
-            val.usageTimer,
-            val.currentTimer);
+        return new UserState(val.isOnline, val.name, val.status, uid);
     }
 
     toString() {
@@ -69,7 +71,7 @@ class UserState implements IUserState {
 export {
     UserState,
     SeatId,
-    ITimerTask,
+    TimerInfo,
     IUserState,
     IUserStateExternal,
     CURRENT_TIMER_PROPERTY_NAME,
