@@ -1,6 +1,6 @@
-import {ISeatPosition} from "./UserState";
 import {UserStateType} from "./UserStateType";
 import {UserStateChangeReason} from "./UserStateChangeReason";
+import {SeatId} from "./SeatId";
 
 interface IUserStateChange {
     userId: string;
@@ -8,14 +8,14 @@ interface IUserStateChange {
     nextState: UserStateType;
     stateUpdatedAt: Date;
     stateUpdatedBy: UserStateChangeReason;
-    seatPosition: ISeatPosition | null;
+    seatPosition: SeatId | null;
 }
 
 interface IUserStateChangeExternal {
     prevState: number;
     nextState: number;
     stateUpdatedBy: number;
-    seatPosition: ISeatPosition | null;
+    seatPosition: SeatId | null;
 }
 
 class UserStateChange implements IUserStateChange {
@@ -25,7 +25,7 @@ class UserStateChange implements IUserStateChange {
         readonly nextState: UserStateType,
         readonly stateUpdatedAt: Date,
         readonly stateUpdatedBy: UserStateChangeReason,
-        readonly seatPosition: ISeatPosition | null,
+        readonly seatPosition: SeatId | null,
     ) {
     }
 

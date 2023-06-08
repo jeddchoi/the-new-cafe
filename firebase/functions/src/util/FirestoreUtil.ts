@@ -1,8 +1,8 @@
-import {getFirestore, Firestore, DocumentReference, UpdateData} from "firebase-admin/firestore";
-import {ISeatPosition} from "../model/UserState";
+import {DocumentReference, Firestore, getFirestore, UpdateData} from "firebase-admin/firestore";
 import {Store, storeConverter} from "../model/Store";
 import {Seat, seatConverter} from "../model/Seat";
 import {Section, sectionConverter} from "../model/Section";
+import {SeatId} from "../model/SeatId";
 
 
 export const COLLECTION_GROUP_STORE_NAME = "stores";
@@ -24,9 +24,9 @@ export default class FirestoreUtil {
             .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId).withConverter(sectionConverter);
     }
 
-    static getSeatDocRef(seatPosition: ISeatPosition): DocumentReference<Seat> {
-        return this.getSectionDocRef(seatPosition.storeId, seatPosition.sectionId)
-            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatPosition.seatId).withConverter(seatConverter);
+    static getSeatDocRef(seatId: SeatId): DocumentReference<Seat> {
+        return this.getSectionDocRef(seatId.storeId, seatId.sectionId)
+            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatId.seatId).withConverter(seatConverter);
     }
 
     static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>): Promise<boolean> {

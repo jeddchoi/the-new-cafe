@@ -1,11 +1,6 @@
 import {UserStateType} from "./UserStateType";
 import {UserStateChangeReason} from "./UserStateChangeReason";
-
-interface ISeatPosition {
-    storeId: string;
-    sectionId: string;
-    seatId: string;
-}
+import {SeatId} from "./SeatId";
 
 interface ITimerTask {
     timerTaskName: string;
@@ -19,7 +14,7 @@ interface IUserState {
     state: UserStateType;
     stateUpdatedAt: Date;
     stateUpdatedBy: UserStateChangeReason;
-    seatPosition: ISeatPosition | null;
+    seatPosition: SeatId | null;
     usageTimer: ITimerTask | null;
     currentTimer: ITimerTask | null;
 }
@@ -33,7 +28,7 @@ interface IUserStateExternal {
     state: number;
     stateUpdatedAt: number;
     stateUpdatedBy: number;
-    seatPosition: ISeatPosition | null;
+    seatPosition: SeatId | null;
     usageTimer: ITimerTask | null;
     currentTimer: ITimerTask | null;
 }
@@ -45,7 +40,7 @@ class UserState implements IUserState {
         readonly state: UserStateType,
         readonly stateUpdatedAt: Date,
         readonly stateUpdatedBy: UserStateChangeReason,
-        readonly seatPosition: ISeatPosition | null,
+        readonly seatPosition: SeatId | null,
         readonly usageTimer: ITimerTask | null,
         readonly currentTimer: ITimerTask | null,
     ) {
@@ -73,7 +68,7 @@ class UserState implements IUserState {
 
 export {
     UserState,
-    ISeatPosition,
+    SeatId,
     ITimerTask,
     IUserState,
     IUserStateExternal,

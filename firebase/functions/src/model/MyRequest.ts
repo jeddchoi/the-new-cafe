@@ -1,6 +1,6 @@
-import {ISeatPosition} from "./UserState";
 import {RequestType} from "./RequestType";
 import {UserStateChangeReason} from "./UserStateChangeReason";
+import {SeatId} from "./SeatId";
 
 
 export interface DeadlineInfo {
@@ -9,12 +9,23 @@ export interface DeadlineInfo {
 }
 
 export class MyRequest {
+    private constructor(
+        readonly requestType: RequestType,
+        readonly userId: string,
+        readonly createdAt: number,
+        readonly startStateAt: number,
+        readonly reason: UserStateChangeReason,
+        readonly deadlineInfo: DeadlineInfo | undefined, // if undefined, no deadline
+        readonly seatPosition: SeatId | undefined,
+    ) {
+    }
+
     static newInstance(
         requestType: RequestType,
         userId: string,
         reason: UserStateChangeReason,
         startStateAt: number | undefined,
-        seatPosition: ISeatPosition | undefined,
+        seatPosition: SeatId | undefined,
         durationInSeconds ?: number,
         keepStateUntil ?: number,
     ): MyRequest {
@@ -31,17 +42,6 @@ export class MyRequest {
             deadlineInfo,
             seatPosition,
         );
-    }
-
-    private constructor(
-        readonly requestType: RequestType,
-        readonly userId: string,
-        readonly createdAt: number,
-        readonly startStateAt: number,
-        readonly reason: UserStateChangeReason,
-        readonly deadlineInfo: DeadlineInfo | undefined, // if undefined, no deadline
-        readonly seatPosition: ISeatPosition | undefined,
-    ) {
     }
 }
 

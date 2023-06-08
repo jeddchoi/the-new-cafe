@@ -1,5 +1,5 @@
 import {logger} from "firebase-functions/v2";
-import {ISeatPosition, ITimerTask} from "../model/UserState";
+import {ITimerTask, SeatId} from "../model/UserState";
 import {Seat, SeatStateType} from "../model/Seat";
 import {RequestTypeInfo} from "../model/RequestTypeInfo";
 import {StateInfo} from "../model/StateInfo";
@@ -113,7 +113,7 @@ export async function requestHandler(
                     if (requestInfo.targetState !== "Existing State") {
                         logger.debug(`[Task #${TaskType[taskType]}] Update seat state`);
                         const targetSeatState = StateInfo[requestInfo.targetState].seatState;
-                        let seatPosition: ISeatPosition | undefined;
+                        let seatPosition: SeatId | undefined;
                         let predicate;
                         if (requestInfo.requiredConditions.includes(RequestCondition.ProvidedSeatPositionInRequest)) {
                             seatPosition = request.seatPosition ?? throwFunctionsHttpsError("invalid-argument", `${RequestType[request.requestType]} Request should be provided with seat position`);
