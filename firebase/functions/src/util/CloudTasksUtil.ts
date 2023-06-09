@@ -1,7 +1,6 @@
 import {CloudTasksClient, protos} from "@google-cloud/tasks";
 import {defineString, projectID} from "firebase-functions/params";
 import {logger} from "firebase-functions";
-import {MyRequest} from "../model/MyRequest";
 
 const tasksQueueName = defineString("TASKS_QUEUE_NAME");
 const tasksLocation = defineString("LOCATION_TASKS");
@@ -23,11 +22,14 @@ export default class CloudTasksUtil {
         this._parent = CloudTasksUtil._client.queuePath(this._projectID, this._tasksLocation, this._tasksQueueName);
     }
 
-    public startTimer(
-        futureRequest: MyRequest,
+    public startRemoveTimer(
+        deletePath: string,
+        scheduleDate: number,
+        taskName: string | null = null,
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
-        return this.createHttpTaskWithSchedule(futureRequest, "onTimeout", Math.round(futureRequest.startStateAt / 1000));
+        return this.createHttpTaskWithSchedule({deletePath}, "onDeletePathTimeout", Math.round(scheduleDate / 1000), taskName);
     }
+
 
     public cancelTimer(
         timerTaskName: string,
@@ -39,16 +41,18 @@ export default class CloudTasksUtil {
     }
 
     private createHttpTaskWithSchedule(
-        payload: MyRequest,
+        payload: NonNullable<any>,
         path: string,
         scheduleTimeInSeconds: number, // The schedule time in seconds
+        taskName: string | null,
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
         // Construct the fully qualified queue name.
 
         const task = this.createTaskObject(
             `${this._tasksBaseUrl}/${path}`,
             payload,
-            scheduleTimeInSeconds
+            scheduleTimeInSeconds,
+            taskName
         );
 
         // Send create task request.
@@ -63,9 +67,11 @@ export default class CloudTasksUtil {
         url: string,
         payload: object,
         scheduleTimeInSeconds: number,
+        taskName: string | null,
     ): protos.google.cloud.tasks.v2.ITask {
         const body = Buffer.from(JSON.stringify(payload)).toString("base64");
         return <protos.google.cloud.tasks.v2.ITask>{
+            name: taskName,
             httpRequest: {
                 httpMethod: "POST",
                 url,

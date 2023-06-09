@@ -9,10 +9,10 @@ interface UserStateChange {
 
 
 interface UserSession {
-    sessionId: string;
     startTime: number;
+    endTime: number | null;
     seatId: SeatId | null;
-    stateChanges:UserStateChange[];
+    stateChanges: { [pushKey: string]: UserStateChange };
 }
 
 const START_TIME_PROPERTY_NAME = "startTime";

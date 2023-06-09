@@ -4,20 +4,26 @@ import {SeatId} from "./SeatId";
 
 interface TimerInfo {
     endTime: number;
-    targetState: UserStateType;
     taskName: string;
 }
 
+interface TemporaryTimerInfo extends TimerInfo{
+    isReset: boolean
+}
+
 interface State {
-    reason: UserStateChangeReason;
-    seatId: string | null;
-    startTime: number;
     state: UserStateType;
+    reason: UserStateChangeReason;
+    startTime: number;
     timer: TimerInfo | null;
 }
 
 interface OverallState extends State{
-    sessionId: string | null;
+    seatId: string | null;
+}
+
+interface TemporaryState extends State {
+    timer: TemporaryTimerInfo | null;
 }
 
 
@@ -26,13 +32,13 @@ interface IUserState {
     name: string;
     status: {
         overall: OverallState,
-        temporary: State
+        temporary: TemporaryState
     };
     userId: string;
 }
 
-const CURRENT_TIMER_PROPERTY_NAME = "currentTimer";
-const USAGE_TIMER_PROPERTY_NAME = "usageTimer";
+const OVERALL_STATE_PROPERTY_NAME = "overall";
+const TEMPORARY_STATE_PROPERTY_NAME = "temporary";
 
 
 interface IUserStateExternal {
@@ -40,7 +46,7 @@ interface IUserStateExternal {
     name: string;
     status: {
         overall: OverallState,
-        temporary: State
+        temporary: TemporaryState
     };
 }
 
@@ -50,7 +56,7 @@ class UserState implements IUserState {
         readonly name: string,
         readonly status: {
             overall: OverallState,
-            temporary: State
+            temporary: TemporaryState
         },
         readonly userId: string,
     ) {
@@ -70,10 +76,13 @@ class UserState implements IUserState {
 
 export {
     UserState,
+    OverallState,
+    TemporaryState,
     SeatId,
     TimerInfo,
+    TemporaryTimerInfo,
     IUserState,
     IUserStateExternal,
-    CURRENT_TIMER_PROPERTY_NAME,
-    USAGE_TIMER_PROPERTY_NAME,
+    OVERALL_STATE_PROPERTY_NAME,
+    TEMPORARY_STATE_PROPERTY_NAME,
 };

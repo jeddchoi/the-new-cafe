@@ -12,12 +12,20 @@ export default class RealtimeDatabaseUtil {
         return this.db.ref(REFERENCE_USER_STATE_NAME).child(userId);
     }
 
-    static getUserSession(userId: string): Reference {
+    static getUserSessionRef(userId: string): Reference {
         return this.db.ref(REFERENCE_USER_SESSION_NAME).child(userId);
     }
-    static getUserHistory(userId: string): Reference {
+    static getUserHistoryRef(userId: string): Reference {
         return this.db.ref(REFERENCE_USER_HISTORY_NAME).child(userId);
+    }
+
+    static deletePath(path: string): Promise<void> {
+        return this.db.ref(path).remove();
     }
 }
 
-
+export {
+    REFERENCE_USER_STATE_NAME,
+    REFERENCE_USER_SESSION_NAME,
+    REFERENCE_USER_HISTORY_NAME,
+};
