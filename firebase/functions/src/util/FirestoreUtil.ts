@@ -1,10 +1,14 @@
-import {getFirestore, Firestore, DocumentReference} from "firebase-admin/firestore";
-import {ISeatPosition} from "../model/UserStatus";
+import {DocumentReference, Firestore, getFirestore, UpdateData} from "firebase-admin/firestore";
+import {Store, storeConverter} from "../model/Store";
+import {Seat, seatConverter} from "../model/Seat";
+import {Section, sectionConverter} from "../model/Section";
+import {
+    COLLECTION_GROUP_SEAT_NAME,
+    COLLECTION_GROUP_SECTION_NAME,
+    COLLECTION_GROUP_STORE_NAME,
+    SeatId,
+} from "../model/SeatId";
 
-
-export const COLLECTION_GROUP_STORE_NAME = "stores";
-export const COLLECTION_GROUP_SECTION_NAME = "sections";
-export const COLLECTION_GROUP_SEAT_NAME = "seats";
 
 /**
  * Utility class for Firestore
@@ -12,19 +16,30 @@ export const COLLECTION_GROUP_SEAT_NAME = "seats";
 export default class FirestoreUtil {
     static db: Firestore = getFirestore();
 
-    static getStore(storeId: string): DocumentReference {
-        return this.db
-            .collection(COLLECTION_GROUP_STORE_NAME).doc(storeId);
+    static getStoreDocRef(storeId: string): DocumentReference<Store> {
+        return FirestoreUtil.db.collection(COLLECTION_GROUP_STORE_NAME).doc(storeId).withConverter(storeConverter);
     }
 
-    static getSection(storeId: string, sectionId: string): DocumentReference {
-        return this.getStore(storeId)
-            .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId);
+    static getSectionDocRef(storeId: string, sectionId: string): DocumentReference<Section> {
+        return this.getStoreDocRef(storeId)
+            .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId).withConverter(sectionConverter);
     }
 
-    static getSeat(seatPosition: ISeatPosition): DocumentReference {
-        return this.getSection(seatPosition.storeId, seatPosition.sectionId)
-            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatPosition.seatId);
+    static getSeatDocRef(seatId: SeatId): DocumentReference<Seat> {
+        return this.getSectionDocRef(seatId.storeId, seatId.sectionId)
+            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatId.seatId).withConverter(seatConverter);
+    }
+
+    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>): Promise<boolean> {
+        return this.db.runTransaction(async (t) => {
+            const data = (await t.get(docRef)).data();
+            if (!predicate(data)) {
+                return false;
+            }
+            const newContent = update(data);
+            t.update(docRef, newContent);
+            return true;
+        });
     }
 }
 

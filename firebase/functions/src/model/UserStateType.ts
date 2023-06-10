@@ -1,4 +1,4 @@
-enum UserStatusType {
+enum UserStateType {
     None,
     Reserved,
     Occupied,
@@ -7,4 +7,4 @@ enum UserStatusType {
     Blocked,
 }
 
-export {UserStatusType};
+export {UserStateType};

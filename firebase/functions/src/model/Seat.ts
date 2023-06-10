@@ -1,8 +1,9 @@
-import {QueryDocumentSnapshot, FirestoreDataConverter, DocumentData} from "firebase-admin/firestore";
+import {DocumentData, FirestoreDataConverter, QueryDocumentSnapshot} from "firebase-admin/firestore";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
+import {SeatId} from "./SeatId";
 
-enum SeatStatusType {
-    None,
+enum SeatStateType {
+    Empty,
     Reserved,
     Occupied,
     Away,
@@ -10,31 +11,27 @@ enum SeatStatusType {
 }
 
 interface ISeat {
-    seatId: string,
-    storeId: string,
-    sectionId: string,
+    seatId: SeatId,
     name: string,
-    status: SeatStatusType,
+    state: SeatStateType,
     isAvailable: boolean,
-    currentUserId?: string,
+    userId: string | null,
 }
 
 interface ISeatExternal {
     name: string,
-    status: number,
+    state: number,
     isAvailable: boolean,
-    currentUserId: string | null,
+    userId: string | null,
 }
 
 class Seat implements ISeat {
     constructor(
-        readonly storeId: string,
-        readonly sectionId: string,
-        readonly seatId: string,
+        readonly seatId: SeatId,
         readonly name: string,
-        readonly status: SeatStatusType,
+        readonly state: SeatStateType,
         readonly isAvailable: boolean,
-        readonly currentUserId?: string,
+        readonly userId: string | null,
     ) {
     }
 }
@@ -42,11 +39,11 @@ class Seat implements ISeat {
 
 const seatConverter: FirestoreDataConverter<Seat> = {
     toFirestore(seat: Seat): DocumentData {
-        return {
+        return <ISeatExternal>{
             name: seat.name,
-            status: seat.status,
+            state: seat.state,
             isAvailable: seat.isAvailable,
-            currentUserId: seat.currentUserId,
+            userId: seat.userId,
         };
     },
     fromFirestore(
@@ -54,14 +51,16 @@ const seatConverter: FirestoreDataConverter<Seat> = {
     ): Seat {
         const data = snapshot.data();
         return new Seat(
-            snapshot.ref.parent.parent?.id ?? throwFunctionsHttpsError("internal", "store doesn't exist"),
-            snapshot.ref.parent.id,
-            snapshot.id,
+            {
+                storeId: snapshot.ref.parent.parent?.id ?? throwFunctionsHttpsError("internal", "store doesn't exist"),
+                sectionId: snapshot.ref.parent.id,
+                seatId: snapshot.id,
+            },
             data.name,
-            data.status,
+            data.state,
             data.isAvailable,
-            data.currentUserId ?? undefined);
+            data.userId ?? null);
     },
 };
 
-export {Seat, ISeat, ISeatExternal, SeatStatusType, seatConverter};
+export {Seat, ISeat, ISeatExternal, SeatStateType, seatConverter};

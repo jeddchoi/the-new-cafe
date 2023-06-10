@@ -1,28 +1,26 @@
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
-import {throwFunctionsHttpsError} from "../util/functions_helper";
-import {IUserStatusChangeExternal, UserStatusChange} from "../model/UserStatusChange";
+import {CompletedUserSession, START_TIME_PROPERTY_NAME} from "../model/UserSession";
 
 export default class UserHistoryHandler {
     // TODO: need to verify
-    static getUserHistoryData(userId: string, perPage: number, startAfter?: Date): Promise<UserStatusChange[]> {
-        let query = RealtimeDatabaseUtil.getUserHistory(userId).orderByKey();
+    static getUserHistoryData(userId: string, perPage: number, startAfter?: Date): Promise<CompletedUserSession[]> {
+        let query = RealtimeDatabaseUtil.getUserHistoryRef(userId).orderByChild(START_TIME_PROPERTY_NAME);
         if (startAfter) {
             query = query.startAfter(startAfter.getTime().toString());
         }
         return query.limitToFirst(perPage).once("value").then((snapshot) => {
-            const result: UserStatusChange[] = [];
+            const result: CompletedUserSession[] = [];
             snapshot.forEach((data) => {
-                result.push(UserStatusChange.fromExternal(userId, parseInt(data.key ?? throwFunctionsHttpsError("not-found", "data key is null")), data.val() as IUserStatusChangeExternal));
+                result.push(data.val() as CompletedUserSession);
             });
             return result;
         });
     }
 
     // TODO: need to verify
-    static getLastUserHistoryData(userId: string): Promise<UserStatusChange> {
-        return RealtimeDatabaseUtil.getUserHistory(userId).orderByKey().limitToLast(1).once("value").then((snapshot) => {
-            const val = snapshot.val() as IUserStatusChangeExternal;
-            return UserStatusChange.fromExternal(userId, parseInt(snapshot.key ?? throwFunctionsHttpsError("not-found", "data key is null")), val);
+    static getLastUserHistoryData(userId: string): Promise<CompletedUserSession> {
+        return RealtimeDatabaseUtil.getUserHistoryRef(userId).orderByChild(START_TIME_PROPERTY_NAME).limitToLast(1).once("value").then((snapshot) => {
+            return snapshot.val() as CompletedUserSession;
         });
     }
 }

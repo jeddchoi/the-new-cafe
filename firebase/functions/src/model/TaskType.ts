@@ -3,6 +3,6 @@ export enum TaskType {
     StopUsageTimer,
     StartCurrentTimer,
     StartUsageTimer,
-    UpdateUserStatus,
-    UpdateSeatStatus,
+    UpdateUserState,
+    UpdateSeatState,
 }

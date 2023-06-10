@@ -1,6 +1,6 @@
-import {initializeApp} from "firebase-admin/app";
-initializeApp();
+// noinspection JSUnusedGlobalSymbols
 
+import {initializeApp} from "firebase-admin/app";
 import {CallableRequest, onCall, onRequest, Request} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
 import {Response} from "express";
@@ -9,14 +9,17 @@ import {MyRequest} from "./model/MyRequest";
 import {requestHandler} from "./handle_request/on_handle_request";
 import {throwFunctionsHttpsError} from "./util/functions_helper";
 
-import {
-    COLLECTION_GROUP_SEAT_NAME,
-    COLLECTION_GROUP_SECTION_NAME,
-    COLLECTION_GROUP_STORE_NAME,
-} from "./util/FirestoreUtil";
 import {countSeatChangeHandler} from "./trigger/count_seat_change";
 import {countSectionChangeHandler} from "./trigger/count_section_change";
+import {logger} from "firebase-functions/v2";
+import {COLLECTION_GROUP_SEAT_NAME, COLLECTION_GROUP_SECTION_NAME, COLLECTION_GROUP_STORE_NAME} from "./model/SeatId";
+import {onValueWritten} from "firebase-functions/v2/database";
+import RealtimeDatabaseUtil, {REFERENCE_USER_STATE_NAME} from "./util/RealtimeDatabaseUtil";
+import {writeOverallTimerHandler} from "./trigger/write_overall_timer";
+import {writeTemporaryTimerHandler} from "./trigger/write_temporary_timer";
+import {writeUserStateStatusHandler} from "./trigger/write_user_state_status";
 
+initializeApp();
 
 /**
  * Callable functions
@@ -28,26 +31,32 @@ export const onHandleRequest =
         if (request.auth === undefined) {
             throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
         }
-        return requestHandler(request.data);
+        return requestHandler(request.data, false);
     });
 
 /**
  * HTTP functions
  */
 
-export const onTimeout =
+export const onDeletePathTimeout =
     onRequest(async (req: Request, res: Response) => {
         try {
-            await requestHandler(req.body as MyRequest);
+            const deletePath = req.body.deletePath;
+            await RealtimeDatabaseUtil.deletePath(deletePath);
+            logger.info("Completed Successfully.");
             res.status(200).send("Completed Successfully.");
         } catch (e) {
+            logger.error("Some error occurred", e);
             res.status(500).send(`Some error occurred. ${e}`);
         }
     });
 
-
 /**
  * Triggered functions
+ */
+
+/**
+ * Update the section's totalAvailableSeats by counting the number of seats for which isAvailable = true
  */
 export const countSeatChange =
     onDocumentWritten(
@@ -56,6 +65,9 @@ export const countSeatChange =
         },
         countSeatChangeHandler);
 
+/**
+ * Update the store's totalAvailableSeats by adding the totalAvailableSeats per section
+ */
 export const countSectionChange =
     onDocumentWritten(
         {
@@ -63,3 +75,34 @@ export const countSectionChange =
         },
         countSectionChangeHandler
     );
+
+/**
+ * Schedule a Cloud task when there is data in UserState's status/overall/timer
+ * If it is fired, delete status of UserState
+ */
+export const writeOverallTimer =
+    onValueWritten(
+        `/${REFERENCE_USER_STATE_NAME}/{userId}/status/overall/timer`,
+        writeOverallTimerHandler
+    );
+
+/**
+ * Schedule a Cloud task when there is data in UserState's status/temporary/timer
+ * If it is fired, delete status of UserState when isReset = true
+ * or delete temporary state of UserState when isReset = false
+ */
+export const writeTemporaryTimer =
+    onValueWritten(
+        `/${REFERENCE_USER_STATE_NAME}/{userId}/status/temporary/timer`,
+        writeTemporaryTimerHandler
+    );
+
+/**
+ * Add state change to UserSession when status is written
+ */
+export const writeUserStateStatus =
+    onValueWritten(
+        `/${REFERENCE_USER_STATE_NAME}/{userId}/status`,
+        writeUserStateStatusHandler
+    );
+
