@@ -3,7 +3,10 @@
 import {initializeApp} from "firebase-admin/app";
 import {CallableRequest, onCall, onRequest, Request} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
+import {onValueWritten} from "firebase-functions/v2/database";
+import {logger} from "firebase-functions/v2";
 import {Response} from "express";
+import {auth} from "firebase-functions";
 
 import {MyRequest} from "./model/MyRequest";
 import {requestHandler} from "./handle_request/on_handle_request";
@@ -11,13 +14,12 @@ import {throwFunctionsHttpsError} from "./util/functions_helper";
 
 import {countSeatChangeHandler} from "./trigger/count_seat_change";
 import {countSectionChangeHandler} from "./trigger/count_section_change";
-import {logger} from "firebase-functions/v2";
 import {COLLECTION_GROUP_SEAT_NAME, COLLECTION_GROUP_SECTION_NAME, COLLECTION_GROUP_STORE_NAME} from "./model/SeatId";
-import {onValueWritten} from "firebase-functions/v2/database";
 import RealtimeDatabaseUtil, {REFERENCE_USER_STATE_NAME} from "./util/RealtimeDatabaseUtil";
 import {writeOverallTimerHandler} from "./trigger/write_overall_timer";
 import {writeTemporaryTimerHandler} from "./trigger/write_temporary_timer";
 import {writeUserStateStatusHandler} from "./trigger/write_user_state_status";
+import {IUserStateExternal} from "./model/UserState";
 
 initializeApp();
 
@@ -104,5 +106,18 @@ export const writeUserStateStatus =
     onValueWritten(
         `/${REFERENCE_USER_STATE_NAME}/{userId}/status`,
         writeUserStateStatusHandler
+    );
+
+
+export const createUserStateOnUserCreate =
+    auth.user().onCreate(
+        (user, context) => {
+            logger.info(`User ${user.uid} created.`);
+            return RealtimeDatabaseUtil.getUserState(user.uid).set(<IUserStateExternal>{
+                name: user.displayName,
+                isOnline: false,
+                status: null,
+            });
+        }
     );
 
