@@ -33,7 +33,7 @@ interface IUserState {
     status: {
         overall: OverallState,
         temporary: TemporaryState
-    };
+    } | null;
     userId: string;
 }
 
@@ -47,7 +47,7 @@ interface IUserStateExternal {
     status: {
         overall: OverallState,
         temporary: TemporaryState
-    };
+    } | null;
 }
 
 class UserState implements IUserState {
@@ -57,7 +57,7 @@ class UserState implements IUserState {
         readonly status: {
             overall: OverallState,
             temporary: TemporaryState
-        },
+        } | null,
         readonly userId: string,
     ) {
     }
