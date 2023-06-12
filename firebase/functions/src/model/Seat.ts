@@ -58,8 +58,8 @@ const seatConverter: FirestoreDataConverter<Seat> = {
         const data = snapshot.data();
         return new Seat(
             {
-                storeId: snapshot.ref.parent.parent?.id ?? throwFunctionsHttpsError("internal", "store doesn't exist"),
-                sectionId: snapshot.ref.parent.id,
+                storeId: snapshot.ref.parent.parent?.parent.parent?.id ?? throwFunctionsHttpsError("internal", "store doesn't exist"),
+                sectionId: snapshot.ref.parent.parent?.id ?? throwFunctionsHttpsError("internal", "section doesn't exist"),
                 seatId: snapshot.id,
             },
             data.name,

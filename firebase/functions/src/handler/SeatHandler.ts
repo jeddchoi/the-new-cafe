@@ -1,10 +1,10 @@
-import {Seat, SeatStateType} from "../model/Seat";
+import {ISeatExternal, SeatStateType} from "../model/Seat";
 import FirestoreUtil from "../util/FirestoreUtil";
 import {SeatPosition} from "../model/SeatPosition";
 
 
 export default class SeatHandler {
-    static getSeatData(seatPosition: SeatPosition): Promise<Seat | undefined> {
+    static getSeatData(seatPosition: SeatPosition): Promise<ISeatExternal | undefined> {
         return FirestoreUtil.getSeatDocRef(seatPosition).get()
             .then((value) => value.data());
     }
@@ -59,15 +59,15 @@ export default class SeatHandler {
 
     static transaction(
         seatPosition: SeatPosition,
-        predicate: (existing: Seat | undefined) => boolean,
-        update: (existing: Seat | undefined) => { [key in keyof Seat]?: Seat[key] }
+        predicate: (existing: ISeatExternal | undefined) => boolean,
+        update: (existing: ISeatExternal | undefined) => { [key in keyof ISeatExternal]?: ISeatExternal[key] }
     ): Promise<boolean> {
         return FirestoreUtil.runTransactionOnSingleRefDoc(FirestoreUtil.getSeatDocRef(seatPosition), predicate, update);
     }
 
     updateSeat(
         seatPosition: SeatPosition,
-        updateContent: { [key in keyof Seat]?: Seat[key] }
+        updateContent: { [key in keyof ISeatExternal]?: ISeatExternal[key] }
     ): Promise<void> {
         return FirestoreUtil.getSeatDocRef(seatPosition).update(updateContent).then();
     }

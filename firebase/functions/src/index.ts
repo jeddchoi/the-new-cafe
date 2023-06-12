@@ -44,6 +44,19 @@ export const onHandleRequest =
 /**
  * HTTP functions
  */
+export const onHandleRequestTest =
+    onRequest(async (req: Request, res: Response) => {
+        try {
+            const userId = req.body.userId as string;
+            const request = UserActionRequest.fromJSON(req.body.request);
+            await requestHandler(userId, request);
+            logger.info("Completed Successfully.");
+            res.status(200).send("Completed Successfully.");
+        } catch (e) {
+            logger.error("Some error occurred", e);
+            res.status(500).send(`Some error occurred. ${e}`);
+        }
+    });
 
 export const onDeletePathTimeout =
     onRequest(async (req: Request, res: Response) => {
