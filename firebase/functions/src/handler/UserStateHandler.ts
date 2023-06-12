@@ -19,7 +19,7 @@ export default class UserStateHandler {
             startTime,
             timer: endTime === null ? null : {
                 endTime,
-                taskName: `${userId}/${UserStateType[UserStateType.Reserved]}/${startTime}`,
+                taskName: this.getTaskName(userId, UserStateType.Reserved, startTime),
             },
             seatPosition,
         });
@@ -39,7 +39,7 @@ export default class UserStateHandler {
                         startTime,
                         timer: endTime === null ? null : {
                             endTime,
-                            taskName: `${userId}/${UserStateType[UserStateType.Occupied]}/${startTime}`,
+                            taskName: this.getTaskName(userId, UserStateType.Occupied, startTime),
                         },
                     },
                 },
@@ -71,6 +71,7 @@ export default class UserStateHandler {
             };
         });
     }
+
     static updateUserTemporaryStateInSession(userId: string, state: UserStateType, startTime: number, endTime: number | null, isReset: boolean) {
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return;
@@ -84,13 +85,17 @@ export default class UserStateHandler {
                         startTime,
                         timer: endTime === null ? null : {
                             endTime,
-                            taskName: `${userId}/${UserStateType[state]}/${startTime}`,
+                            taskName: this.getTaskName(userId, state, startTime),
                             isReset,
                         },
                     },
                 },
             };
         });
+    }
+
+    private static getTaskName(userId: string, state: UserStateType, startTime: number): string {
+        return `${userId}_${UserStateType[state]}_${startTime}`;
     }
 
 

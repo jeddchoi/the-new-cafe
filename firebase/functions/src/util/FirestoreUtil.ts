@@ -16,18 +16,18 @@ import {
 export default class FirestoreUtil {
     static db: Firestore = getFirestore();
 
-    static getStoreDocRef(storeId: string): DocumentReference<IStoreExternal> {
-        return FirestoreUtil.db.collection(COLLECTION_GROUP_STORE_NAME).doc(storeId).withConverter(storeConverter);
+    static getStoreDocRef(storeId: string) {
+        return FirestoreUtil.db.collection(COLLECTION_GROUP_STORE_NAME).doc(storeId);
     }
 
-    static getSectionDocRef(storeId: string, sectionId: string): DocumentReference<ISectionExternal> {
+    static getSectionDocRef(storeId: string, sectionId: string) {
         return this.getStoreDocRef(storeId)
-            .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId).withConverter(sectionConverter);
+            .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId);
     }
 
-    static getSeatDocRef(seatId: SeatPosition): DocumentReference<ISeatExternal> {
+    static getSeatDocRef(seatId: SeatPosition) {
         return this.getSectionDocRef(seatId.storeId, seatId.sectionId)
-            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatId.seatId).withConverter(seatConverter);
+            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatId.seatId);
     }
 
     static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>): Promise<boolean> {
