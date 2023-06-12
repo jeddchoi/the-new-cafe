@@ -27,6 +27,7 @@ import {overallTimerCreatedHandler} from "./trigger/on_overall_timer_written";
 import {temporaryTimerCreatedHandler} from "./trigger/on_temporary_timer_written";
 import {userStateStatusWrittenHandler} from "./trigger/on_user_state_status_written";
 import {authUserCreatedHandler} from "./trigger/on_auth_user_created";
+import {TimeoutRequest} from "./util/CloudTasksUtil";
 
 /**
  * Callable functions
@@ -39,7 +40,7 @@ export const onHandleRequest =
             throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
         }
         const current = new Date().getTime();
-        return requestHandler(request.auth.uid, request.data.requestType, request.data.seatPosition, current, request.data.getEndTime(current));
+        return requestHandler(request.auth.uid, request.data.requestType, request.data.seatPosition, request.data.getEndTime(current), current);
     });
 
 /**
@@ -51,7 +52,7 @@ export const onHandleRequestTest =
             const userId = req.body.userId as string;
             const request = UserActionRequest.fromJSON(req.body.request);
             const current = new Date().getTime();
-            await requestHandler(userId, request.requestType, request.seatPosition, current, request.getEndTime(current));
+            await requestHandler(userId, request.requestType, request.seatPosition, request.getEndTime(current), current);
             logger.info("Completed Successfully.");
             res.status(200).send("Completed Successfully.");
         } catch (e) {
@@ -60,11 +61,11 @@ export const onHandleRequestTest =
         }
     });
 
-export const onDeletePathTimeout =
+export const onTimeout =
     onRequest(async (req: Request, res: Response) => {
         try {
-            const deletePath = req.body.deletePath;
-            await RealtimeDatabaseUtil.deletePath(deletePath);
+            const timeoutRequest = req.body as TimeoutRequest;
+            await requestHandler(timeoutRequest.userId, timeoutRequest.requestType, null, null);
             logger.info("Completed Successfully.");
             res.status(200).send("Completed Successfully.");
         } catch (e) {

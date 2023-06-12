@@ -13,8 +13,8 @@ export async function requestHandler(
     userId: string,
     requestType: RequestType,
     seatPosition: SeatPosition | null,
-    current: number,
     endTime: number | null,
+    current: number = new Date().getTime(),
 ) {
     const promises = [];
     logger.info(`[${current} -> ${endTime}] request: ${requestType} ${seatPosition} by ${userId}`);

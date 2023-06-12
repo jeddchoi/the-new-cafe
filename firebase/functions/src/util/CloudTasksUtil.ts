@@ -2,17 +2,15 @@ import {CloudTasksClient, protos} from "@google-cloud/tasks";
 import {defineString, projectID} from "firebase-functions/params";
 import {logger} from "firebase-functions";
 import {RequestType} from "../model/RequestType";
+import {onTimeout} from "../index";
 
 const tasksQueueName = defineString("TASKS_QUEUE_NAME");
 const tasksLocation = defineString("LOCATION_TASKS");
 const gServiceAccountEmail = defineString("G_SERVICE_ACCOUNT_EMAIL");
 
-export class TimeoutRequest {
-    constructor(
-        readonly requestType: RequestType,
-        readonly userId: string,
-    ) {
-    }
+export interface TimeoutRequest {
+    requestType: RequestType;
+    userId: string;
 }
 
 export default class CloudTasksUtil {
@@ -32,11 +30,15 @@ export default class CloudTasksUtil {
     }
 
     public startRemoveTimer(
-        deletePath: string,
+        userId: string,
+        willRequestType: RequestType,
         scheduleDate: number,
         taskName: string,
     ) {
-        return this.createHttpTaskWithSchedule({deletePath}, "onDeletePathTimeout", Math.round(scheduleDate / 1000), this.getFullTaskName(taskName));
+        return this.createHttpTaskWithSchedule(<TimeoutRequest>{
+            userId,
+            requestType: willRequestType,
+        }, "onTimeout", Math.round(scheduleDate / 1000), this.getFullTaskName(taskName));
     }
 
 
