@@ -1,10 +1,12 @@
 import {UserStateType} from "./UserStateType";
 import {UserStateChangeReason} from "./UserStateChangeReason";
 import {SeatPosition} from "./SeatPosition";
+import {RequestType} from "./RequestType";
 
 interface TimerInfo {
     endTime: number;
     taskName: string;
+    willRequestType: RequestType,
 }
 
 interface TemporaryTimerInfo extends TimerInfo{

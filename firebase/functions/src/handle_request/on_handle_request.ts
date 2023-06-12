@@ -44,7 +44,6 @@ export async function requestHandler(
             break;
         }
         // remove user temporary state, update seat state
-        case RequestType.FinishBusiness:
         case RequestType.ResumeUsing: {
             promises.push(UserStateHandler.removeTemporaryState(userId).then(transformToSeatPosition).then((seatPosition) => {
                 return SeatHandler.resumeUsing(userId, seatPosition);

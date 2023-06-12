@@ -5,7 +5,6 @@ export enum RequestType {
     OccupySeat,
     StopUsingSeat,
     DoBusiness,
-    FinishBusiness,
     ShiftToBusiness,
     LeaveAway,
     ResumeUsing,

@@ -1,9 +1,17 @@
-import {IUserStateExternal, OverallState, SeatPosition, UserState} from "../model/UserState";
+import {
+    IUserStateExternal,
+    OverallState,
+    SeatPosition,
+    TemporaryTimerInfo,
+    TimerInfo,
+    UserState,
+} from "../model/UserState";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {UserStateType} from "../model/UserStateType";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
 import {serializeSeatId} from "../model/SeatPosition";
 import {logger} from "firebase-functions/v2";
+import {RequestType} from "../model/RequestType";
 
 
 export default class UserStateHandler {
@@ -20,9 +28,10 @@ export default class UserStateHandler {
             state: UserStateType.Reserved,
             reason: UserStateChangeReason.UserAction,
             startTime,
-            timer: endTime === null ? null : {
+            timer: endTime === null ? null : <TimerInfo>{
                 endTime,
                 taskName: this.getTaskName(userId, UserStateType.Reserved, startTime),
+                willRequestType: RequestType.CancelReservation,
             },
             seatPosition: serializeSeatId(seatPosition),
         });
@@ -41,9 +50,10 @@ export default class UserStateHandler {
                         state: UserStateType.Occupied,
                         reason: UserStateChangeReason.UserAction,
                         startTime,
-                        timer: endTime === null ? null : {
+                        timer: endTime === null ? null : <TimerInfo>{
                             endTime,
                             taskName: this.getTaskName(userId, UserStateType.Occupied, startTime),
+                            willRequestType: RequestType.StopUsingSeat,
                         },
                     },
                 },
@@ -90,9 +100,10 @@ export default class UserStateHandler {
                         state,
                         reason: UserStateChangeReason.UserAction,
                         startTime,
-                        timer: endTime === null ? null : {
+                        timer: endTime === null ? null : <TemporaryTimerInfo>{
                             endTime,
                             taskName: this.getTaskName(userId, state, startTime),
+                            willRequestType: RequestType.ResumeUsing,
                             isReset,
                         },
                     },
