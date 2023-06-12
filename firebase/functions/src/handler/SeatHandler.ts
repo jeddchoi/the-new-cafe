@@ -30,6 +30,21 @@ export default class SeatHandler {
         });
     }
 
+    static occupySeat(userId: string, seatPosition: SeatPosition, occupyEndTime: number | null) {
+        return this.transaction(seatPosition, (existing) => {
+            if (!existing) return false;
+            if (existing.isAvailable) return false;
+            if (existing.reserveEndTime || existing.state !== SeatStateType.Empty) return false;
+            return existing.userId === userId;
+        }, (existing) => {
+            return {
+                state: SeatStateType.Occupied,
+                reserveEndTime: null,
+                occupyEndTime,
+            };
+        });
+    }
+
     static freeSeat(userId: string, seatPosition: SeatPosition) {
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
@@ -47,16 +62,26 @@ export default class SeatHandler {
     }
 
 
-    static updateSeatInSession(userId: string, seatPosition: SeatPosition, seatState: SeatStateType, reserveEndTime?: number | null, occupyEndTime?: number | null) {
+    static resumeUsing(userId: string, seatPosition : SeatPosition) {
+        return this.transaction(seatPosition, (existing) => {
+            if (!existing) return false;
+            if (existing.isAvailable) return false;
+            return existing.userId === userId;
+        }, () => {
+            return {
+                state: SeatStateType.Occupied,
+            };
+        });
+    }
+
+    static away(userId: string, seatPosition: SeatPosition) {
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
             return existing.userId === userId;
         }, (existing) => {
             return {
-                state: seatState,
-                reserveEndTime,
-                occupyEndTime,
+                state: SeatStateType.Away,
             };
         });
     }

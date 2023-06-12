@@ -39,7 +39,7 @@ export async function requestHandler(
         // update user overall state, update seat state
         case RequestType.OccupySeat: {
             return UserStateHandler.occupySeat(userId, current, endTime).then(transformToSeatPosition).then((seatPosition) => {
-                return SeatHandler.updateSeatInSession(userId, seatPosition, SeatStateType.Occupied, null, endTime);
+                return SeatHandler.occupySeat(userId, seatPosition, endTime);
             });
         }
         // remove user state status  -> trigger -> update seat state
@@ -59,7 +59,7 @@ export async function requestHandler(
             const targetState = request.requestType === RequestType.LeaveAway ? UserStateType.Away : UserStateType.OnBusiness;
             return UserStateHandler.updateUserTemporaryStateInSession(userId, targetState, current, endTime, targetState === UserStateType.Away)
                 .then(transformToSeatPosition).then((seatPosition) => {
-                    return SeatHandler.updateSeatInSession(userId, seatPosition, SeatStateType.Away, undefined, undefined);
+                    return SeatHandler.away(userId, seatPosition);
                 });
         }
         // update user state temporary timer, update seat state

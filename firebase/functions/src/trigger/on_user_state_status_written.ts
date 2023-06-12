@@ -95,7 +95,7 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
 
                 if (after.overall.seatPosition) {
                     promises.push(
-                        SeatHandler.updateSeatInSession(event.params.userId, deserializeSeatId(after.overall.seatPosition), SeatStateType.Occupied)
+                        SeatHandler.resumeUsing(event.params.userId, deserializeSeatId(after.overall.seatPosition))
                     );
                 }
             }
