@@ -17,17 +17,17 @@ export default class FirestoreUtil {
     static db: Firestore = getFirestore();
 
     static getStoreDocRef(storeId: string) {
-        return FirestoreUtil.db.collection(COLLECTION_GROUP_STORE_NAME).doc(storeId);
+        return FirestoreUtil.db.collection(COLLECTION_GROUP_STORE_NAME).withConverter(storeConverter).doc(storeId);
     }
 
     static getSectionDocRef(storeId: string, sectionId: string) {
         return this.getStoreDocRef(storeId)
-            .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId);
+            .collection(COLLECTION_GROUP_SECTION_NAME).withConverter(sectionConverter).doc(sectionId);
     }
 
     static getSeatDocRef(seatId: SeatPosition) {
         return this.getSectionDocRef(seatId.storeId, seatId.sectionId)
-            .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatId.seatId);
+            .collection(COLLECTION_GROUP_SEAT_NAME).withConverter(seatConverter).doc(seatId.seatId);
     }
 
     static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>): Promise<boolean> {

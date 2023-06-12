@@ -1,15 +1,17 @@
-import {ISeatExternal, SeatStateType} from "../model/Seat";
+import {ISeatExternal, Seat, SeatStateType} from "../model/Seat";
 import FirestoreUtil from "../util/FirestoreUtil";
 import {SeatPosition} from "../model/SeatPosition";
+import {logger} from "firebase-functions/v2";
 
 
 export default class SeatHandler {
-    static getSeatData(seatPosition: SeatPosition): Promise<ISeatExternal | undefined> {
+    static getSeatData(seatPosition: SeatPosition) {
         return FirestoreUtil.getSeatDocRef(seatPosition).get()
             .then((value) => value.data());
     }
 
     static reserveSeat(userId: string, seatPosition: SeatPosition, endTime: number | null): Promise<boolean> {
+        logger.debug(`reserveSeat(${userId}, ${seatPosition}, ${endTime})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.userId) return false;
@@ -20,7 +22,6 @@ export default class SeatHandler {
             return existing.isAvailable;
         }, (existing) => {
             return {
-                ...existing,
                 state: SeatStateType.Reserved,
                 isAvailable: false,
                 userId,
@@ -36,12 +37,15 @@ export default class SeatHandler {
             return existing.userId === userId;
         }, (existing) => {
             return {
+                state: SeatStateType.Empty,
+                isAvailable: true,
                 userId: null,
                 reserveEndTime: null,
                 occupyEndTime: null,
             };
         }).then();
     }
+
 
     static updateSeatInSession(userId: string, seatPosition: SeatPosition, seatState: SeatStateType, reserveEndTime?: number | null, occupyEndTime?: number | null): Promise<boolean> {
         return this.transaction(seatPosition, (existing) => {
@@ -59,8 +63,8 @@ export default class SeatHandler {
 
     static transaction(
         seatPosition: SeatPosition,
-        predicate: (existing: ISeatExternal | undefined) => boolean,
-        update: (existing: ISeatExternal | undefined) => { [key in keyof ISeatExternal]?: ISeatExternal[key] }
+        predicate: (existing: Seat | undefined) => boolean,
+        update: (existing: Seat | undefined) => { [key in keyof ISeatExternal]?: ISeatExternal[key] }
     ): Promise<boolean> {
         return FirestoreUtil.runTransactionOnSingleRefDoc(FirestoreUtil.getSeatDocRef(seatPosition), predicate, update);
     }

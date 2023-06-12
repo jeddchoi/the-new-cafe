@@ -1,7 +1,8 @@
-import {IUserStateExternal, SeatPosition, UserState} from "../model/UserState";
+import {IUserStateExternal, OverallState, SeatPosition, UserState} from "../model/UserState";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {UserStateType} from "../model/UserStateType";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
+import {serializeSeatId} from "../model/SeatPosition";
 
 
 export default class UserStateHandler {
@@ -13,7 +14,7 @@ export default class UserStateHandler {
     }
 
     static reserveSeat(userId: string, seatPosition: SeatPosition, startTime: number, endTime: number | null): Promise<void> {
-        return RealtimeDatabaseUtil.getUserState(userId).child("status/overall").update({
+        return RealtimeDatabaseUtil.getUserState(userId).child("status/overall").update(<OverallState>{
             state: UserStateType.Reserved,
             reason: UserStateChangeReason.UserAction,
             startTime,
@@ -21,7 +22,7 @@ export default class UserStateHandler {
                 endTime,
                 taskName: this.getTaskName(userId, UserStateType.Reserved, startTime),
             },
-            seatPosition,
+            seatPosition: serializeSeatId(seatPosition),
         });
     }
 
@@ -30,7 +31,7 @@ export default class UserStateHandler {
             if (!existing) return;
             if (!existing.status) return;
             if (!existing.status.overall.seatPosition) return;
-            return {
+            return <IUserStateExternal>{
                 ...existing,
                 status: {
                     overall: {
@@ -52,7 +53,7 @@ export default class UserStateHandler {
             if (!existing) return;
             if (!existing.status) return;
 
-            return {
+            return <IUserStateExternal>{
                 ...existing,
                 status: null,
             };
@@ -63,7 +64,7 @@ export default class UserStateHandler {
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return;
             if (!existing.status) return;
-            return {
+            return <IUserStateExternal>{
                 ...existing,
                 status: {
                     temporary: null,
@@ -75,8 +76,8 @@ export default class UserStateHandler {
     static updateUserTemporaryStateInSession(userId: string, state: UserStateType, startTime: number, endTime: number | null, isReset: boolean) {
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return;
-            if (!existing.status) return; // abort
-            return {
+            if (!existing.status) return;
+            return <IUserStateExternal>{
                 ...existing,
                 status: {
                     temporary: {

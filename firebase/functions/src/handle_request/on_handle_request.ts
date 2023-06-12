@@ -8,6 +8,7 @@ import {SeatStateType} from "../model/Seat";
 import {deserializeSeatId} from "../model/SeatPosition";
 import {UserStateType} from "../model/UserStateType";
 import {TransactionResult} from "@firebase/database-types";
+import {logger} from "firebase-functions/v2";
 
 
 function transformToSeatPosition(result: TransactionResult) {
@@ -25,6 +26,7 @@ export async function requestHandler(
 ) {
     const current = new Date().getTime();
     const endTime = request.getEndTime(current);
+    logger.info(`[${current} -> ${endTime}] request: ${JSON.stringify(request)}`);
 
     switch (request.requestType) {
         // after reserve seat, update user state
@@ -40,19 +42,15 @@ export async function requestHandler(
                 return SeatHandler.updateSeatInSession(userId, seatPosition, SeatStateType.Occupied, null, endTime);
             });
         }
-        // remove user state status, update seat state
+        // remove user state status  -> trigger -> update seat state
         case RequestType.CancelReservation:
         case RequestType.StopUsingSeat: {
-            return UserStateHandler.quit(userId).then(transformToSeatPosition).then((seatPosition) => {
-                return SeatHandler.freeSeat(userId, seatPosition);
-            });
+            return UserStateHandler.quit(userId);
         }
-        // remove user temporary state, update seat state
+        // remove user temporary state -> trigger -> update seat state
         case RequestType.FinishBusiness:
         case RequestType.ResumeUsing: {
-            return UserStateHandler.removeTemporaryState(userId).then(transformToSeatPosition).then((seatPosition) => {
-                return SeatHandler.updateSeatInSession(userId, seatPosition, SeatStateType.Occupied, undefined, undefined);
-            });
+            return UserStateHandler.removeTemporaryState(userId);
         }
         // update user temporary state, update seat state
         case RequestType.DoBusiness:

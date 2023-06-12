@@ -44,7 +44,7 @@ class Seat implements ISeat {
 
 
 const seatConverter: FirestoreDataConverter<Seat> = {
-    toFirestore(seat: Seat): DocumentData {
+    toFirestore(seat: Seat) {
         return <ISeatExternal>{
             name: seat.name,
             state: seat.state,
@@ -54,7 +54,7 @@ const seatConverter: FirestoreDataConverter<Seat> = {
     },
     fromFirestore(
         snapshot: QueryDocumentSnapshot<ISeatExternal>
-    ): Seat {
+    ) {
         const data = snapshot.data();
         return new Seat(
             {

@@ -6,6 +6,9 @@ import {UserSession, UserStateChange} from "../model/UserSession";
 import * as util from "util";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
 import {UserStateType} from "../model/UserStateType";
+import SeatHandler from "../handler/SeatHandler";
+import {deserializeSeatId} from "../model/SeatPosition";
+import {SeatStateType} from "../model/Seat";
 
 export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSnapshot>, { userId: string }>) => {
     const promises = [];
@@ -90,11 +93,11 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
                     reason: UserStateChangeReason.Timeout,
                 }));
 
-                // if (after.overall.seatPosition) {
-                //     promises.push(
-                //         SeatHandler.updateSeatInSession(event.params.userId, deserializeSeatId(after.overall.seatPosition), after.overall.state)
-                //     );
-                // }
+                if (after.overall.seatPosition) {
+                    promises.push(
+                        SeatHandler.updateSeatInSession(event.params.userId, deserializeSeatId(after.overall.seatPosition), SeatStateType.Occupied)
+                    );
+                }
             }
         }
     } else if (event.data.before.exists() && !event.data.after.exists()) { // if status is deleted (e.g. Stop using seat)
@@ -116,15 +119,10 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
             });
         }).then(() => {
             return sessionRef.remove();
-        })
-        //     .then(() => {
-        //     if (before.overall.seatPosition) {
-        //         return SeatHandler.freeSeat(event.params.userId, deserializeSeatId(before.overall.seatPosition));
-        //     } else {
-        //         return Promise.resolve();
-        //     }
-        // })
-        );
+        }));
+        if (before.overall.seatPosition) {
+            promises.push(SeatHandler.freeSeat(event.params.userId, deserializeSeatId(before.overall.seatPosition)));
+        }
     }
     return Promise.all(promises);
 };
