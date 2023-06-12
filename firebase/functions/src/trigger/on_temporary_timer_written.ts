@@ -19,9 +19,8 @@ export const temporaryTimerCreatedHandler = (event: DatabaseEvent<DataSnapshot, 
     if (event.data.exists()) {
         const newTimer = event.data.val() as TimerInfo;
         promises.push(timer.startRemoveTimer(
-            newTimer.willRequestType === RequestType.StopUsingSeat ?
-                `/${REFERENCE_USER_STATE_NAME}/${event.params.userId}/status` :
-                `/${REFERENCE_USER_STATE_NAME}/${event.params.userId}/status/temporary`,
+            event.params.userId,
+            newTimer.willRequestType,
             newTimer.endTime,
             newTimer.taskName));
     }

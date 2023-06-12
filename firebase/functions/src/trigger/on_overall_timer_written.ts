@@ -17,7 +17,12 @@ export const overallTimerCreatedHandler = (event: DatabaseEvent<DataSnapshot, { 
 
     if (event.data.exists()) {
         const newTimer = event.data.val() as TimerInfo;
-        promises.push(timer.startRemoveTimer(`/${REFERENCE_USER_STATE_NAME}/${event.params.userId}/status`, newTimer.endTime, newTimer.taskName));
+        promises.push(timer.startRemoveTimer(
+            event.params.userId,
+            newTimer.willRequestType,
+            newTimer.endTime,
+            newTimer.taskName
+        ));
     }
 
     return Promise.all(promises);
