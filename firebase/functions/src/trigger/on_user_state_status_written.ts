@@ -8,9 +8,10 @@ import {UserStateChangeReason} from "../model/UserStateChangeReason";
 import {UserStateType} from "../model/UserStateType";
 import SeatHandler from "../handler/SeatHandler";
 import {deserializeSeatId} from "../model/SeatPosition";
-import {SeatStateType} from "../model/Seat";
+import {logger} from "firebase-functions/v2";
 
 export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSnapshot>, { userId: string }>) => {
+    logger.debug(`userStateStatusWrittenHandler ${event.params.userId}`);
     const promises = [];
     const sessionRef = RealtimeDatabaseUtil.getUserSessionRef(event.params.userId);
     const stateChangesRef = sessionRef.child("stateChanges");
@@ -49,24 +50,6 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
                     timestamp: eventTimestamp,
                     reason: after.overall.reason,
                 }));
-
-                // if (after.overall.seatPosition) {
-                //     let reserveEndTime;
-                //     let occupyEndTime;
-                //     if (before.overall.state === UserStateType.Reserved && after.overall.state === UserStateType.Occupied) {
-                //         reserveEndTime = null;
-                //         occupyEndTime = after.overall.timer?.endTime;
-                //     }
-                //     promises.push(
-                //         SeatHandler.updateSeatInSession(
-                //             event.params.userId,
-                //             deserializeSeatId(after.overall.seatPosition),
-                //             after.overall.state,
-                //             reserveEndTime,
-                //             occupyEndTime
-                //         )
-                //     );
-                // }
             }
         } else if (!util.isDeepStrictEqual(before.temporary, after.temporary)) { // same overall, different temporary
             if (after.temporary && before.temporary?.state !== after.temporary.state) { // when after.temporary exists and different state
@@ -75,16 +58,6 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
                     timestamp: eventTimestamp,
                     reason: after.temporary.reason,
                 }));
-                // if (after.overall.seatPosition) {
-                //     promises.push(
-                //         SeatHandler.updateSeatInSession(
-                //             event.params.userId,
-                //             deserializeSeatId(after.overall.seatPosition),
-                //             after.temporary.state,
-                //             after.overall.timer?.endTime,
-                //         )
-                //     );
-                // }
             }
             if (before.temporary && !after.temporary) { // when deleted temporary
                 promises.push(stateChangesRef.push(<UserStateChange>{

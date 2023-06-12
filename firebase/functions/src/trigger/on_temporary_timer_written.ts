@@ -3,8 +3,10 @@ import {TemporaryTimerInfo} from "../model/UserState";
 import {REFERENCE_USER_STATE_NAME} from "../util/RealtimeDatabaseUtil";
 import {DatabaseEvent, DataSnapshot} from "firebase-functions/v2/database";
 import {Change} from "firebase-functions/v2/firestore";
+import {logger} from "firebase-functions/v2";
 
 export const temporaryTimerWrittenHandler = (event: DatabaseEvent<Change<DataSnapshot>, { userId: string }>) => {
+    logger.debug(`temporaryTimerWrittenHandler ${event.params.userId}`);
     const timer = new CloudTasksUtil();
     const promises = [];
     if (event.data.before.exists()) {

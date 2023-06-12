@@ -1,4 +1,4 @@
-import {Database, getDatabase, Reference} from "firebase-admin/database";
+import {Database, getDatabase} from "firebase-admin/database";
 
 const REFERENCE_USER_STATE_NAME = "user_state";
 const REFERENCE_USER_SESSION_NAME = "user_session";

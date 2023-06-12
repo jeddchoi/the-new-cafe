@@ -1,4 +1,3 @@
-import {IStoreExternal} from "../model/Store";
 import FirestoreUtil from "../util/FirestoreUtil";
 
 export default class StoreHandler {

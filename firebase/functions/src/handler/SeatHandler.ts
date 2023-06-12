@@ -11,7 +11,7 @@ export default class SeatHandler {
     }
 
     static reserveSeat(userId: string, seatPosition: SeatPosition, endTime: number | null) {
-        logger.debug(`reserveSeat(${userId}, ${seatPosition}, ${endTime})`);
+        logger.debug(`[SeatHandler] reserveSeat(${userId}, ${seatPosition}, ${endTime})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.userId) return false;
@@ -31,6 +31,7 @@ export default class SeatHandler {
     }
 
     static occupySeat(userId: string, seatPosition: SeatPosition, occupyEndTime: number | null) {
+        logger.debug(`[SeatHandler] occupySeat(${userId}, ${seatPosition}, ${occupyEndTime})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
@@ -46,6 +47,7 @@ export default class SeatHandler {
     }
 
     static freeSeat(userId: string, seatPosition: SeatPosition) {
+        logger.debug(`[SeatHandler] freeSeat(${userId}, ${seatPosition})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
@@ -63,6 +65,7 @@ export default class SeatHandler {
 
 
     static resumeUsing(userId: string, seatPosition : SeatPosition) {
+        logger.debug(`[SeatHandler] resumeUsing(${userId}, ${seatPosition})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
@@ -75,6 +78,7 @@ export default class SeatHandler {
     }
 
     static away(userId: string, seatPosition: SeatPosition) {
+        logger.debug(`[SeatHandler] away(${userId}, ${seatPosition})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;

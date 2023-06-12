@@ -3,6 +3,7 @@ import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {UserStateType} from "../model/UserStateType";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
 import {serializeSeatId} from "../model/SeatPosition";
+import {logger} from "firebase-functions/v2";
 
 
 export default class UserStateHandler {
@@ -14,6 +15,7 @@ export default class UserStateHandler {
     }
 
     static reserveSeat(userId: string, seatPosition: SeatPosition, startTime: number, endTime: number | null) {
+        logger.debug(`[UserStateHandler] reserveSeat(${userId}, ${seatPosition}, ${startTime}, ${endTime})`);
         return RealtimeDatabaseUtil.getUserState(userId).child("status/overall").update(<OverallState>{
             state: UserStateType.Reserved,
             reason: UserStateChangeReason.UserAction,
@@ -27,6 +29,7 @@ export default class UserStateHandler {
     }
 
     static occupySeat(userId: string, startTime: number, endTime: number | null) {
+        logger.debug(`[UserStateHandler] occupySeat(${userId}, ${startTime}, ${endTime})`);
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return;
             if (!existing.status) return;
@@ -49,6 +52,7 @@ export default class UserStateHandler {
     }
 
     static quit(userId: string) {
+        logger.debug(`[UserStateHandler] quit(${userId})`);
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return;
             if (!existing.status) return;
@@ -61,6 +65,7 @@ export default class UserStateHandler {
     }
 
     static removeTemporaryState(userId: string) {
+        logger.debug(`[UserStateHandler] removeTemporaryState(${userId})`);
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return;
             if (!existing.status) return;
@@ -74,6 +79,7 @@ export default class UserStateHandler {
     }
 
     static updateUserTemporaryStateInSession(userId: string, state: UserStateType, startTime: number, endTime: number | null, isReset: boolean) {
+        logger.debug(`[UserStateHandler] updateUserTemporaryStateInSession(${userId}, ${state}, ${startTime}, ${endTime}, ${isReset})`);
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return;
             if (!existing.status) return;

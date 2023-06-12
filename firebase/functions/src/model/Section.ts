@@ -1,4 +1,4 @@
-import {FirestoreDataConverter, DocumentData, QueryDocumentSnapshot} from "firebase-admin/firestore";
+import {FirestoreDataConverter, QueryDocumentSnapshot} from "firebase-admin/firestore";
 
 interface ISection {
     uid: string,

@@ -1,4 +1,4 @@
-import {DocumentData, FirestoreDataConverter, QueryDocumentSnapshot} from "firebase-admin/firestore";
+import {FirestoreDataConverter, QueryDocumentSnapshot} from "firebase-admin/firestore";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import {SeatPosition} from "./SeatPosition";
 

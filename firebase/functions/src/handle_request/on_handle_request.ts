@@ -4,7 +4,6 @@ import SeatHandler from "../handler/SeatHandler";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import UserStateHandler from "../handler/UserStateHandler";
 import {IUserStateExternal} from "../model/UserState";
-import {SeatStateType} from "../model/Seat";
 import {deserializeSeatId} from "../model/SeatPosition";
 import {UserStateType} from "../model/UserStateType";
 import {TransactionResult} from "@firebase/database-types";

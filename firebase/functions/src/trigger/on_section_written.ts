@@ -8,6 +8,7 @@ import {throwFunctionsHttpsError} from "../util/functions_helper";
 export const sectionWrittenHandler = async (
     event: FirestoreEvent<Change<DocumentSnapshot> | undefined, { storeId: string, sectionId: string }>,
 ) => {
+    logger.debug(`sectionWrittenHandler ${event.params.storeId} ${event.params.sectionId}`);
     const beforeSection = event.data?.before?.data() as ISectionExternal | null;
     const afterSection = event.data?.after?.data() as ISectionExternal | null;
     const storeRef = event.data?.after?.ref?.parent?.parent ?? throwFunctionsHttpsError("not-found", "store not found");

@@ -8,6 +8,7 @@ import {throwFunctionsHttpsError} from "../util/functions_helper";
 export const seatWrittenHandler = async (
     event: FirestoreEvent<Change<DocumentSnapshot> | undefined, { storeId: string, sectionId: string, seatId: string }>
 ) => {
+    logger.debug(`seatWrittenHandler ${event.params.storeId} ${event.params.sectionId} ${event.params.seatId}`);
     const promises = [];
     const beforeSeat = event.data?.before?.data() as ISeatExternal | null;
     const afterSeat = event.data?.after?.data() as ISeatExternal | null;

@@ -1,7 +1,7 @@
 import {DocumentReference, Firestore, getFirestore, UpdateData} from "firebase-admin/firestore";
-import {IStoreExternal, Store, storeConverter} from "../model/Store";
-import {ISeatExternal, Seat, seatConverter} from "../model/Seat";
-import {ISectionExternal, Section, sectionConverter} from "../model/Section";
+import {storeConverter} from "../model/Store";
+import {seatConverter} from "../model/Seat";
+import {sectionConverter} from "../model/Section";
 import {
     COLLECTION_GROUP_SEAT_NAME,
     COLLECTION_GROUP_SECTION_NAME,

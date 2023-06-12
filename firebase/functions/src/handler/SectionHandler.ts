@@ -1,4 +1,3 @@
-import {ISectionExternal} from "../model/Section";
 import FirestoreUtil from "../util/FirestoreUtil";
 
 
