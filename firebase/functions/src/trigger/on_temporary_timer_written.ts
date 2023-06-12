@@ -11,7 +11,9 @@ export const temporaryTimerWrittenHandler = (event: DatabaseEvent<Change<DataSna
     const promises = [];
     if (event.data.before.exists()) {
         const existingTimer = event.data.before.val() as TemporaryTimerInfo;
-        promises.push(timer.cancelTimer(existingTimer.taskName));
+        if (existingTimer.endTime > Date.now()) {
+            promises.push(timer.cancelTimer(existingTimer.taskName));
+        }
     }
 
     if (event.data.after.exists()) {

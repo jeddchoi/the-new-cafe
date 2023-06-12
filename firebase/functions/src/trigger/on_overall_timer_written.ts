@@ -11,7 +11,9 @@ export const overallTimerWrittenHandler = (event: DatabaseEvent<Change<DataSnaps
     const promises = [];
     if (event.data.before.exists()) {
         const existingTimer = event.data.before.val() as TimerInfo;
-        promises.push(timer.cancelTimer(existingTimer.taskName));
+        if (existingTimer.endTime > Date.now()) {
+            promises.push(timer.cancelTimer(existingTimer.taskName));
+        }
     }
 
     if (event.data.after.exists()) {
