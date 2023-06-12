@@ -6,8 +6,8 @@ import {
     COLLECTION_GROUP_SEAT_NAME,
     COLLECTION_GROUP_SECTION_NAME,
     COLLECTION_GROUP_STORE_NAME,
-    SeatId,
-} from "../model/SeatId";
+    SeatPosition,
+} from "../model/SeatPosition";
 
 
 /**
@@ -25,20 +25,20 @@ export default class FirestoreUtil {
             .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId).withConverter(sectionConverter);
     }
 
-    static getSeatDocRef(seatId: SeatId): DocumentReference<Seat> {
+    static getSeatDocRef(seatId: SeatPosition): DocumentReference<Seat> {
         return this.getSectionDocRef(seatId.storeId, seatId.sectionId)
             .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatId.seatId).withConverter(seatConverter);
     }
 
-    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>): Promise<boolean> {
+    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>): Promise<void> {
         return this.db.runTransaction(async (t) => {
             const data = (await t.get(docRef)).data();
             if (!predicate(data)) {
-                return false;
+                return;
             }
             const newContent = update(data);
             t.update(docRef, newContent);
-            return true;
+            return;
         });
     }
 }

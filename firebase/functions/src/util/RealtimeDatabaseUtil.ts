@@ -15,6 +15,7 @@ export default class RealtimeDatabaseUtil {
     static getUserSessionRef(userId: string): Reference {
         return this.db.ref(REFERENCE_USER_SESSION_NAME).child(userId);
     }
+
     static getUserHistoryRef(userId: string): Reference {
         return this.db.ref(REFERENCE_USER_HISTORY_NAME).child(userId);
     }

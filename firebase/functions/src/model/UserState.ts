@@ -1,6 +1,6 @@
 import {UserStateType} from "./UserStateType";
 import {UserStateChangeReason} from "./UserStateChangeReason";
-import {SeatId} from "./SeatId";
+import {SeatPosition} from "./SeatPosition";
 
 interface TimerInfo {
     endTime: number;
@@ -19,7 +19,7 @@ interface State {
 }
 
 interface OverallState extends State{
-    seatId: string | null;
+    seatPosition: string | null;
 }
 
 interface TemporaryState extends State {
@@ -78,7 +78,7 @@ export {
     UserState,
     OverallState,
     TemporaryState,
-    SeatId,
+    SeatPosition,
     TimerInfo,
     TemporaryTimerInfo,
     IUserState,

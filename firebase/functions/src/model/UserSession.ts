@@ -1,4 +1,4 @@
-import {SeatId} from "./SeatId";
+import {SeatPosition} from "./SeatPosition";
 import {UserStateChangeReason} from "./UserStateChangeReason";
 
 interface UserStateChange {
@@ -11,7 +11,7 @@ interface UserStateChange {
 interface UserSession {
     startTime: number;
     endTime: number | null;
-    seatId: SeatId | null;
+    seatPosition: SeatPosition | null;
     stateChanges: { [pushKey: string]: UserStateChange };
 }
 

@@ -8,27 +8,32 @@ import {logger} from "firebase-functions/v2";
 import {Response} from "express";
 import {auth} from "firebase-functions";
 
-import {MyRequest} from "./model/MyRequest";
+import {UserActionRequest} from "./model/UserActionRequest";
 import {requestHandler} from "./handle_request/on_handle_request";
 import {throwFunctionsHttpsError} from "./util/functions_helper";
 
-import {countSeatChangeHandler} from "./trigger/count_seat_change";
-import {countSectionChangeHandler} from "./trigger/count_section_change";
-import {COLLECTION_GROUP_SEAT_NAME, COLLECTION_GROUP_SECTION_NAME, COLLECTION_GROUP_STORE_NAME} from "./model/SeatId";
+import {seatWrittenHandler} from "./trigger/on_seat_written";
+import {sectionWrittenHandler} from "./trigger/on_section_written";
+import {
+    COLLECTION_GROUP_SEAT_NAME,
+    COLLECTION_GROUP_SECTION_NAME,
+    COLLECTION_GROUP_STORE_NAME,
+} from "./model/SeatPosition";
 import RealtimeDatabaseUtil, {REFERENCE_USER_STATE_NAME} from "./util/RealtimeDatabaseUtil";
-import {writeOverallTimerHandler} from "./trigger/write_overall_timer";
-import {writeTemporaryTimerHandler} from "./trigger/write_temporary_timer";
-import {writeUserStateStatusHandler} from "./trigger/write_user_state_status";
+import {overallTimerWrittenHandler} from "./trigger/on_overall_timer_written";
+import {temporaryTimerWrittenHandler} from "./trigger/on_temporary_timer_written";
+import {userStateStatusWrittenHandler} from "./trigger/on_user_state_status_written";
 import {IUserStateExternal} from "./model/UserState";
 
 initializeApp();
+
 
 /**
  * Callable functions
  */
 export const onHandleRequest =
-    onCall<MyRequest, Promise<void>>((
-        request: CallableRequest<MyRequest>,
+    onCall<UserActionRequest, Promise<void>>((
+        request: CallableRequest<UserActionRequest>,
     ): Promise<void> => {
         if (request.auth === undefined) {
             throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
@@ -60,32 +65,33 @@ export const onDeletePathTimeout =
 /**
  * Update the section's totalAvailableSeats by counting the number of seats for which isAvailable = true
  */
-export const countSeatChange =
+export const onSeatWritten =
     onDocumentWritten(
         {
             document: `${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}/${COLLECTION_GROUP_SEAT_NAME}/{seatId}`,
         },
-        countSeatChangeHandler);
+        seatWrittenHandler);
 
 /**
  * Update the store's totalAvailableSeats by adding the totalAvailableSeats per section
  */
-export const countSectionChange =
+export const onSectionWritten =
     onDocumentWritten(
         {
             document: `${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}`,
         },
-        countSectionChangeHandler
+        sectionWrittenHandler
     );
+
 
 /**
  * Schedule a Cloud task when there is data in UserState's status/overall/timer
  * If it is fired, delete status of UserState
  */
-export const writeOverallTimer =
+export const onOverallTimerWritten =
     onValueWritten(
         `/${REFERENCE_USER_STATE_NAME}/{userId}/status/overall/timer`,
-        writeOverallTimerHandler
+        overallTimerWrittenHandler
     );
 
 /**
@@ -93,25 +99,27 @@ export const writeOverallTimer =
  * If it is fired, delete status of UserState when isReset = true
  * or delete temporary state of UserState when isReset = false
  */
-export const writeTemporaryTimer =
+export const onTemporaryTimerWritten =
     onValueWritten(
         `/${REFERENCE_USER_STATE_NAME}/{userId}/status/temporary/timer`,
-        writeTemporaryTimerHandler
+        temporaryTimerWrittenHandler
     );
 
 /**
  * Add state change to UserSession when status is written
  */
-export const writeUserStateStatus =
+export const onUserStateStatusWritten =
     onValueWritten(
         `/${REFERENCE_USER_STATE_NAME}/{userId}/status`,
-        writeUserStateStatusHandler
+        userStateStatusWrittenHandler
     );
 
-
-export const createUserStateOnUserCreate =
+/**
+ * Create user state when auth user is created
+ */
+export const onAuthUserCreated =
     auth.user().onCreate(
-        (user, context) => {
+        (user) => {
             logger.info(`User ${user.uid} created.`);
             return RealtimeDatabaseUtil.getUserState(user.uid).set(<IUserStateExternal>{
                 name: user.displayName,

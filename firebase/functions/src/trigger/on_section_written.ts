@@ -1,11 +1,11 @@
 import {logger} from "firebase-functions/v2";
-import {FirestoreEvent, Change, DocumentSnapshot} from "firebase-functions/v2/firestore";
+import {Change, DocumentSnapshot, FirestoreEvent} from "firebase-functions/v2/firestore";
 import {FieldValue} from "firebase-admin/firestore";
 import {ISectionExternal} from "../model/Section";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 
 
-export const countSectionChangeHandler = async (
+export const sectionWrittenHandler = async (
     event: FirestoreEvent<Change<DocumentSnapshot> | undefined, { storeId: string, sectionId: string }>,
 ) => {
     const beforeSection = event.data?.before?.data() as ISectionExternal | null;

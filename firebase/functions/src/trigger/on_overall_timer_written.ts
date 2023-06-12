@@ -4,7 +4,7 @@ import CloudTasksUtil from "../util/CloudTasksUtil";
 import {TimerInfo} from "../model/UserState";
 import {REFERENCE_USER_STATE_NAME} from "../util/RealtimeDatabaseUtil";
 
-export const writeOverallTimerHandler = (event: DatabaseEvent<Change<DataSnapshot>, { userId: string }>) => {
+export const overallTimerWrittenHandler = (event: DatabaseEvent<Change<DataSnapshot>, { userId: string }>) => {
     const timer = new CloudTasksUtil();
     const promises = [];
     if (event.data.before.exists()) {
@@ -14,7 +14,7 @@ export const writeOverallTimerHandler = (event: DatabaseEvent<Change<DataSnapsho
 
     if (event.data.after.exists()) {
         const newTimer = event.data.after.val() as TimerInfo;
-        promises.push(timer.startRemoveTimer(`/${REFERENCE_USER_STATE_NAME}/${event.params.userId}/status`, newTimer.endTime));
+        promises.push(timer.startRemoveTimer(`/${REFERENCE_USER_STATE_NAME}/${event.params.userId}/status`, newTimer.endTime, newTimer.taskName));
     }
 
     return Promise.all(promises);

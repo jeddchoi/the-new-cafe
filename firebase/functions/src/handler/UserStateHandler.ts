@@ -1,5 +1,7 @@
-import {IUserStateExternal, UserState} from "../model/UserState";
+import {IUserStateExternal, SeatPosition, UserState} from "../model/UserState";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
+import {UserStateType} from "../model/UserStateType";
+import {UserStateChangeReason} from "../model/UserStateChangeReason";
 
 
 export default class UserStateHandler {
@@ -7,6 +9,19 @@ export default class UserStateHandler {
         return RealtimeDatabaseUtil.getUserState(uid).once("value").then((snapshot) => {
             const val = snapshot.val() as IUserStateExternal;
             return UserState.fromExternal(uid, val);
+        });
+    }
+
+    static reserveSeat(userId: string, seatPosition: SeatPosition, startTime: number, endTime: number | null): Promise<void> {
+        return RealtimeDatabaseUtil.getUserState(userId).child("status/overall").update({
+            state: UserStateType.Reserved,
+            reason: UserStateChangeReason.UserAction,
+            startTime,
+            timer: endTime === null ? null : {
+                endTime,
+                taskName: `${userId}/reserve/${startTime}`,
+            },
+            seatPosition,
         });
     }
 

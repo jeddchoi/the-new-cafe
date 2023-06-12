@@ -25,7 +25,7 @@ export default class CloudTasksUtil {
     public startRemoveTimer(
         deletePath: string,
         scheduleDate: number,
-        taskName: string | null = null,
+        taskName: string,
     ): Promise<protos.google.cloud.tasks.v2.ITask> {
         return this.createHttpTaskWithSchedule({deletePath}, "onDeletePathTimeout", Math.round(scheduleDate / 1000), taskName);
     }

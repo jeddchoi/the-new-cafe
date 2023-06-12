@@ -1,8 +1,8 @@
-import {MyRequest} from "../model/MyRequest";
+import {UserActionRequest} from "../model/UserActionRequest";
 
 
 export async function requestHandler(
-    request: MyRequest,
+    request: UserActionRequest,
     isTimeout: boolean,
 ): Promise<void> {
     return Promise.resolve();

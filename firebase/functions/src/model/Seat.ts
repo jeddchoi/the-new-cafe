@@ -1,6 +1,6 @@
 import {DocumentData, FirestoreDataConverter, QueryDocumentSnapshot} from "firebase-admin/firestore";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
-import {SeatId} from "./SeatId";
+import {SeatPosition} from "./SeatPosition";
 
 enum SeatStateType {
     Empty,
@@ -11,11 +11,13 @@ enum SeatStateType {
 }
 
 interface ISeat {
-    seatId: SeatId,
+    seatPosition: SeatPosition,
     name: string,
     state: SeatStateType,
     isAvailable: boolean,
     userId: string | null,
+    reserveEndTime: number | null,
+    occupyEndTime: number | null,
 }
 
 interface ISeatExternal {
@@ -23,15 +25,19 @@ interface ISeatExternal {
     state: number,
     isAvailable: boolean,
     userId: string | null,
+    reserveEndTime: number | null,
+    occupyEndTime: number | null,
 }
 
 class Seat implements ISeat {
     constructor(
-        readonly seatId: SeatId,
+        readonly seatPosition: SeatPosition,
         readonly name: string,
         readonly state: SeatStateType,
         readonly isAvailable: boolean,
         readonly userId: string | null,
+        readonly reserveEndTime: number | null,
+        readonly occupyEndTime: number | null,
     ) {
     }
 }
@@ -59,7 +65,10 @@ const seatConverter: FirestoreDataConverter<Seat> = {
             data.name,
             data.state,
             data.isAvailable,
-            data.userId ?? null);
+            data.userId ?? null,
+            data.reserveEndTime,
+            data.occupyEndTime,
+        );
     },
 };
 
