@@ -98,25 +98,4 @@ export default class UserStateHandler {
     private static getTaskName(userId: string, state: UserStateType, startTime: number): string {
         return `${userId}_${UserStateType[state]}_${startTime}`;
     }
-
-
-    // static updateUserStateData(userId: string, updateContent: { [key in keyof IUserStateExternal]?: IUserStateExternal[key] }): Promise<void> {
-    //     return RealtimeDatabaseUtil.getUserState(userId).update(updateContent);
-    // }
-    //
-    // static updateUserTimerTask(userId: string, taskType: TaskType.StartCurrentTimer | TaskType.StartUsageTimer, timerTaskInfo: TimerInfo) {
-    //     if (taskType === TaskType.StartCurrentTimer) {
-    //         return RealtimeDatabaseUtil.getUserState(userId).child(CURRENT_TIMER_PROPERTY_NAME).update(timerTaskInfo);
-    //     } else {
-    //         return RealtimeDatabaseUtil.getUserState(userId).child(USAGE_TIMER_PROPERTY_NAME).update(timerTaskInfo);
-    //     }
-    // }
-    //
-    // static removeUserTimerTask(userId: string, taskType: TaskType.StopCurrentTimer | TaskType.StopUsageTimer) {
-    //     if (taskType === TaskType.StopCurrentTimer) {
-    //         return RealtimeDatabaseUtil.getUserState(userId).child(CURRENT_TIMER_PROPERTY_NAME).remove();
-    //     } else {
-    //         return RealtimeDatabaseUtil.getUserState(userId).child(USAGE_TIMER_PROPERTY_NAME).remove();
-    //     }
-    // }
 }
