@@ -35,19 +35,6 @@ export const seatWrittenHandler = async (
             availableSeatsInc = 1;
         } else if (beforeSeat?.isAvailable === true && afterSeat?.isAvailable === false) {
             availableSeatsInc = -1;
-            //
-            // if (beforeSeat.userId === null &&
-            //     afterSeat.userId !== null &&
-            //     beforeSeat.state === SeatStateType.Empty &&
-            //     afterSeat.state === SeatStateType.Reserved &&
-            //     afterSeat.occupyEndTime === null
-            // ) {
-            //     promises.push(UserStateHandler.reserveSeat(afterSeat.userId, <SeatPosition>{
-            //         storeId: event.params.storeId,
-            //         sectionId: event.params.sectionId,
-            //         seatId: event.params.seatId,
-            //     }, Date.parse(event.time), afterSeat.reserveEndTime));
-            // }
         } else {
             availableSeatsInc = 0;
         }
