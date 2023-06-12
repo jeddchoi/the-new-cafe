@@ -92,10 +92,13 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
             });
         }).then(() => {
             return sessionRef.remove();
+        }).then(() => {
+            if (before.overall.seatPosition) {
+                return SeatHandler.freeSeat(event.params.userId, deserializeSeatId(before.overall.seatPosition));
+            } else {
+                return;
+            }
         }));
-        if (before.overall.seatPosition) {
-            promises.push(SeatHandler.freeSeat(event.params.userId, deserializeSeatId(before.overall.seatPosition)));
-        }
     }
     return Promise.all(promises);
 };
