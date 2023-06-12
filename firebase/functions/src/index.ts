@@ -5,25 +5,25 @@ import {CallableRequest, onCall, onRequest, Request} from "firebase-functions/v2
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
 import {onValueWritten} from "firebase-functions/v2/database";
 import {logger} from "firebase-functions/v2";
-import {Response} from "express";
 import {auth} from "firebase-functions";
+import {Response} from "express";
 
 import {UserActionRequest} from "./model/UserActionRequest";
 import {requestHandler} from "./handle_request/on_handle_request";
-import {throwFunctionsHttpsError} from "./util/functions_helper";
-
-import {seatWrittenHandler} from "./trigger/on_seat_written";
-import {sectionWrittenHandler} from "./trigger/on_section_written";
 import {
     COLLECTION_GROUP_SEAT_NAME,
     COLLECTION_GROUP_SECTION_NAME,
     COLLECTION_GROUP_STORE_NAME,
 } from "./model/SeatPosition";
+
+import {throwFunctionsHttpsError} from "./util/functions_helper";
 import RealtimeDatabaseUtil, {REFERENCE_USER_STATE_NAME} from "./util/RealtimeDatabaseUtil";
+import {seatWrittenHandler} from "./trigger/on_seat_written";
+import {sectionWrittenHandler} from "./trigger/on_section_written";
 import {overallTimerWrittenHandler} from "./trigger/on_overall_timer_written";
 import {temporaryTimerWrittenHandler} from "./trigger/on_temporary_timer_written";
 import {userStateStatusWrittenHandler} from "./trigger/on_user_state_status_written";
-import {IUserStateExternal} from "./model/UserState";
+import {authUserCreatedHandler} from "./trigger/on_auth_user_created";
 
 initializeApp();
 
@@ -119,13 +119,6 @@ export const onUserStateStatusWritten =
  */
 export const onAuthUserCreated =
     auth.user().onCreate(
-        (user) => {
-            logger.info(`User ${user.uid} created.`);
-            return RealtimeDatabaseUtil.getUserState(user.uid).set(<IUserStateExternal>{
-                name: user.displayName,
-                isOnline: false,
-                status: null,
-            });
-        }
+        authUserCreatedHandler
     );
 
