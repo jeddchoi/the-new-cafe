@@ -2,7 +2,6 @@ import {
     IUserStateExternal,
     OverallState,
     SeatPosition,
-    TemporaryTimerInfo,
     TimerInfo,
     UserState,
 } from "../model/UserState";
@@ -88,8 +87,8 @@ export default class UserStateHandler {
         });
     }
 
-    static updateUserTemporaryStateInSession(userId: string, state: UserStateType, startTime: number, endTime: number | null, isReset: boolean) {
-        logger.debug(`[UserStateHandler] updateUserTemporaryStateInSession(${userId}, ${state}, ${startTime}, ${endTime}, ${isReset})`);
+    static updateUserTemporaryStateInSession(userId: string, state: UserStateType, startTime: number, endTime: number | null) {
+        logger.debug(`[UserStateHandler] updateUserTemporaryStateInSession(${userId}, ${state}, ${startTime}, ${endTime})`);
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return;
             if (!existing.status) return;
@@ -100,11 +99,10 @@ export default class UserStateHandler {
                         state,
                         reason: UserStateChangeReason.UserAction,
                         startTime,
-                        timer: endTime === null ? null : <TemporaryTimerInfo>{
+                        timer: endTime === null ? null : <TimerInfo>{
                             endTime,
                             taskName: this.getTaskName(userId, state, startTime),
-                            willRequestType: RequestType.ResumeUsing,
-                            isReset,
+                            willRequestType: state === UserStateType.Away ? RequestType.StopUsingSeat : RequestType.ResumeUsing,
                         },
                     },
                 },

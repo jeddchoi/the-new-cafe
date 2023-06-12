@@ -1,6 +1,6 @@
 import {DatabaseEvent, DataSnapshot} from "firebase-functions/v2/database";
 import {Change} from "firebase-functions/v2/firestore";
-import {OverallState, TemporaryState} from "../model/UserState";
+import {OverallState, State} from "../model/UserState";
 import * as util from "util";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
 import {UserStateType} from "../model/UserStateType";
@@ -14,12 +14,12 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
 
     const before = event.data.before.val() as {
         overall: OverallState,
-        temporary: TemporaryState | null
+        temporary: State | null
     } | null;
 
     const after = event.data.after.val() as {
         overall: OverallState,
-        temporary: TemporaryState | null
+        temporary: State | null
     } | null;
 
     const sessionHandler = new UserSessionHandler(event.params.userId);

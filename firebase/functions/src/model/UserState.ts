@@ -9,10 +9,6 @@ interface TimerInfo {
     willRequestType: RequestType,
 }
 
-interface TemporaryTimerInfo extends TimerInfo{
-    isReset: boolean
-}
-
 interface State {
     state: UserStateType;
     reason: UserStateChangeReason;
@@ -24,17 +20,12 @@ interface OverallState extends State{
     seatPosition: string | null;
 }
 
-interface TemporaryState extends State {
-    timer: TemporaryTimerInfo | null;
-}
-
-
 interface IUserState {
     isOnline: boolean;
     name: string;
     status: {
         overall: OverallState,
-        temporary: TemporaryState | null,
+        temporary: State | null,
     } | null;
     userId: string;
 }
@@ -48,7 +39,7 @@ interface IUserStateExternal {
     name: string;
     status: {
         overall: OverallState,
-        temporary: TemporaryState | null,
+        temporary: State | null,
     } | null;
 }
 
@@ -58,7 +49,7 @@ class UserState implements IUserState {
         readonly name: string,
         readonly status: {
             overall: OverallState,
-            temporary: TemporaryState | null,
+            temporary: State | null,
         } | null,
         readonly userId: string,
     ) {
@@ -80,10 +71,8 @@ export {
     UserState,
     State,
     OverallState,
-    TemporaryState,
     SeatPosition,
     TimerInfo,
-    TemporaryTimerInfo,
     IUserState,
     IUserStateExternal,
     OVERALL_STATE_PROPERTY_NAME,

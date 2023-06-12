@@ -55,7 +55,7 @@ export async function requestHandler(
         case RequestType.LeaveAway:
         case RequestType.ShiftToBusiness: {
             const targetState = requestType === RequestType.LeaveAway ? UserStateType.Away : UserStateType.OnBusiness;
-            promises.push(UserStateHandler.updateUserTemporaryStateInSession(userId, targetState, current, endTime, targetState === UserStateType.Away)
+            promises.push(UserStateHandler.updateUserTemporaryStateInSession(userId, targetState, current, endTime)
                 .then(transformToSeatPosition).then((seatPosition) => {
                     return SeatHandler.away(userId, seatPosition);
                 }));
