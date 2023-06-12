@@ -1,10 +1,19 @@
 import {CloudTasksClient, protos} from "@google-cloud/tasks";
 import {defineString, projectID} from "firebase-functions/params";
 import {logger} from "firebase-functions";
+import {RequestType} from "../model/RequestType";
 
 const tasksQueueName = defineString("TASKS_QUEUE_NAME");
 const tasksLocation = defineString("LOCATION_TASKS");
 const gServiceAccountEmail = defineString("G_SERVICE_ACCOUNT_EMAIL");
+
+export class TimeoutRequest {
+    constructor(
+        readonly requestType: RequestType,
+        readonly userId: string,
+    ) {
+    }
+}
 
 export default class CloudTasksUtil {
     private static _client = new CloudTasksClient();

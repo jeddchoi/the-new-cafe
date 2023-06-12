@@ -6,7 +6,7 @@ initializeApp();
 
 import {CallableRequest, onCall, onRequest, Request} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
-import {onValueWritten} from "firebase-functions/v2/database";
+import {onValueCreated, onValueWritten} from "firebase-functions/v2/database";
 import {logger} from "firebase-functions/v2";
 import {auth} from "firebase-functions";
 import {Response} from "express";
@@ -23,8 +23,8 @@ import {throwFunctionsHttpsError} from "./util/functions_helper";
 import RealtimeDatabaseUtil, {REFERENCE_USER_STATE_NAME} from "./util/RealtimeDatabaseUtil";
 import {seatWrittenHandler} from "./trigger/on_seat_written";
 import {sectionWrittenHandler} from "./trigger/on_section_written";
-import {overallTimerWrittenHandler} from "./trigger/on_overall_timer_written";
-import {temporaryTimerWrittenHandler} from "./trigger/on_temporary_timer_written";
+import {overallTimerCreatedHandler} from "./trigger/on_overall_timer_written";
+import {temporaryTimerCreatedHandler} from "./trigger/on_temporary_timer_written";
 import {userStateStatusWrittenHandler} from "./trigger/on_user_state_status_written";
 import {authUserCreatedHandler} from "./trigger/on_auth_user_created";
 
@@ -102,31 +102,29 @@ export const onSectionWritten =
 
 
 /**
- * Schedule a Cloud task when there is data in UserState's status/overall/timer
- * If it is fired, delete status of UserState
+ * Schedule a Cloud task when created overall timer
+ * If it is fired, requestHandler will handle it
  */
-export const onOverallTimerWritten =
-    onValueWritten(
+export const onOverallTimerCreated =
+    onValueCreated(
         {
             ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status/overall/timer`,
             region: "asia-southeast1",
         },
-        overallTimerWrittenHandler
-    )
-;
+        overallTimerCreatedHandler,
+    );
 
 /**
- * Schedule a Cloud task when there is data in UserState's status/temporary/timer
- * If it is fired, delete status of UserState when isReset = true
- * or delete temporary state of UserState when isReset = false
+ * Schedule a Cloud task when created temporary timer
+ * If it is fired, requestHandler will handle it
  */
-export const onTemporaryTimerWritten =
-    onValueWritten(
+export const onTemporaryTimerCreated =
+    onValueCreated(
         {
             ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status/temporary/timer`,
             region: "asia-southeast1",
         },
-        temporaryTimerWrittenHandler
+        temporaryTimerCreatedHandler
     );
 
 /**
