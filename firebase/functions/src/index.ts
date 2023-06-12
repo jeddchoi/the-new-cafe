@@ -1,6 +1,9 @@
 // noinspection JSUnusedGlobalSymbols
 
 import {initializeApp} from "firebase-admin/app";
+
+initializeApp();
+
 import {CallableRequest, onCall, onRequest, Request} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
 import {onValueWritten} from "firebase-functions/v2/database";
@@ -24,9 +27,6 @@ import {overallTimerWrittenHandler} from "./trigger/on_overall_timer_written";
 import {temporaryTimerWrittenHandler} from "./trigger/on_temporary_timer_written";
 import {userStateStatusWrittenHandler} from "./trigger/on_user_state_status_written";
 import {authUserCreatedHandler} from "./trigger/on_auth_user_created";
-
-initializeApp();
-
 
 /**
  * Callable functions
@@ -68,6 +68,7 @@ export const onDeletePathTimeout =
 export const onSeatWritten =
     onDocumentWritten(
         {
+            region: "asia-northeast3",
             document: `${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}/${COLLECTION_GROUP_SEAT_NAME}/{seatId}`,
         },
         seatWrittenHandler);
@@ -78,6 +79,7 @@ export const onSeatWritten =
 export const onSectionWritten =
     onDocumentWritten(
         {
+            region: "asia-northeast3",
             document: `${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}`,
         },
         sectionWrittenHandler
@@ -90,9 +92,13 @@ export const onSectionWritten =
  */
 export const onOverallTimerWritten =
     onValueWritten(
-        `/${REFERENCE_USER_STATE_NAME}/{userId}/status/overall/timer`,
+        {
+            ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status/overall/timer`,
+            region: "asia-southeast1",
+        },
         overallTimerWrittenHandler
-    );
+    )
+;
 
 /**
  * Schedule a Cloud task when there is data in UserState's status/temporary/timer
@@ -101,7 +107,10 @@ export const onOverallTimerWritten =
  */
 export const onTemporaryTimerWritten =
     onValueWritten(
-        `/${REFERENCE_USER_STATE_NAME}/{userId}/status/temporary/timer`,
+        {
+            ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status/temporary/timer`,
+            region: "asia-southeast1",
+        },
         temporaryTimerWrittenHandler
     );
 
@@ -110,7 +119,10 @@ export const onTemporaryTimerWritten =
  */
 export const onUserStateStatusWritten =
     onValueWritten(
-        `/${REFERENCE_USER_STATE_NAME}/{userId}/status`,
+        {
+            ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status`,
+            region: "asia-southeast1",
+        },
         userStateStatusWrittenHandler
     );
 
