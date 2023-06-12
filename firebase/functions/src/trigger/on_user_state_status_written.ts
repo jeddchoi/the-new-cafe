@@ -14,8 +14,6 @@ import UserSessionHandler from "../handler/UserSessionHandler";
 export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSnapshot>, { userId: string }>) => {
     logger.debug(`userStateStatusWrittenHandler ${event.params.userId}`);
     const promises = [];
-    const sessionHandler = new UserSessionHandler(event.params.userId);
-
     const eventTimestamp = Date.parse(event.time);
 
     const before = event.data.before.val() as {
@@ -28,11 +26,11 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
         temporary: TemporaryState | null
     } | null;
 
+    const sessionHandler = new UserSessionHandler(event.params.userId);
+
     if (!event.data.before.exists() && event.data.after.exists()) { // if status is created (e.g. Reserve)
         if (after?.overall) {
-            promises.push(
-                sessionHandler.createSession(after.overall)
-            );
+            promises.push(sessionHandler.createSession(after.overall));
         }
     } else if (event.data.before.exists() && event.data.after.exists()) { // if status is updated
         if (after && !util.isDeepStrictEqual(before?.overall, after.overall)) { // different overall
@@ -52,9 +50,7 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
                     )
                 );
                 if (after.overall.seatPosition) {
-                    promises.push(
-                        SeatHandler.resumeUsing(event.params.userId, deserializeSeatId(after.overall.seatPosition))
-                    );
+                    promises.push(SeatHandler.resumeUsing(event.params.userId, deserializeSeatId(after.overall.seatPosition)));
                 }
             }
         }
