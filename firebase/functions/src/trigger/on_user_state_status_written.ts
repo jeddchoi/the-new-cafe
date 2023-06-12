@@ -4,8 +4,6 @@ import {OverallState, TemporaryState} from "../model/UserState";
 import * as util from "util";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
 import {UserStateType} from "../model/UserStateType";
-import SeatHandler from "../handler/SeatHandler";
-import {deserializeSeatId} from "../model/SeatPosition";
 import {logger} from "firebase-functions/v2";
 import UserSessionHandler from "../handler/UserSessionHandler";
 
