@@ -29,7 +29,7 @@ export default class CloudTasksUtil {
         this._parent = CloudTasksUtil._client.queuePath(this._projectID, this._tasksLocation, this._tasksQueueName);
     }
 
-    public startRemoveTimer(
+    public startTimeoutTimer(
         userId: string,
         willRequestType: RequestType,
         scheduleDate: number,
