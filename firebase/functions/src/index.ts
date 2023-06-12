@@ -38,7 +38,8 @@ export const onHandleRequest =
         if (request.auth === undefined) {
             throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
         }
-        return requestHandler(request.auth.uid, request.data);
+        const current = new Date().getTime();
+        return requestHandler(request.auth.uid, request.data.requestType, request.data.seatPosition, current, request.data.getEndTime(current));
     });
 
 /**
@@ -49,7 +50,8 @@ export const onHandleRequestTest =
         try {
             const userId = req.body.userId as string;
             const request = UserActionRequest.fromJSON(req.body.request);
-            await requestHandler(userId, request);
+            const current = new Date().getTime();
+            await requestHandler(userId, request.requestType, request.seatPosition, current, request.getEndTime(current));
             logger.info("Completed Successfully.");
             res.status(200).send("Completed Successfully.");
         } catch (e) {
