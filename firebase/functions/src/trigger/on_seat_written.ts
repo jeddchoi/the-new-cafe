@@ -1,10 +1,8 @@
 import {logger} from "firebase-functions/v2";
 import {Change, DocumentSnapshot, FirestoreEvent} from "firebase-functions/v2/firestore";
 import {FieldValue} from "firebase-admin/firestore";
-import {ISeatExternal, SeatStateType} from "../model/Seat";
+import {ISeatExternal} from "../model/Seat";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
-import UserStateHandler from "../handler/UserStateHandler";
-import {SeatPosition} from "../model/SeatPosition";
 
 
 export const seatWrittenHandler = async (
@@ -36,19 +34,19 @@ export const seatWrittenHandler = async (
             availableSeatsInc = 1;
         } else if (beforeSeat?.isAvailable === true && afterSeat?.isAvailable === false) {
             availableSeatsInc = -1;
-
-            if (beforeSeat.userId === null &&
-                afterSeat.userId !== null &&
-                beforeSeat.state === SeatStateType.Empty &&
-                afterSeat.state === SeatStateType.Reserved &&
-                afterSeat.occupyEndTime === null
-            ) {
-                promises.push(UserStateHandler.reserveSeat(afterSeat.userId, <SeatPosition>{
-                    storeId: event.params.storeId,
-                    sectionId: event.params.sectionId,
-                    seatId: event.params.seatId,
-                }, Date.parse(event.time), afterSeat.reserveEndTime));
-            }
+            //
+            // if (beforeSeat.userId === null &&
+            //     afterSeat.userId !== null &&
+            //     beforeSeat.state === SeatStateType.Empty &&
+            //     afterSeat.state === SeatStateType.Reserved &&
+            //     afterSeat.occupyEndTime === null
+            // ) {
+            //     promises.push(UserStateHandler.reserveSeat(afterSeat.userId, <SeatPosition>{
+            //         storeId: event.params.storeId,
+            //         sectionId: event.params.sectionId,
+            //         seatId: event.params.seatId,
+            //     }, Date.parse(event.time), afterSeat.reserveEndTime));
+            // }
         } else {
             availableSeatsInc = 0;
         }
