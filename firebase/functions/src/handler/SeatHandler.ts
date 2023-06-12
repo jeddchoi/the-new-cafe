@@ -20,7 +20,7 @@ export default class SeatHandler {
             if (existing.state !== SeatStateType.Empty) return false;
 
             return existing.isAvailable;
-        }, (existing) => {
+        }, () => {
             return {
                 state: SeatStateType.Reserved,
                 isAvailable: false,
@@ -37,7 +37,7 @@ export default class SeatHandler {
             if (existing.isAvailable) return false;
             if (existing.reserveEndTime || existing.state !== SeatStateType.Empty) return false;
             return existing.userId === userId;
-        }, (existing) => {
+        }, () => {
             return {
                 state: SeatStateType.Occupied,
                 reserveEndTime: null,
@@ -52,7 +52,7 @@ export default class SeatHandler {
             if (!existing) return false;
             if (existing.isAvailable) return false;
             return existing.userId === userId;
-        }, (existing) => {
+        }, () => {
             return {
                 state: SeatStateType.Empty,
                 isAvailable: true,
@@ -83,7 +83,7 @@ export default class SeatHandler {
             if (!existing) return false;
             if (existing.isAvailable) return false;
             return existing.userId === userId;
-        }, (existing) => {
+        }, () => {
             return {
                 state: SeatStateType.Away,
             };
