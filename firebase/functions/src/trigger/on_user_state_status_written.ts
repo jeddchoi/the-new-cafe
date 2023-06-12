@@ -29,7 +29,7 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
         }).then(() => {
             return stateChangesRef.push(<UserStateChange>{
                 state: after.overall.state,
-                timestamp: eventTimestamp,
+                timestamp: after.overall.startTime,
                 reason: after.overall.reason,
             });
         }));
@@ -47,7 +47,7 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
             if (before.overall.state !== after.overall.state) {
                 promises.push(stateChangesRef.push(<UserStateChange>{
                     state: after.overall.state,
-                    timestamp: eventTimestamp,
+                    timestamp: after.overall.startTime,
                     reason: after.overall.reason,
                 }));
             }
@@ -55,7 +55,7 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
             if (after.temporary && before.temporary?.state !== after.temporary.state) { // when after.temporary exists and different state
                 promises.push(stateChangesRef.push(<UserStateChange>{
                     state: after.temporary.state,
-                    timestamp: eventTimestamp,
+                    timestamp: after.temporary.startTime,
                     reason: after.temporary.reason,
                 }));
             }
