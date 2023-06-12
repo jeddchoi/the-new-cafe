@@ -32,9 +32,9 @@ initializeApp();
  * Callable functions
  */
 export const onHandleRequest =
-    onCall<UserActionRequest, Promise<void>>((
+    onCall<UserActionRequest>((
         request: CallableRequest<UserActionRequest>,
-    ): Promise<void> => {
+    ) => {
         if (request.auth === undefined) {
             throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
         }

@@ -44,7 +44,7 @@ export async function requestHandler(
         case RequestType.CancelReservation:
         case RequestType.StopUsingSeat: {
             return UserStateHandler.quit(userId).then(transformToSeatPosition).then((seatPosition) => {
-                return SeatHandler.updateSeatInSession(userId, seatPosition, SeatStateType.Empty, null, null);
+                return SeatHandler.freeSeat(userId, seatPosition);
             });
         }
         // remove user temporary state, update seat state
