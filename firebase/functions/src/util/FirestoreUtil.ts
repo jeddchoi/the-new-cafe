@@ -1,7 +1,7 @@
 import {DocumentReference, Firestore, getFirestore, UpdateData} from "firebase-admin/firestore";
-import {Store, storeConverter} from "../model/Store";
-import {Seat, seatConverter} from "../model/Seat";
-import {Section, sectionConverter} from "../model/Section";
+import {IStoreExternal, Store, storeConverter} from "../model/Store";
+import {ISeatExternal, Seat, seatConverter} from "../model/Seat";
+import {ISectionExternal, Section, sectionConverter} from "../model/Section";
 import {
     COLLECTION_GROUP_SEAT_NAME,
     COLLECTION_GROUP_SECTION_NAME,
@@ -16,16 +16,16 @@ import {
 export default class FirestoreUtil {
     static db: Firestore = getFirestore();
 
-    static getStoreDocRef(storeId: string): DocumentReference<Store> {
+    static getStoreDocRef(storeId: string): DocumentReference<IStoreExternal> {
         return FirestoreUtil.db.collection(COLLECTION_GROUP_STORE_NAME).doc(storeId).withConverter(storeConverter);
     }
 
-    static getSectionDocRef(storeId: string, sectionId: string): DocumentReference<Section> {
+    static getSectionDocRef(storeId: string, sectionId: string): DocumentReference<ISectionExternal> {
         return this.getStoreDocRef(storeId)
             .collection(COLLECTION_GROUP_SECTION_NAME).doc(sectionId).withConverter(sectionConverter);
     }
 
-    static getSeatDocRef(seatId: SeatPosition): DocumentReference<Seat> {
+    static getSeatDocRef(seatId: SeatPosition): DocumentReference<ISeatExternal> {
         return this.getSectionDocRef(seatId.storeId, seatId.sectionId)
             .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatId.seatId).withConverter(seatConverter);
     }
