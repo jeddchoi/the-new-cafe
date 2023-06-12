@@ -1,8 +1,6 @@
 import {DatabaseEvent, DataSnapshot} from "firebase-functions/v2/database";
 import {Change} from "firebase-functions/v2/firestore";
-import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {OverallState, TemporaryState} from "../model/UserState";
-import {UserSession, UserStateChange} from "../model/UserSession";
 import * as util from "util";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
 import {UserStateType} from "../model/UserStateType";
@@ -49,9 +47,6 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
                         UserStateChangeReason.Timeout, // TODO: not right
                     )
                 );
-                if (after.overall.seatPosition) {
-                    promises.push(SeatHandler.resumeUsing(event.params.userId, deserializeSeatId(after.overall.seatPosition)));
-                }
             }
         }
     } else if (event.data.before.exists() && !event.data.after.exists()) { // if status is deleted (e.g. Stop using seat)
@@ -61,12 +56,6 @@ export const userStateStatusWrittenHandler = (event: DatabaseEvent<Change<DataSn
             UserStateChangeReason.Timeout // TODO: not right
         ).then(() => {
             return sessionHandler.cleanupSession(eventTimestamp);
-        }).then(() => {
-            if (before?.overall.seatPosition) {
-                return SeatHandler.freeSeat(event.params.userId, deserializeSeatId(before.overall.seatPosition));
-            } else {
-                return;
-            }
         }));
     }
     return Promise.all(promises);

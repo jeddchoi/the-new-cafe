@@ -35,16 +35,20 @@ export async function requestHandler(
             }));
             break;
         }
-        // remove user state status  -> trigger -> update seat state
+        // remove user state status, update seat state
         case RequestType.CancelReservation:
         case RequestType.StopUsingSeat: {
-            promises.push(UserStateHandler.quit(userId));
+            promises.push(UserStateHandler.quit(userId).then(transformToSeatPosition).then((seatPosition) => {
+                return SeatHandler.freeSeat(userId, seatPosition);
+            }));
             break;
         }
-        // remove user temporary state -> trigger -> update seat state
+        // remove user temporary state, update seat state
         case RequestType.FinishBusiness:
         case RequestType.ResumeUsing: {
-            promises.push(UserStateHandler.removeTemporaryState(userId));
+            promises.push(UserStateHandler.removeTemporaryState(userId).then(transformToSeatPosition).then((seatPosition) => {
+                return SeatHandler.resumeUsing(userId, seatPosition);
+            }));
             break;
         }
         // update user temporary state, update seat state
