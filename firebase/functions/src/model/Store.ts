@@ -34,7 +34,7 @@ class Store implements IStore {
 
 
 const storeConverter: FirestoreDataConverter<Store> = {
-    toFirestore(store: Store): DocumentData {
+    toFirestore(store: Store) {
         return <IStoreExternal>{
             name: store.name,
             totalSeats: store.totalSeats,
@@ -46,7 +46,7 @@ const storeConverter: FirestoreDataConverter<Store> = {
     },
     fromFirestore(
         snapshot: QueryDocumentSnapshot<IStoreExternal>
-    ): Store {
+    ) {
         const data = snapshot.data();
         return new Store(snapshot.id,
             data.name,

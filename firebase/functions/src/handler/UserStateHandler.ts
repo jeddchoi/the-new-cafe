@@ -6,14 +6,14 @@ import {serializeSeatId} from "../model/SeatPosition";
 
 
 export default class UserStateHandler {
-    static getUserStateData(uid: string): Promise<UserState> {
+    static getUserStateData(uid: string) {
         return RealtimeDatabaseUtil.getUserState(uid).once("value").then((snapshot) => {
             const val = snapshot.val() as IUserStateExternal;
             return UserState.fromExternal(uid, val);
         });
     }
 
-    static reserveSeat(userId: string, seatPosition: SeatPosition, startTime: number, endTime: number | null): Promise<void> {
+    static reserveSeat(userId: string, seatPosition: SeatPosition, startTime: number, endTime: number | null) {
         return RealtimeDatabaseUtil.getUserState(userId).child("status/overall").update(<OverallState>{
             state: UserStateType.Reserved,
             reason: UserStateChangeReason.UserAction,
@@ -95,7 +95,7 @@ export default class UserStateHandler {
         });
     }
 
-    private static getTaskName(userId: string, state: UserStateType, startTime: number): string {
+    private static getTaskName(userId: string, state: UserStateType, startTime: number) {
         return `${userId}_${UserStateType[state]}_${startTime}`;
     }
 }

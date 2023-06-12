@@ -62,7 +62,7 @@ class UserState implements IUserState {
     ) {
     }
 
-    static fromExternal(uid: string, val: IUserStateExternal): UserState {
+    static fromExternal(uid: string, val: IUserStateExternal) {
         return new UserState(val.isOnline, val.name, val.status, uid);
     }
 

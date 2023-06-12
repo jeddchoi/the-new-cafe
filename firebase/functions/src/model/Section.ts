@@ -27,7 +27,7 @@ class Section implements ISection {
 
 
 const sectionConverter: FirestoreDataConverter<Section> = {
-    toFirestore(section: Section): DocumentData {
+    toFirestore(section: Section) {
         return {
             name: section.name,
             totalSeats: section.totalSeats,
@@ -36,7 +36,7 @@ const sectionConverter: FirestoreDataConverter<Section> = {
     },
     fromFirestore(
         snapshot: QueryDocumentSnapshot<ISectionExternal>
-    ): Section {
+    ) {
         const data = snapshot.data();
         return new Section(snapshot.id, data.name, snapshot.ref.parent.id, data.totalSeats, data.totalAvailableSeats);
     },

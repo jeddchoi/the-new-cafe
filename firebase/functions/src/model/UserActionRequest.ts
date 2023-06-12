@@ -17,7 +17,7 @@ export class UserActionRequest {
         seatPosition: SeatPosition | null,
         durationInSeconds: number | null,
         endTime: number | null
-    }): UserActionRequest {
+    }) {
         return new UserActionRequest(
             json.requestType,
             json.seatPosition,
@@ -26,7 +26,7 @@ export class UserActionRequest {
         );
     }
 
-    getEndTime(startTime: number): number | null {
+    getEndTime(startTime: number) {
         if (this.durationInSeconds === null && this.endTime === null) {
             return null;
         } else if (this.durationInSeconds !== null) {

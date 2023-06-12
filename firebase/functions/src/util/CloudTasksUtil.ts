@@ -26,14 +26,14 @@ export default class CloudTasksUtil {
         deletePath: string,
         scheduleDate: number,
         taskName: string,
-    ): Promise<protos.google.cloud.tasks.v2.ITask> {
+    ) {
         return this.createHttpTaskWithSchedule({deletePath}, "onDeletePathTimeout", Math.round(scheduleDate / 1000), this.getFullTaskName(taskName));
     }
 
 
     public cancelTimer(
         taskName: string,
-    ): Promise<void> {
+    ) {
         return CloudTasksUtil._client.deleteTask({name: this.getFullTaskName(taskName)})
             .catch((err) => {
                 logger.warn(`Deletion task(${taskName}) failed. maybe already consumed`, err);
@@ -51,7 +51,7 @@ export default class CloudTasksUtil {
         path: string,
         scheduleTimeInSeconds: number, // The schedule time in seconds
         taskName: string | null,
-    ): Promise<protos.google.cloud.tasks.v2.ITask> {
+    ) {
         // Construct the fully qualified queue name.
 
         const task = this.createTaskObject(
@@ -74,7 +74,7 @@ export default class CloudTasksUtil {
         payload: object,
         scheduleTimeInSeconds: number,
         taskName: string | null,
-    ): protos.google.cloud.tasks.v2.ITask {
+    ) {
         const body = Buffer.from(JSON.stringify(payload)).toString("base64");
         return <protos.google.cloud.tasks.v2.ITask>{
             name: taskName,

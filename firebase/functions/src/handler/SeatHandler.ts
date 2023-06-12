@@ -10,7 +10,7 @@ export default class SeatHandler {
             .then((value) => value.data());
     }
 
-    static reserveSeat(userId: string, seatPosition: SeatPosition, endTime: number | null): Promise<boolean> {
+    static reserveSeat(userId: string, seatPosition: SeatPosition, endTime: number | null) {
         logger.debug(`reserveSeat(${userId}, ${seatPosition}, ${endTime})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
@@ -30,7 +30,7 @@ export default class SeatHandler {
         });
     }
 
-    static freeSeat(userId: string, seatPosition: SeatPosition): Promise<void> {
+    static freeSeat(userId: string, seatPosition: SeatPosition) {
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
@@ -47,7 +47,7 @@ export default class SeatHandler {
     }
 
 
-    static updateSeatInSession(userId: string, seatPosition: SeatPosition, seatState: SeatStateType, reserveEndTime?: number | null, occupyEndTime?: number | null): Promise<boolean> {
+    static updateSeatInSession(userId: string, seatPosition: SeatPosition, seatState: SeatStateType, reserveEndTime?: number | null, occupyEndTime?: number | null) {
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
@@ -65,14 +65,14 @@ export default class SeatHandler {
         seatPosition: SeatPosition,
         predicate: (existing: Seat | undefined) => boolean,
         update: (existing: Seat | undefined) => { [key in keyof ISeatExternal]?: ISeatExternal[key] }
-    ): Promise<boolean> {
+    ) {
         return FirestoreUtil.runTransactionOnSingleRefDoc(FirestoreUtil.getSeatDocRef(seatPosition), predicate, update);
     }
 
     updateSeat(
         seatPosition: SeatPosition,
         updateContent: { [key in keyof ISeatExternal]?: ISeatExternal[key] }
-    ): Promise<void> {
+    ) {
         return FirestoreUtil.getSeatDocRef(seatPosition).update(updateContent).then();
     }
 }
