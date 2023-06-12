@@ -23,6 +23,7 @@ export async function requestHandler(
     userId: string,
     request: UserActionRequest,
 ) {
+    const promises = [];
     const current = new Date().getTime();
     const endTime = request.getEndTime(current);
     logger.info(`[${current} -> ${endTime}] request: ${JSON.stringify(request)}`);
@@ -33,33 +34,38 @@ export async function requestHandler(
             if (!request.seatPosition) throwFunctionsHttpsError("invalid-argument", "seatPosition is required");
             const isReserved = await SeatHandler.reserveSeat(userId, request.seatPosition, endTime);
             if (!isReserved) throwFunctionsHttpsError("failed-precondition", "Failed to reserve seat");
-            return UserStateHandler.reserveSeat(userId, request.seatPosition, current, endTime);
+            promises.push(UserStateHandler.reserveSeat(userId, request.seatPosition, current, endTime));
+            break;
         }
         // update user overall state, update seat state
         case RequestType.OccupySeat: {
-            return UserStateHandler.occupySeat(userId, current, endTime).then(transformToSeatPosition).then((seatPosition) => {
+            promises.push(UserStateHandler.occupySeat(userId, current, endTime).then(transformToSeatPosition).then((seatPosition) => {
                 return SeatHandler.occupySeat(userId, seatPosition, endTime);
-            });
+            }));
+            break;
         }
         // remove user state status  -> trigger -> update seat state
         case RequestType.CancelReservation:
         case RequestType.StopUsingSeat: {
-            return UserStateHandler.quit(userId);
+            promises.push(UserStateHandler.quit(userId));
+            break;
         }
         // remove user temporary state -> trigger -> update seat state
         case RequestType.FinishBusiness:
         case RequestType.ResumeUsing: {
-            return UserStateHandler.removeTemporaryState(userId);
+            promises.push(UserStateHandler.removeTemporaryState(userId));
+            break;
         }
         // update user temporary state, update seat state
         case RequestType.DoBusiness:
         case RequestType.LeaveAway:
         case RequestType.ShiftToBusiness: {
             const targetState = request.requestType === RequestType.LeaveAway ? UserStateType.Away : UserStateType.OnBusiness;
-            return UserStateHandler.updateUserTemporaryStateInSession(userId, targetState, current, endTime, targetState === UserStateType.Away)
+            promises.push(UserStateHandler.updateUserTemporaryStateInSession(userId, targetState, current, endTime, targetState === UserStateType.Away)
                 .then(transformToSeatPosition).then((seatPosition) => {
                     return SeatHandler.away(userId, seatPosition);
-                });
+                }));
+            break;
         }
         // update user state temporary timer, update seat state
         case RequestType.ChangeTemporaryTimeoutTime: {
@@ -70,4 +76,6 @@ export async function requestHandler(
             break;
         }
     }
+
+    return Promise.all(promises);
 }
