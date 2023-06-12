@@ -38,7 +38,7 @@ export const onHandleRequest =
         if (request.auth === undefined) {
             throwFunctionsHttpsError("unauthenticated", "User is not authenticated");
         }
-        return requestHandler(request.data, false);
+        return requestHandler(request.auth.uid, request.data);
     });
 
 /**

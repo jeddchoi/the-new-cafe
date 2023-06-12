@@ -1,13 +1,32 @@
 import {Seat, SeatStateType} from "../model/Seat";
 import FirestoreUtil from "../util/FirestoreUtil";
 import {SeatPosition} from "../model/SeatPosition";
-import {UserStateType} from "../model/UserStateType";
 
 
 export default class SeatHandler {
     static getSeatData(seatPosition: SeatPosition): Promise<Seat | undefined> {
         return FirestoreUtil.getSeatDocRef(seatPosition).get()
             .then((value) => value.data());
+    }
+
+    static reserveSeat(userId: string, seatPosition: SeatPosition, endTime: number | null): Promise<boolean> {
+        return this.transaction(seatPosition, (existing) => {
+            if (!existing) return false;
+            if (existing.userId) return false;
+            if (existing.occupyEndTime) return false;
+            if (existing.reserveEndTime) return false;
+            if (existing.state !== SeatStateType.Empty) return false;
+
+            return existing.isAvailable;
+        }, (existing) => {
+            return {
+                ...existing,
+                state: SeatStateType.Reserved,
+                isAvailable: false,
+                userId,
+                reserveEndTime: endTime,
+            };
+        });
     }
 
     static freeSeat(userId: string, seatPosition: SeatPosition): Promise<void> {
@@ -24,29 +43,12 @@ export default class SeatHandler {
         }).then();
     }
 
-    static updateSeatInSession(userId: string, seatPosition: SeatPosition, userState: UserStateType, reserveEndTime?: number | null, occupyEndTime?: number): Promise<void> {
+    static updateSeatInSession(userId: string, seatPosition: SeatPosition, seatState: SeatStateType, reserveEndTime?: number | null, occupyEndTime?: number | null): Promise<boolean> {
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
             return existing.userId === userId;
         }, (existing) => {
-            let seatState;
-            switch (userState) {
-                case UserStateType.None:
-                case UserStateType.Blocked:
-                    seatState = SeatStateType.Empty;
-                    break;
-                case UserStateType.Reserved:
-                    seatState = SeatStateType.Reserved;
-                    break;
-                case UserStateType.Occupied:
-                    seatState = SeatStateType.Occupied;
-                    break;
-                case UserStateType.Away:
-                case UserStateType.OnBusiness:
-                    seatState = SeatStateType.Away;
-                    break;
-            }
             return {
                 state: seatState,
                 reserveEndTime,
@@ -59,7 +61,7 @@ export default class SeatHandler {
         seatPosition: SeatPosition,
         predicate: (existing: Seat | undefined) => boolean,
         update: (existing: Seat | undefined) => { [key in keyof Seat]?: Seat[key] }
-    ): Promise<void> {
+    ): Promise<boolean> {
         return FirestoreUtil.runTransactionOnSingleRefDoc(FirestoreUtil.getSeatDocRef(seatPosition), predicate, update);
     }
 

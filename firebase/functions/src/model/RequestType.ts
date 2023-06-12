@@ -1,5 +1,6 @@
 export enum RequestType {
     ReserveSeat,
+
     CancelReservation,
     OccupySeat,
     StopUsingSeat,
@@ -8,9 +9,6 @@ export enum RequestType {
     ShiftToBusiness,
     LeaveAway,
     ResumeUsing,
-    ChangeCurrentTimeoutTime,
-    ChangeUsageTimeoutTime,
-    Block,
-    Unblock,
-    NoOp,
+    ChangeTemporaryTimeoutTime,
+    ChangeOverallTimeoutTime,
 }

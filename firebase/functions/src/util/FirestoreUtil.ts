@@ -30,15 +30,15 @@ export default class FirestoreUtil {
             .collection(COLLECTION_GROUP_SEAT_NAME).doc(seatId.seatId).withConverter(seatConverter);
     }
 
-    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>): Promise<void> {
+    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>): Promise<boolean> {
         return this.db.runTransaction(async (t) => {
             const data = (await t.get(docRef)).data();
             if (!predicate(data)) {
-                return;
+                return false;
             }
             const newContent = update(data);
             t.update(docRef, newContent);
-            return;
+            return true;
         });
     }
 }

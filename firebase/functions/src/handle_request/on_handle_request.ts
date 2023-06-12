@@ -1,149 +1,76 @@
 import {UserActionRequest} from "../model/UserActionRequest";
+import {RequestType} from "../model/RequestType";
+import SeatHandler from "../handler/SeatHandler";
+import {throwFunctionsHttpsError} from "../util/functions_helper";
+import UserStateHandler from "../handler/UserStateHandler";
+import {IUserStateExternal} from "../model/UserState";
+import {SeatStateType} from "../model/Seat";
+import {deserializeSeatId} from "../model/SeatPosition";
+import {UserStateType} from "../model/UserStateType";
+import {TransactionResult} from "@firebase/database-types";
 
+
+function transformToSeatPosition(result: TransactionResult) {
+    if (!result.committed) throwFunctionsHttpsError("failed-precondition", "Failed to update User State");
+    const userState = result.snapshot.val() as IUserStateExternal;
+    if (!userState.status?.overall.seatPosition) {
+        throwFunctionsHttpsError("invalid-argument", "seatPosition of existing state is required");
+    }
+    return deserializeSeatId(userState.status?.overall.seatPosition);
+}
 
 export async function requestHandler(
+    userId: string,
     request: UserActionRequest,
-    isTimeout: boolean,
-): Promise<void> {
-    return Promise.resolve();
-    // if (request.requestType === RequestType.NoOp) {
-    //     logger.debug("Don't do anything");
-    //     return Promise.resolve();
-    // }
-    // logger.debug(`Handling request ... [isTimeout = ${isTimeout}] ${JSON.stringify(request)}`);
-    // const requestInfo = RequestTypeInfo[request.requestType];
-    // logger.debug(`[Request Info] ${JSON.stringify(requestInfo)}`);
-    //
-    // const existingUserState = await UserStateHandler.getUserStateData(request.userId);
-    // logger.debug(`[Exising State] ${JSON.stringify(existingUserState)}`);
-    //
-    // // Check if existing user state is valid
-    // if (!requestInfo.availablePriorUserState.includes(existingUserState.state)) {
-    //     throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user state is ${UserStateType[existingUserState.state]}`);
-    // }
-    //
-    // const timer = new CloudTasksUtil();
-    // let promise: Promise<boolean | void> = Promise.resolve();
-    // requestInfo.tasks.forEach((taskType) => {
-    //     switch (taskType) {
-    //         case TaskType.StopCurrentTimer:
-    //         case TaskType.StopUsageTimer:
-    //             promise = promise.then(() => {
-    //                 let ret = Promise.resolve();
-    //                 const timerTaskNameToStop = taskType === TaskType.StopCurrentTimer ?
-    //                     existingUserState.currentTimer?.taskName : existingUserState.usageTimer?.taskName;
-    //                 if (!timerTaskNameToStop) {
-    //                     logger.debug(`[Task #${TaskType[taskType]}] No timer to stop`);
-    //                     return ret;
-    //                 }
-    //                 if (!isTimeout) {
-    //                     logger.debug(`[Task #${TaskType[taskType]}] Cancel timer & Remove timer info of user state`);
-    //                     ret = ret.then(() => timer.cancelTimer(timerTaskNameToStop));
-    //                 }
-    //                 logger.debug(`[Task #${TaskType[taskType]}] Remove timer info of user state`);
-    //                 ret = ret.then(() => UserStateHandler.removeUserTimerTask(request.userId, taskType));
-    //                 return ret;
-    //             });
-    //             break;
-    //         case TaskType.StartCurrentTimer:
-    //         case TaskType.StartUsageTimer:
-    //             promise = promise.then(() => {
-    //                 if (request.deadlineInfo !== undefined) {
-    //                     let timeoutRequest: MyRequest;
-    //
-    //                     if (requestInfo.targetState === "Existing State") {
-    //                         logger.debug(`[Task #${TaskType[taskType]}] Change existing timer with different deadline`);
-    //                         timeoutRequest = MyRequest.newInstance(
-    //                             StateInfo[existingUserState.state].requestTypeIfTimeout,
-    //                             request.userId,
-    //                             UserStateChangeReason.Timeout,
-    //                             request.deadlineInfo?.keepStateUntil,
-    //                             request.seatPosition,
-    //                         );
-    //                     } else {
-    //                         logger.debug(`[Task #${TaskType[taskType]}] Start new timer`);
-    //                         timeoutRequest = MyRequest.newInstance(
-    //                             StateInfo[requestInfo.targetState].requestTypeIfTimeout,
-    //                             request.userId,
-    //                             UserStateChangeReason.Timeout,
-    //                             request.deadlineInfo?.keepStateUntil,
-    //                             request.seatPosition,
-    //                         );
-    //                     }
-    //
-    //                     return timer.startTimer(timeoutRequest).then((task) => {
-    //                         return UserStateHandler.updateUserTimerTask(request.userId, taskType, <TimerInfo>{
-    //                             taskName: task.name,
-    //                             startTime: request.startStateAt,
-    //                             endTime: request.deadlineInfo?.keepStateUntil,
-    //                         });
-    //                     });
-    //                 } else { // No deadline
-    //                     return Promise.resolve();
-    //                 }
-    //             });
-    //             break;
-    //         case TaskType.UpdateUserState:
-    //             promise = promise.then(() => {
-    //                 logger.debug(`[Task #${TaskType[taskType]}] Update user state`);
-    //                 return UserStateHandler.updateUserStateData(request.userId, {
-    //                     lastState: existingUserState.state,
-    //                     state: requestInfo.targetState === "Existing State" ? existingUserState.state : requestInfo.targetState,
-    //                     stateUpdatedAt: request.startStateAt,
-    //                     stateUpdatedBy: request.reason,
-    //                     seatPosition: requestInfo.requiredConditions.includes(RequestCondition.ProvidedSeatPositionInRequest) ? request.seatPosition : (requestInfo.targetState === UserStateType.None ? null : existingUserState.seatPosition),
-    //                 }).then();
-    //             });
-    //             break;
-    //         case TaskType.UpdateSeatState:
-    //             promise = promise.then(() => {
-    //                 if (requestInfo.targetState !== "Existing State") {
-    //                     logger.debug(`[Task #${TaskType[taskType]}] Update seat state`);
-    //                     const targetSeatState = StateInfo[requestInfo.targetState].seatState;
-    //                     let seatPosition: SeatId | undefined;
-    //                     let predicate;
-    //                     if (requestInfo.requiredConditions.includes(RequestCondition.ProvidedSeatPositionInRequest)) {
-    //                         seatPosition = request.seatPosition ?? throwFunctionsHttpsError("invalid-argument", `${RequestType[request.requestType]} Request should be provided with seat position`);
-    //
-    //                         predicate = (existing: Seat | undefined) => {
-    //                             if (!existing) return false;
-    //                             if (requestInfo.requiredConditions.includes(RequestCondition.RequestSeatIsAvailable)) {
-    //                                 if (!existing.isAvailable || existing.userId || existing.state !== SeatStateType.Empty) {
-    //                                     return false;
-    //                                 }
-    //                             }
-    //                             return true;
-    //                         };
-    //                     }
-    //                     if (requestInfo.requiredConditions.includes(RequestCondition.SeatPositionInExistingUserState)) {
-    //                         seatPosition = existingUserState.seatPosition ?? throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user seat position doesn't exist`);
-    //
-    //                         predicate = (existing: Seat | undefined) => {
-    //                             if (!existing) return false;
-    //                             if (requestInfo.requiredConditions.includes(RequestCondition.SeatOfExistingUserStateIsOccupiedByMe)) {
-    //                                 if (existing.userId !== request.userId || existing.isAvailable) {
-    //                                     return false;
-    //                                 }
-    //                             }
-    //                             return true;
-    //                         };
-    //                     }
-    //                     if (seatPosition && predicate) {
-    //                         return SeatHandler.transaction(seatPosition, predicate, (existing) => {
-    //                             return {
-    //                                 userId: (targetSeatState === SeatStateType.Empty) ? null : request.userId,
-    //                                 state: targetSeatState,
-    //                                 isAvailable: targetSeatState === SeatStateType.Empty,
-    //                             };
-    //                         });
-    //                     }
-    //                 }
-    //                 logger.debug(`[Task #${TaskType[taskType]}] Don't update seat state`);
-    //                 return Promise.resolve(true);
-    //             });
-    //             break;
-    //     }
-    // });
-    //
-    // return promise.then();
+) {
+    const current = new Date().getTime();
+    const endTime = request.getEndTime(current);
+
+    switch (request.requestType) {
+        // after reserve seat, update user state
+        case RequestType.ReserveSeat: {
+            if (!request.seatPosition) throwFunctionsHttpsError("invalid-argument", "seatPosition is required");
+            const isReserved = await SeatHandler.reserveSeat(userId, request.seatPosition, endTime);
+            if (!isReserved) throwFunctionsHttpsError("failed-precondition", "Failed to reserve seat");
+            return UserStateHandler.reserveSeat(userId, request.seatPosition, current, endTime);
+        }
+        // update user overall state, update seat state
+        case RequestType.OccupySeat: {
+            return UserStateHandler.occupySeat(userId, current, endTime).then(transformToSeatPosition).then((seatPosition) => {
+                return SeatHandler.updateSeatInSession(userId, seatPosition, SeatStateType.Occupied, null, endTime);
+            });
+        }
+        // remove user state status, update seat state
+        case RequestType.CancelReservation:
+        case RequestType.StopUsingSeat: {
+            return UserStateHandler.quit(userId).then(transformToSeatPosition).then((seatPosition) => {
+                return SeatHandler.updateSeatInSession(userId, seatPosition, SeatStateType.Empty, null, null);
+            });
+        }
+        // remove user temporary state, update seat state
+        case RequestType.FinishBusiness:
+        case RequestType.ResumeUsing: {
+            return UserStateHandler.removeTemporaryState(userId).then(transformToSeatPosition).then((seatPosition) => {
+                return SeatHandler.updateSeatInSession(userId, seatPosition, SeatStateType.Occupied, undefined, undefined);
+            });
+        }
+        // update user temporary state, update seat state
+        case RequestType.DoBusiness:
+        case RequestType.LeaveAway:
+        case RequestType.ShiftToBusiness: {
+            const targetState = request.requestType === RequestType.LeaveAway ? UserStateType.Away : UserStateType.OnBusiness;
+            return UserStateHandler.updateUserTemporaryStateInSession(userId, targetState, current, endTime, targetState === UserStateType.Away)
+                .then(transformToSeatPosition).then((seatPosition) => {
+                    return SeatHandler.updateSeatInSession(userId, seatPosition, SeatStateType.Away, undefined, undefined);
+                });
+        }
+        // update user state temporary timer, update seat state
+        case RequestType.ChangeTemporaryTimeoutTime: {
+            break;
+        }
+        // update user state overall timer, update seat state
+        case RequestType.ChangeOverallTimeoutTime: {
+            break;
+        }
+    }
 }

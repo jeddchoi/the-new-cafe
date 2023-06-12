@@ -19,11 +19,80 @@ export default class UserStateHandler {
             startTime,
             timer: endTime === null ? null : {
                 endTime,
-                taskName: `${userId}/reserve/${startTime}`,
+                taskName: `${userId}/${UserStateType[UserStateType.Reserved]}/${startTime}`,
             },
             seatPosition,
         });
     }
+
+    static occupySeat(userId: string, startTime: number, endTime: number | null) {
+        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
+            if (!existing) return;
+            if (!existing.status) return;
+            if (!existing.status.overall.seatPosition) return;
+            return {
+                ...existing,
+                status: {
+                    overall: {
+                        state: UserStateType.Occupied,
+                        reason: UserStateChangeReason.UserAction,
+                        startTime,
+                        timer: endTime === null ? null : {
+                            endTime,
+                            taskName: `${userId}/${UserStateType[UserStateType.Occupied]}/${startTime}`,
+                        },
+                    },
+                },
+            };
+        });
+    }
+
+    static quit(userId: string) {
+        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
+            if (!existing) return;
+            if (!existing.status) return;
+
+            return {
+                ...existing,
+                status: null,
+            };
+        });
+    }
+
+    static removeTemporaryState(userId: string) {
+        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
+            if (!existing) return;
+            if (!existing.status) return;
+            return {
+                ...existing,
+                status: {
+                    temporary: null,
+                },
+            };
+        });
+    }
+    static updateUserTemporaryStateInSession(userId: string, state: UserStateType, startTime: number, endTime: number | null, isReset: boolean) {
+        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
+            if (!existing) return;
+            if (!existing.status) return; // abort
+            return {
+                ...existing,
+                status: {
+                    temporary: {
+                        state,
+                        reason: UserStateChangeReason.UserAction,
+                        startTime,
+                        timer: endTime === null ? null : {
+                            endTime,
+                            taskName: `${userId}/${UserStateType[state]}/${startTime}`,
+                            isReset,
+                        },
+                    },
+                },
+            };
+        });
+    }
+
 
     // static updateUserStateData(userId: string, updateContent: { [key in keyof IUserStateExternal]?: IUserStateExternal[key] }): Promise<void> {
     //     return RealtimeDatabaseUtil.getUserState(userId).update(updateContent);

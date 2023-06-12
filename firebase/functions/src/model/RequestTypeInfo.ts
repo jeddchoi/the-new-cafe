@@ -65,13 +65,13 @@ export const RequestTypeInfo: {
         tasks: [TaskType.StopCurrentTimer, TaskType.UpdateUserState, TaskType.UpdateSeatState],
         requiredConditions: [RequestCondition.SeatPositionInExistingUserState, RequestCondition.SeatOfExistingUserStateIsOccupiedByMe],
     },
-    [RequestType.ChangeCurrentTimeoutTime]: {
+    [RequestType.ChangeTemporaryTimeoutTime]: {
         availablePriorUserState: [UserStateType.Reserved, UserStateType.Away, UserStateType.OnBusiness],
         targetState: "Existing State",
         tasks: [TaskType.StopCurrentTimer, TaskType.StartCurrentTimer, TaskType.UpdateUserState],
         requiredConditions: [RequestCondition.SeatOfExistingUserStateIsOccupiedByMe],
     },
-    [RequestType.ChangeUsageTimeoutTime]: {
+    [RequestType.ChangeOverallTimeoutTime]: {
         availablePriorUserState: [UserStateType.Occupied],
         targetState: "Existing State",
         tasks: [TaskType.StopUsageTimer, TaskType.StartUsageTimer, TaskType.UpdateUserState],
