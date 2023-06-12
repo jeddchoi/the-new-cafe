@@ -76,6 +76,7 @@ class UserState implements IUserState {
 
 export {
     UserState,
+    State,
     OverallState,
     TemporaryState,
     SeatPosition,
