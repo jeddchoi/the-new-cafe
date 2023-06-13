@@ -5,8 +5,6 @@ import {logger} from "firebase-functions/v2";
 
 
 export default class SeatHandler {
-
-
     static getSeatData(seatPosition: SeatPosition | string) {
         return FirestoreUtil.getSeatDocRef(seatPosition).get()
             .then((value) => value.data());
