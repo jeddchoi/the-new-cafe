@@ -7,8 +7,14 @@ import {deserializeSeatId} from "../model/SeatPosition";
 import {UserStateType} from "../model/UserStateType";
 import {TransactionResult} from "@firebase/database-types";
 import {logger} from "firebase-functions/v2";
-import CloudTasksUtil from "../util/CloudTasksUtil";
 
+
+async function reserveSeat(userId: string, seatPosition: SeatPosition | null, current: number, endTime: number | null) {
+    if (!seatPosition) throwFunctionsHttpsError("invalid-argument", "seatPosition is required");
+    const isReserved = await SeatHandler.reserveSeat(userId, seatPosition, endTime);
+    if (!isReserved) throwFunctionsHttpsError("failed-precondition", "Failed to reserve seat");
+    return UserStateHandler.reserveSeat(userId, seatPosition, current, endTime);
+}
 
 export async function requestHandler(
     userId: string,
@@ -19,14 +25,10 @@ export async function requestHandler(
 ) {
     const promises = [];
     logger.info(`[${current} -> ${endTime}] request: ${requestType} ${seatPosition} by ${userId}`);
-    const timer = new CloudTasksUtil();
     switch (requestType) {
         // after reserve seat, update user state
         case RequestType.ReserveSeat: {
-            if (!seatPosition) throwFunctionsHttpsError("invalid-argument", "seatPosition is required");
-            const isReserved = await SeatHandler.reserveSeat(userId, seatPosition, endTime);
-            if (!isReserved) throwFunctionsHttpsError("failed-precondition", "Failed to reserve seat");
-            promises.push(UserStateHandler.reserveSeat(userId, seatPosition, current, endTime));
+            promises.push(reserveSeat(userId, seatPosition, current, endTime));
             break;
         }
         // update user overall state, update seat state
@@ -42,28 +44,9 @@ export async function requestHandler(
             promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
                 if (userState.status?.overall.seatPosition) {
                     return SeatHandler.freeSeat(userId, deserializeSeatId(userState.status?.overall.seatPosition));
-                } else {
-                    return;
-                }
+                } else return;
             }));
-
-            promises.push(UserStateHandler.quit(userId)
-            //     .then((result) => {
-            //     logger.info(`before quit = ${result}`);
-            //     const userState = result.snapshot.val() as IUserStateExternal; // TODO: snapshot would have resulting state
-            //     const taskName = userState.status?.overall.timer?.taskName;
-            //     const time = userState.status?.overall.timer?.endTime;
-            //     const ps = [];
-            //     if (taskName && time && time > current) {
-            //         ps.push(timer.cancelTimer(taskName));
-            //     }
-            //     const seatPosition = userState.status?.overall.seatPosition;
-            //     if (seatPosition) {
-            //         ps.push(SeatHandler.freeSeat(userId, deserializeSeatId(seatPosition)));
-            //     }
-            //     return Promise.all(ps);
-            // })
-            );
+            promises.push(UserStateHandler.quit(userId));
             break;
         }
         // remove user temporary state, update seat state
@@ -71,26 +54,9 @@ export async function requestHandler(
             promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
                 if (userState.status?.overall?.seatPosition) {
                     return SeatHandler.resumeUsing(userId, deserializeSeatId(userState.status?.overall?.seatPosition));
-                } else {
-                    return;
-                }
+                } else return;
             }));
-            promises.push(UserStateHandler.removeTemporaryState(userId)
-            //     .then((result) => {
-            //     const userState = result.snapshot.val() as IUserStateExternal; // TODO: snapshot would have resulting state
-            //     const taskName = userState.status?.temporary?.timer?.taskName;
-            //     const time = userState.status?.temporary?.timer?.endTime;
-            //     const ps = [];
-            //     if (taskName && time && time > current) {
-            //         ps.push(timer.cancelTimer(taskName));
-            //     }
-            //     const seatPosition = userState.status?.overall.seatPosition;
-            //     if (seatPosition) {
-            //         ps.push(SeatHandler.resumeUsing(userId, deserializeSeatId(seatPosition)));
-            //     }
-            //     return Promise.all(ps);
-            // })
-            );
+            promises.push(UserStateHandler.removeTemporaryState(userId));
             break;
         }
         // update user temporary state, update seat state

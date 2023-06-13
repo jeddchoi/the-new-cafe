@@ -1,6 +1,5 @@
 import {database} from "firebase-admin";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
-import {SeatPosition} from "../model/SeatPosition";
 import {UserSession, UserStateChange} from "../model/UserSession";
 import {UserStateType} from "../model/UserStateType";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";

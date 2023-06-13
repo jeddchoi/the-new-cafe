@@ -1,10 +1,4 @@
-import {
-    IUserStateExternal,
-    OverallState,
-    SeatPosition,
-    TimerInfo,
-    UserState,
-} from "../model/UserState";
+import {IUserStateExternal, OverallState, SeatPosition, TimerInfo, UserState,} from "../model/UserState";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {UserStateType} from "../model/UserStateType";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
@@ -39,7 +33,7 @@ export default class UserStateHandler {
     static occupySeat(userId: string, startTime: number, endTime: number | null) {
         logger.debug(`[UserStateHandler] occupySeat(${userId}, ${startTime}, ${endTime})`);
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
-            if (!existing) return;
+            if (!existing) return null;
             if (!existing.status) return;
             if (!existing.status.overall.seatPosition) return;
             return <IUserStateExternal>{
@@ -62,20 +56,23 @@ export default class UserStateHandler {
 
     static quit(userId: string) {
         logger.debug(`[UserStateHandler] quit(${userId})`);
-        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
-            if (!existing) return;
+        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing : IUserStateExternal | null) => {
+            logger.log(`transaction : ${existing}`);
+            if (!existing) return null;
             if (!existing.status) return;
             return <IUserStateExternal>{
                 ...existing,
                 status: null,
             };
+        }).then((result) => {
+            logger.log(`quit result = ${result.committed}`);
         });
     }
 
     static removeTemporaryState(userId: string) {
         logger.debug(`[UserStateHandler] removeTemporaryState(${userId})`);
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
-            if (!existing) return;
+            if (!existing) return null;
             if (!existing.status) return;
             return <IUserStateExternal>{
                 ...existing,
@@ -89,7 +86,7 @@ export default class UserStateHandler {
     static updateUserTemporaryStateInSession(userId: string, state: UserStateType, startTime: number, endTime: number | null) {
         logger.debug(`[UserStateHandler] updateUserTemporaryStateInSession(${userId}, ${state}, ${startTime}, ${endTime})`);
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
-            if (!existing) return;
+            if (!existing) return null;
             if (!existing.status) return;
             return <IUserStateExternal>{
                 ...existing,

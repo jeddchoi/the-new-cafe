@@ -6,7 +6,7 @@ initializeApp();
 
 import {CallableRequest, onCall, onRequest, Request} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
-import {onValueCreated, onValueWritten} from "firebase-functions/v2/database";
+import {onValueWritten} from "firebase-functions/v2/database";
 import {logger} from "firebase-functions/v2";
 import {auth} from "firebase-functions";
 import {Response} from "express";
@@ -20,13 +20,14 @@ import {
 } from "./model/SeatPosition";
 
 import {throwFunctionsHttpsError} from "./util/functions_helper";
-import RealtimeDatabaseUtil, {REFERENCE_USER_STATE_NAME} from "./util/RealtimeDatabaseUtil";
+import {REFERENCE_USER_STATE_NAME} from "./util/RealtimeDatabaseUtil";
 import {seatWrittenHandler} from "./trigger/on_seat_written";
 import {sectionWrittenHandler} from "./trigger/on_section_written";
 import {timerWrittenHandler} from "./trigger/on_timer_written";
 import {userStateStatusWrittenHandler} from "./trigger/on_user_state_status_written";
 import {authUserCreatedHandler} from "./trigger/on_auth_user_created";
 import {TimeoutRequest} from "./util/CloudTasksUtil";
+
 
 /**
  * Callable functions
@@ -51,9 +52,10 @@ export const onHandleRequestTest =
             const userId = req.body.userId as string;
             const request = UserActionRequest.fromJSON(req.body.request);
             const current = new Date().getTime();
-            await requestHandler(userId, request.requestType, request.seatPosition, request.getEndTime(current), current);
-            logger.info("Completed Successfully.");
-            res.status(200).send("Completed Successfully.");
+            return requestHandler(userId, request.requestType, request.seatPosition, request.getEndTime(current), current).then(() => {
+                logger.info("Completed Successfully.");
+                res.status(200).send("Completed Successfully.");
+            });
         } catch (e) {
             logger.error("Some error occurred", e);
             res.status(500).send(`Some error occurred. ${e}`);
@@ -64,9 +66,10 @@ export const onTimeout =
     onRequest(async (req: Request, res: Response) => {
         try {
             const timeoutRequest = req.body as TimeoutRequest;
-            await requestHandler(timeoutRequest.userId, timeoutRequest.requestType, null, null);
-            logger.info("Completed Successfully.");
-            res.status(200).send("Completed Successfully.");
+            return requestHandler(timeoutRequest.userId, timeoutRequest.requestType, null, null).then(() => {
+                logger.info("Completed Successfully.");
+                res.status(200).send("Completed Successfully.");
+            });
         } catch (e) {
             logger.error("Some error occurred", e);
             res.status(500).send(`Some error occurred. ${e}`);
