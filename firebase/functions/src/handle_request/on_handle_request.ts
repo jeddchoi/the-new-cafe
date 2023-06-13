@@ -3,7 +3,6 @@ import SeatHandler from "../handler/SeatHandler";
 import {throwFunctionsHttpsError} from "../util/functions_helper";
 import UserStateHandler from "../handler/UserStateHandler";
 import {IUserStateExternal, SeatPosition} from "../model/UserState";
-import {deserializeSeatId} from "../model/SeatPosition";
 import {UserStateType} from "../model/UserStateType";
 import {TransactionResult} from "@firebase/database-types";
 import {logger} from "firebase-functions/v2";
