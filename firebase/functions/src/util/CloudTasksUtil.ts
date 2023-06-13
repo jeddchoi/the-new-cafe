@@ -59,7 +59,7 @@ export default class CloudTasksUtil {
     }
 
     private createHttpTaskWithSchedule(
-        payload: NonNullable<any>,
+        payload: NonNullable<unknown>,
         path: string,
         scheduleTimeInSeconds: number, // The schedule time in seconds
         taskName: string | null,
