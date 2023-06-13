@@ -31,8 +31,7 @@ export async function requestHandler(
             break;
         }
         // remove user state status, update seat state
-        case RequestType.CancelReservation:
-        case RequestType.StopUsingSeat: {
+        case RequestType.Quit: {
             promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
                 const seatPosition = userState.status?.overall.seatPosition;
                 const ps = [];
@@ -67,11 +66,6 @@ export async function requestHandler(
                 }));
             break;
         }
-        // update user state temporary timer, update seat state
-        case RequestType.ChangeTemporaryTimeoutTime: {
-            promises.push(UserStateHandler.updateTemporaryTimer(userId, endTime));
-            break;
-        }
         // update user state overall timer, update seat state
         case RequestType.ChangeOverallTimeoutTime: {
             promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
@@ -88,6 +82,11 @@ export async function requestHandler(
                 ps.push(UserStateHandler.updateOverallTimer(userId, endTime));
                 return Promise.all(ps);
             }));
+            break;
+        }
+        // update user state temporary timer, update seat state
+        case RequestType.ChangeTemporaryTimeoutTime: {
+            promises.push(UserStateHandler.updateTemporaryTimer(userId, endTime));
             break;
         }
     }

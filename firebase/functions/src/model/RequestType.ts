@@ -2,16 +2,14 @@ import {UserStateType} from "./UserStateType";
 
 export enum RequestType {
     ReserveSeat,
-
-    CancelReservation,
     OccupySeat,
-    StopUsingSeat,
+    Quit,
     DoBusiness,
     ShiftToBusiness,
     LeaveAway,
     ResumeUsing,
-    ChangeTemporaryTimeoutTime,
     ChangeOverallTimeoutTime,
+    ChangeTemporaryTimeoutTime,
 }
 
 export function resultStateByRequestType(requestType: RequestType, success: boolean) {
@@ -19,8 +17,7 @@ export function resultStateByRequestType(requestType: RequestType, success: bool
     switch (requestType) {
         case RequestType.ReserveSeat:
             return UserStateType.Reserved;
-        case RequestType.CancelReservation:
-        case RequestType.StopUsingSeat:
+        case RequestType.Quit:
             return UserStateType.None;
         case RequestType.OccupySeat:
         case RequestType.ResumeUsing:
@@ -30,8 +27,8 @@ export function resultStateByRequestType(requestType: RequestType, success: bool
             return UserStateType.OnBusiness;
         case RequestType.LeaveAway:
             return UserStateType.Away;
-        case RequestType.ChangeTemporaryTimeoutTime:
         case RequestType.ChangeOverallTimeoutTime:
+        case RequestType.ChangeTemporaryTimeoutTime:
             return null;
     }
 }

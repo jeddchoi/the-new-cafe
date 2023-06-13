@@ -25,8 +25,7 @@ export function afterRequestHandler(
                 } else return;
             });
         }
-        case RequestType.CancelReservation:
-        case RequestType.StopUsingSeat: {
+        case RequestType.Quit: {
             return sessionHandler.addStateChange(requestType, resultState, current, reason, success)
                 .then(() => sessionHandler.cleanupSession(requestType, current));
         }

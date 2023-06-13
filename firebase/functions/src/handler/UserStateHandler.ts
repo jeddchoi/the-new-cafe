@@ -25,7 +25,7 @@ export default class UserStateHandler {
             timer: endTime === null ? null : <TimerInfo>{
                 endTime,
                 taskName: this.getTaskName(userId, UserStateType.Reserved, endTime),
-                willRequestType: RequestType.CancelReservation,
+                willRequestType: RequestType.Quit,
             },
             seatPosition: serializeSeatId(seatPosition),
         });
@@ -49,7 +49,7 @@ export default class UserStateHandler {
                         timer: endTime === null ? null : <TimerInfo>{
                             endTime,
                             taskName: this.getTaskName(userId, UserStateType.Occupied, endTime),
-                            willRequestType: RequestType.StopUsingSeat,
+                            willRequestType: RequestType.Quit,
                         },
                     },
                 },
@@ -87,7 +87,7 @@ export default class UserStateHandler {
                         timer: endTime === null ? null : <TimerInfo>{
                             endTime,
                             taskName: this.getTaskName(userId, state, endTime),
-                            willRequestType: state === UserStateType.Away ? RequestType.StopUsingSeat : RequestType.ResumeUsing,
+                            willRequestType: state === UserStateType.Away ? RequestType.Quit : RequestType.ResumeUsing,
                         },
                     },
                 },
