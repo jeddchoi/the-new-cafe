@@ -65,7 +65,6 @@ export default class UserStateHandler {
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return;
             if (!existing.status) return;
-
             return <IUserStateExternal>{
                 ...existing,
                 status: null,

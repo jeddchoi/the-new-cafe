@@ -7,6 +7,7 @@ import {deserializeSeatId} from "../model/SeatPosition";
 import {UserStateType} from "../model/UserStateType";
 import {TransactionResult} from "@firebase/database-types";
 import {logger} from "firebase-functions/v2";
+import CloudTasksUtil from "../util/CloudTasksUtil";
 
 
 export async function requestHandler(
@@ -18,7 +19,7 @@ export async function requestHandler(
 ) {
     const promises = [];
     logger.info(`[${current} -> ${endTime}] request: ${requestType} ${seatPosition} by ${userId}`);
-
+    const timer = new CloudTasksUtil();
     switch (requestType) {
         // after reserve seat, update user state
         case RequestType.ReserveSeat: {
@@ -38,16 +39,58 @@ export async function requestHandler(
         // remove user state status, update seat state
         case RequestType.CancelReservation:
         case RequestType.StopUsingSeat: {
-            promises.push(UserStateHandler.quit(userId).then(transformToSeatPosition).then((seatPosition) => {
-                return SeatHandler.freeSeat(userId, seatPosition);
+            promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
+                if (userState.status?.overall.seatPosition) {
+                    return SeatHandler.freeSeat(userId, deserializeSeatId(userState.status?.overall.seatPosition));
+                } else {
+                    return;
+                }
             }));
+
+            promises.push(UserStateHandler.quit(userId)
+            //     .then((result) => {
+            //     logger.info(`before quit = ${result}`);
+            //     const userState = result.snapshot.val() as IUserStateExternal; // TODO: snapshot would have resulting state
+            //     const taskName = userState.status?.overall.timer?.taskName;
+            //     const time = userState.status?.overall.timer?.endTime;
+            //     const ps = [];
+            //     if (taskName && time && time > current) {
+            //         ps.push(timer.cancelTimer(taskName));
+            //     }
+            //     const seatPosition = userState.status?.overall.seatPosition;
+            //     if (seatPosition) {
+            //         ps.push(SeatHandler.freeSeat(userId, deserializeSeatId(seatPosition)));
+            //     }
+            //     return Promise.all(ps);
+            // })
+            );
             break;
         }
         // remove user temporary state, update seat state
         case RequestType.ResumeUsing: {
-            promises.push(UserStateHandler.removeTemporaryState(userId).then(transformToSeatPosition).then((seatPosition) => {
-                return SeatHandler.resumeUsing(userId, seatPosition);
+            promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
+                if (userState.status?.overall?.seatPosition) {
+                    return SeatHandler.resumeUsing(userId, deserializeSeatId(userState.status?.overall?.seatPosition));
+                } else {
+                    return;
+                }
             }));
+            promises.push(UserStateHandler.removeTemporaryState(userId)
+            //     .then((result) => {
+            //     const userState = result.snapshot.val() as IUserStateExternal; // TODO: snapshot would have resulting state
+            //     const taskName = userState.status?.temporary?.timer?.taskName;
+            //     const time = userState.status?.temporary?.timer?.endTime;
+            //     const ps = [];
+            //     if (taskName && time && time > current) {
+            //         ps.push(timer.cancelTimer(taskName));
+            //     }
+            //     const seatPosition = userState.status?.overall.seatPosition;
+            //     if (seatPosition) {
+            //         ps.push(SeatHandler.resumeUsing(userId, deserializeSeatId(seatPosition)));
+            //     }
+            //     return Promise.all(ps);
+            // })
+            );
             break;
         }
         // update user temporary state, update seat state
