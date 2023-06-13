@@ -36,9 +36,10 @@ export async function requestHandler(
         case RequestType.CancelReservation:
         case RequestType.StopUsingSeat: {
             promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
+                const seatPosition = userState.status?.overall.seatPosition;
                 const ps = [];
-                if (userState.status?.overall.seatPosition) {
-                    ps.push(SeatHandler.freeSeat(userId, deserializeSeatId(userState.status?.overall.seatPosition)));
+                if (seatPosition) {
+                    ps.push(SeatHandler.freeSeat(userId, deserializeSeatId(seatPosition)));
                 }
                 ps.push(UserStateHandler.quit(userId));
                 return Promise.all(ps);
