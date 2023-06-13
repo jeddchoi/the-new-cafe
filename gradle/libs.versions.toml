@@ -19,7 +19,7 @@ firebaseBom = "31.3.0"
 hilt = "2.46.1"
 junit4 = "4.13.2"
 kotlin = "1.8.22" # TODO: compatible with jetpack compose
-kotlinxCoroutines = "1.6.4"
+kotlinxCoroutines = "1.7.1"
 kotlinxDatetime = "0.4.0"
 kotlinxSerializationJson = "1.5.0"
 
