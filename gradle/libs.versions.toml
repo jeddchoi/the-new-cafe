@@ -21,7 +21,7 @@ junit4 = "4.13.2"
 kotlin = "1.8.22" # TODO: compatible with jetpack compose
 kotlinxCoroutines = "1.7.1"
 kotlinxDatetime = "0.4.0"
-kotlinxSerializationJson = "1.5.0"
+kotlinxSerializationJson = "1.5.1"
 
 
 [libraries]
