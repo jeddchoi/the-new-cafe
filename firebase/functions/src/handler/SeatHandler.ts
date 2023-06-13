@@ -35,7 +35,7 @@ export default class SeatHandler {
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
-            if (existing.reserveEndTime || existing.state !== SeatStateType.Empty) return false;
+            if (!existing.reserveEndTime || existing.state !== SeatStateType.Reserved) return false;
             return existing.userId === userId;
         }, () => {
             return {

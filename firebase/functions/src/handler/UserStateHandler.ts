@@ -39,7 +39,9 @@ export default class UserStateHandler {
             return <IUserStateExternal>{
                 ...existing,
                 status: {
+                    ...existing.status,
                     overall: {
+                        ...existing.status.overall,
                         state: UserStateType.Occupied,
                         reason: UserStateChangeReason.UserAction,
                         startTime,
@@ -75,6 +77,7 @@ export default class UserStateHandler {
             return <IUserStateExternal>{
                 ...existing,
                 status: {
+                    ...existing.status,
                     temporary: null,
                 },
             };
@@ -89,7 +92,9 @@ export default class UserStateHandler {
             return <IUserStateExternal>{
                 ...existing,
                 status: {
+                    ...existing.status,
                     temporary: {
+                        ...existing.status.temporary,
                         state,
                         reason: UserStateChangeReason.UserAction,
                         startTime,
