@@ -45,10 +45,10 @@ export const onHandleRequest =
         return requestHandler(userId, request.data.requestType, request.data.seatPosition, request.data.getEndTime(current), current)
             .then(() => {
                 logger.info("Completed Successfully.");
-                return afterRequestHandler(userId, request.data.requestType, true, UserStateChangeReason.UserAction, current);
+                return afterRequestHandler(userId, request.data.requestType, true, UserStateChangeReason.UserAction, request.data.seatPosition, current);
             }).catch((e) => {
                 logger.error("Some error occurred", e);
-                return afterRequestHandler(userId, request.data.requestType, false, UserStateChangeReason.UserAction, current);
+                return afterRequestHandler(userId, request.data.requestType, false, UserStateChangeReason.UserAction, request.data.seatPosition, current);
             });
     });
 
@@ -63,12 +63,12 @@ export const onHandleRequestTest =
 
         return requestHandler(userId, request.requestType, request.seatPosition, request.getEndTime(current), current)
             .then(() => {
-                return afterRequestHandler(userId, request.requestType, true, UserStateChangeReason.UserAction, current).then(() => {
+                return afterRequestHandler(userId, request.requestType, true, UserStateChangeReason.UserAction, request.seatPosition, current).then(() => {
                     logger.info("Completed Successfully.");
                     res.status(200).send("Completed Successfully.");
                 });
             }).catch((e) => {
-                return afterRequestHandler(userId, request.requestType, false, UserStateChangeReason.UserAction, current).then(() => {
+                return afterRequestHandler(userId, request.requestType, false, UserStateChangeReason.UserAction, request.seatPosition, current).then(() => {
                     logger.error("Some error occurred", e);
                     res.status(500).send(`Some error occurred. ${e}`);
                 });
@@ -81,12 +81,12 @@ export const onTimeout =
 
         return requestHandler(timeoutRequest.userId, timeoutRequest.requestType, null, null)
             .then(() => {
-                return afterRequestHandler(timeoutRequest.userId, timeoutRequest.requestType, true, UserStateChangeReason.Timeout).then(() => {
+                return afterRequestHandler(timeoutRequest.userId, timeoutRequest.requestType, true, UserStateChangeReason.Timeout, null).then(() => {
                     logger.info("Completed Successfully.");
                     res.status(200).send("Completed Successfully.");
                 });
             }).catch((e) => {
-                return afterRequestHandler(timeoutRequest.userId, timeoutRequest.requestType, false, UserStateChangeReason.Timeout).then(() => {
+                return afterRequestHandler(timeoutRequest.userId, timeoutRequest.requestType, false, UserStateChangeReason.Timeout, null).then(() => {
                     logger.error("Some error occurred", e);
                     res.status(500).send(`Some error occurred. ${e}`);
                 });

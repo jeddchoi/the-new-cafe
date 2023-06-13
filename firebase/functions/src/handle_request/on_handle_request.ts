@@ -85,12 +85,8 @@ async function reserveSeat(userId: string, seatPosition: SeatPosition | null, cu
     if (!seatPosition) throwFunctionsHttpsError("invalid-argument", "seatPosition is required");
     const isReserved = await SeatHandler.reserveSeat(userId, seatPosition, endTime);
     if (!isReserved) throwFunctionsHttpsError("failed-precondition", "Failed to reserve seat");
-    const sessionHandler = new UserSessionHandler(userId);
 
-    return Promise.all([
-        UserStateHandler.reserveSeat(userId, seatPosition, current, endTime),
-        sessionHandler.createSession(current, seatPosition),
-    ]);
+    return UserStateHandler.reserveSeat(userId, seatPosition, current, endTime);
 }
 
 function transformToSeatPositionIfSuccess(result: TransactionResult) {
