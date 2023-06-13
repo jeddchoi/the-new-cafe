@@ -3,11 +3,13 @@ import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {UserSession, UserStateChange} from "../model/UserSession";
 import {UserStateType} from "../model/UserStateType";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
-import {OverallState, State} from "../model/UserState";
+import {SeatPosition} from "../model/UserState";
+import {RequestType} from "../model/RequestType";
 
 export default class UserSessionHandler {
     private ref: database.Reference;
     private stateChangesRef: database.Reference;
+
     constructor(
         readonly userId: string
     ) {
@@ -15,42 +17,33 @@ export default class UserSessionHandler {
         this.stateChangesRef = this.ref.child("stateChanges");
     }
 
-    createSession(overallState: OverallState) {
+    createSession(timestamp: number, seatPosition: SeatPosition | null) {
         return this.ref.set(<UserSession>{
-            startTime: overallState.startTime,
-            seatPosition: overallState.seatPosition,
-        }).then(() => {
-            return this.stateChangesRef.push(<UserStateChange>{
-                state: overallState.state,
-                timestamp: overallState.startTime,
-                reason: overallState.reason,
-            });
-        });
-    }
-    addStateChange(state: State) {
-        return this.stateChangesRef.push(<UserStateChange>{
-            state: state.state,
-            timestamp: state.startTime,
-            reason: state.reason,
+            startTime: timestamp,
+            seatPosition,
         });
     }
 
-    addStateChangeOnDeletion(state: UserStateType, timestamp: number, reason: UserStateChangeReason) {
+    addStateChange(requestType: RequestType, resultState: UserStateType | undefined, timestamp: number, reason: UserStateChangeReason, success: boolean) {
         return this.stateChangesRef.push(<UserStateChange>{
-            state,
+            resultState,
             timestamp,
             reason,
+            requestType,
+            success,
         });
     }
 
-    cleanupSession(eventTimestamp: number) {
-        return this.ref.once("value").then((snapshot) => {
+    cleanupSession(requestType: RequestType, timestamp: number, reason: UserStateChangeReason, success: boolean) {
+        return this.addStateChange(requestType, UserStateType.None, timestamp, reason, success).then(() => {
+            return this.ref.once("value");
+        }).then((snapshot) => {
             const userSession = snapshot.val() as UserSession;
             return RealtimeDatabaseUtil.getUserHistoryRef(this.userId).push(<UserSession>{
                 ...userSession,
-                endTime: eventTimestamp,
+                endTime: timestamp,
             });
-        }).then(()=> {
+        }).then(() => {
             return this.ref.remove();
         });
     }

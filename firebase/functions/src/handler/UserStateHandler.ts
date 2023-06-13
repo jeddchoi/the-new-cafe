@@ -1,4 +1,4 @@
-import {IUserStateExternal, OverallState, SeatPosition, TimerInfo, UserState,} from "../model/UserState";
+import {IUserStateExternal, OverallState, SeatPosition, TimerInfo, UserState} from "../model/UserState";
 import RealtimeDatabaseUtil from "../util/RealtimeDatabaseUtil";
 import {UserStateType} from "../model/UserStateType";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
@@ -64,8 +64,6 @@ export default class UserStateHandler {
                 ...existing,
                 status: null,
             };
-        }).then((result) => {
-            logger.log(`quit result = ${result.committed}`);
         });
     }
 

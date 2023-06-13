@@ -1,10 +1,14 @@
 import {SeatPosition} from "./SeatPosition";
 import {UserStateChangeReason} from "./UserStateChangeReason";
+import {UserStateType} from "./UserStateType";
+import {RequestType} from "./RequestType";
 
 interface UserStateChange {
-    state: number;
+    requestType: RequestType;
+    resultState: UserStateType | undefined; // if state is changed successfully, resultState will not be undefined. If same, undefined
     timestamp: number;
     reason: UserStateChangeReason;
+    success: boolean;
 }
 
 

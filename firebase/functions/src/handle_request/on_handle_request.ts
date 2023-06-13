@@ -7,14 +7,7 @@ import {deserializeSeatId} from "../model/SeatPosition";
 import {UserStateType} from "../model/UserStateType";
 import {TransactionResult} from "@firebase/database-types";
 import {logger} from "firebase-functions/v2";
-
-
-async function reserveSeat(userId: string, seatPosition: SeatPosition | null, current: number, endTime: number | null) {
-    if (!seatPosition) throwFunctionsHttpsError("invalid-argument", "seatPosition is required");
-    const isReserved = await SeatHandler.reserveSeat(userId, seatPosition, endTime);
-    if (!isReserved) throwFunctionsHttpsError("failed-precondition", "Failed to reserve seat");
-    return UserStateHandler.reserveSeat(userId, seatPosition, current, endTime);
-}
+import UserSessionHandler from "../handler/UserSessionHandler";
 
 export async function requestHandler(
     userId: string,
@@ -25,6 +18,7 @@ export async function requestHandler(
 ) {
     const promises = [];
     logger.info(`[${current} -> ${endTime}] request: ${requestType} ${seatPosition} by ${userId}`);
+
     switch (requestType) {
         // after reserve seat, update user state
         case RequestType.ReserveSeat: {
@@ -33,7 +27,7 @@ export async function requestHandler(
         }
         // update user overall state, update seat state
         case RequestType.OccupySeat: {
-            promises.push(UserStateHandler.occupySeat(userId, current, endTime).then(transformToSeatPosition).then((seatPosition) => {
+            promises.push(UserStateHandler.occupySeat(userId, current, endTime).then(transformToSeatPositionIfSuccess).then((seatPosition) => {
                 return SeatHandler.occupySeat(userId, seatPosition, endTime);
             }));
             break;
@@ -42,21 +36,25 @@ export async function requestHandler(
         case RequestType.CancelReservation:
         case RequestType.StopUsingSeat: {
             promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
+                const ps = [];
                 if (userState.status?.overall.seatPosition) {
-                    return SeatHandler.freeSeat(userId, deserializeSeatId(userState.status?.overall.seatPosition));
-                } else return;
+                    ps.push(SeatHandler.freeSeat(userId, deserializeSeatId(userState.status?.overall.seatPosition)));
+                }
+                ps.push(UserStateHandler.quit(userId));
+                return Promise.all(ps);
             }));
-            promises.push(UserStateHandler.quit(userId));
             break;
         }
         // remove user temporary state, update seat state
         case RequestType.ResumeUsing: {
             promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
+                const ps = [];
                 if (userState.status?.overall?.seatPosition) {
-                    return SeatHandler.resumeUsing(userId, deserializeSeatId(userState.status?.overall?.seatPosition));
-                } else return;
+                    ps.push(SeatHandler.resumeUsing(userId, deserializeSeatId(userState.status?.overall?.seatPosition)));
+                }
+                ps.push(UserStateHandler.removeTemporaryState(userId));
+                return Promise.all(ps);
             }));
-            promises.push(UserStateHandler.removeTemporaryState(userId));
             break;
         }
         // update user temporary state, update seat state
@@ -65,7 +63,7 @@ export async function requestHandler(
         case RequestType.ShiftToBusiness: {
             const targetState = requestType === RequestType.LeaveAway ? UserStateType.Away : UserStateType.OnBusiness;
             promises.push(UserStateHandler.updateUserTemporaryStateInSession(userId, targetState, current, endTime)
-                .then(transformToSeatPosition).then((seatPosition) => {
+                .then(transformToSeatPositionIfSuccess).then((seatPosition) => {
                     return SeatHandler.away(userId, seatPosition);
                 }));
             break;
@@ -79,12 +77,22 @@ export async function requestHandler(
             break;
         }
     }
-
     return Promise.all(promises);
 }
 
+async function reserveSeat(userId: string, seatPosition: SeatPosition | null, current: number, endTime: number | null) {
+    if (!seatPosition) throwFunctionsHttpsError("invalid-argument", "seatPosition is required");
+    const isReserved = await SeatHandler.reserveSeat(userId, seatPosition, endTime);
+    if (!isReserved) throwFunctionsHttpsError("failed-precondition", "Failed to reserve seat");
+    const sessionHandler = new UserSessionHandler(userId);
 
-function transformToSeatPosition(result: TransactionResult) {
+    return Promise.all([
+        UserStateHandler.reserveSeat(userId, seatPosition, current, endTime),
+        sessionHandler.createSession(current, seatPosition),
+    ]);
+}
+
+function transformToSeatPositionIfSuccess(result: TransactionResult) {
     if (!result.committed) throwFunctionsHttpsError("failed-precondition", "Failed to update User State");
     const userState = result.snapshot.val() as IUserStateExternal;
     if (!userState.status?.overall.seatPosition) {

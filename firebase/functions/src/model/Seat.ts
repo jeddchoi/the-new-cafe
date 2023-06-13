@@ -22,7 +22,7 @@ interface ISeat {
 
 interface ISeatExternal {
     name: string,
-    state: number,
+    state: SeatStateType,
     isAvailable: boolean,
     userId: string | null,
     reserveEndTime: number | null,
