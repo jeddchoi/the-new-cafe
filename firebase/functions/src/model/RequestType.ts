@@ -15,7 +15,7 @@ export enum RequestType {
 }
 
 export function resultStateByRequestType(requestType: RequestType, success: boolean) {
-    if (!success) return undefined;
+    if (!success) return null;
     switch (requestType) {
         case RequestType.ReserveSeat:
             return UserStateType.Reserved;
@@ -32,6 +32,6 @@ export function resultStateByRequestType(requestType: RequestType, success: bool
             return UserStateType.Away;
         case RequestType.ChangeTemporaryTimeoutTime:
         case RequestType.ChangeOverallTimeoutTime:
-            return undefined;
+            return null;
     }
 }

@@ -5,7 +5,7 @@ import {RequestType} from "./RequestType";
 
 interface UserStateChange {
     requestType: RequestType;
-    resultState: UserStateType | undefined; // if state is changed successfully, resultState will not be undefined. If same, undefined
+    resultState: UserStateType | null; // if state is changed successfully, resultState will not be null. If same, null
     timestamp: number;
     reason: UserStateChangeReason;
     success: boolean;

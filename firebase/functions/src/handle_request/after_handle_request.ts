@@ -12,20 +12,23 @@ export function afterRequestHandler(
     seatPosition: SeatPosition | null,
     current: number = new Date().getTime(),
 ) {
-    logger.debug(`afterRequestHandler : ${userId} ${requestType} ${success} ${reason} ${current}`);
+    logger.debug(`afterRequestHandler : ${userId} ${requestType} ${success} ${reason} ${current} ${JSON.stringify(seatPosition)}`);
     const sessionHandler = new UserSessionHandler(userId);
     const resultState = resultStateByRequestType(requestType, success);
     switch (requestType) {
         case RequestType.ReserveSeat: {
             return sessionHandler.createSession(current, seatPosition).then(() => {
                 return sessionHandler.addStateChange(requestType, resultState, current, reason, success);
-            }).then(()=> {
-                return;
+            }).then(() => {
+                if (!success) {
+                    return sessionHandler.cleanupSession(requestType, current, reason, success);
+                } else return;
             });
         }
         case RequestType.CancelReservation:
         case RequestType.StopUsingSeat: {
-            return sessionHandler.cleanupSession(requestType, current, reason, success);
+            return sessionHandler.addStateChange(requestType, resultState, current, reason, success)
+                .then(() => sessionHandler.cleanupSession(requestType, current, reason, success));
         }
         default: {
             return sessionHandler.addStateChange(requestType, resultState, current, reason, success).then(() => {

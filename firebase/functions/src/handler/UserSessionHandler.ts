@@ -24,7 +24,7 @@ export default class UserSessionHandler {
         });
     }
 
-    addStateChange(requestType: RequestType, resultState: UserStateType | undefined, timestamp: number, reason: UserStateChangeReason, success: boolean) {
+    addStateChange(requestType: RequestType, resultState: UserStateType | null, timestamp: number, reason: UserStateChangeReason, success: boolean) {
         return this.stateChangesRef.push(<UserStateChange>{
             resultState,
             timestamp,
@@ -35,10 +35,8 @@ export default class UserSessionHandler {
     }
 
     cleanupSession(requestType: RequestType, timestamp: number, reason: UserStateChangeReason, success: boolean) {
-        return this.addStateChange(requestType, UserStateType.None, timestamp, reason, success)
-            .then(() => {
-                return this.ref.once("value");
-            }).then((snapshot) => {
+        return this.ref.once("value")
+            .then((snapshot) => {
                 const userSession = snapshot.val() as UserSession;
                 return RealtimeDatabaseUtil.getUserHistoryRef(this.userId).push(<UserSession>{
                     ...userSession,

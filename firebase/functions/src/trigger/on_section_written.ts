@@ -18,17 +18,14 @@ export const sectionWrittenHandler = async (
     let totalSectionsInc: number;
 
     if (event.data?.after?.exists && !event.data?.before?.exists) { // 없다가 생기면
-        logger.debug("Add section!");
         totalSeatsInc = afterSection?.totalSeats ?? 0;
         availableSeatsInc = afterSection?.totalAvailableSeats ?? 0;
         totalSectionsInc = 1;
     } else if (!event.data?.after?.exists && event.data?.before?.exists) { // 있다가 없으면
-        logger.debug("Delete section!");
         totalSeatsInc = -(beforeSection?.totalSeats ?? 0);
         availableSeatsInc = -(beforeSection?.totalAvailableSeats ?? 0);
         totalSectionsInc = -1;
     } else {
-        logger.debug("ELSE");
         totalSeatsInc = (afterSection?.totalSeats ?? 0) - (beforeSection?.totalSeats ?? 0);
         availableSeatsInc = (afterSection?.totalAvailableSeats ?? 0) - (beforeSection?.totalAvailableSeats ?? 0);
         totalSectionsInc = 0;

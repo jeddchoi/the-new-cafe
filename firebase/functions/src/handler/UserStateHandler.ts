@@ -16,7 +16,7 @@ export default class UserStateHandler {
     }
 
     static reserveSeat(userId: string, seatPosition: SeatPosition, startTime: number, endTime: number | null) {
-        logger.debug(`[UserStateHandler] reserveSeat(${userId}, ${seatPosition}, ${startTime}, ${endTime})`);
+        logger.debug(`[UserStateHandler] reserveSeat(${userId}, ${JSON.stringify(seatPosition)}, ${startTime}, ${endTime})`);
         return RealtimeDatabaseUtil.getUserState(userId).child("status/overall").update(<OverallState>{
             state: UserStateType.Reserved,
             reason: UserStateChangeReason.UserAction,

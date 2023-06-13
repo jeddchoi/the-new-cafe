@@ -7,7 +7,6 @@ import {deserializeSeatId} from "../model/SeatPosition";
 import {UserStateType} from "../model/UserStateType";
 import {TransactionResult} from "@firebase/database-types";
 import {logger} from "firebase-functions/v2";
-import UserSessionHandler from "../handler/UserSessionHandler";
 
 export async function requestHandler(
     userId: string,
@@ -17,7 +16,7 @@ export async function requestHandler(
     current: number = new Date().getTime(),
 ) {
     const promises = [];
-    logger.info(`[${current} -> ${endTime}] request: ${requestType} ${seatPosition} by ${userId}`);
+    logger.info(`[${current} -> ${endTime}] request: ${requestType} ${JSON.stringify(seatPosition)} by ${userId}`);
 
     switch (requestType) {
         // after reserve seat, update user state

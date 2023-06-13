@@ -11,7 +11,7 @@ export default class SeatHandler {
     }
 
     static reserveSeat(userId: string, seatPosition: SeatPosition, endTime: number | null) {
-        logger.debug(`[SeatHandler] reserveSeat(${userId}, ${seatPosition}, ${endTime})`);
+        logger.debug(`[SeatHandler] reserveSeat(${userId}, ${JSON.stringify(seatPosition)}, ${endTime})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.userId) return false;
@@ -31,7 +31,7 @@ export default class SeatHandler {
     }
 
     static occupySeat(userId: string, seatPosition: SeatPosition, occupyEndTime: number | null) {
-        logger.debug(`[SeatHandler] occupySeat(${userId}, ${seatPosition}, ${occupyEndTime})`);
+        logger.debug(`[SeatHandler] occupySeat(${userId}, ${JSON.stringify(seatPosition)}, ${occupyEndTime})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
@@ -47,7 +47,7 @@ export default class SeatHandler {
     }
 
     static freeSeat(userId: string, seatPosition: SeatPosition) {
-        logger.debug(`[SeatHandler] freeSeat(${userId}, ${seatPosition})`);
+        logger.debug(`[SeatHandler] freeSeat(${userId}, ${JSON.stringify(seatPosition)})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
@@ -65,7 +65,7 @@ export default class SeatHandler {
 
 
     static resumeUsing(userId: string, seatPosition : SeatPosition) {
-        logger.debug(`[SeatHandler] resumeUsing(${userId}, ${seatPosition})`);
+        logger.debug(`[SeatHandler] resumeUsing(${userId}, ${JSON.stringify(seatPosition)})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
@@ -78,7 +78,7 @@ export default class SeatHandler {
     }
 
     static away(userId: string, seatPosition: SeatPosition) {
-        logger.debug(`[SeatHandler] away(${userId}, ${seatPosition})`);
+        logger.debug(`[SeatHandler] away(${userId}, ${JSON.stringify(seatPosition)})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
