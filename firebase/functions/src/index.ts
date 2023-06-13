@@ -148,18 +148,6 @@ export const onTemporaryTimerWritten =
     );
 
 /**
- * Add state change to UserSession when status is written
- */
-// export const onUserStateStatusWritten =
-//     onValueWritten(
-//         {
-//             ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status`,
-//             region: "asia-southeast1",
-//         },
-//         userStateStatusWrittenHandler
-//     );
-
-/**
  * Create user state when auth user is created
  */
 export const onAuthUserCreated =
