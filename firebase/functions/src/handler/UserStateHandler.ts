@@ -111,6 +111,7 @@ export default class UserStateHandler {
 
 
     static updateOverallTimer(userId: string, newEndTime: number | null) {
+        logger.debug(`[UserStateHandler] updateOverallTimer(${userId}, ${newEndTime})`);
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return null;
             if (!existing.status?.overall) return;
@@ -133,9 +134,10 @@ export default class UserStateHandler {
     }
 
     static updateTemporaryTimer(userId: string, newEndTime: number | null) {
+        logger.debug(`[UserStateHandler] updateTemporaryTimer(${userId}, ${newEndTime})`);
         return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             if (!existing) return null;
-            if (!existing.status?.overall) return;
+            if (!existing.status?.temporary) return;
 
             return <IUserStateExternal>{
                 ...existing,
@@ -146,7 +148,7 @@ export default class UserStateHandler {
                         timer: newEndTime === null ? null : <TimerInfo>{
                             ...existing.status.temporary?.timer,
                             endTime: newEndTime,
-                            taskName: this.getTaskName(userId, existing.status.overall.state, newEndTime),
+                            taskName: this.getTaskName(userId, existing.status.temporary?.state, newEndTime),
                         },
                     },
                 },
