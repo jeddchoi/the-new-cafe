@@ -1,6 +1,9 @@
 // noinspection JSUnusedGlobalSymbols
 
 import {initializeApp} from "firebase-admin/app";
+
+initializeApp();
+
 import {CallableRequest, onCall, onRequest, Request} from "firebase-functions/v2/https";
 import {onDocumentWritten} from "firebase-functions/v2/firestore";
 import {onValueWritten} from "firebase-functions/v2/database";
@@ -26,7 +29,6 @@ import {TimeoutRequest} from "./util/CloudTasksUtil";
 import {afterRequestHandler} from "./handle_request/after_handle_request";
 import {UserStateChangeReason} from "./model/UserStateChangeReason";
 
-initializeApp();
 
 /**
  * Callable functions
