@@ -34,7 +34,7 @@ export default class UserSessionHandler {
         });
     }
 
-    cleanupSession(requestType: RequestType, timestamp: number, reason: UserStateChangeReason, success: boolean) {
+    cleanupSession(requestType: RequestType, timestamp: number) {
         return this.ref.once("value")
             .then((snapshot) => {
                 const userSession = snapshot.val() as UserSession;

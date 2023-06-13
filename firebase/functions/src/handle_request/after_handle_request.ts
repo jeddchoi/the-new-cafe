@@ -21,14 +21,14 @@ export function afterRequestHandler(
                 return sessionHandler.addStateChange(requestType, resultState, current, reason, success);
             }).then(() => {
                 if (!success) {
-                    return sessionHandler.cleanupSession(requestType, current, reason, success);
+                    return sessionHandler.cleanupSession(requestType, current);
                 } else return;
             });
         }
         case RequestType.CancelReservation:
         case RequestType.StopUsingSeat: {
             return sessionHandler.addStateChange(requestType, resultState, current, reason, success)
-                .then(() => sessionHandler.cleanupSession(requestType, current, reason, success));
+                .then(() => sessionHandler.cleanupSession(requestType, current));
         }
         default: {
             return sessionHandler.addStateChange(requestType, resultState, current, reason, success).then(() => {
