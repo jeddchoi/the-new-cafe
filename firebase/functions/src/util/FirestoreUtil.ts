@@ -25,9 +25,13 @@ export default class FirestoreUtil {
             .collection(COLLECTION_GROUP_SECTION_NAME).withConverter(sectionConverter).doc(sectionId);
     }
 
-    static getSeatDocRef(seatId: SeatPosition) {
-        return this.getSectionDocRef(seatId.storeId, seatId.sectionId)
-            .collection(COLLECTION_GROUP_SEAT_NAME).withConverter(seatConverter).doc(seatId.seatId);
+    static getSeatDocRef(seatId: SeatPosition | string) {
+        if (typeof seatId === "string") {
+            return FirestoreUtil.db.doc(seatId).withConverter(seatConverter);
+        } else {
+            return this.getSectionDocRef(seatId.storeId, seatId.sectionId)
+                .collection(COLLECTION_GROUP_SEAT_NAME).withConverter(seatConverter).doc(seatId.seatId);
+        }
     }
 
     static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>) {

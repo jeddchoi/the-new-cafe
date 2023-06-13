@@ -5,7 +5,7 @@ import {logger} from "firebase-functions/v2";
 
 
 export default class SeatHandler {
-    static getSeatData(seatPosition: SeatPosition) {
+    static getSeatData(seatPosition: SeatPosition | string) {
         return FirestoreUtil.getSeatDocRef(seatPosition).get()
             .then((value) => value.data());
     }
@@ -30,7 +30,7 @@ export default class SeatHandler {
         });
     }
 
-    static occupySeat(userId: string, seatPosition: SeatPosition, occupyEndTime: number | null) {
+    static occupySeat(userId: string, seatPosition: SeatPosition | string, occupyEndTime: number | null) {
         logger.debug(`[SeatHandler] occupySeat(${userId}, ${JSON.stringify(seatPosition)}, ${occupyEndTime})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
@@ -46,7 +46,7 @@ export default class SeatHandler {
         });
     }
 
-    static freeSeat(userId: string, seatPosition: SeatPosition) {
+    static freeSeat(userId: string, seatPosition: SeatPosition | string) {
         logger.debug(`[SeatHandler] freeSeat(${userId}, ${JSON.stringify(seatPosition)})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
@@ -64,7 +64,7 @@ export default class SeatHandler {
     }
 
 
-    static resumeUsing(userId: string, seatPosition : SeatPosition) {
+    static resumeUsing(userId: string, seatPosition: SeatPosition | string) {
         logger.debug(`[SeatHandler] resumeUsing(${userId}, ${JSON.stringify(seatPosition)})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
@@ -77,7 +77,7 @@ export default class SeatHandler {
         });
     }
 
-    static away(userId: string, seatPosition: SeatPosition) {
+    static away(userId: string, seatPosition: SeatPosition | string) {
         logger.debug(`[SeatHandler] away(${userId}, ${JSON.stringify(seatPosition)})`);
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
@@ -91,7 +91,7 @@ export default class SeatHandler {
     }
 
     static transaction(
-        seatPosition: SeatPosition,
+        seatPosition: SeatPosition | string,
         predicate: (existing: Seat | undefined) => boolean,
         update: (existing: Seat | undefined) => { [key in keyof ISeatExternal]?: ISeatExternal[key] }
     ) {
@@ -99,7 +99,7 @@ export default class SeatHandler {
     }
 
     updateSeat(
-        seatPosition: SeatPosition,
+        seatPosition: SeatPosition | string,
         updateContent: { [key in keyof ISeatExternal]?: ISeatExternal[key] }
     ) {
         return FirestoreUtil.getSeatDocRef(seatPosition).update(updateContent).then();

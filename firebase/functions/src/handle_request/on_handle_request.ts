@@ -38,7 +38,7 @@ export async function requestHandler(
                 const seatPosition = userState.status?.overall.seatPosition;
                 const ps = [];
                 if (seatPosition) {
-                    ps.push(SeatHandler.freeSeat(userId, deserializeSeatId(seatPosition)));
+                    ps.push(SeatHandler.freeSeat(userId, seatPosition));
                 }
                 ps.push(UserStateHandler.quit(userId));
                 return Promise.all(ps);
@@ -50,7 +50,7 @@ export async function requestHandler(
             promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
                 const ps = [];
                 if (userState.status?.overall?.seatPosition) {
-                    ps.push(SeatHandler.resumeUsing(userId, deserializeSeatId(userState.status?.overall?.seatPosition)));
+                    ps.push(SeatHandler.resumeUsing(userId, userState.status?.overall?.seatPosition));
                 }
                 ps.push(UserStateHandler.removeTemporaryState(userId));
                 return Promise.all(ps);
@@ -94,5 +94,5 @@ function transformToSeatPositionIfSuccess(result: TransactionResult) {
     if (!userState.status?.overall.seatPosition) {
         throwFunctionsHttpsError("invalid-argument", "seatPosition of existing state is required");
     }
-    return deserializeSeatId(userState.status?.overall.seatPosition);
+    return userState.status?.overall.seatPosition;
 }
