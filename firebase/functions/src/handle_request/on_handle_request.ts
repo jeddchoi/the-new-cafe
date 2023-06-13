@@ -1,149 +1,111 @@
-import {MyRequest} from "../model/MyRequest";
-
+import {RequestType} from "../model/RequestType";
+import SeatHandler from "../handler/SeatHandler";
+import {throwFunctionsHttpsError} from "../util/functions_helper";
+import UserStateHandler from "../handler/UserStateHandler";
+import {IUserStateExternal, SeatPosition} from "../model/UserState";
+import {UserStateType} from "../model/UserStateType";
+import {TransactionResult} from "@firebase/database-types";
+import {logger} from "firebase-functions/v2";
 
 export async function requestHandler(
-    request: MyRequest,
-    isTimeout: boolean,
-): Promise<void> {
-    return Promise.resolve();
-    // if (request.requestType === RequestType.NoOp) {
-    //     logger.debug("Don't do anything");
-    //     return Promise.resolve();
-    // }
-    // logger.debug(`Handling request ... [isTimeout = ${isTimeout}] ${JSON.stringify(request)}`);
-    // const requestInfo = RequestTypeInfo[request.requestType];
-    // logger.debug(`[Request Info] ${JSON.stringify(requestInfo)}`);
-    //
-    // const existingUserState = await UserStateHandler.getUserStateData(request.userId);
-    // logger.debug(`[Exising State] ${JSON.stringify(existingUserState)}`);
-    //
-    // // Check if existing user state is valid
-    // if (!requestInfo.availablePriorUserState.includes(existingUserState.state)) {
-    //     throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user state is ${UserStateType[existingUserState.state]}`);
-    // }
-    //
-    // const timer = new CloudTasksUtil();
-    // let promise: Promise<boolean | void> = Promise.resolve();
-    // requestInfo.tasks.forEach((taskType) => {
-    //     switch (taskType) {
-    //         case TaskType.StopCurrentTimer:
-    //         case TaskType.StopUsageTimer:
-    //             promise = promise.then(() => {
-    //                 let ret = Promise.resolve();
-    //                 const timerTaskNameToStop = taskType === TaskType.StopCurrentTimer ?
-    //                     existingUserState.currentTimer?.taskName : existingUserState.usageTimer?.taskName;
-    //                 if (!timerTaskNameToStop) {
-    //                     logger.debug(`[Task #${TaskType[taskType]}] No timer to stop`);
-    //                     return ret;
-    //                 }
-    //                 if (!isTimeout) {
-    //                     logger.debug(`[Task #${TaskType[taskType]}] Cancel timer & Remove timer info of user state`);
-    //                     ret = ret.then(() => timer.cancelTimer(timerTaskNameToStop));
-    //                 }
-    //                 logger.debug(`[Task #${TaskType[taskType]}] Remove timer info of user state`);
-    //                 ret = ret.then(() => UserStateHandler.removeUserTimerTask(request.userId, taskType));
-    //                 return ret;
-    //             });
-    //             break;
-    //         case TaskType.StartCurrentTimer:
-    //         case TaskType.StartUsageTimer:
-    //             promise = promise.then(() => {
-    //                 if (request.deadlineInfo !== undefined) {
-    //                     let timeoutRequest: MyRequest;
-    //
-    //                     if (requestInfo.targetState === "Existing State") {
-    //                         logger.debug(`[Task #${TaskType[taskType]}] Change existing timer with different deadline`);
-    //                         timeoutRequest = MyRequest.newInstance(
-    //                             StateInfo[existingUserState.state].requestTypeIfTimeout,
-    //                             request.userId,
-    //                             UserStateChangeReason.Timeout,
-    //                             request.deadlineInfo?.keepStateUntil,
-    //                             request.seatPosition,
-    //                         );
-    //                     } else {
-    //                         logger.debug(`[Task #${TaskType[taskType]}] Start new timer`);
-    //                         timeoutRequest = MyRequest.newInstance(
-    //                             StateInfo[requestInfo.targetState].requestTypeIfTimeout,
-    //                             request.userId,
-    //                             UserStateChangeReason.Timeout,
-    //                             request.deadlineInfo?.keepStateUntil,
-    //                             request.seatPosition,
-    //                         );
-    //                     }
-    //
-    //                     return timer.startTimer(timeoutRequest).then((task) => {
-    //                         return UserStateHandler.updateUserTimerTask(request.userId, taskType, <TimerInfo>{
-    //                             taskName: task.name,
-    //                             startTime: request.startStateAt,
-    //                             endTime: request.deadlineInfo?.keepStateUntil,
-    //                         });
-    //                     });
-    //                 } else { // No deadline
-    //                     return Promise.resolve();
-    //                 }
-    //             });
-    //             break;
-    //         case TaskType.UpdateUserState:
-    //             promise = promise.then(() => {
-    //                 logger.debug(`[Task #${TaskType[taskType]}] Update user state`);
-    //                 return UserStateHandler.updateUserStateData(request.userId, {
-    //                     lastState: existingUserState.state,
-    //                     state: requestInfo.targetState === "Existing State" ? existingUserState.state : requestInfo.targetState,
-    //                     stateUpdatedAt: request.startStateAt,
-    //                     stateUpdatedBy: request.reason,
-    //                     seatPosition: requestInfo.requiredConditions.includes(RequestCondition.ProvidedSeatPositionInRequest) ? request.seatPosition : (requestInfo.targetState === UserStateType.None ? null : existingUserState.seatPosition),
-    //                 }).then();
-    //             });
-    //             break;
-    //         case TaskType.UpdateSeatState:
-    //             promise = promise.then(() => {
-    //                 if (requestInfo.targetState !== "Existing State") {
-    //                     logger.debug(`[Task #${TaskType[taskType]}] Update seat state`);
-    //                     const targetSeatState = StateInfo[requestInfo.targetState].seatState;
-    //                     let seatPosition: SeatId | undefined;
-    //                     let predicate;
-    //                     if (requestInfo.requiredConditions.includes(RequestCondition.ProvidedSeatPositionInRequest)) {
-    //                         seatPosition = request.seatPosition ?? throwFunctionsHttpsError("invalid-argument", `${RequestType[request.requestType]} Request should be provided with seat position`);
-    //
-    //                         predicate = (existing: Seat | undefined) => {
-    //                             if (!existing) return false;
-    //                             if (requestInfo.requiredConditions.includes(RequestCondition.RequestSeatIsAvailable)) {
-    //                                 if (!existing.isAvailable || existing.userId || existing.state !== SeatStateType.Empty) {
-    //                                     return false;
-    //                                 }
-    //                             }
-    //                             return true;
-    //                         };
-    //                     }
-    //                     if (requestInfo.requiredConditions.includes(RequestCondition.SeatPositionInExistingUserState)) {
-    //                         seatPosition = existingUserState.seatPosition ?? throwFunctionsHttpsError("failed-precondition", `${RequestType[request.requestType]} Request can't be accepted when existing user seat position doesn't exist`);
-    //
-    //                         predicate = (existing: Seat | undefined) => {
-    //                             if (!existing) return false;
-    //                             if (requestInfo.requiredConditions.includes(RequestCondition.SeatOfExistingUserStateIsOccupiedByMe)) {
-    //                                 if (existing.userId !== request.userId || existing.isAvailable) {
-    //                                     return false;
-    //                                 }
-    //                             }
-    //                             return true;
-    //                         };
-    //                     }
-    //                     if (seatPosition && predicate) {
-    //                         return SeatHandler.transaction(seatPosition, predicate, (existing) => {
-    //                             return {
-    //                                 userId: (targetSeatState === SeatStateType.Empty) ? null : request.userId,
-    //                                 state: targetSeatState,
-    //                                 isAvailable: targetSeatState === SeatStateType.Empty,
-    //                             };
-    //                         });
-    //                     }
-    //                 }
-    //                 logger.debug(`[Task #${TaskType[taskType]}] Don't update seat state`);
-    //                 return Promise.resolve(true);
-    //             });
-    //             break;
-    //     }
-    // });
-    //
-    // return promise.then();
+    userId: string,
+    requestType: RequestType,
+    seatPosition: SeatPosition | null,
+    endTime: number | null,
+    current: number = new Date().getTime(),
+) {
+    const promises = [];
+    logger.info(`[${current} -> ${endTime}] request: ${requestType} ${JSON.stringify(seatPosition)} by ${userId}`);
+
+    switch (requestType) {
+        // after reserve seat, update user state
+        case RequestType.ReserveSeat: {
+            promises.push(reserveSeat(userId, seatPosition, current, endTime));
+            break;
+        }
+        // update user overall state, update seat state
+        case RequestType.OccupySeat: {
+            promises.push(UserStateHandler.occupySeat(userId, current, endTime).then(transformToSeatPositionIfSuccess).then((seatPosition) => {
+                return SeatHandler.occupySeat(userId, seatPosition, endTime);
+            }));
+            break;
+        }
+        // remove user state status, update seat state
+        case RequestType.Quit: {
+            promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
+                const seatPosition = userState.status?.overall.seatPosition;
+                const ps = [];
+                if (seatPosition) {
+                    ps.push(SeatHandler.freeSeat(userId, seatPosition));
+                }
+                ps.push(UserStateHandler.quit(userId));
+                return Promise.all(ps);
+            }));
+            break;
+        }
+        // remove user temporary state, update seat state
+        case RequestType.ResumeUsing: {
+            promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
+                const ps = [];
+                if (userState.status?.overall?.seatPosition) {
+                    ps.push(SeatHandler.resumeUsing(userId, userState.status?.overall?.seatPosition));
+                }
+                ps.push(UserStateHandler.removeTemporaryState(userId));
+                return Promise.all(ps);
+            }));
+            break;
+        }
+        // update user temporary state, update seat state
+        case RequestType.DoBusiness:
+        case RequestType.LeaveAway:
+        case RequestType.ShiftToBusiness: {
+            const targetState = requestType === RequestType.LeaveAway ? UserStateType.Away : UserStateType.OnBusiness;
+            promises.push(UserStateHandler.updateUserTemporaryStateInSession(userId, targetState, current, endTime)
+                .then(transformToSeatPositionIfSuccess).then((seatPosition) => {
+                    return SeatHandler.away(userId, seatPosition);
+                }));
+            break;
+        }
+        // update user state overall timer, update seat state
+        case RequestType.ChangeOverallTimeoutTime: {
+            promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
+                const ps = [];
+                const state = userState.status?.overall.state;
+                const seatPosition = userState.status?.overall.seatPosition;
+                if (seatPosition) {
+                    if (state === UserStateType.Reserved) {
+                        ps.push(SeatHandler.updateReserveEndTime(userId, seatPosition, endTime));
+                    } else if (state === UserStateType.Occupied) {
+                        ps.push(SeatHandler.updateOccupyEndTime(userId, seatPosition, endTime));
+                    }
+                }
+                ps.push(UserStateHandler.updateOverallTimer(userId, endTime));
+                return Promise.all(ps);
+            }));
+            break;
+        }
+        // update user state temporary timer, update seat state
+        case RequestType.ChangeTemporaryTimeoutTime: {
+            promises.push(UserStateHandler.updateTemporaryTimer(userId, endTime));
+            break;
+        }
+    }
+    return Promise.all(promises);
+}
+
+async function reserveSeat(userId: string, seatPosition: SeatPosition | null, current: number, endTime: number | null) {
+    if (!seatPosition) throwFunctionsHttpsError("invalid-argument", "seatPosition is required");
+    const isReserved = await SeatHandler.reserveSeat(userId, seatPosition, endTime);
+    if (!isReserved) throwFunctionsHttpsError("failed-precondition", "Failed to reserve seat");
+
+    return UserStateHandler.reserveSeat(userId, seatPosition, current, endTime);
+}
+
+function transformToSeatPositionIfSuccess(result: TransactionResult) {
+    if (!result.committed) throwFunctionsHttpsError("failed-precondition", "Failed to update User State");
+    const userState = result.snapshot.val() as IUserStateExternal;
+    if (!userState.status?.overall.seatPosition) {
+        throwFunctionsHttpsError("invalid-argument", "seatPosition of existing state is required");
+    }
+    return userState.status?.overall.seatPosition;
 }

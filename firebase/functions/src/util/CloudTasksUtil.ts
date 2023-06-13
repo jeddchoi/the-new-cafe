@@ -1,10 +1,16 @@
 import {CloudTasksClient, protos} from "@google-cloud/tasks";
 import {defineString, projectID} from "firebase-functions/params";
 import {logger} from "firebase-functions";
+import {RequestType} from "../model/RequestType";
 
 const tasksQueueName = defineString("TASKS_QUEUE_NAME");
 const tasksLocation = defineString("LOCATION_TASKS");
 const gServiceAccountEmail = defineString("G_SERVICE_ACCOUNT_EMAIL");
+
+export interface TimeoutRequest {
+    requestType: RequestType;
+    userId: string;
+}
 
 export default class CloudTasksUtil {
     private static _client = new CloudTasksClient();
@@ -22,30 +28,42 @@ export default class CloudTasksUtil {
         this._parent = CloudTasksUtil._client.queuePath(this._projectID, this._tasksLocation, this._tasksQueueName);
     }
 
-    public startRemoveTimer(
-        deletePath: string,
+    public startTimeoutTimer(
+        userId: string,
+        willRequestType: RequestType,
         scheduleDate: number,
-        taskName: string | null = null,
-    ): Promise<protos.google.cloud.tasks.v2.ITask> {
-        return this.createHttpTaskWithSchedule({deletePath}, "onDeletePathTimeout", Math.round(scheduleDate / 1000), taskName);
+        taskName: string,
+    ) {
+        logger.debug(`[CloudTasksUtil] startTimeoutTimer : ${userId}, ${willRequestType}, ${scheduleDate}, ${taskName}`);
+        return this.createHttpTaskWithSchedule(<TimeoutRequest>{
+            userId,
+            requestType: willRequestType,
+        }, "onTimeout", Math.round(scheduleDate / 1000), this.getFullTaskName(taskName));
     }
 
 
     public cancelTimer(
-        timerTaskName: string,
-    ): Promise<void> {
-        return CloudTasksUtil._client.deleteTask({name: timerTaskName})
+        taskName: string,
+    ) {
+        logger.debug(`[CloudTasksUtil] cancelTimer : ${taskName}`);
+        return CloudTasksUtil._client.deleteTask({name: this.getFullTaskName(taskName)})
             .catch((err) => {
-                logger.warn(`Deletion task(${timerTaskName}) failed. maybe already consumed`, err);
+                logger.warn(`Deletion task(${taskName}) failed. maybe already consumed`, err);
             }).then();
     }
 
+    private getFullTaskName(taskId: string) {
+        const fullName = CloudTasksUtil._client.taskPath(this._projectID, this._tasksLocation, this._tasksQueueName, taskId);
+        logger.log(`fullName = ${fullName}`);
+        return fullName;
+    }
+
     private createHttpTaskWithSchedule(
-        payload: NonNullable<any>,
+        payload: NonNullable<unknown>,
         path: string,
         scheduleTimeInSeconds: number, // The schedule time in seconds
         taskName: string | null,
-    ): Promise<protos.google.cloud.tasks.v2.ITask> {
+    ) {
         // Construct the fully qualified queue name.
 
         const task = this.createTaskObject(
@@ -68,7 +86,7 @@ export default class CloudTasksUtil {
         payload: object,
         scheduleTimeInSeconds: number,
         taskName: string | null,
-    ): protos.google.cloud.tasks.v2.ITask {
+    ) {
         const body = Buffer.from(JSON.stringify(payload)).toString("base64");
         return <protos.google.cloud.tasks.v2.ITask>{
             name: taskName,

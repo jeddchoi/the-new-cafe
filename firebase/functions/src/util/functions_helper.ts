@@ -1,4 +1,4 @@
-import {logger, https} from "firebase-functions/v2";
+import {https, logger} from "firebase-functions/v2";
 import {FunctionsErrorCode} from "firebase-functions/lib/common/providers/https";
 
 /**

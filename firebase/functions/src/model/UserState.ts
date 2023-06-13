@@ -1,14 +1,12 @@
 import {UserStateType} from "./UserStateType";
 import {UserStateChangeReason} from "./UserStateChangeReason";
-import {SeatId} from "./SeatId";
+import {SeatPosition} from "./SeatPosition";
+import {RequestType} from "./RequestType";
 
 interface TimerInfo {
     endTime: number;
     taskName: string;
-}
-
-interface TemporaryTimerInfo extends TimerInfo{
-    isReset: boolean
+    willRequestType: RequestType,
 }
 
 interface State {
@@ -19,20 +17,15 @@ interface State {
 }
 
 interface OverallState extends State{
-    seatId: string | null;
+    seatPosition: string | null;
 }
-
-interface TemporaryState extends State {
-    timer: TemporaryTimerInfo | null;
-}
-
 
 interface IUserState {
     isOnline: boolean;
     name: string;
     status: {
         overall: OverallState,
-        temporary: TemporaryState
+        temporary: State | null,
     } | null;
     userId: string;
 }
@@ -46,7 +39,7 @@ interface IUserStateExternal {
     name: string;
     status: {
         overall: OverallState,
-        temporary: TemporaryState
+        temporary: State | null,
     } | null;
 }
 
@@ -56,13 +49,13 @@ class UserState implements IUserState {
         readonly name: string,
         readonly status: {
             overall: OverallState,
-            temporary: TemporaryState
+            temporary: State | null,
         } | null,
         readonly userId: string,
     ) {
     }
 
-    static fromExternal(uid: string, val: IUserStateExternal): UserState {
+    static fromExternal(uid: string, val: IUserStateExternal) {
         return new UserState(val.isOnline, val.name, val.status, uid);
     }
 
@@ -76,11 +69,10 @@ class UserState implements IUserState {
 
 export {
     UserState,
+    State,
     OverallState,
-    TemporaryState,
-    SeatId,
+    SeatPosition,
     TimerInfo,
-    TemporaryTimerInfo,
     IUserState,
     IUserStateExternal,
     OVERALL_STATE_PROPERTY_NAME,

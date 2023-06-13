@@ -1,17 +1,21 @@
-import {SeatId} from "./SeatId";
+import {SeatPosition} from "./SeatPosition";
 import {UserStateChangeReason} from "./UserStateChangeReason";
+import {UserStateType} from "./UserStateType";
+import {RequestType} from "./RequestType";
 
 interface UserStateChange {
-    state: number;
+    requestType: RequestType;
+    resultState: UserStateType | null; // if state is changed successfully, resultState will not be null. If same, null
     timestamp: number;
     reason: UserStateChangeReason;
+    success: boolean;
 }
 
 
 interface UserSession {
     startTime: number;
     endTime: number | null;
-    seatId: SeatId | null;
+    seatPosition: SeatPosition | null;
     stateChanges: { [pushKey: string]: UserStateChange };
 }
 
