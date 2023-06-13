@@ -23,7 +23,7 @@ export default class UserStateHandler {
             startTime,
             timer: endTime === null ? null : <TimerInfo>{
                 endTime,
-                taskName: this.getTaskName(userId, UserStateType.Reserved, startTime),
+                taskName: this.getTaskName(userId, UserStateType.Reserved, endTime),
                 willRequestType: RequestType.CancelReservation,
             },
             seatPosition: serializeSeatId(seatPosition),
@@ -47,7 +47,7 @@ export default class UserStateHandler {
                         startTime,
                         timer: endTime === null ? null : <TimerInfo>{
                             endTime,
-                            taskName: this.getTaskName(userId, UserStateType.Occupied, startTime),
+                            taskName: this.getTaskName(userId, UserStateType.Occupied, endTime),
                             willRequestType: RequestType.StopUsingSeat,
                         },
                     },
@@ -58,28 +58,13 @@ export default class UserStateHandler {
 
     static quit(userId: string) {
         logger.debug(`[UserStateHandler] quit(${userId})`);
-        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing : IUserStateExternal | null) => {
+        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
             logger.log(`transaction : ${existing}`);
             if (!existing) return null;
             if (!existing.status) return;
             return <IUserStateExternal>{
                 ...existing,
                 status: null,
-            };
-        });
-    }
-
-    static removeTemporaryState(userId: string) {
-        logger.debug(`[UserStateHandler] removeTemporaryState(${userId})`);
-        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
-            if (!existing) return null;
-            if (!existing.status) return;
-            return <IUserStateExternal>{
-                ...existing,
-                status: {
-                    ...existing.status,
-                    temporary: null,
-                },
             };
         });
     }
@@ -100,7 +85,7 @@ export default class UserStateHandler {
                         startTime,
                         timer: endTime === null ? null : <TimerInfo>{
                             endTime,
-                            taskName: this.getTaskName(userId, state, startTime),
+                            taskName: this.getTaskName(userId, state, endTime),
                             willRequestType: state === UserStateType.Away ? RequestType.StopUsingSeat : RequestType.ResumeUsing,
                         },
                     },
@@ -109,7 +94,68 @@ export default class UserStateHandler {
         });
     }
 
-    private static getTaskName(userId: string, state: UserStateType, startTime: number) {
-        return `${userId}_${UserStateType[state]}_${startTime}`;
+    static removeTemporaryState(userId: string) {
+        logger.debug(`[UserStateHandler] removeTemporaryState(${userId})`);
+        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
+            if (!existing) return null;
+            if (!existing.status) return;
+            return <IUserStateExternal>{
+                ...existing,
+                status: {
+                    ...existing.status,
+                    temporary: null,
+                },
+            };
+        });
+    }
+
+
+    static updateOverallTimer(userId: string, newEndTime: number | null) {
+        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
+            if (!existing) return null;
+            if (!existing.status?.overall) return;
+
+            return <IUserStateExternal>{
+                ...existing,
+                status: {
+                    ...existing.status,
+                    overall: {
+                        ...existing.status.overall,
+                        timer: newEndTime === null ? null : <TimerInfo>{
+                            ...existing.status.overall.timer,
+                            endTime: newEndTime,
+                            taskName: this.getTaskName(userId, existing.status.overall.state, newEndTime),
+                        },
+                    },
+                },
+            };
+        });
+    }
+
+    static updateTemporaryTimer(userId: string, newEndTime: number | null) {
+        return RealtimeDatabaseUtil.getUserState(userId).transaction((existing: IUserStateExternal | null) => {
+            if (!existing) return null;
+            if (!existing.status?.overall) return;
+
+            return <IUserStateExternal>{
+                ...existing,
+                status: {
+                    ...existing.status,
+                    temporary: {
+                        ...existing.status.temporary,
+                        timer: newEndTime === null ? null : <TimerInfo>{
+                            ...existing.status.temporary?.timer,
+                            endTime: newEndTime,
+                            taskName: this.getTaskName(userId, existing.status.overall.state, newEndTime),
+                        },
+                    },
+                },
+            };
+        });
+    }
+
+
+    private static getTaskName(userId: string, state: UserStateType, endTime: number) {
+        return `${userId}_${UserStateType[state]}_${endTime}`;
     }
 }

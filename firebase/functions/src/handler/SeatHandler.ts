@@ -5,6 +5,8 @@ import {logger} from "firebase-functions/v2";
 
 
 export default class SeatHandler {
+
+
     static getSeatData(seatPosition: SeatPosition | string) {
         return FirestoreUtil.getSeatDocRef(seatPosition).get()
             .then((value) => value.data());
@@ -15,8 +17,6 @@ export default class SeatHandler {
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.userId) return false;
-            if (existing.occupyEndTime) return false;
-            if (existing.reserveEndTime) return false;
             if (existing.state !== SeatStateType.Empty) return false;
 
             return existing.isAvailable;
@@ -35,7 +35,7 @@ export default class SeatHandler {
         return this.transaction(seatPosition, (existing) => {
             if (!existing) return false;
             if (existing.isAvailable) return false;
-            if (!existing.reserveEndTime || existing.state !== SeatStateType.Reserved) return false;
+            if (existing.state !== SeatStateType.Reserved) return false;
             return existing.userId === userId;
         }, () => {
             return {
@@ -63,7 +63,6 @@ export default class SeatHandler {
         }).then();
     }
 
-
     static resumeUsing(userId: string, seatPosition: SeatPosition | string) {
         logger.debug(`[SeatHandler] resumeUsing(${userId}, ${JSON.stringify(seatPosition)})`);
         return this.transaction(seatPosition, (existing) => {
@@ -86,6 +85,34 @@ export default class SeatHandler {
         }, () => {
             return {
                 state: SeatStateType.Away,
+            };
+        });
+    }
+
+    static updateReserveEndTime(userId: string, seatPosition: SeatPosition | string, newEndTime: number | null) {
+        logger.debug(`[SeatHandler] updateReserveEndTime(${userId}, ${JSON.stringify(seatPosition)}, ${newEndTime})`);
+        return this.transaction(seatPosition, (existing) => {
+            if (!existing) return false;
+            if (existing.isAvailable) return false;
+            if (existing.state !== SeatStateType.Reserved) return false;
+            return existing.userId === userId;
+        }, () => {
+            return {
+                reserveEndTime: newEndTime,
+            };
+        });
+    }
+
+    static updateOccupyEndTime(userId: string, seatPosition: SeatPosition | string, newEndTime: number | null) {
+        logger.debug(`[SeatHandler] updateOccupyEndTime(${userId}, ${JSON.stringify(seatPosition)}, ${newEndTime})`);
+        return this.transaction(seatPosition, (existing) => {
+            if (!existing) return false;
+            if (existing.isAvailable) return false;
+            if (existing.state !== SeatStateType.Occupied) return false;
+            return existing.userId === userId;
+        }, () => {
+            return {
+                occupyEndTime: newEndTime,
             };
         });
     }
