@@ -23,8 +23,7 @@ import {throwFunctionsHttpsError} from "./util/functions_helper";
 import RealtimeDatabaseUtil, {REFERENCE_USER_STATE_NAME} from "./util/RealtimeDatabaseUtil";
 import {seatWrittenHandler} from "./trigger/on_seat_written";
 import {sectionWrittenHandler} from "./trigger/on_section_written";
-import {overallTimerCreatedHandler} from "./trigger/on_overall_timer_written";
-import {temporaryTimerCreatedHandler} from "./trigger/on_temporary_timer_written";
+import {timerWrittenHandler} from "./trigger/on_timer_written";
 import {userStateStatusWrittenHandler} from "./trigger/on_user_state_status_written";
 import {authUserCreatedHandler} from "./trigger/on_auth_user_created";
 import {TimeoutRequest} from "./util/CloudTasksUtil";
@@ -106,26 +105,26 @@ export const onSectionWritten =
  * Schedule a Cloud task when created overall timer
  * If it is fired, requestHandler will handle it
  */
-export const onOverallTimerCreated =
-    onValueCreated(
+export const onOverallTimerWritten =
+    onValueWritten(
         {
             ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status/overall/timer`,
             region: "asia-southeast1",
         },
-        overallTimerCreatedHandler,
+        timerWrittenHandler,
     );
 
 /**
  * Schedule a Cloud task when created temporary timer
  * If it is fired, requestHandler will handle it
  */
-export const onTemporaryTimerCreated =
-    onValueCreated(
+export const onTemporaryTimerWritten =
+    onValueWritten(
         {
             ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status/temporary/timer`,
             region: "asia-southeast1",
         },
-        temporaryTimerCreatedHandler
+        timerWrittenHandler
     );
 
 /**
