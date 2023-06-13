@@ -2,7 +2,6 @@ import {CloudTasksClient, protos} from "@google-cloud/tasks";
 import {defineString, projectID} from "firebase-functions/params";
 import {logger} from "firebase-functions";
 import {RequestType} from "../model/RequestType";
-import {onTimeout} from "../index";
 
 const tasksQueueName = defineString("TASKS_QUEUE_NAME");
 const tasksLocation = defineString("LOCATION_TASKS");
