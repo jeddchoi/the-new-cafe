@@ -34,7 +34,7 @@ export default class CloudTasksUtil {
         scheduleDate: number,
         taskName: string,
     ) {
-        logger.debug(`startTimeoutTimer : ${userId}, ${willRequestType}, ${scheduleDate}, ${taskName}`);
+        logger.debug(`[CloudTasksUtil] startTimeoutTimer : ${userId}, ${willRequestType}, ${scheduleDate}, ${taskName}`);
         return this.createHttpTaskWithSchedule(<TimeoutRequest>{
             userId,
             requestType: willRequestType,
@@ -45,7 +45,7 @@ export default class CloudTasksUtil {
     public cancelTimer(
         taskName: string,
     ) {
-        logger.debug(`cancelTimer : ${taskName}`);
+        logger.debug(`[CloudTasksUtil] cancelTimer : ${taskName}`);
         return CloudTasksUtil._client.deleteTask({name: this.getFullTaskName(taskName)})
             .catch((err) => {
                 logger.warn(`Deletion task(${taskName}) failed. maybe already consumed`, err);

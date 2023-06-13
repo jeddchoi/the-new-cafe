@@ -68,8 +68,8 @@ export const onHandleRequestTest =
                     res.status(200).send("Completed Successfully.");
                 });
             }).catch((e) => {
+                logger.error("Some error occurred", e);
                 return afterRequestHandler(userId, request.requestType, false, UserStateChangeReason.UserAction, request.seatPosition, current).then(() => {
-                    logger.error("Some error occurred", e);
                     res.status(500).send(`Some error occurred. ${e}`);
                 });
             });
@@ -86,8 +86,8 @@ export const onTimeout =
                     res.status(200).send("Completed Successfully.");
                 });
             }).catch((e) => {
+                logger.error("Some error occurred", e);
                 return afterRequestHandler(timeoutRequest.userId, timeoutRequest.requestType, false, UserStateChangeReason.Timeout, null).then(() => {
-                    logger.error("Some error occurred", e);
                     res.status(500).send(`Some error occurred. ${e}`);
                 });
             });

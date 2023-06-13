@@ -9,6 +9,7 @@ import {RequestType} from "../model/RequestType";
 
 export default class UserStateHandler {
     static getUserStateData(uid: string) {
+        logger.debug(`[UserStateHandler] getUserStateData(${uid})`);
         return RealtimeDatabaseUtil.getUserState(uid).once("value").then((snapshot) => {
             const val = snapshot.val() as IUserStateExternal;
             return UserState.fromExternal(uid, val);

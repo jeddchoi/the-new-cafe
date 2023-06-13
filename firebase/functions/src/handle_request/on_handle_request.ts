@@ -74,18 +74,19 @@ export async function requestHandler(
         }
         // update user state overall timer, update seat state
         case RequestType.ChangeOverallTimeoutTime: {
-            promises.push(UserStateHandler.updateOverallTimer(userId, endTime));
             promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
+                const ps = [];
                 const state = userState.status?.overall.state;
                 const seatPosition = userState.status?.overall.seatPosition;
                 if (seatPosition) {
                     if (state === UserStateType.Reserved) {
-                        return SeatHandler.updateReserveEndTime(userId, seatPosition, endTime);
+                        ps.push(SeatHandler.updateReserveEndTime(userId, seatPosition, endTime));
                     } else if (state === UserStateType.Occupied) {
-                        return SeatHandler.updateOccupyEndTime(userId, seatPosition, endTime);
+                        ps.push(SeatHandler.updateOccupyEndTime(userId, seatPosition, endTime));
                     }
                 }
-                throwFunctionsHttpsError("invalid-argument", "Invalid User State");
+                ps.push(UserStateHandler.updateOverallTimer(userId, endTime));
+                return Promise.all(ps);
             }));
             break;
         }

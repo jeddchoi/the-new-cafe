@@ -5,6 +5,7 @@ import {UserStateType} from "../model/UserStateType";
 import {UserStateChangeReason} from "../model/UserStateChangeReason";
 import {SeatPosition} from "../model/UserState";
 import {RequestType} from "../model/RequestType";
+import {logger} from "firebase-functions/v2";
 
 export default class UserSessionHandler {
     private ref: database.Reference;
@@ -18,6 +19,7 @@ export default class UserSessionHandler {
     }
 
     createSession(timestamp: number, seatPosition: SeatPosition | null) {
+        logger.debug(`[UserSessionHandler] createSession(${timestamp}, ${seatPosition})`);
         return this.ref.set(<UserSession>{
             startTime: timestamp,
             seatPosition,
@@ -25,6 +27,7 @@ export default class UserSessionHandler {
     }
 
     addStateChange(requestType: RequestType, resultState: UserStateType | null, timestamp: number, reason: UserStateChangeReason, success: boolean) {
+        logger.debug(`[UserSessionHandler] addStateChange(${requestType}, ${resultState}, ${timestamp}, ${reason}, ${success})`);
         return this.stateChangesRef.push(<UserStateChange>{
             resultState,
             timestamp,
@@ -35,6 +38,7 @@ export default class UserSessionHandler {
     }
 
     cleanupSession(requestType: RequestType, timestamp: number) {
+        logger.debug(`[UserSessionHandler] cleanupSession(${requestType}, ${timestamp})`);
         return this.ref.once("value")
             .then((snapshot) => {
                 const userSession = snapshot.val() as UserSession;
