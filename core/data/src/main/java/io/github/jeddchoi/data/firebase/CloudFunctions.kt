@@ -22,31 +22,34 @@ class CloudFunctions @Inject constructor(
     private val functions: FirebaseFunctions
 ) {
 
-    suspend fun reserveSeat(uid: String, seatPosition: SeatPosition, durationInSeconds: Int): String {
-        return functions.getHttpsCallable(CLOUD_FUNCTION_RESERVE_SEAT).call(
-            Json.encodeToString(
-                UserStatusChange(
-                    prevStatus = UserStatusType.None,
-                    targetStatus = UserStatusType.Reserved,
-                    cause = UserStatusChangeCause.UserAction,
-                    requestTimestamp = Clock.System.now().epochSeconds,
-                    seatPos = seatPosition,
-                    durationInSeconds = durationInSeconds,
+    suspend fun reserveSeat(
+        seatPosition: SeatPosition,
+        durationInSeconds: Int
+    ): String {
+        try {
+            val result = functions.getHttpsCallable(CLOUD_FUNCTION_RESERVE_SEAT).call(
+                Json.encodeToString(
+                    UserStatusChange(
+                        prevStatus = UserStatusType.None,
+                        targetStatus = UserStatusType.Reserved,
+                        cause = UserStatusChangeCause.UserAction,
+                        requestTimestamp = Clock.System.now().epochSeconds,
+                        seatPos = seatPosition,
+                        durationInSeconds = durationInSeconds,
+                    )
                 )
+            ).await()
+
+            return result.data.toString()
+        } catch (e: FirebaseFunctionsException) {
+            val code = e.code
+            val details = e.details
+            val message = e.message
+            Log.e(
+                "CloudFunctions",
+                "Error code: $code, details: $details, message: $message"
             )
-        ).addOnCompleteListener {task ->
-            if (!task.isSuccessful) {
-                val e = task.exception
-                if (e is FirebaseFunctionsException) {
-                    val code = e.code
-                    val details = e.details
-                    val message = e.message
-                    Log.e("CloudFunctions", "Error code: $code, details: $details, message: $message")
-                }
-            }
-        }.continueWith { task ->
-            val result = task.result?.data?.toString()
-            result?: "Not returning result"
-        }.await()
+            return "Not returning result"
+        }
     }
 }

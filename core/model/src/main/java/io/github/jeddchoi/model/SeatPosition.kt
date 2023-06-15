@@ -8,12 +8,3 @@ data class SeatPosition(
     val sectionId: String = "section_1",
     val seatId: String = "seat_1",
 )
-
-enum class SeatStatusType {
-    None,
-    Reserved,
-    Occupied,
-    Vacant,
-    OnTask,
-    Blocked,
-}

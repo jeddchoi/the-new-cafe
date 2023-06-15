@@ -22,6 +22,24 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val database: FirebaseDatabase,
 ) : AuthRepository {
+    val currentUser = callbackFlow {
+        val authStateListener = FirebaseAuth.AuthStateListener { auth ->
+            trySend(
+                auth.currentUser?.let {
+                    User(
+                        emailAddress = it.email ?: "Email not provided",
+                        displayName = it.displayName ?: "Display name not provided",
+                        id = it.uid,
+                    )
+                }
+            )
+        }
+        auth.addAuthStateListener(authStateListener)
+        awaitClose {
+            auth.removeAuthStateListener(authStateListener)
+        }
+    }
+
     override suspend fun signInWithEmail(email: String, password: String): Result<Unit> {
         auth.signInWithEmailAndPassword(email, password).await()
         return Result.success(Unit)
