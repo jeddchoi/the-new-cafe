@@ -6,7 +6,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.jeddchoi.data.firebase.FirebaseAuthRepositoryImpl
+import io.github.jeddchoi.data.firebase.FirebaseCurrentUserRepositoryImpl
 import io.github.jeddchoi.data.repository.AuthRepository
+import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.util.AuthInputValidator
 import javax.inject.Singleton
 
@@ -19,6 +21,13 @@ abstract class DataModule {
     abstract fun bindsAuthRepository(
         authRepository: FirebaseAuthRepositoryImpl,
     ): AuthRepository
+
+
+    @Singleton
+    @Binds
+    abstract fun bindsCurrentUserRepository(
+        currentUserRepository: FirebaseCurrentUserRepositoryImpl,
+    ): CurrentUserRepository
 }
 
 @Module

@@ -8,4 +8,10 @@
     <string name="google_crash_reporting_api_key" translatable="false">AIzaSyACSIk3HUKyIsd7bEpyXVfJ6wlWRTRdIHU</string>
     <string name="google_storage_bucket" translatable="false">the-new-cafe.appspot.com</string>
     <string name="project_id" translatable="false">the-new-cafe</string>
+
+    <string name="result_ok">The operation completed successfully.</string>
+    <string name="result_unauthenticated">The request does not have valid authentication credentials for the operation.</string>
+    <string name="result_unknown">Unknown error or an error from a different error domain.</string>
+    <string name="result_cancelled">The operation was cancelled (typically by the caller).</string>
+    <string name="result_internal">Internal errors. Means some invariants expected by underlying system has been broken.</string>
 </resources>
