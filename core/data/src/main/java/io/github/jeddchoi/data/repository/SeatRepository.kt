@@ -15,7 +15,7 @@ class SeatRepository @Inject constructor(
     suspend fun reserveSeat(seatPosition: SeatPosition, expiresIn: Int) {
         authRepository.getUserId()?.let {
             Log.d("ReserveSeat", "id = $it")
-            val result = functions.reserveSeat(it, seatPosition, expiresIn)
+            val result = functions.reserveSeat(seatPosition, expiresIn)
             Log.i("ReserveSeat", "result = $result")
         }
     }
