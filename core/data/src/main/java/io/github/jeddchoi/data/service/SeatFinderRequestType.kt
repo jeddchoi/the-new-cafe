@@ -1,6 +1,6 @@
-package io.github.jeddchoi.model
+package io.github.jeddchoi.data.service
 
-enum class RequestType {
+enum class SeatFinderRequestType {
     ReserveSeat,
     OccupySeat,
     Quit,

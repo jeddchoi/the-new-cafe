@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.SeatRepository
-import io.github.jeddchoi.model.SeatPosition
+import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
 import io.github.jeddchoi.ui.model.FeedbackState
 import io.github.jeddchoi.ui.model.Message
 import io.github.jeddchoi.ui.model.UiState
@@ -34,7 +34,7 @@ internal class StoreListViewModel @Inject constructor(
 
     fun reserveSeat() {
         launchOneShotJob {
-            seatRepository.reserveSeat(SeatPosition("store_1", "section_1", "seat_1"), 100)
+            seatRepository.reserveSeat(FirebaseSeatPosition("store_1", "section_1", "seat_1"), 100)
         }
     }
 

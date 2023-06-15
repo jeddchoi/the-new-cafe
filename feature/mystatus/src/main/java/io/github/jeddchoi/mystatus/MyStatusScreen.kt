@@ -42,7 +42,7 @@ internal fun MyStatusScreen(
             UiState.EmptyResult -> "EMPTY"
             is UiState.Error -> "ERROR : ${uiState.exception.message}"
             is UiState.InitialLoading -> "LOADING"
-            is UiState.Success -> "SUCCESS 🎉 ${uiState.data.data}"
+            is UiState.Success -> "OK 🎉 ${uiState.data.data}"
         }
 
         Text(

@@ -1,8 +1,5 @@
 package io.github.jeddchoi.data.repository
 
-import io.github.jeddchoi.model.User
-import kotlinx.coroutines.flow.Flow
-
 interface AuthRepository {
     /**
      * Attempts to log the user in with the given email and password.
@@ -36,21 +33,6 @@ interface AuthRepository {
      * Logs the current user out.
      */
     suspend fun logout()
-
-    /**
-     * Returns true if a user is currently signed in, false otherwise.
-     */
-    fun isUserSignedIn(): Boolean
-
-    /**
-     * Get current user id
-     */
-    fun getUserId(): String?
-
-    /**
-     * Returns the currently signed-in user, or null if no user is signed in.
-     */
-    fun getCurrentUser(): Flow<User?>
 
     /**
      * Sends a password reset email to the given email address.
