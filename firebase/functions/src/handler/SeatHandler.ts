@@ -119,7 +119,7 @@ export default class SeatHandler {
     static transaction(
         seatPosition: SeatPosition | string,
         predicate: (existing: Seat | undefined) => boolean,
-        update: (existing: Seat | undefined) => { [key in keyof ISeatExternal]?: ISeatExternal[key] }
+        update: (existing: Seat | undefined) => Partial<Seat>
     ) {
         return FirestoreUtil.runTransactionOnSingleRefDoc(FirestoreUtil.getSeatDocRef(seatPosition), predicate, update);
     }
