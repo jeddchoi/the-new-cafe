@@ -107,7 +107,6 @@ export const onHandleRequestTest =
 
 export const onTimeout =
     onRequest(async (req: Request, res: Response) => Promise.resolve().then(() => {
-
         const request = req.body as TimeoutRequest;
         const userId = request.userId;
         return requestHandler(userId, request.requestType, null, null)
