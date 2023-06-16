@@ -1,4 +1,4 @@
-import {DocumentReference, Firestore, getFirestore, UpdateData} from "firebase-admin/firestore";
+import {DocumentReference, Firestore, getFirestore} from "firebase-admin/firestore";
 import {storeConverter} from "../model/Store";
 import {seatConverter} from "../model/Seat";
 import {sectionConverter} from "../model/Section";
@@ -34,16 +34,32 @@ export default class FirestoreUtil {
         }
     }
 
-    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>) {
+    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => Partial<T>) {
+        const result = new TransactionResult<T>();
         return this.db.runTransaction(async (t) => {
             const data = (await t.get(docRef)).data();
+            result.before = data;
             if (!predicate(data)) {
-                return false;
+                return result;
             }
             const newContent = update(data);
-            t.update(docRef, newContent);
-            return true;
+            t.set(docRef, newContent, {merge: true});
+            result.committed = true;
+            result.after = <T>{
+                ...data,
+                ...newContent,
+            };
+
+            return result;
         });
     }
 }
 
+class TransactionResult<T> {
+    constructor(
+        public before?: T,
+        public after?: T,
+        public committed: boolean = false,
+    ) {
+    }
+}
