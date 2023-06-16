@@ -1,8 +1,7 @@
-import {logger} from "firebase-functions/v2";
+import {https, logger} from "firebase-functions/v2";
 import {Change, DocumentSnapshot, FirestoreEvent} from "firebase-functions/v2/firestore";
 import {FieldValue} from "firebase-admin/firestore";
 import {ISectionExternal} from "../model/Section";
-import {throwFunctionsHttpsError} from "../util/functions_helper";
 
 
 export const sectionWrittenHandler = async (
@@ -11,7 +10,10 @@ export const sectionWrittenHandler = async (
     logger.debug(`sectionWrittenHandler ${event.params.storeId} ${event.params.sectionId}`);
     const beforeSection = event.data?.before?.data() as ISectionExternal | null;
     const afterSection = event.data?.after?.data() as ISectionExternal | null;
-    const storeRef = event.data?.after?.ref?.parent?.parent ?? throwFunctionsHttpsError("not-found", "store not found");
+    const storeRef = event.data?.after?.ref?.parent?.parent;
+    if (!storeRef) {
+        throw new https.HttpsError("not-found", "store not found");
+    }
 
     let totalSeatsInc: number;
     let availableSeatsInc: number;

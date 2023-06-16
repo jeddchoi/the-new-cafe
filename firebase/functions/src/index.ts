@@ -1,6 +1,6 @@
 // noinspection JSUnusedGlobalSymbols
 
-import "./util/firebase_initialize";
+import "./util/firebase_initialize"; // This must be located on top
 import {Response} from "express";
 import {auth} from "firebase-functions";
 import {logger} from "firebase-functions/v2";
