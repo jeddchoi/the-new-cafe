@@ -1,25 +1,17 @@
-import {ISeatExternal, Seat, SeatStateType} from "../model/Seat";
+import {Seat, SeatStateType} from "../model/Seat";
 import FirestoreUtil from "../util/FirestoreUtil";
 import {SeatPosition} from "../model/SeatPosition";
-import {logger} from "firebase-functions/v2";
+import {https, logger} from "firebase-functions/v2";
+import {BusinessResultCode} from "../model/BusinessResultCode";
 
 
 export default class SeatHandler {
-    static getSeatData(seatPosition: SeatPosition | string) {
-        logger.debug(`[SeatHandler] getSeatData(${seatPosition})`);
-        return FirestoreUtil.getSeatDocRef(seatPosition).get()
-            .then((value) => value.data());
-    }
-
     static reserveSeat(userId: string, seatPosition: SeatPosition, endTime: number | null) {
         logger.debug(`[SeatHandler] reserveSeat(${userId}, ${JSON.stringify(seatPosition)}, ${endTime})`);
         return this.transaction(seatPosition, (existing) => {
-            if (!existing) return false;
-            if (existing.userId) return false;
-            if (existing.state !== SeatStateType.Empty) return false;
-
-            return existing.isAvailable;
-        }, () => {
+            if (existing.userId || existing.state !== SeatStateType.Empty || !existing.isAvailable) {
+                throw BusinessResultCode.SEAT_NOT_AVAILABLE;
+            }
             return {
                 state: SeatStateType.Reserved,
                 isAvailable: false,
@@ -32,11 +24,9 @@ export default class SeatHandler {
     static occupySeat(userId: string, seatPosition: SeatPosition | string, occupyEndTime: number | null) {
         logger.debug(`[SeatHandler] occupySeat(${userId}, ${JSON.stringify(seatPosition)}, ${occupyEndTime})`);
         return this.transaction(seatPosition, (existing) => {
-            if (!existing) return false;
-            if (existing.isAvailable) return false;
-            if (existing.state !== SeatStateType.Reserved) return false;
-            return existing.userId === userId;
-        }, () => {
+            if (existing.isAvailable || existing.state !== SeatStateType.Reserved || existing.userId !== userId) {
+                throw new https.HttpsError("data-loss", "System state is corrupted");
+            }
             return {
                 state: SeatStateType.Occupied,
                 reserveEndTime: null,
@@ -48,10 +38,10 @@ export default class SeatHandler {
     static freeSeat(userId: string, seatPosition: SeatPosition | string) {
         logger.debug(`[SeatHandler] freeSeat(${userId}, ${JSON.stringify(seatPosition)})`);
         return this.transaction(seatPosition, (existing) => {
-            if (!existing) return false;
-            if (existing.isAvailable) return false;
-            return existing.userId === userId;
-        }, () => {
+            if (existing.isAvailable || existing.userId !== userId) {
+                throw new https.HttpsError("data-loss", "System state is corrupted");
+            }
+
             return {
                 state: SeatStateType.Empty,
                 isAvailable: true,
@@ -59,16 +49,15 @@ export default class SeatHandler {
                 reserveEndTime: null,
                 occupyEndTime: null,
             };
-        }).then();
+        });
     }
 
     static resumeUsing(userId: string, seatPosition: SeatPosition | string) {
         logger.debug(`[SeatHandler] resumeUsing(${userId}, ${JSON.stringify(seatPosition)})`);
         return this.transaction(seatPosition, (existing) => {
-            if (!existing) return false;
-            if (existing.isAvailable) return false;
-            return existing.userId === userId;
-        }, () => {
+            if (existing.isAvailable || existing.userId !== userId) {
+                throw new https.HttpsError("data-loss", "System state is corrupted");
+            }
             return {
                 state: SeatStateType.Occupied,
             };
@@ -78,10 +67,9 @@ export default class SeatHandler {
     static away(userId: string, seatPosition: SeatPosition | string) {
         logger.debug(`[SeatHandler] away(${userId}, ${JSON.stringify(seatPosition)})`);
         return this.transaction(seatPosition, (existing) => {
-            if (!existing) return false;
-            if (existing.isAvailable) return false;
-            return existing.userId === userId;
-        }, () => {
+            if (existing.isAvailable || existing.userId !== userId) {
+                throw new https.HttpsError("data-loss", "System state is corrupted");
+            }
             return {
                 state: SeatStateType.Away,
             };
@@ -91,11 +79,10 @@ export default class SeatHandler {
     static updateReserveEndTime(userId: string, seatPosition: SeatPosition | string, newEndTime: number | null) {
         logger.debug(`[SeatHandler] updateReserveEndTime(${userId}, ${JSON.stringify(seatPosition)}, ${newEndTime})`);
         return this.transaction(seatPosition, (existing) => {
-            if (!existing) return false;
-            if (existing.isAvailable) return false;
-            if (existing.state !== SeatStateType.Reserved) return false;
-            return existing.userId === userId;
-        }, () => {
+            if (existing.isAvailable || existing.state !== SeatStateType.Reserved || existing.userId !== userId) {
+                throw new https.HttpsError("data-loss", "System state is corrupted");
+            }
+
             return {
                 reserveEndTime: newEndTime,
             };
@@ -105,28 +92,35 @@ export default class SeatHandler {
     static updateOccupyEndTime(userId: string, seatPosition: SeatPosition | string, newEndTime: number | null) {
         logger.debug(`[SeatHandler] updateOccupyEndTime(${userId}, ${JSON.stringify(seatPosition)}, ${newEndTime})`);
         return this.transaction(seatPosition, (existing) => {
-            if (!existing) return false;
-            if (existing.isAvailable) return false;
-            if (existing.state !== SeatStateType.Occupied) return false;
-            return existing.userId === userId;
-        }, () => {
+            if (existing.isAvailable || existing.state !== SeatStateType.Occupied || existing.userId !== userId) {
+                throw new https.HttpsError("data-loss", "System state is corrupted");
+            }
             return {
                 occupyEndTime: newEndTime,
             };
         });
     }
 
+    static setSeat(seatPosition: SeatPosition, seat: Seat) {
+        return FirestoreUtil.getSeatDocRef(seatPosition).set(seat);
+    }
+
+    static getSeatData(seatPosition: SeatPosition | string) {
+        logger.debug(`[SeatHandler] getSeatData(${seatPosition})`);
+        return FirestoreUtil.getSeatDocRef(seatPosition).get()
+            .then((value) => value.data());
+    }
+
     static transaction(
         seatPosition: SeatPosition | string,
-        predicate: (existing: Seat | undefined) => boolean,
-        update: (existing: Seat | undefined) => Partial<Seat>
+        update: (existing: Seat) => Partial<Seat>
     ) {
-        return FirestoreUtil.runTransactionOnSingleRefDoc(FirestoreUtil.getSeatDocRef(seatPosition), predicate, update);
+        return FirestoreUtil.runTransactionOnSingleRefDoc(FirestoreUtil.getSeatDocRef(seatPosition), update);
     }
 
     updateSeat(
         seatPosition: SeatPosition | string,
-        updateContent: { [key in keyof ISeatExternal]?: ISeatExternal[key] }
+        updateContent: Partial<Seat>
     ) {
         return FirestoreUtil.getSeatDocRef(seatPosition).update(updateContent).then();
     }
