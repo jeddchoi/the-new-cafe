@@ -66,7 +66,7 @@ export default class UserStateHandler {
 
     static quit(userId: string) {
         logger.debug(`[UserStateHandler] quit(${userId})`);
-        return this.transactionOnStatus(userId, (existing) => {
+        return this.transactionOnStatus(userId, () => {
             return null;
         });
     }
@@ -151,13 +151,13 @@ export default class UserStateHandler {
         return RealtimeDatabaseUtil.getUserState(userId).child(REFERENCE_USER_STATUS_NAME);
     }
 
-    private static getUserOverallStateRef(userId: string) {
-        return RealtimeDatabaseUtil.getUserState(userId).child(REFERENCE_USER_STATUS_NAME).child(REFERENCE_USER_OVERALL_STATE_NAME);
-    }
-
-    private static getUserTemporaryStateRef(userId: string) {
-        return RealtimeDatabaseUtil.getUserState(userId).child(REFERENCE_USER_STATUS_NAME).child(REFERENCE_USER_TEMPORARY_STATE_NAME);
-    }
+    // private static getUserOverallStateRef(userId: string) {
+    //     return RealtimeDatabaseUtil.getUserState(userId).child(REFERENCE_USER_STATUS_NAME).child(REFERENCE_USER_OVERALL_STATE_NAME);
+    // }
+    //
+    // private static getUserTemporaryStateRef(userId: string) {
+    //     return RealtimeDatabaseUtil.getUserState(userId).child(REFERENCE_USER_STATUS_NAME).child(REFERENCE_USER_TEMPORARY_STATE_NAME);
+    // }
 
     private static getTaskName(userId: string, state: UserStateType, endTime: number) {
         return `${userId}_${UserStateType[state]}_${endTime}`;
