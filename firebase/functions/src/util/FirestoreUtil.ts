@@ -8,6 +8,7 @@ import {
     COLLECTION_GROUP_STORE_NAME,
     SeatPosition,
 } from "../model/SeatPosition";
+import {TransactionResult} from "../model/TransactionResult";
 
 
 /**
@@ -34,32 +35,32 @@ export default class FirestoreUtil {
         }
     }
 
-    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => Partial<T>) {
-        const result = new TransactionResult<T>();
+    // in Firestore world, absence of data(including field) is undefined, not null (null means explicit null)
+    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, checkAndUpdate: (existing: T) => Partial<T>) {
+        let before: T | undefined = undefined;
         return this.db.runTransaction(async (t) => {
+            const result = new TransactionResult<T>();
             const data = (await t.get(docRef)).data();
-            result.before = data;
-            if (!predicate(data)) {
-                return result;
-            }
-            const newContent = update(data);
+            before = data;
+            if (!data) return result;
+            const newContent = checkAndUpdate(data);
             t.set(docRef, newContent, {merge: true});
             result.committed = true;
             result.after = <T>{
                 ...data,
                 ...newContent,
             };
-
+            return result;
+        }).then((result) => {
+            result.rollback = () => {
+                if (before === undefined) {
+                    return docRef.delete();
+                } else {
+                    return docRef.set(before);
+                }
+            };
             return result;
         });
     }
 }
 
-class TransactionResult<T> {
-    constructor(
-        public before?: T,
-        public after?: T,
-        public committed: boolean = false,
-    ) {
-    }
-}

@@ -20,6 +20,11 @@ interface OverallState extends State{
     seatPosition: string | null;
 }
 
+interface UserStatus {
+    overall: OverallState,
+    temporary: State | null,
+}
+
 interface IUserState {
     isOnline: boolean;
     name: string;
@@ -71,6 +76,7 @@ export {
     UserState,
     State,
     OverallState,
+    UserStatus,
     SeatPosition,
     TimerInfo,
     IUserState,
