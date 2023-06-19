@@ -26,12 +26,13 @@ import {TimeoutRequest} from "./util/CloudTasksUtil";
 import {isBusinessResultCode} from "./util/functions_helper";
 
 import {REFERENCE_USER_STATE_NAME} from "./util/RealtimeDatabaseUtil";
+import {RequestResult} from "./model/RequestResult";
 
 /**
  * Callable functions
  */
 export const onHandleRequest =
-    onCall<UserActionRequest, Promise<BusinessResultCode>>(
+    onCall<UserActionRequest, Promise<RequestResult>>(
         {
             timeoutSeconds: 30,
         },
@@ -61,10 +62,17 @@ export const onHandleRequest =
                     return afterRequestHandler(userId, request.data.requestType, true, UserStateChangeReason.UserAction, request.data.seatPosition, current);
                 });
         }).then(() => {
-            return BusinessResultCode.OK;
+            logger.info("SUCCESS");
+            return {
+                code: BusinessResultCode.OK,
+                message: BusinessResultCode.OK.toString(),
+            };
         }).catch((err) => {
             if (isBusinessResultCode((err))) { // business error
-                return err;
+                return {
+                    code: err,
+                    message: BusinessResultCode[err].toString(),
+                };
             }
             throw err;
         }));
@@ -95,13 +103,19 @@ export const onHandleRequestTest =
                 return afterRequestHandler(userId, request.requestType, true, UserStateChangeReason.UserAction, request.seatPosition, current);
             });
     }).then(() => {
-        res.status(200).send(BusinessResultCode.OK);
+        res.status(200).send({
+            code: BusinessResultCode.OK,
+            message: BusinessResultCode.OK.toString(),
+        });
     }).catch((err) => {
         if (isBusinessResultCode((err))) { // business error
-            res.status(200).send(err);
+            res.status(200).send({
+                code: err,
+                message: BusinessResultCode[err].toString(),
+            });
             // return err;
         } else {
-            res.status(500).send(err);
+            res.status(500).send(err.toString());
         }
     }));
 
@@ -125,12 +139,18 @@ export const onTimeout =
                 return afterRequestHandler(userId, request.requestType, true, UserStateChangeReason.Timeout, null);
             });
     }).then(() => {
-        res.status(200).send(BusinessResultCode.OK);
+        res.status(200).send({
+            code: BusinessResultCode.OK,
+            message: BusinessResultCode.OK.toString(),
+        });
     }).catch((err) => {
         if (isBusinessResultCode((err))) { // business error
-            res.status(200).send(err);
+            res.status(200).send({
+                code: err,
+                message: BusinessResultCode[err].toString(),
+            });
         }
-        res.status(500).send(err);
+        res.status(500).send(err.toString());
     }));
 
 
@@ -144,7 +164,7 @@ export const onTimeout =
 export const onSeatWritten =
     onDocumentWritten(
         {
-            region: "asia-northeast3",
+            // region: "asia-northeast3",
             document: `${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}/${COLLECTION_GROUP_SEAT_NAME}/{seatId}`,
         },
         seatWrittenHandler);
@@ -155,7 +175,7 @@ export const onSeatWritten =
 export const onSectionWritten =
     onDocumentWritten(
         {
-            region: "asia-northeast3",
+            // region: "asia-northeast3",
             document: `${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}`,
         },
         sectionWrittenHandler
@@ -170,7 +190,7 @@ export const onOverallTimerWritten =
     onValueWritten(
         {
             ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status/overall/timer`,
-            region: "asia-southeast1",
+            // region: "asia-southeast1",
         },
         timerWrittenHandler,
     );
@@ -183,7 +203,7 @@ export const onTemporaryTimerWritten =
     onValueWritten(
         {
             ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status/temporary/timer`,
-            region: "asia-southeast1",
+            // region: "asia-southeast1",
         },
         timerWrittenHandler
     );
