@@ -1,11 +1,187 @@
 import {RequestType} from "../model/RequestType";
 import SeatHandler from "../handler/SeatHandler";
-import {throwFunctionsHttpsError} from "../util/functions_helper";
 import UserStateHandler from "../handler/UserStateHandler";
-import {IUserStateExternal, SeatPosition} from "../model/UserState";
+import {SeatPosition} from "../model/UserState";
 import {UserStateType} from "../model/UserStateType";
-import {TransactionResult} from "@firebase/database-types";
-import {logger} from "firebase-functions/v2";
+import {https, logger} from "firebase-functions/v2";
+
+async function reserveSeat(userId: string, seatPosition: SeatPosition | null, current: number, endTime: number | null) {
+    if (!seatPosition) throw new https.HttpsError("invalid-argument", "seatPosition is required");
+    return SeatHandler.reserveSeat(userId, seatPosition, endTime).then((seatResult) => {
+        if (!seatResult.committed) {
+            throw new https.HttpsError("failed-precondition", "Failed to reserve seat");
+        }
+        return UserStateHandler.reserveSeat(userId, seatPosition, current, endTime).then((userResult) => {
+            if (!userResult.committed && seatResult?.rollback) {
+                logger.warn("userResult not committed -> seatResult rollback");
+                return seatResult.rollback();
+            } else {
+                return;
+            }
+        }).catch((err) => {
+            if (seatResult.rollback) {
+                logger.warn("userResult error -> seatResult rollback");
+                return seatResult.rollback().then(() => {
+                    throw err;
+                });
+            }
+            throw err;
+        });
+    });
+}
+
+function occupySeat(userId: string, current: number, endTime: number | null) {
+    return UserStateHandler.occupySeat(userId, current, endTime)
+        .then((userResult) => {
+            if (!userResult.committed || !userResult.after?.overall.seatPosition) {
+                throw new https.HttpsError("failed-precondition", "Failed to occupy seat");
+            }
+            return SeatHandler.occupySeat(userId, userResult.after?.overall.seatPosition, endTime).then((seatResult) => {
+                if (!seatResult.committed && userResult?.rollback) {
+                    logger.warn("seatResult not committed -> userResult rollback");
+                    return userResult.rollback();
+                } else {
+                    return;
+                }
+            }).catch((err) => {
+                if (userResult.rollback) {
+                    logger.warn("seatResult error -> userResult rollback");
+                    return userResult.rollback().then(() => {
+                        throw err;
+                    });
+                }
+                throw err;
+            });
+        });
+}
+
+function quit(userId: string) {
+    return UserStateHandler.quit(userId).then((userResult) => {
+        if (!userResult.committed || !userResult.before?.overall.seatPosition) {
+            throw new https.HttpsError("failed-precondition", "Failed to quit seat");
+        }
+        return SeatHandler.freeSeat(userId, userResult.before?.overall.seatPosition).then((seatResult) => {
+            if (!seatResult.committed && userResult?.rollback) {
+                logger.warn("seatResult not committed -> userResult rollback");
+                return userResult.rollback();
+            } else {
+                return;
+            }
+        }).catch((err) => {
+            if (userResult.rollback) {
+                logger.warn("seatResult error -> userResult rollback");
+                return userResult.rollback().then(() => {
+                    throw err;
+                });
+            }
+            throw err;
+        });
+    });
+}
+
+function resumeUsing(userId: string) {
+    return UserStateHandler.removeTemporaryState(userId).then((userResult) => {
+        if (!userResult.committed || !userResult.after?.overall.seatPosition) {
+            throw new https.HttpsError("failed-precondition", "Failed to resume using seat");
+        }
+        return SeatHandler.resumeUsing(userId, userResult.after?.overall.seatPosition).then((seatResult) => {
+            if (!seatResult.committed && userResult?.rollback) {
+                logger.warn("seatResult not committed -> userResult rollback");
+                return userResult.rollback();
+            } else {
+                return;
+            }
+        }).catch((err) => {
+            if (userResult.rollback) {
+                logger.warn("seatResult error -> userResult rollback");
+                return userResult.rollback().then(() => {
+                    throw err;
+                });
+            }
+            throw err;
+        });
+    });
+}
+
+function goTemporary(userId: string, targetState: UserStateType.Away | UserStateType.OnBusiness, current: number, endTime: number | null) {
+    return UserStateHandler.updateUserTemporaryStateInSession(userId, targetState, current, endTime).then((userResult) => {
+        if (!userResult.committed || !userResult.after?.overall.seatPosition) {
+            throw new https.HttpsError("failed-precondition", "Failed to go temporary seat");
+        }
+        return SeatHandler.away(userId, userResult.after?.overall.seatPosition).then((seatResult) => {
+            if (!seatResult.committed && userResult?.rollback) {
+                logger.warn("seatResult not committed -> userResult rollback");
+                return userResult.rollback();
+            } else {
+                return;
+            }
+        }).catch((err) => {
+            if (userResult.rollback) {
+                logger.warn("seatResult error -> userResult rollback");
+                return userResult.rollback().then(() => {
+                    throw err;
+                });
+            }
+            throw err;
+        });
+    });
+}
+
+function changeOverallTimeoutTime(userId: string, endTime: number | null, current: number) {
+    if (endTime && endTime <= current) {
+        throw new https.HttpsError("invalid-argument", "endTime must be greater than current");
+    }
+    return UserStateHandler.updateOverallTimer(userId, endTime, current).then((userResult) => {
+        if (!userResult.committed || !userResult.after?.overall.seatPosition) {
+            throw new https.HttpsError("failed-precondition", "Failed to change overallTimeoutTime");
+        }
+
+        if (userResult.after.overall.state === UserStateType.Reserved) {
+            return SeatHandler.updateReserveEndTime(userId, userResult.after?.overall.seatPosition, endTime).then((seatResult) => {
+                if (!seatResult.committed && userResult?.rollback) {
+                    logger.warn("seatResult not committed -> userResult rollback");
+                    return userResult.rollback();
+                } else {
+                    return;
+                }
+            }).catch((err) => {
+                if (userResult.rollback) {
+                    logger.warn("seatResult error -> userResult rollback");
+                    return userResult.rollback().then(() => {
+                        throw err;
+                    });
+                }
+                throw err;
+            });
+        } else if (userResult.after.overall.state === UserStateType.Occupied) {
+            return SeatHandler.updateOccupyEndTime(userId, userResult.after?.overall.seatPosition, endTime).then((seatResult) => {
+                if (!seatResult.committed && userResult?.rollback) {
+                    logger.warn("seatResult not committed -> userResult rollback");
+                    return userResult.rollback();
+                } else {
+                    return;
+                }
+            }).catch((err) => {
+                if (userResult.rollback) {
+                    logger.warn("seatResult error -> userResult rollback");
+                    return userResult.rollback().then(() => {
+                        throw err;
+                    });
+                }
+                throw err;
+            });
+        } else {
+            throw new https.HttpsError("internal", "Something went wrong");
+        }
+    });
+}
+
+function changeTemporaryTimeoutTime(userId: string, endTime: number | null, current: number) {
+    if (endTime && endTime <= current) {
+        throw new https.HttpsError("invalid-argument", "endTime must be greater than current");
+    }
+    return UserStateHandler.updateTemporaryTimer(userId, endTime, current);
+}
 
 export async function requestHandler(
     userId: string,
@@ -14,98 +190,41 @@ export async function requestHandler(
     endTime: number | null,
     current: number = new Date().getTime(),
 ) {
-    const promises = [];
     logger.info(`[${current} -> ${endTime}] request: ${requestType} ${JSON.stringify(seatPosition)} by ${userId}`);
 
     switch (requestType) {
-        // after reserve seat, update user state
         case RequestType.ReserveSeat: {
-            promises.push(reserveSeat(userId, seatPosition, current, endTime));
+            await reserveSeat(userId, seatPosition, current, endTime);
             break;
         }
-        // update user overall state, update seat state
         case RequestType.OccupySeat: {
-            promises.push(UserStateHandler.occupySeat(userId, current, endTime).then(transformToSeatPositionIfSuccess).then((seatPosition) => {
-                return SeatHandler.occupySeat(userId, seatPosition, endTime);
-            }));
+            await occupySeat(userId, current, endTime);
             break;
         }
-        // remove user state status, update seat state
         case RequestType.Quit: {
-            promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
-                const seatPosition = userState.status?.overall.seatPosition;
-                const ps = [];
-                if (seatPosition) {
-                    ps.push(SeatHandler.freeSeat(userId, seatPosition));
-                }
-                ps.push(UserStateHandler.quit(userId));
-                return Promise.all(ps);
-            }));
+            await quit(userId);
             break;
         }
-        // remove user temporary state, update seat state
         case RequestType.ResumeUsing: {
-            promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
-                const ps = [];
-                if (userState.status?.overall?.seatPosition) {
-                    ps.push(SeatHandler.resumeUsing(userId, userState.status?.overall?.seatPosition));
-                }
-                ps.push(UserStateHandler.removeTemporaryState(userId));
-                return Promise.all(ps);
-            }));
+            await resumeUsing(userId);
             break;
         }
-        // update user temporary state, update seat state
+        case RequestType.LeaveAway: {
+            await goTemporary(userId, UserStateType.Away, current, endTime);
+            break;
+        }
         case RequestType.DoBusiness:
-        case RequestType.LeaveAway:
         case RequestType.ShiftToBusiness: {
-            const targetState = requestType === RequestType.LeaveAway ? UserStateType.Away : UserStateType.OnBusiness;
-            promises.push(UserStateHandler.updateUserTemporaryStateInSession(userId, targetState, current, endTime)
-                .then(transformToSeatPositionIfSuccess).then((seatPosition) => {
-                    return SeatHandler.away(userId, seatPosition);
-                }));
+            await goTemporary(userId, UserStateType.OnBusiness, current, endTime);
             break;
         }
-        // update user state overall timer, update seat state
         case RequestType.ChangeOverallTimeoutTime: {
-            promises.push(UserStateHandler.getUserStateData(userId).then((userState) => {
-                const ps = [];
-                const state = userState.status?.overall.state;
-                const seatPosition = userState.status?.overall.seatPosition;
-                if (seatPosition) {
-                    if (state === UserStateType.Reserved) {
-                        ps.push(SeatHandler.updateReserveEndTime(userId, seatPosition, endTime));
-                    } else if (state === UserStateType.Occupied) {
-                        ps.push(SeatHandler.updateOccupyEndTime(userId, seatPosition, endTime));
-                    }
-                }
-                ps.push(UserStateHandler.updateOverallTimer(userId, endTime));
-                return Promise.all(ps);
-            }));
+            await changeOverallTimeoutTime(userId, endTime, current);
             break;
         }
-        // update user state temporary timer, update seat state
         case RequestType.ChangeTemporaryTimeoutTime: {
-            promises.push(UserStateHandler.updateTemporaryTimer(userId, endTime));
+            await changeTemporaryTimeoutTime(userId, endTime, current);
             break;
         }
     }
-    return Promise.all(promises);
-}
-
-async function reserveSeat(userId: string, seatPosition: SeatPosition | null, current: number, endTime: number | null) {
-    if (!seatPosition) throwFunctionsHttpsError("invalid-argument", "seatPosition is required");
-    const isReserved = await SeatHandler.reserveSeat(userId, seatPosition, endTime);
-    if (!isReserved) throwFunctionsHttpsError("failed-precondition", "Failed to reserve seat");
-
-    return UserStateHandler.reserveSeat(userId, seatPosition, current, endTime);
-}
-
-function transformToSeatPositionIfSuccess(result: TransactionResult) {
-    if (!result.committed) throwFunctionsHttpsError("failed-precondition", "Failed to update User State");
-    const userState = result.snapshot.val() as IUserStateExternal;
-    if (!userState.status?.overall.seatPosition) {
-        throwFunctionsHttpsError("invalid-argument", "seatPosition of existing state is required");
-    }
-    return userState.status?.overall.seatPosition;
 }

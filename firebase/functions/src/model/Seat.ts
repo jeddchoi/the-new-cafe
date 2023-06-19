@@ -1,6 +1,6 @@
 import {FirestoreDataConverter, QueryDocumentSnapshot} from "firebase-admin/firestore";
-import {throwFunctionsHttpsError} from "../util/functions_helper";
 import {SeatPosition} from "./SeatPosition";
+import {https} from "firebase-functions/v2";
 
 enum SeatStateType {
     Empty,
@@ -50,16 +50,26 @@ const seatConverter: FirestoreDataConverter<Seat> = {
             state: seat.state,
             isAvailable: seat.isAvailable,
             userId: seat.userId,
+            reserveEndTime: seat.reserveEndTime,
+            occupyEndTime: seat.occupyEndTime,
         };
     },
     fromFirestore(
         snapshot: QueryDocumentSnapshot<ISeatExternal>
     ) {
         const data = snapshot.data();
+
+        const storeId = snapshot.ref.parent.parent?.parent.parent?.id;
+        const sectionId = snapshot.ref.parent.parent?.id;
+
+        if (!storeId || !sectionId) {
+            throw new https.HttpsError("not-found", "store doesn't exist");
+        }
+
         return new Seat(
             {
-                storeId: snapshot.ref.parent.parent?.parent.parent?.id ?? throwFunctionsHttpsError("internal", "store doesn't exist"),
-                sectionId: snapshot.ref.parent.parent?.id ?? throwFunctionsHttpsError("internal", "section doesn't exist"),
+                storeId,
+                sectionId,
                 seatId: snapshot.id,
             },
             data.name,

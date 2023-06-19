@@ -41,7 +41,8 @@ export default class UserSessionHandler {
         logger.debug(`[UserSessionHandler] cleanupSession(${requestType}, ${timestamp})`);
         return this.ref.once("value")
             .then((snapshot) => {
-                const userSession = snapshot.val() as UserSession;
+                const userSession = snapshot.val() as UserSession | null;
+                if (!userSession) return;
                 return RealtimeDatabaseUtil.getUserHistoryRef(this.userId).push(<UserSession>{
                     ...userSession,
                     endTime: timestamp,

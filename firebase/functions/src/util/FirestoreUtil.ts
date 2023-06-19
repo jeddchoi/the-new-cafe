@@ -1,4 +1,4 @@
-import {DocumentReference, Firestore, getFirestore, UpdateData} from "firebase-admin/firestore";
+import {DocumentReference, Firestore, getFirestore} from "firebase-admin/firestore";
 import {storeConverter} from "../model/Store";
 import {seatConverter} from "../model/Seat";
 import {sectionConverter} from "../model/Section";
@@ -8,6 +8,10 @@ import {
     COLLECTION_GROUP_STORE_NAME,
     SeatPosition,
 } from "../model/SeatPosition";
+import {TransactionResult} from "../model/TransactionResult";
+import {logger} from "firebase-functions/v2";
+import {firestore} from "firebase-admin";
+import UpdateData = firestore.UpdateData;
 
 
 /**
@@ -34,15 +38,36 @@ export default class FirestoreUtil {
         }
     }
 
-    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, predicate: (data: T | undefined) => boolean, update: (existing: T | undefined) => UpdateData<T>) {
+    // in Firestore world, absence of data(including field) is undefined, not null (null means explicit null)
+    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, checkAndUpdate: (existing: T) => UpdateData<T>) {
         return this.db.runTransaction(async (t) => {
+            const result = new TransactionResult<T>();
             const data = (await t.get(docRef)).data();
-            if (!predicate(data)) {
-                return false;
+            result.before = data;
+            if (!data) {
+                logger.debug(`data = ${data}`);
+                return result;
             }
-            const newContent = update(data);
+            const newContent = checkAndUpdate(data);
+            logger.log(`newContent = ${JSON.stringify(newContent)}`);
             t.update(docRef, newContent);
-            return true;
+            result.committed = true;
+            result.after = {
+                ...data,
+                newContent,
+            };
+            return result;
+        }).then((result) => {
+            result.rollback = () => {
+                logger.warn("Rollback!");
+                if (!result.before) {
+                    return docRef.delete();
+                } else {
+                    return docRef.set(result.before);
+                }
+            };
+            logger.log("[Firestore] transaction result = " + JSON.stringify(result));
+            return result;
         });
     }
 }

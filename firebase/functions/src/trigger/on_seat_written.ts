@@ -1,8 +1,7 @@
-import {logger} from "firebase-functions/v2";
+import {https, logger} from "firebase-functions/v2";
 import {Change, DocumentSnapshot, FirestoreEvent} from "firebase-functions/v2/firestore";
 import {FieldValue} from "firebase-admin/firestore";
 import {ISeatExternal} from "../model/Seat";
-import {throwFunctionsHttpsError} from "../util/functions_helper";
 
 
 export const seatWrittenHandler = async (
@@ -12,7 +11,10 @@ export const seatWrittenHandler = async (
     const promises = [];
     const beforeSeat = event.data?.before?.data() as ISeatExternal | null;
     const afterSeat = event.data?.after?.data() as ISeatExternal | null;
-    const sectionRef = event.data?.after?.ref?.parent?.parent ?? throwFunctionsHttpsError("not-found", "section not found");
+    const sectionRef = event.data?.after?.ref?.parent?.parent;
+    if (!sectionRef) {
+        throw new https.HttpsError("not-found", "section not found");
+    }
     let totalSeatsInc: number;
     let availableSeatsInc: number;
     if (event.data?.after?.exists && !event.data?.before?.exists) { // 없다가 생기면
