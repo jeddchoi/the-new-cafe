@@ -8,7 +8,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeout
-import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.IOException
@@ -30,15 +29,15 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
             if (currentUserRepository.isUserSignedIn()) {
                 functions.getHttpsCallable(CLOUD_FUNCTION_USER_ACTION_HANDLE).call(
                     Json.encodeToString(request)
-                ).await().data as? Int ?: 0
+                ).await().data as? RequestResult ?: RequestResult.fromResultCode(ResultCode.OK)
             } else {
-                ResultCode.UNAUTHENTICATED.value
+                RequestResult.fromResultCode(ResultCode.UNAUTHENTICATED)
             }
         }
     }.fold(
         onSuccess = {
             // handles success or business errors
-            ResultCode.getByValue(it)
+            ResultCode.getByValue(it.code)
         },
         onFailure = {
             // handles technical errors
@@ -46,22 +45,22 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
                 is FirebaseFunctionsException -> {
                     when (it.code) {
                         FirebaseFunctionsException.Code.OK -> ResultCode.OK
-                        FirebaseFunctionsException.Code.CANCELLED -> TODO()
+                        FirebaseFunctionsException.Code.CANCELLED -> ResultCode.CANCELLED
                         FirebaseFunctionsException.Code.UNKNOWN -> ResultCode.UNKNOWN
-                        FirebaseFunctionsException.Code.INVALID_ARGUMENT -> TODO()
-                        FirebaseFunctionsException.Code.DEADLINE_EXCEEDED -> TODO()
-                        FirebaseFunctionsException.Code.NOT_FOUND -> TODO()
-                        FirebaseFunctionsException.Code.ALREADY_EXISTS -> TODO()
-                        FirebaseFunctionsException.Code.PERMISSION_DENIED -> TODO()
-                        FirebaseFunctionsException.Code.RESOURCE_EXHAUSTED -> TODO()
-                        FirebaseFunctionsException.Code.FAILED_PRECONDITION -> TODO()
-                        FirebaseFunctionsException.Code.ABORTED -> TODO()
-                        FirebaseFunctionsException.Code.OUT_OF_RANGE -> TODO()
-                        FirebaseFunctionsException.Code.UNIMPLEMENTED -> TODO()
-                        FirebaseFunctionsException.Code.INTERNAL -> TODO()
-                        FirebaseFunctionsException.Code.UNAVAILABLE -> TODO()
-                        FirebaseFunctionsException.Code.DATA_LOSS -> TODO()
-                        FirebaseFunctionsException.Code.UNAUTHENTICATED -> TODO()
+                        FirebaseFunctionsException.Code.INVALID_ARGUMENT -> ResultCode.INVALID_ARGUMENT
+                        FirebaseFunctionsException.Code.DEADLINE_EXCEEDED -> ResultCode.DEADLINE_EXCEEDED
+                        FirebaseFunctionsException.Code.NOT_FOUND -> ResultCode.NOT_FOUND
+                        FirebaseFunctionsException.Code.ALREADY_EXISTS -> ResultCode.ALREADY_EXISTS
+                        FirebaseFunctionsException.Code.PERMISSION_DENIED -> ResultCode.PERMISSION_DENIED
+                        FirebaseFunctionsException.Code.RESOURCE_EXHAUSTED -> ResultCode.RESOURCE_EXHAUSTED
+                        FirebaseFunctionsException.Code.FAILED_PRECONDITION -> ResultCode.FAILED_PRECONDITION
+                        FirebaseFunctionsException.Code.ABORTED -> ResultCode.ABORTED
+                        FirebaseFunctionsException.Code.OUT_OF_RANGE -> ResultCode.OUT_OF_RANGE
+                        FirebaseFunctionsException.Code.UNIMPLEMENTED -> ResultCode.UNIMPLEMENTED
+                        FirebaseFunctionsException.Code.INTERNAL -> ResultCode.INTERNAL
+                        FirebaseFunctionsException.Code.UNAVAILABLE -> ResultCode.UNAVAILABLE
+                        FirebaseFunctionsException.Code.DATA_LOSS -> ResultCode.DATA_LOSS
+                        FirebaseFunctionsException.Code.UNAUTHENTICATED -> ResultCode.UNAUTHENTICATED
                     }
                 }
 

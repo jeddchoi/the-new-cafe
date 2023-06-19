@@ -14,4 +14,23 @@
     <string name="result_unknown">Unknown error or an error from a different error domain.</string>
     <string name="result_cancelled">The operation was cancelled (typically by the caller).</string>
     <string name="result_internal">Internal errors. Means some invariants expected by underlying system has been broken.</string>
+    <string name="result_seat_not_available">Seat is not available.</string>
+    <string name="result_already_in_progress">You are already in progress.</string>
+    <string name="result_timer_change_not_available">Timer change is not available.</string>
+    <string name="result_already_timeout">Timer is already expired.</string>
+    <string name="result_temporary_longer_than_overall">Temporary state is limited to overall state.</string>
+    <string name="result_permission_denied">The caller does not have permission to execute the specified operation.</string>
+    <string name="result_invalid_state">Invalid state.</string>
+    <string name="result_network_failure">Network is failed.</string>
+    <string name="result_invalid_argument">Client specified an invalid argument.</string>
+    <string name="result_failed_precondition">Operation was rejected because the system is not in a state required for the operation\'s execution.</string>
+    <string name="result_deadline_exceeded">Deadline expired before operation could complete. For operations that change the state of the system, this error may be returned even if the operation has completed successfully. For example, a successful response from a server could have been delayed long enough for the deadline to expire.</string>
+    <string name="result_not_found">Some requested document was not found.</string>
+    <string name="result_already_exists">Some document that we attempted to create already exists.</string>
+    <string name="result_resource_exhausted">Some resource has been exhausted, perhaps a per-user quota, or perhaps the entire file system is out of space.</string>
+    <string name="result_aborted">The operation was aborted, typically due to a concurrency issue like transaction aborts, etc.</string>
+    <string name="result_out_of_range">Operation was attempted past the valid range.</string>
+    <string name="result_unimplemented">Operation is not implemented or not supported/enabled.</string>
+    <string name="result_unavailable">The service is currently unavailable. This is a most likely a transient condition and may be corrected by retrying with a backoff.</string>
+    <string name="result_data_loss"> Unrecoverable data loss or corruption.</string>
 </resources>
