@@ -24,7 +24,7 @@ export default class UserStateHandler {
     static reserveSeat(userId: string, seatPosition: SeatPosition, startTime: number, endTime: number | null) {
         logger.debug(`[UserStateHandler] reserveSeat(${userId}, ${JSON.stringify(seatPosition)}, ${startTime}, ${endTime})`);
         return this.transactionOnStatus(userId, (existing) => {
-            if (existing.overall || existing.temporary) throw BusinessResultCode.ALREADY_IN_PROGRESS;
+            if (existing && (existing.overall || existing.temporary)) throw BusinessResultCode.ALREADY_IN_PROGRESS;
             return <UserStatus>{
                 overall: <OverallState>{
                     state: UserStateType.Reserved,
@@ -45,7 +45,7 @@ export default class UserStateHandler {
         logger.debug(`[UserStateHandler] occupySeat(${userId}, ${startTime}, ${endTime})`);
 
         return this.transactionOnStatus(userId, (existing) => {
-            if (existing.overall.state !== UserStateType.Reserved) throw BusinessResultCode.INVALID_STATE;
+            if (!existing || existing.overall.state !== UserStateType.Reserved) throw BusinessResultCode.INVALID_STATE;
 
             return <UserStatus>{
                 ...existing,
@@ -105,6 +105,7 @@ export default class UserStateHandler {
     static updateOverallTimer(userId: string, newEndTime: number | null, current: number) {
         logger.debug(`[UserStateHandler] updateOverallTimer(${userId}, ${newEndTime})`);
         return this.transactionOnStatus(userId, (existing) => {
+            if (!existing) throw BusinessResultCode.INVALID_STATE;
             if (!existing.overall) throw BusinessResultCode.TIMER_CHANGE_NOT_AVAILABLE;
             if (existing.overall.timer && existing.overall.timer.endTime <= current) throw BusinessResultCode.ALREADY_TIMEOUT;
             return {
@@ -124,6 +125,7 @@ export default class UserStateHandler {
     static updateTemporaryTimer(userId: string, newEndTime: number | null, current: number) {
         logger.debug(`[UserStateHandler] updateTemporaryTimer(${userId}, ${newEndTime})`);
         return this.transactionOnStatus(userId, (existing) => {
+            if (!existing) throw BusinessResultCode.INVALID_STATE;
             if (!existing.temporary) throw BusinessResultCode.TIMER_CHANGE_NOT_AVAILABLE;
             if (existing.overall.timer && existing.overall.timer.endTime <= current) throw BusinessResultCode.ALREADY_TIMEOUT;
             if (newEndTime && existing.overall.timer && existing.overall.timer.endTime <= newEndTime) throw BusinessResultCode.TEMPORARY_LONGER_THAN_OVERALL;
@@ -143,7 +145,7 @@ export default class UserStateHandler {
         });
     }
 
-    private static transactionOnStatus(userId: string, checkAndUpdate: (existing: UserStatus) => UserStatus | null) {
+    private static transactionOnStatus(userId: string, checkAndUpdate: (existing: UserStatus | null) => UserStatus | null) {
         return RealtimeDatabaseUtil.runTransactionOnRef(this.getUserStatusRef(userId), checkAndUpdate);
     }
 

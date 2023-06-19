@@ -50,6 +50,8 @@ const seatConverter: FirestoreDataConverter<Seat> = {
             state: seat.state,
             isAvailable: seat.isAvailable,
             userId: seat.userId,
+            reserveEndTime: seat.reserveEndTime,
+            occupyEndTime: seat.occupyEndTime,
         };
     },
     fromFirestore(

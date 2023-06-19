@@ -9,6 +9,9 @@ import {
     SeatPosition,
 } from "../model/SeatPosition";
 import {TransactionResult} from "../model/TransactionResult";
+import {logger} from "firebase-functions/v2";
+import {firestore} from "firebase-admin";
+import UpdateData = firestore.UpdateData;
 
 
 /**
@@ -36,29 +39,34 @@ export default class FirestoreUtil {
     }
 
     // in Firestore world, absence of data(including field) is undefined, not null (null means explicit null)
-    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, checkAndUpdate: (existing: T) => Partial<T>) {
-        let before: T | undefined = undefined;
+    static runTransactionOnSingleRefDoc<T>(docRef: DocumentReference<T>, checkAndUpdate: (existing: T) => UpdateData<T>) {
         return this.db.runTransaction(async (t) => {
             const result = new TransactionResult<T>();
             const data = (await t.get(docRef)).data();
-            before = data;
-            if (!data) return result;
+            result.before = data;
+            if (!data) {
+                logger.debug(`data = ${data}`);
+                return result;
+            }
             const newContent = checkAndUpdate(data);
-            t.set(docRef, newContent, {merge: true});
+            logger.log(`newContent = ${JSON.stringify(newContent)}`);
+            t.update(docRef, newContent);
             result.committed = true;
-            result.after = <T>{
+            result.after = {
                 ...data,
-                ...newContent,
+                newContent,
             };
             return result;
         }).then((result) => {
             result.rollback = () => {
-                if (before === undefined) {
+                logger.warn("Rollback!");
+                if (!result.before) {
                     return docRef.delete();
                 } else {
-                    return docRef.set(before);
+                    return docRef.set(result.before);
                 }
             };
+            logger.log("[Firestore] transaction result = " + JSON.stringify(result));
             return result;
         });
     }
