@@ -1,7 +1,6 @@
 package io.github.jeddchoi.data.service
 
 import androidx.annotation.StringRes
-import com.google.firebase.functions.FirebaseFunctionsException
 import io.github.jeddchoi.data.R
 
 /**
@@ -16,25 +15,31 @@ enum class ResultCode(val value: Int, @StringRes val description: Int){
     // SUCCESS
     OK(0, R.string.result_ok),
 
+    UNAUTHENTICATED(100, R.string.result_unauthenticated), // prompts client that user should be logged in
+    SEAT_NOT_AVAILABLE(101, R.string.result_seat_not_available), // prompts client that seat is not available
+    ALREADY_IN_PROGRESS(102, R.string.result_already_in_progress), // prompts client that user is already in progress
+    TIMER_CHANGE_NOT_AVAILABLE(103, R.string.result_timer_change_not_available), // prompts client that timer change is not available
+    ALREADY_TIMEOUT(104, R.string.result_already_timeout), // prompts client that user is already timeout
+    TEMPORARY_LONGER_THAN_OVERALL(105, R.string.result_temporary_longer_than_overall), // prompts client that temporary longer than overall
+    PERMISSION_DENIED(106, R.string.result_permission_denied), // prompts client that permission denied
+    INVALID_STATE(107, R.string.result_invalid_state), // prompts client that invalid state
 
-    NETWORK_FAILURE(100, R.string.result_network_failure),
-    CANCELLED(1, R.string.result_cancelled),
-    UNKNOWN(2, R.string.result_unknown),
-    INVALID_ARGUMENT(3, R.string.result_invalid_argument),
-    PERMISSION_DENIED(7, R.string.result_permission_denied),
-    FAILED_PRECONDITION(9, R.string.result_failed_precondition),
-    UNAUTHENTICATED(16, R.string.result_unauthenticated),
-    DEADLINE_EXCEEDED(4, R.string.result_deadline_exceeded),
+    CANCELLED(201, R.string.result_cancelled),
+    UNKNOWN(202, R.string.result_unknown),
+    NETWORK_FAILURE(203, R.string.result_network_failure),
+    INVALID_ARGUMENT(204, R.string.result_invalid_argument),
+    FAILED_PRECONDITION(205, R.string.result_failed_precondition),
+    DEADLINE_EXCEEDED(206, R.string.result_deadline_exceeded),
 
-    NOT_FOUND(5, R.string.result_not_found),
-    ALREADY_EXISTS(6, R.string.result_already_exists),
-    RESOURCE_EXHAUSTED(8, R.string.result_resource_exhausted),
-    ABORTED(10, R.string.result_aborted),
-    OUT_OF_RANGE(11, R.string.result_out_of_range),
-    UNIMPLEMENTED(12, R.string.result_unimplemented),
-    INTERNAL(13, R.string.result_internal),
-    UNAVAILABLE(14, R.string.result_unavailable),
-    DATA_LOSS(15, R.string.result_data_loss)
+    NOT_FOUND(301, R.string.result_not_found),
+    ALREADY_EXISTS(302, R.string.result_already_exists),
+    RESOURCE_EXHAUSTED(303, R.string.result_resource_exhausted),
+    ABORTED(304, R.string.result_aborted),
+    OUT_OF_RANGE(305, R.string.result_out_of_range),
+    UNIMPLEMENTED(306, R.string.result_unimplemented),
+    INTERNAL(307, R.string.result_internal),
+    UNAVAILABLE(308, R.string.result_unavailable),
+    DATA_LOSS(309, R.string.result_data_loss)
     ;
 
     companion object {
@@ -42,68 +47,3 @@ enum class ResultCode(val value: Int, @StringRes val description: Int){
         fun getByValue(value: Int) = VALUES.firstOrNull { it.value == value } ?: UNKNOWN
     }
 }
-
-
-
-/**
- * Client specified an invalid argument. Note that this differs from FAILED_PRECONDITION.
- * INVALID_ARGUMENT indicates arguments that are problematic regardless of the state of the
- * system (e.g., an invalid field name).
- */
-var INVALID_ARGUMENT: FirebaseFunctionsException.Code? = null,
-
-/**
- * Deadline expired before operation could complete. For operations that change the state of the
- * system, this error may be returned even if the operation has completed successfully. For
- * example, a successful response from a server could have been delayed long enough for the
- * deadline to expire.
- */
-var DEADLINE_EXCEEDED: FirebaseFunctionsException.Code? = null,
-
-/** Some requested document was not found.  */
-var NOT_FOUND: FirebaseFunctionsException.Code? = null,
-
-/** Some document that we attempted to create already exists.  */
-var ALREADY_EXISTS: FirebaseFunctionsException.Code? = null,
-
-/** The caller does not have permission to execute the specified operation.  */
-var PERMISSION_DENIED: FirebaseFunctionsException.Code? = null,
-
-/**
- * Some resource has been exhausted, perhaps a per-user quota, or perhaps the entire file system
- * is out of space.
- */
-var RESOURCE_EXHAUSTED: FirebaseFunctionsException.Code? = null,
-
-/**
- * Operation was rejected because the system is not in a state required for the operation's
- * execution.
- */
-var FAILED_PRECONDITION: FirebaseFunctionsException.Code? = null,
-
-/**
- * The operation was aborted, typically due to a concurrency issue like transaction aborts, etc.
- */
-var ABORTED: FirebaseFunctionsException.Code? = null,
-
-/** Operation was attempted past the valid range.  */
-var OUT_OF_RANGE: FirebaseFunctionsException.Code? = null,
-
-/** Operation is not implemented or not supported/enabled.  */
-var UNIMPLEMENTED: FirebaseFunctionsException.Code? = null,
-
-/**
- * Internal errors. Means some invariants expected by underlying system has been broken. If you
- * see one of these errors, something is very broken.
- */
-var INTERNAL: FirebaseFunctionsException.Code? = null,
-
-/**
- * The service is currently unavailable. This is a most likely a transient condition and may be
- * corrected by retrying with a backoff.
- */
-var UNAVAILABLE: FirebaseFunctionsException.Code? = null,
-
-/** Unrecoverable data loss or corruption.  */
-var DATA_LOSS: FirebaseFunctionsException.Code? = null,
-
