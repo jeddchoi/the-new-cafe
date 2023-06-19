@@ -1,0 +1,10 @@
+{
+  "requestType": 0,
+  "seatPosition?": {
+    "storeId": "",
+    "sectionId": "",
+    "seatId": ""
+  },
+  "durationInSeconds?": 0,
+  "endTime?": 0
+}

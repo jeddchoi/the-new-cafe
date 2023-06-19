@@ -1,0 +1,23 @@
+{
+  "profile": {
+    "displayName": "",
+    "isOnline": true,
+    "profilePhotoUrl?": "",
+    "emailAddress?": "",
+    "privateInfo": {
+      "isAnonymous": true,
+      "creationTime": 0,
+      "lastSignInTime": 0,
+      "emailVerified": false,
+      "sex?": 0,
+      "block?": {
+        "reason": 0,
+        "startTime": 0,
+        "timer?": {
+          "endTime": 0,
+          "taskName": ""
+        }
+      }
+    }
+  }
+}
