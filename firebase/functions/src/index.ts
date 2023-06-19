@@ -164,7 +164,7 @@ export const onTimeout =
 export const onSeatWritten =
     onDocumentWritten(
         {
-            // region: "asia-northeast3",
+            region: "asia-northeast3",
             document: `${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}/${COLLECTION_GROUP_SEAT_NAME}/{seatId}`,
         },
         seatWrittenHandler);
@@ -175,7 +175,7 @@ export const onSeatWritten =
 export const onSectionWritten =
     onDocumentWritten(
         {
-            // region: "asia-northeast3",
+            region: "asia-northeast3",
             document: `${COLLECTION_GROUP_STORE_NAME}/{storeId}/${COLLECTION_GROUP_SECTION_NAME}/{sectionId}`,
         },
         sectionWrittenHandler
@@ -190,7 +190,7 @@ export const onOverallTimerWritten =
     onValueWritten(
         {
             ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status/overall/timer`,
-            // region: "asia-southeast1",
+            region: "asia-southeast1",
         },
         timerWrittenHandler,
     );
@@ -203,7 +203,7 @@ export const onTemporaryTimerWritten =
     onValueWritten(
         {
             ref: `/${REFERENCE_USER_STATE_NAME}/{userId}/status/temporary/timer`,
-            // region: "asia-southeast1",
+            region: "asia-southeast1",
         },
         timerWrittenHandler
     );
