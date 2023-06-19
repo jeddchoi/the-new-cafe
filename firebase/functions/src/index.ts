@@ -212,7 +212,7 @@ export const onTemporaryTimerWritten =
  * Create user state when auth user is created
  */
 export const onAuthUserCreated =
+    
     auth.user().onCreate(
         authUserCreatedHandler
     );
-
