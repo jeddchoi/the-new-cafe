@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.authentication.SignInNavigation
 import io.github.jeddchoi.data.repository.AuthRepository
+import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.thenewcafe.navigation.main.MainNavigation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val currentUserRepository: CurrentUserRepository,
 ) : ViewModel() {
     private val _isLoading = MutableStateFlow(true)
     val isLoading = _isLoading.asStateFlow()
@@ -27,7 +28,7 @@ class SplashViewModel @Inject constructor(
 
     private fun initialize() {
         viewModelScope.launch {
-            if (authRepository.isUserSignedIn()) {
+            if (currentUserRepository.isUserSignedIn()) {
                 _startDestination.value = MainNavigation.route()
             } else {
                 _startDestination.value = SignInNavigation.routeGraph

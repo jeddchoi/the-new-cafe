@@ -63,7 +63,7 @@ internal fun ProfileScreen(
             UiState.EmptyResult -> "EMPTY"
             is UiState.Error -> "ERROR : ${uiState.exception.message}"
             is UiState.InitialLoading -> "LOADING"
-            is UiState.Success -> "OK 🎉 ${uiState.data.displayName}"
+            is UiState.Success -> "OK 🎉 ${uiState.data}"
         }
         Text(
             text = text,
