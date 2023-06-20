@@ -1,5 +1,5 @@
-import {SeatFinderRequestType} from "../../enum/SeatFinderRequestType";
-import {SeatPosition} from "../../firestore/seat/SeatPosition";
+import {SeatFinderRequestType} from "../_enum/SeatFinderRequestType";
+import {SeatPosition} from "../../_firestore/model/SeatPosition";
 
 export class SeatFinderRequest {
     constructor(
@@ -24,7 +24,7 @@ export class SeatFinderRequest {
         );
     }
 
-    endTime(startTime: number) {
+    getEndTime = (startTime: number) => {
         if (this.durationInSeconds === null && this._endTime === null) {
             return null;
         } else if (this.durationInSeconds !== null) {
@@ -32,5 +32,5 @@ export class SeatFinderRequest {
         } else {
             return this._endTime;
         }
-    }
+    };
 }

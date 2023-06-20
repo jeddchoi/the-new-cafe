@@ -1,6 +1,6 @@
-const COLLECTION_GROUP_STORE_NAME = "store";
-const COLLECTION_GROUP_SECTION_NAME = "section";
-const COLLECTION_GROUP_SEAT_NAME = "seat";
+const COLLECTION_GROUP_STORE_NAME = "stores";
+const COLLECTION_GROUP_SECTION_NAME = "sections";
+const COLLECTION_GROUP_SEAT_NAME = "seats";
 
 class SeatPosition {
     constructor(

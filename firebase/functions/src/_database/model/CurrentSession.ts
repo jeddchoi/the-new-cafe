@@ -1,4 +1,4 @@
-import {SeatPosition} from "../../../firestore/seat/SeatPosition";
+import {SeatPosition} from "../../_firestore/model/SeatPosition";
 import {PartialUserState} from "./PartialUserState";
 
 export interface CurrentSession {

@@ -1,4 +1,4 @@
-import {SeatStateType} from "../../enum/SeatStateType";
+import {SeatStateType} from "../../seat-finder/_enum/SeatStateType";
 
 export interface Seat {
     name: string;
