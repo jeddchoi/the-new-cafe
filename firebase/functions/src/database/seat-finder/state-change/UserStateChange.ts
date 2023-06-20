@@ -1,6 +1,6 @@
-import {SeatFinderRequestType} from "../../../https/request/SeatFinderRequestType";
-import {UserStateType} from "../UserStateType";
-import {UserStateChangeReason} from "./UserStateChangeReason";
+import {SeatFinderRequestType} from "../../../enum/SeatFinderRequestType";
+import {UserStateType} from "../../../enum/UserStateType";
+import {UserStateChangeReason} from "../../../enum/UserStateChangeReason";
 
 export interface UserStateChange {
     requestType: SeatFinderRequestType;

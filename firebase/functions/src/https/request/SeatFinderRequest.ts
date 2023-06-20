@@ -1,4 +1,4 @@
-import {SeatFinderRequestType} from "./SeatFinderRequestType";
+import {SeatFinderRequestType} from "../../enum/SeatFinderRequestType";
 import {SeatPosition} from "../../firestore/seat/SeatPosition";
 
 export class SeatFinderRequest {

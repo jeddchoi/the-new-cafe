@@ -1,4 +1,4 @@
-import {SeatFinderRequestType} from "../../../https/request/SeatFinderRequestType";
+import {SeatFinderRequestType} from "../../../enum/SeatFinderRequestType";
 
 export interface TimerInfo {
     willRequestType: SeatFinderRequestType | "unblock";
