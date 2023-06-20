@@ -55,7 +55,7 @@ export default class SeatHandler {
             }
             if (existing.isAvailable || existing.state !== SeatStateType.Reserved) {
                 logger.warn("[SeatHandler] Seat is in invalid state", {seatPosition, existing});
-                throw ResultCode.INVALID_STATE;
+                throw ResultCode.INVALID_SEAT_STATE;
             }
 
             return <Seat>{
@@ -80,7 +80,7 @@ export default class SeatHandler {
             }
             if (existing.isAvailable) {
                 logger.warn("[SeatHandler] Seat is in invalid state", {seatPosition, existing});
-                throw ResultCode.INVALID_STATE;
+                throw ResultCode.INVALID_SEAT_STATE;
             }
 
             if (existing.state !== SeatStateType.Occupied) {
