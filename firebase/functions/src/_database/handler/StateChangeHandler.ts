@@ -80,8 +80,6 @@ export default class StateChangeHandler {
         handleSeat: (seatPosition: SeatPosition) => Promise<TransactionResult<Seat>>,
     ) {
         logger.debug("[StateChangeHandler] cleanupSession");
-        return this.transaction(handleSession, handleSeat).finally(() => {
-
-        });
+        return this.transaction(handleSession, handleSeat);
     }
 }
