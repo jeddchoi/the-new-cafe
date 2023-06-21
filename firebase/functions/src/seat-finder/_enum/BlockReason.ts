@@ -1,3 +1,3 @@
-export enum BlockReason {
+export const enum BlockReason {
     MALFORMED_USER
 }

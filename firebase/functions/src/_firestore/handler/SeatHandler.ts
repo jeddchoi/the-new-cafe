@@ -83,10 +83,6 @@ export default class SeatHandler {
                 throw ResultCode.INVALID_SEAT_STATE;
             }
 
-            if (existing.state !== SeatStateType.Occupied) {
-                logger.warn("[SeatHandler] Seat may be in invalid state", {seatPosition, existing});
-            }
-
             return <Seat>{
                 ...existing,
                 state: SeatStateType.Away,
@@ -94,10 +90,9 @@ export default class SeatHandler {
         });
     };
 
-    resumeUsing = (seatPosition: SeatPosition, endTime: number | null = null) => {
+    resumeUsing = (seatPosition: SeatPosition) => {
         logger.debug("[SeatHandler] resumeUsing", {
             seatPosition,
-            endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
         return firestoreUtil.transaction<Seat>(seatPosition.serialize(), (existing) => {
             if (!existing) {

@@ -1,4 +1,4 @@
-export enum UserStateChangeReason {
+export const enum UserStateChangeReason {
     UserAction,
     Timeout,
     Admin,

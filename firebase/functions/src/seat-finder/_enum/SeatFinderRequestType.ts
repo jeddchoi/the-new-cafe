@@ -1,5 +1,5 @@
 
-export enum SeatFinderRequestType {
+export const enum SeatFinderRequestType {
     ReserveSeat,
     OccupySeat,
     LeaveAway,

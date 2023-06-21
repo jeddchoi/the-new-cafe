@@ -1,4 +1,4 @@
-export enum SeatStateType {
+export const enum SeatStateType {
     Empty,
     Reserved,
     Occupied,
