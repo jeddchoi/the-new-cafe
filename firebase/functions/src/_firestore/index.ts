@@ -5,6 +5,7 @@ import {SeatPosition} from "./model/SeatPosition";
 import {SeatFinderRequestType} from "../seat-finder/_enum/SeatFinderRequestType";
 import {https, logger} from "firebase-functions/v2";
 import {SeatFinderRequest} from "../seat-finder/_model/SeatFinderRequest";
+import {isResultCode} from "../helper/isResultCode";
 
 export const onTest =
     onRequest((req: Request, res: Response) => Promise.resolve().then(() => {
@@ -28,7 +29,6 @@ export const onTest =
                 return seatHandler.occupySeat(existingSeatPos, request.getEndTime(current));
             }
             case SeatFinderRequestType.LeaveAway:
-            case SeatFinderRequestType.ShiftToBusiness:
             case SeatFinderRequestType.DoBusiness:
                 return seatHandler.away(existingSeatPos);
             case SeatFinderRequestType.ResumeUsing:
@@ -43,10 +43,14 @@ export const onTest =
             }
         }
     }).then((result) => {
-        logger.info("success", result);
+        logger.info("FINAL SUCCESS", result);
         res.sendStatus(200);
     }).catch(((err) => {
-        logger.error(err);
-        res.status(500).send(err);
+        logger.error(`FINAL ERROR = ${err}`);
+        if (isResultCode(err)) {
+            res.status(200).send({err});
+        } else {
+            res.status(500).send({err});
+        }
     })));
 

@@ -10,4 +10,6 @@ export enum ResultCode {
     PERMISSION_DENIED = 106, // prompts client that permission denied
     INVALID_SEAT_STATE = 107, // prompts client that invalid seat state
     INVALID_SESSION_STATE = 108, // prompts client that invalid seat state
+
+    CORRUPTED = 200, // rollback failed
 }

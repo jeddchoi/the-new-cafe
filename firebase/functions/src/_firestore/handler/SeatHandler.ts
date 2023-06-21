@@ -174,8 +174,8 @@ export default class SeatHandler {
             }
 
             if (existing.isAvailable || existing.state !== target) {
-                logger.warn("[SeatHandler] Something is broken", {seatPosition, existing});
-                throw new https.HttpsError("data-loss", "Something is broken", {seatPosition, existing});
+                logger.error("[SessionHandler] Session is in invalid state", {existing});
+                throw ResultCode.INVALID_SESSION_STATE;
             }
 
             if (target === SeatStateType.Reserved) {

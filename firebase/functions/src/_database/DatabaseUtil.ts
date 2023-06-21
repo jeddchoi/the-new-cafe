@@ -7,27 +7,39 @@ import {ResultCode} from "../seat-finder/_enum/ResultCode";
 
 const REFERENCE_SEAT_FINDER_NAME = "seatFinder";
 
+
 export class DatabaseUtil implements TransactionSupportUtil {
     private db: Database = getDatabase();
 
+    getRefPath(ref: database.Reference) {
+        return ref.toString().substring(ref.root.toString().length - 1);
+    }
 
     seatFinderRef(): database.Reference {
-        return this.db.ref(REFERENCE_SEAT_FINDER_NAME);
+        return this.db.ref().child(REFERENCE_SEAT_FINDER_NAME);
     }
 
     transaction<T>(refPath: string, checkAndUpdate: (existing: (T | null)) => (T | null)): Promise<TransactionResult<T>> {
         logger.debug("[DatabaseUtil] transaction", {refPath});
         const result = new TransactionResult<T>();
         const ref = this.db.ref(refPath);
+        let capturedError: unknown;
+
         return ref.transaction((existing: T | null) => {
             result.before = existing;
             logger.debug("[DatabaseUtil] existing data", {existing});
-            const newContent = checkAndUpdate(existing);
-            logger.debug("[DatabaseUtil] new data", {newContent});
-            return newContent;
+            try {
+                const newContent = checkAndUpdate(existing);
+                logger.debug("[DatabaseUtil] new data", {newContent});
+                return newContent;
+            } catch (e) {
+                logger.error(`captured error : ${e}`);
+                capturedError = e;
+                return;
+            }
         }).then((tResult) => {
             if (!tResult.committed) {
-                throw ResultCode.REJECTED;
+                throw capturedError ?? ResultCode.REJECTED;
             }
             result.after = tResult.snapshot.val();
             result.rollback = () => {
@@ -48,5 +60,6 @@ export class DatabaseUtil implements TransactionSupportUtil {
         });
     }
 }
+
 
 export const databaseUtil = new DatabaseUtil();
