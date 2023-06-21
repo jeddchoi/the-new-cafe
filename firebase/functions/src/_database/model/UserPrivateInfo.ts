@@ -1,3 +1,4 @@
+import {BlockInfo} from "./BlockInfo";
 
 export interface UserPrivateInfo {
     isAnonymous: boolean;
@@ -5,4 +6,5 @@ export interface UserPrivateInfo {
     lastSignInTime: number;
     emailVerified: boolean;
     sex: number | null;
+    block: BlockInfo | null;
 }

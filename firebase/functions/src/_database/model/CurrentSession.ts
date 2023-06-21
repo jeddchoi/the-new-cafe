@@ -5,6 +5,6 @@ export interface CurrentSession {
     sessionId: string;
     seatPosition: SeatPosition;
     startSessionTime: number;
-    main: PartialUserState;
-    sub: PartialUserState | null;
+    mainState: PartialUserState;
+    subState: PartialUserState | null;
 }

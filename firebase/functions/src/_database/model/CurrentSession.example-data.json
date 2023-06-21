@@ -8,22 +8,22 @@
         "seatId": ""
       },
       "startSessionTime": 0,
-      "main": {
+      "mainState": {
         "startTime": 0,
         "state": 0,
         "timer?": {
           "willRequestType": 0,
           "endTime": 0,
-          "taskName": ""
+          "taskId": ""
         }
       },
-      "sub?": {
+      "subState?": {
         "startTime": 0,
         "state": 0,
         "timer?": {
           "willRequestType": 0,
           "endTime": 0,
-          "taskName": ""
+          "taskId": ""
         }
       }
     }

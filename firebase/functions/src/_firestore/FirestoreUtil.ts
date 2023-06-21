@@ -30,16 +30,15 @@ export class FirestoreUtil implements TransactionSupportUtil {
             } else {
                 transaction.set(ref, newContent);
             }
-            result.committed = true;
             result.after = newContent;
             result.rollback = () => {
                 logger.debug("[FirestoreUtil] rollback called", {refPath});
                 if (!result.before) {
                     logger.debug("[FirestoreUtil] ref will be removed", {refPath});
-                    return ref.delete();
+                    return ref.delete().then();
                 } else {
-                    logger.debug("[FirestoreUtil] ref will be set", {refPath});
-                    return ref.set(result.before);
+                    logger.debug("[FirestoreUtil] ref will be set as before", {refPath});
+                    return ref.set(result.before).then();
                 }
             };
             logger.debug("[FirestoreUtil] transaction result", {result});

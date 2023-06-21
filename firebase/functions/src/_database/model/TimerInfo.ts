@@ -3,5 +3,5 @@ import {SeatFinderRequestType} from "../../seat-finder/_enum/SeatFinderRequestTy
 export interface TimerInfo {
     willRequestType: SeatFinderRequestType | "unblock";
     endTime: number;
-    taskName: string;
+    taskId: string;
 }
