@@ -1,9 +1,4 @@
+import {UserMainStateType} from "./UserMainStateType";
+import {UserSubStateType} from "./UserSubStateType";
 
-
-export const enum UserStateType {
-    None,
-    Reserved,
-    Occupied,
-    Away,
-    OnBusiness,
-}
+export type UserStateType = "User_None" | UserMainStateType | UserSubStateType

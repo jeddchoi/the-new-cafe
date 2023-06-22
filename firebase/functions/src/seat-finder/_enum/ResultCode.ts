@@ -1,4 +1,4 @@
-export const enum ResultCode {
+export enum ResultCode {
     OK = 0,
     REJECTED = 99,
     UNAUTHENTICATED = 100, // prompts client that user should be logged in

@@ -1,8 +1,7 @@
 import {TimerInfo} from "./TimerInfo";
-import {UserStateType} from "../../seat-finder/_enum/UserStateType";
 
-export interface PartialUserState {
+export interface PartialUserState<T> {
     startTime: number;
-    state: UserStateType;
+    state: T;
     timer: TimerInfo | null;
 }

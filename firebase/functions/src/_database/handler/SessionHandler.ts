@@ -4,10 +4,11 @@ import {logger} from "firebase-functions/v2";
 import {ResultCode} from "../../seat-finder/_enum/ResultCode";
 import {CurrentSession} from "../model/CurrentSession";
 import {database} from "firebase-admin";
-import {PartialUserState} from "../model/PartialUserState";
-import {UserStateType} from "../../seat-finder/_enum/UserStateType";
+import {UserMainStateType} from "../../seat-finder/_enum/UserMainStateType";
 import {TimerInfo} from "../model/TimerInfo";
 import {SeatFinderRequestType} from "../../seat-finder/_enum/SeatFinderRequestType";
+import {UserSubStateType} from "../../seat-finder/_enum/UserSubStateType";
+import {UserStateType} from "../../seat-finder/_enum/UserStateType";
 
 const REFERENCE_CURRENT_SESSION_NAME = "session";
 
@@ -41,13 +42,13 @@ export default class SessionHandler {
                 sessionId,
                 seatPosition,
                 startSessionTime: startTime,
-                mainState: <PartialUserState>{
+                mainState: {
                     startTime,
-                    state: UserStateType.Reserved,
+                    state: UserMainStateType.Reserved,
                     timer: endTime === null ? null : <TimerInfo>{
                         willRequestType: SeatFinderRequestType.Quit,
                         endTime,
-                        taskId: this.getTimerTaskId(UserStateType.Reserved, endTime),
+                        taskId: this.getTimerTaskId(UserMainStateType.Reserved, endTime),
                     },
                 },
             };
@@ -64,20 +65,20 @@ export default class SessionHandler {
                 logger.warn("[SessionHandler] Session not found", {existing});
                 return null;
             }
-            if (existing.mainState.state !== UserStateType.Reserved) {
+            if (existing.mainState.state !== UserMainStateType.Reserved) {
                 logger.error("[SessionHandler] Session is in invalid state", {existing});
                 throw ResultCode.INVALID_SESSION_STATE;
             }
 
             return <CurrentSession>{
                 ...existing,
-                mainState: <PartialUserState>{
+                mainState: {
                     startTime,
-                    state: UserStateType.Occupied,
+                    state: UserMainStateType.Occupied,
                     timer: endTime === null ? null : <TimerInfo>{
                         willRequestType: SeatFinderRequestType.Quit,
                         endTime,
-                        taskId: this.getTimerTaskId(UserStateType.Occupied, endTime),
+                        taskId: this.getTimerTaskId(UserMainStateType.Occupied, endTime),
                     },
                 },
             };
@@ -94,20 +95,20 @@ export default class SessionHandler {
                 logger.warn("[SessionHandler] Session not found", {existing});
                 return null;
             }
-            if (existing.mainState.state !== UserStateType.Occupied) {
+            if (existing.mainState.state !== UserMainStateType.Occupied) {
                 logger.error("[SessionHandler] Session is in invalid state", {existing});
                 throw ResultCode.INVALID_SESSION_STATE;
             }
 
             return <CurrentSession>{
                 ...existing,
-                subState: <PartialUserState>{
+                subState: {
                     startTime,
-                    state: UserStateType.Away,
+                    state: UserSubStateType.Away,
                     timer: endTime === null ? null : <TimerInfo>{
                         willRequestType: SeatFinderRequestType.Quit,
                         endTime,
-                        taskId: this.getTimerTaskId(UserStateType.Away, endTime),
+                        taskId: this.getTimerTaskId(UserSubStateType.Away, endTime),
                     },
                 },
             };
@@ -124,20 +125,20 @@ export default class SessionHandler {
                 logger.warn("[SessionHandler] Session not found", {existing});
                 return null;
             }
-            if (existing.mainState.state !== UserStateType.Occupied) {
+            if (existing.mainState.state !== UserMainStateType.Occupied) {
                 logger.error("[SessionHandler] Session is in invalid state", {existing});
                 throw ResultCode.INVALID_SESSION_STATE;
             }
 
             return <CurrentSession>{
                 ...existing,
-                subState: <PartialUserState>{
+                subState: {
                     startTime,
-                    state: UserStateType.OnBusiness,
+                    state: UserSubStateType.OnBusiness,
                     timer: endTime === null ? null : <TimerInfo>{
                         willRequestType: SeatFinderRequestType.ResumeUsing,
                         endTime,
-                        taskId: this.getTimerTaskId(UserStateType.OnBusiness, endTime),
+                        taskId: this.getTimerTaskId(UserSubStateType.OnBusiness, endTime),
                     },
                 },
             };
@@ -172,7 +173,7 @@ export default class SessionHandler {
 
             return <CurrentSession>{
                 ...existing,
-                mainState: <PartialUserState>{
+                mainState: {
                     ...existing.mainState,
                     timer: endTime === null ? null : <TimerInfo>{
                         ...existing.mainState.timer,
@@ -202,7 +203,7 @@ export default class SessionHandler {
 
             return <CurrentSession>{
                 ...existing,
-                subState: <PartialUserState>{
+                subState: {
                     ...existing.subState,
                     timer: endTime === null ? null : <TimerInfo>{
                         ...existing.subState.timer,
@@ -222,6 +223,6 @@ export default class SessionHandler {
     };
 
     private getTimerTaskId(fromState: UserStateType, endTime: number) {
-        return `${this.userId}-${UserStateType[fromState]}-${endTime}`;
+        return `${this.userId}-${fromState}-${endTime}`;
     }
 }

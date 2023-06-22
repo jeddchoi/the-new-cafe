@@ -5,12 +5,12 @@ import {TransactionResult} from "../../helper/TransactionResult";
 import {UserStateChange} from "../model/UserStateChange";
 import {CurrentSession} from "../model/CurrentSession";
 import {Seat} from "../../_firestore/model/Seat";
-import {SeatPosition} from "../../_firestore/model/SeatPosition";
 import {SeatFinderRequestType} from "../../seat-finder/_enum/SeatFinderRequestType";
 import SessionHandler from "./SessionHandler";
 import SeatHandler from "../../_firestore/handler/SeatHandler";
 import {SeatFinderRequest} from "../../seat-finder/_model/SeatFinderRequest";
 import {ResultCode} from "../../seat-finder/_enum/ResultCode";
+import {UserMainStateType} from "../../seat-finder/_enum/UserMainStateType";
 
 const REFERENCE_STATE_CHANGES_NAME = "stateChanges";
 const REFERENCE_HISTORY_NAME = "history";
@@ -50,28 +50,39 @@ export default class SeatFinderHandler {
             case SeatFinderRequestType.OccupySeat: {
                 return this.transaction(
                     () => this.sessionHandler.occupySeat(current, endTime),
-                    (seatPosition: SeatPosition) => this.seatHandler.occupySeat(seatPosition, endTime),
+                    (currentSession: CurrentSession) => this.seatHandler.occupySeat(currentSession.seatPosition, endTime),
                 );
             }
             case SeatFinderRequestType.LeaveAway: {
-                // TODO: handle it
-                // return this.transaction(
-                //     () => this.sessionHandler.a(current, endTime),
-                //     (seatPosition: SeatPosition) => this.seatHandler.occupySeat(seatPosition, endTime),
-                // );
-                return Promise.resolve();
+                return this.transaction(
+                    () => this.sessionHandler.leaveAway(current, endTime),
+                    (currentSession: CurrentSession) => this.seatHandler.away(currentSession.seatPosition),
+                );
             }
             case SeatFinderRequestType.DoBusiness: {
-                // TODO: handle it
-                return Promise.resolve();
+                return this.transaction(
+                    () => this.sessionHandler.doBusiness(current, endTime),
+                    (currentSession: CurrentSession) => this.seatHandler.away(currentSession.seatPosition),
+                );
             }
             case SeatFinderRequestType.ResumeUsing: {
-                // TODO: handle it
-                return Promise.resolve();
+                return this.transaction(
+                    () => this.sessionHandler.resumeUsing(),
+                    (currentSession: CurrentSession) => this.seatHandler.resumeUsing(currentSession.seatPosition),
+                );
             }
             case SeatFinderRequestType.ChangeMainStateEndTime: {
-                // TODO: handle it
-                return Promise.resolve();
+                return this.transaction(
+                    () => this.sessionHandler.changeMainStateEndTime(current, endTime),
+                    (currentSession: CurrentSession) => {
+                        switch (currentSession.mainState.state) {
+                            case UserMainStateType.Reserved:
+                                return this.seatHandler.changeReserveEndTime(currentSession.seatPosition, endTime);
+                            case UserMainStateType.Occupied:
+                                return this.seatHandler.changeOccupyEndTime(currentSession.seatPosition, endTime);
+                        }
+                    },
+                );
             }
             case SeatFinderRequestType.ChangeSubStateEndTime: {
                 // TODO: handle it
@@ -129,7 +140,7 @@ export default class SeatFinderHandler {
 
     transaction(
         handleSession: () => Promise<TransactionResult<CurrentSession>>,
-        handleSeat: (seatPosition: SeatPosition) => Promise<TransactionResult<Seat>>,
+        handleSeat: (currentSession: CurrentSession) => Promise<TransactionResult<Seat>>,
     ) {
         logger.debug("[StateChangeHandler] transaction");
         return handleSession().then((sessionResult) => {
@@ -137,7 +148,7 @@ export default class SeatFinderHandler {
             if (!sessionResult.after?.seatPosition) {
                 throw ResultCode.INVALID_SESSION_STATE;
             }
-            return handleSeat(sessionResult.after.seatPosition).catch((err) => {
+            return handleSeat(sessionResult.after).catch((err) => {
                 logger.error("[StateChangeHandler] handleSeat error", {err});
                 return sessionResult.rollback().then(() => {
                     logger.warn("[StateChangeHandler] rollback success", {err});

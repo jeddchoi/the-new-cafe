@@ -32,7 +32,7 @@ export const onTest =
             case SeatFinderRequestType.DoBusiness:
                 return seatHandler.away(existingSeatPos);
             case SeatFinderRequestType.ResumeUsing:
-                return seatHandler.resumeUsing(existingSeatPos, request.getEndTime(current));
+                return seatHandler.resumeUsing(existingSeatPos);
             case SeatFinderRequestType.ChangeMainStateEndTime:
                 return seatHandler.changeReserveEndTime(existingSeatPos, request.getEndTime(current));
                 // return seatHandler.changeOccupyEndTime(existingSeatPos, request.getEndTime(current));

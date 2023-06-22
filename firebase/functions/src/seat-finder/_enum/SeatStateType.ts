@@ -1,7 +1,7 @@
 export const enum SeatStateType {
-    Empty,
-    Reserved,
-    Occupied,
-    Away,
-    Restricted,
+    Empty = "Seat_Empty",
+    Reserved = "Seat_Reserved",
+    Occupied = "Seat_Occupied",
+    Away = "Seat_Away",
+    Restricted = "Seat_Restricted",
 }
