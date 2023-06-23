@@ -1,8 +1,9 @@
 import {SeatPosition} from "../../_firestore/model/SeatPosition";
+import "reflect-metadata";
 
 export interface PreviousSession {
-    startTime: number;
-    endTime: number;
-    seatPosition: SeatPosition;
-    hasError: boolean;
+    readonly startTime: number;
+    readonly endTime: number;
+    readonly seatPosition: SeatPosition;
+    readonly hasFailure: boolean;
 }

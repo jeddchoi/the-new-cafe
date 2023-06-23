@@ -1,5 +1,5 @@
 import {firestoreUtil, FirestoreUtil} from "../FirestoreUtil";
-import {SeatPosition} from "../model/SeatPosition";
+import {SeatPosition, seatPositionToPath} from "../model/SeatPosition";
 import {Seat} from "../model/Seat";
 import {https, logger} from "firebase-functions/v2";
 import {ResultCode} from "../../seat-finder/_enum/ResultCode";
@@ -19,7 +19,7 @@ export default class SeatHandler {
             seatPosition,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return firestoreUtil.transaction<Seat>(seatPosition.serialize(), (existing) => {
+        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.warn("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -44,7 +44,7 @@ export default class SeatHandler {
             seatPosition,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return firestoreUtil.transaction<Seat>(seatPosition.serialize(), (existing) => {
+        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.error("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -69,7 +69,7 @@ export default class SeatHandler {
 
     away = (seatPosition: SeatPosition) => {
         logger.debug("[SeatHandler] leaveAway", {seatPosition});
-        return firestoreUtil.transaction<Seat>(seatPosition.serialize(), (existing) => {
+        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.error("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -94,7 +94,7 @@ export default class SeatHandler {
         logger.debug("[SeatHandler] resumeUsing", {
             seatPosition,
         });
-        return firestoreUtil.transaction<Seat>(seatPosition.serialize(), (existing) => {
+        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.error("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -127,7 +127,7 @@ export default class SeatHandler {
         logger.debug("[SeatHandler] freeSeat", {
             seatPosition,
         });
-        return firestoreUtil.transaction<Seat>(seatPosition.serialize(), (existing) => {
+        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.error("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -158,7 +158,7 @@ export default class SeatHandler {
             seatPosition,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return firestoreUtil.transaction<Seat>(seatPosition.serialize(), (existing) => {
+        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.error("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -168,8 +168,8 @@ export default class SeatHandler {
                 throw ResultCode.PERMISSION_DENIED;
             }
 
-            if (existing.isAvailable || existing.state !== target) {
-                logger.error("[SessionHandler] Session is in invalid state", {existing});
+            if (existing.isAvailable || (target === SeatStateType.Reserved && existing.state !== SeatStateType.Reserved) || (target === SeatStateType.Occupied && ![SeatStateType.Occupied, SeatStateType.Away].includes(existing.state))) {
+                logger.error("[SeatHandler] Session is in invalid state", {existing});
                 throw ResultCode.INVALID_SESSION_STATE;
             }
 

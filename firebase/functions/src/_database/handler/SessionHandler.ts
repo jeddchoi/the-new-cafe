@@ -11,6 +11,7 @@ import {UserSubStateType} from "../../seat-finder/_enum/UserSubStateType";
 import {UserStateType} from "../../seat-finder/_enum/UserStateType";
 
 const REFERENCE_CURRENT_SESSION_NAME = "session";
+const REFERENCE_SESSION_HAS_FAILURE_NAME = "hasFailure";
 
 export default class SessionHandler {
     private readonly databaseUtil: DatabaseUtil;
@@ -26,13 +27,22 @@ export default class SessionHandler {
         this.userCurrentSessionPath = databaseUtil.getRefPath(this.userCurrentSessionRef);
     }
 
+    hasFailed() {
+        return this.databaseUtil.transaction<boolean>(
+            `${this.userCurrentSessionPath}/${REFERENCE_SESSION_HAS_FAILURE_NAME}`,
+            () => {
+                return true;
+            }
+        );
+    }
+
     reserveSeat = (sessionId: string, seatPosition: SeatPosition, startTime: number, endTime: number | null = null) => {
         logger.debug("[SessionHandler] reserveSeat", {
             seatPosition,
             startTime,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
+        return this.databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (existing) {
                 logger.warn("[SessionHandler] Session already exists", {existing});
                 throw ResultCode.ALREADY_IN_PROGRESS;
@@ -42,6 +52,7 @@ export default class SessionHandler {
                 sessionId,
                 seatPosition,
                 startSessionTime: startTime,
+                hasFailure: false,
                 mainState: {
                     startTime,
                     state: UserMainStateType.Reserved,
@@ -60,7 +71,7 @@ export default class SessionHandler {
             startTime,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
+        return this.databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
                 logger.warn("[SessionHandler] Session not found", {existing});
                 return null;
@@ -90,7 +101,7 @@ export default class SessionHandler {
             startTime,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
+        return this.databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
                 logger.warn("[SessionHandler] Session not found", {existing});
                 return null;
@@ -120,7 +131,7 @@ export default class SessionHandler {
             startTime,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
+        return this.databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
                 logger.warn("[SessionHandler] Session not found", {existing});
                 return null;
@@ -147,7 +158,7 @@ export default class SessionHandler {
 
     resumeUsing = () => {
         logger.debug("[SessionHandler] resumeUsing");
-        return databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
+        return this.databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
                 logger.warn("[SessionHandler] Session not found", {existing});
                 return null;
@@ -165,7 +176,7 @@ export default class SessionHandler {
             startTime,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
+        return this.databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
                 logger.warn("[SessionHandler] Session not found", {existing});
                 return null;
@@ -190,7 +201,7 @@ export default class SessionHandler {
             startTime,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
+        return this.databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
                 logger.warn("[SessionHandler] Session not found", {existing});
                 return null;
@@ -217,7 +228,7 @@ export default class SessionHandler {
 
     quit = () => {
         logger.debug("[SessionHandler] quit");
-        return databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, () => {
+        return this.databaseUtil.transaction<CurrentSession>(this.userCurrentSessionPath, () => {
             return null;
         });
     };

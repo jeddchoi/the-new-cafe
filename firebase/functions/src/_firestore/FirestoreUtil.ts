@@ -3,6 +3,8 @@ import {TransactionResult} from "../helper/TransactionResult";
 import {logger} from "firebase-functions/v2";
 import {FirestoreDataConverter, getFirestore} from "firebase-admin/firestore";
 import {firestore} from "firebase-admin";
+import {ResultCode} from "../seat-finder/_enum/ResultCode";
+import {isResultCode} from "../helper/isResultCode";
 
 export class FirestoreUtil implements TransactionSupportUtil {
     private db: firestore.Firestore = getFirestore();
@@ -19,33 +21,43 @@ export class FirestoreUtil implements TransactionSupportUtil {
             },
         });
         return this.db.runTransaction(async (transaction) => {
-            const result = new TransactionResult<T>();
             const existing = (await transaction.get(ref)).data() ?? null;
-            result.before = existing;
-            logger.debug("[FirestoreUtil] existing data", {existing});
-            const newContent = checkAndUpdate(existing);
-            logger.debug("[FirestoreUtil] new data", {newContent});
-            if (newContent === null) {
-                transaction.delete(ref);
-            } else {
-                transaction.set(ref, newContent);
-            }
-            result.after = newContent;
-            result.rollback = () => {
+            const rollback = async () => {
                 logger.debug("[FirestoreUtil] rollback called", {refPath});
-                if (!result.before) {
-                    logger.debug("[FirestoreUtil] ref will be removed", {refPath});
-                    return ref.delete().then();
-                } else {
-                    logger.debug("[FirestoreUtil] ref will be set as before", {refPath});
-                    return ref.set(result.before).then();
+                try {
+                    if (!existing) {
+                        logger.debug("[FirestoreUtil] ref will be removed", {refPath});
+                        await ref.delete();
+                    } else {
+                        logger.debug("[FirestoreUtil] ref will be set as before", {refPath, before: existing});
+                        await ref.set(existing);
+                    }
+                } catch (e) {
+                    throw ResultCode.CORRUPTED;
                 }
             };
+
+            try {
+                logger.debug("[FirestoreUtil] existing data", {existing});
+                const newContent = checkAndUpdate(existing);
+                logger.debug("[FirestoreUtil] new data", {newContent});
+                if (newContent === null) {
+                    transaction.delete(ref);
+                } else {
+                    transaction.set(ref, newContent);
+                }
+
+                return new TransactionResult<T>(existing, newContent, rollback, ResultCode.OK);
+            } catch (e) { // abort
+                if (isResultCode(e)) {
+                    return new TransactionResult<T>(existing, null, rollback, e);
+                } else {
+                    return new TransactionResult<T>(existing, null, rollback);
+                }
+            }
+        }).then((result) => {
             logger.debug("[FirestoreUtil] transaction result", {result});
             return result;
-        }).catch((err) => {
-            logger.error("[FirestoreUtil] transaction error", {err});
-            throw err;
         });
     }
 }

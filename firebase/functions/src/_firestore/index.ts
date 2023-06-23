@@ -4,29 +4,30 @@ import SeatHandler from "./handler/SeatHandler";
 import {SeatPosition} from "./model/SeatPosition";
 import {SeatFinderRequestType} from "../seat-finder/_enum/SeatFinderRequestType";
 import {https, logger} from "firebase-functions/v2";
-import {SeatFinderRequest} from "../seat-finder/_model/SeatFinderRequest";
 import {isResultCode} from "../helper/isResultCode";
+import {getEndTime, ISeatFinderRequest} from "../seat-finder/_model/SeatFinderRequest";
 
 export const onTest =
     onRequest((req: Request, res: Response) => Promise.resolve().then(() => {
         logger.log(`body = ${JSON.stringify(req.body)}`);
-        const request = SeatFinderRequest.fromJson(req.body);
+        const request = req.body as ISeatFinderRequest;
         logger.log(`request: ${JSON.stringify(request)}`);
 
-        const existingSeatPos = new SeatPosition(
-            "i9sAij5mVBijR85hgraE",
-            "FMLYWLzKmiou1PTcrFR8",
-            "ZlblGsMYd7IlO1DEho4H");
+        const existingSeatPos = <SeatPosition>{
+            storeId: "i9sAij5mVBijR85hgraE",
+            sectionId: "FMLYWLzKmiou1PTcrFR8",
+            seatId: "ZlblGsMYd7IlO1DEho4H",
+        };
 
         const seatHandler = new SeatHandler("TEST_USER_ID");
         const current = new Date().getTime();
 
-        switch (+request.requestType) {
+        switch (request.requestType) {
             case SeatFinderRequestType.ReserveSeat: {
-                return seatHandler.reserveSeat(existingSeatPos, request.getEndTime(current));
+                return seatHandler.reserveSeat(existingSeatPos, getEndTime(request, current));
             }
             case SeatFinderRequestType.OccupySeat: {
-                return seatHandler.occupySeat(existingSeatPos, request.getEndTime(current));
+                return seatHandler.occupySeat(existingSeatPos, getEndTime(request, current));
             }
             case SeatFinderRequestType.LeaveAway:
             case SeatFinderRequestType.DoBusiness:
@@ -34,8 +35,8 @@ export const onTest =
             case SeatFinderRequestType.ResumeUsing:
                 return seatHandler.resumeUsing(existingSeatPos);
             case SeatFinderRequestType.ChangeMainStateEndTime:
-                return seatHandler.changeReserveEndTime(existingSeatPos, request.getEndTime(current));
-                // return seatHandler.changeOccupyEndTime(existingSeatPos, request.getEndTime(current));
+                // return seatHandler.changeReserveEndTime(existingSeatPos, request.getETA(current));
+                return seatHandler.changeOccupyEndTime(existingSeatPos, getEndTime(request, current));
             case SeatFinderRequestType.Quit:
                 return seatHandler.freeSeat(existingSeatPos);
             default: {
@@ -44,7 +45,7 @@ export const onTest =
         }
     }).then((result) => {
         logger.info("FINAL SUCCESS", result);
-        res.sendStatus(200);
+        res.status(200).send(result);
     }).catch(((err) => {
         logger.error(`FINAL ERROR = ${err}`);
         if (isResultCode(err)) {

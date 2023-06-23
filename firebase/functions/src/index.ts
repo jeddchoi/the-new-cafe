@@ -1,6 +1,8 @@
 import "./helper/firebase-initialize";
+import "reflect-metadata";
 
-// exports.seatFinder = require("./seat-finder");
+
+exports.SeatFinder = require("./seat-finder");
 
 if (process.env.FUNCTIONS_EMULATOR === "true") {
     exports.Database = require("./_database");

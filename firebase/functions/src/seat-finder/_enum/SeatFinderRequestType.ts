@@ -1,11 +1,11 @@
 
 export const enum SeatFinderRequestType {
-    ReserveSeat,
-    OccupySeat,
-    LeaveAway,
-    DoBusiness,
-    ResumeUsing,
-    ChangeMainStateEndTime,
-    ChangeSubStateEndTime,
-    Quit,
+    ReserveSeat = "ReserveSeat",
+    OccupySeat = "OccupySeat",
+    LeaveAway = "LeaveAway",
+    DoBusiness = "DoBusiness",
+    ResumeUsing = "ResumeUsing",
+    ChangeMainStateEndTime = "ChangeMainStateEndTime",
+    ChangeSubStateEndTime = "ChangeSubStateEndTime",
+    Quit = "Quit",
 }

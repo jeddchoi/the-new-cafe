@@ -4,44 +4,45 @@ import {https, logger} from "firebase-functions/v2";
 import SessionHandler from "./handler/SessionHandler";
 import {SeatFinderRequestType} from "../seat-finder/_enum/SeatFinderRequestType";
 import {SeatPosition} from "../_firestore/model/SeatPosition";
-import {SeatFinderRequest} from "../seat-finder/_model/SeatFinderRequest";
 import {isResultCode} from "../helper/isResultCode";
+import {getEndTime, ISeatFinderRequest} from "../seat-finder/_model/SeatFinderRequest";
 
 export const onTest =
     onRequest((req: Request, res: Response) => Promise.resolve().then(() => {
         logger.log(`body = ${JSON.stringify(req.body)}`);
-        const request = SeatFinderRequest.fromJson(req.body);
+        const request = req.body as ISeatFinderRequest;
         logger.log(`request: ${JSON.stringify(request)}`);
 
-        const existingSeatPos = new SeatPosition(
-            "i9sAij5mVBijR85hgraE",
-            "FMLYWLzKmiou1PTcrFR8",
-            "ZlblGsMYd7IlO1DEho4H");
+        const existingSeatPos = <SeatPosition>{
+            storeId: "i9sAij5mVBijR85hgraE",
+            sectionId: "FMLYWLzKmiou1PTcrFR8",
+            seatId: "ZlblGsMYd7IlO1DEho4H",
+        };
 
         const sessionHandler = new SessionHandler("TEST_USER_ID");
         const current = new Date().getTime();
 
-        switch (+request.requestType) {
+        switch (request.requestType) {
             case SeatFinderRequestType.ReserveSeat: {
-                return sessionHandler.reserveSeat("NEW_SESSION_ID", existingSeatPos, current, request.getEndTime(current));
+                return sessionHandler.reserveSeat("NEW_SESSION_ID", existingSeatPos, current, getEndTime(request, current));
             }
             case SeatFinderRequestType.OccupySeat: {
-                return sessionHandler.occupySeat(current, request.getEndTime(current));
+                return sessionHandler.occupySeat(current, getEndTime(request, current));
             }
             case SeatFinderRequestType.LeaveAway: {
-                return sessionHandler.leaveAway(current, request.getEndTime(current));
+                return sessionHandler.leaveAway(current, getEndTime(request, current));
             }
             case SeatFinderRequestType.DoBusiness: {
-                return sessionHandler.doBusiness(current, request.getEndTime(current));
+                return sessionHandler.doBusiness(current, getEndTime(request, current));
             }
             case SeatFinderRequestType.ResumeUsing: {
                 return sessionHandler.resumeUsing();
             }
             case SeatFinderRequestType.ChangeMainStateEndTime: {
-                return sessionHandler.changeMainStateEndTime(current, request.getEndTime(current));
+                return sessionHandler.changeMainStateEndTime(current, getEndTime(request, current));
             }
             case SeatFinderRequestType.ChangeSubStateEndTime: {
-                return sessionHandler.changeSubStateEndTime(current, request.getEndTime(current));
+                return sessionHandler.changeSubStateEndTime(current, getEndTime(request, current));
             }
             case SeatFinderRequestType.Quit: {
                 return sessionHandler.quit();
@@ -52,7 +53,7 @@ export const onTest =
         }
     }).then((result) => {
         logger.info("FINAL SUCCESS", result);
-        res.sendStatus(200);
+        res.status(200).send(result);
     }).catch(((err) => {
         logger.error(`FINAL ERROR = ${err}`);
         if (isResultCode(err)) {
