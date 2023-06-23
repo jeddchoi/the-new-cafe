@@ -1,7 +1,7 @@
 import {onRequest, Request} from "firebase-functions/v2/https";
 import {Response} from "express";
 import {https, logger} from "firebase-functions/v2";
-import SessionHandler from "./handler/SessionHandler";
+import SessionHandler from "./SessionHandler";
 import {SeatFinderRequestType} from "../seat-finder/_enum/SeatFinderRequestType";
 import {SeatPosition} from "../_firestore/model/SeatPosition";
 import {isResultCode} from "../helper/isResultCode";

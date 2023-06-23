@@ -30,5 +30,5 @@ export {
     COLLECTION_GROUP_SECTION_NAME,
     COLLECTION_GROUP_SEAT_NAME,
     pathToSeatPosition,
-    seatPositionToPath
+    seatPositionToPath,
 };

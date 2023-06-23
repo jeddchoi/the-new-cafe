@@ -26,7 +26,7 @@ function compareObjects<T>(obj1: T, obj2: T, path = "") {
                 const currentPath = path ? `${path}.${key}` : key.toString();
 
                 if (typeof value1 === "object" && typeof value2 === "object") {
-                    compareObjects(value1 as any, value2 as any, currentPath); // 재귀적으로 nested 프로퍼티 비교
+                    compareObjects(value1 as unknown, value2 as unknown, currentPath); // 재귀적으로 nested 프로퍼티 비교
                 } else {
                     if (value1 !== value2) {
                         console.log(`[${currentPath}]: ${value1} => ${value2}`);
@@ -41,7 +41,7 @@ function compareObjects<T>(obj1: T, obj2: T, path = "") {
                 const currentPath = path ? `${path}.${key}` : key.toString();
 
                 if (typeof value1 === "object" && typeof value2 === "object") {
-                    compareObjects(value1 as any, value2 as any, currentPath); // 재귀적으로 nested 프로퍼티 비교
+                    compareObjects(value1 as unknown, value2 as unknown, currentPath); // 재귀적으로 nested 프로퍼티 비교
                 } else {
                     if (value1 !== value2) {
                         console.log(`[${currentPath}]: ${value1} => ${value2}`);
@@ -57,7 +57,7 @@ function compareObjects<T>(obj1: T, obj2: T, path = "") {
             const currentPath = path ? `${path}.${key}` : key.toString();
 
             if (typeof value1 === "object" && typeof value2 === "object") {
-                compareObjects(value1 as any, value2 as any, currentPath); // 재귀적으로 nested 프로퍼티 비교
+                compareObjects(value1 as unknown, value2 as unknown, currentPath); // 재귀적으로 nested 프로퍼티 비교
             } else {
                 if (value1 !== value2) {
                     console.log(`[${currentPath}]: ${value1} => ${value2}`);
@@ -72,7 +72,7 @@ function compareObjects<T>(obj1: T, obj2: T, path = "") {
             const currentPath = path ? `${path}.${key}` : key.toString();
 
             if (typeof value1 === "object" && typeof value2 === "object") {
-                compareObjects(value1 as any, value2 as any, currentPath); // 재귀적으로 nested 프로퍼티 비교
+                compareObjects(value1 as unknown, value2 as unknown, currentPath); // 재귀적으로 nested 프로퍼티 비교
             } else {
                 if (value1 !== value2) {
                     console.log(`[${currentPath}]: ${value1} => ${value2}`);

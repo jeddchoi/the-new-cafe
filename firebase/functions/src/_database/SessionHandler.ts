@@ -1,14 +1,14 @@
-import {databaseUtil, DatabaseUtil} from "../DatabaseUtil";
-import {SeatPosition} from "../../_firestore/model/SeatPosition";
+import {databaseUtil, DatabaseUtil} from "./DatabaseUtil";
+import {SeatPosition} from "../_firestore/model/SeatPosition";
 import {logger} from "firebase-functions/v2";
-import {ResultCode} from "../../seat-finder/_enum/ResultCode";
-import {CurrentSession} from "../model/CurrentSession";
+import {ResultCode} from "../seat-finder/_enum/ResultCode";
+import {CurrentSession} from "./model/CurrentSession";
 import {database} from "firebase-admin";
-import {UserMainStateType} from "../../seat-finder/_enum/UserMainStateType";
-import {TimerInfo} from "../model/TimerInfo";
-import {SeatFinderRequestType} from "../../seat-finder/_enum/SeatFinderRequestType";
-import {UserSubStateType} from "../../seat-finder/_enum/UserSubStateType";
-import {UserStateType} from "../../seat-finder/_enum/UserStateType";
+import {UserMainStateType} from "../seat-finder/_enum/UserMainStateType";
+import {TimerInfo} from "./model/TimerInfo";
+import {SeatFinderRequestType} from "../seat-finder/_enum/SeatFinderRequestType";
+import {UserSubStateType} from "../seat-finder/_enum/UserSubStateType";
+import {UserStateType} from "../seat-finder/_enum/UserStateType";
 
 const REFERENCE_CURRENT_SESSION_NAME = "session";
 const REFERENCE_SESSION_HAS_FAILURE_NAME = "hasFailure";

@@ -1,6 +1,6 @@
 import {onRequest, Request} from "firebase-functions/v2/https";
 import {Response} from "express";
-import SeatHandler from "./handler/SeatHandler";
+import SeatHandler from "./SeatHandler";
 import {SeatPosition} from "./model/SeatPosition";
 import {SeatFinderRequestType} from "../seat-finder/_enum/SeatFinderRequestType";
 import {https, logger} from "firebase-functions/v2";
