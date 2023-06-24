@@ -1,7 +1,7 @@
 {
   "name": "",
   "minor": "",
-  "state": 0,
+  "state": "Seat_Empty",
   "isAvailable": true,
   "userId?": "",
   "reserveEndTime?": 0,
