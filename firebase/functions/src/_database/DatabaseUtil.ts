@@ -5,8 +5,7 @@ import {logger} from "firebase-functions/v2";
 import {database} from "firebase-admin";
 import {ResultCode} from "../seat-finder/_enum/ResultCode";
 import {isResultCode} from "../helper/isResultCode";
-
-const REFERENCE_SEAT_FINDER_NAME = "seatFinder";
+import {REFERENCE_SEAT_FINDER_NAME} from "./NameConstant";
 
 
 export class DatabaseUtil implements TransactionSupportUtil {

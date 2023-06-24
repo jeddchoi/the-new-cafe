@@ -9,9 +9,7 @@ import {TimerInfo} from "./model/TimerInfo";
 import {SeatFinderRequestType} from "../seat-finder/_enum/SeatFinderRequestType";
 import {UserSubStateType} from "../seat-finder/_enum/UserSubStateType";
 import {UserStateType} from "../seat-finder/_enum/UserStateType";
-
-const REFERENCE_CURRENT_SESSION_NAME = "session";
-const REFERENCE_SESSION_HAS_FAILURE_NAME = "hasFailure";
+import {REFERENCE_CURRENT_SESSION_NAME, REFERENCE_SESSION_HAS_FAILURE_NAME} from "./NameConstant";
 
 export default class SessionHandler {
     private readonly userCurrentSessionRef: database.Reference;

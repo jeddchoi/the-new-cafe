@@ -1,9 +1,6 @@
 import "reflect-metadata";
+import {COLLECTION_GROUP_SEAT_NAME, COLLECTION_GROUP_SECTION_NAME, COLLECTION_GROUP_STORE_NAME} from "../NameConstant";
 
-
-const COLLECTION_GROUP_STORE_NAME = "stores";
-const COLLECTION_GROUP_SECTION_NAME = "sections";
-const COLLECTION_GROUP_SEAT_NAME = "seats";
 
 interface SeatPosition {
     readonly storeId: string;
@@ -26,9 +23,6 @@ function seatPositionToPath(seatPosition: SeatPosition) {
 
 export {
     SeatPosition,
-    COLLECTION_GROUP_STORE_NAME,
-    COLLECTION_GROUP_SECTION_NAME,
-    COLLECTION_GROUP_SEAT_NAME,
     pathToSeatPosition,
     seatPositionToPath,
 };

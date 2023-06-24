@@ -14,9 +14,7 @@ import {SeatPosition} from "../_firestore/model/SeatPosition";
 import {SeatFinderEventBy} from "./_enum/SeatFinderEventBy";
 import {PreviousSession} from "../_database/model/PreviousSession";
 import {SeatFinderResult} from "./_model/SeatFinderResult";
-
-const REFERENCE_STATE_CHANGES_NAME = "stateChanges";
-const REFERENCE_HISTORY_NAME = "history";
+import {REFERENCE_HISTORY_NAME, REFERENCE_STATE_CHANGES_NAME} from "../_database/NameConstant";
 
 export default class SeatFinderHandler {
     private readonly sessionHandler: SessionHandler;
