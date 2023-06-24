@@ -4,22 +4,22 @@ import SeatFinderHandler from "./SeatFinderHandler";
 import {logger} from "firebase-functions/v2";
 import {Response} from "express";
 import {TimerPayload} from "../_task/TimerPayload";
-import {defineString} from "firebase-functions/params";
 
+// TODO: use parameterized configuration when fixed
 const SEAT_FINDER_FUNCTION_LOCATION = "SEAT_FINDER_FUNCTION_LOCATION";
 
 export const onHandleRequest =
     onCall<ISeatFinderRequest>(
         {
-            region: defineString(SEAT_FINDER_FUNCTION_LOCATION),
+            region: "asia-northeast3",
         },
         (request: CallableRequest<ISeatFinderRequest>) => {
             // if (!request.auth?.uid) {
             //     throw new https.HttpsError("unauthenticated", "User must be authenticated");
             // }
             //
-            // const handler = new SeatFinderHandler(request.auth.uid);
             const current = Date.now();
+            // const handler = new SeatFinderHandler(request.auth.uid);
             const handler = new SeatFinderHandler("SAMPLE_USER_ID");
             logger.log("onHandleRequest =======", {request: request.data});
             return handler.handleSeatFinderRequest(
@@ -35,7 +35,7 @@ export const onHandleRequest =
 export const onTimeout =
     onRequest(
         {
-            region: defineString(SEAT_FINDER_FUNCTION_LOCATION),
+            region: "asia-northeast3",
         },
         (req: Request, res: Response) => Promise.resolve().then(() => {
             const current = Date.now();
