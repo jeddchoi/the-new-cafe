@@ -18,12 +18,12 @@ export const onSeatWritten =
             region: "asia-northeast3",
         },
         (event) => {
-            logger.debug(`[onSeatWritten] called ${JSON.stringify(event.data)}`);
             let totalSeatsDiff = 0;
             let availableSeatsDiff = 0;
 
             const before = event.data?.before.data() as Seat | null;
             const after = event.data?.after.data() as Seat | null;
+            logger.debug(`[onSeatWritten] called ${JSON.stringify(before)} => ${JSON.stringify(after)}`);
 
             if (before && after) { // update
                 if (before.isAvailable && !after.isAvailable) {

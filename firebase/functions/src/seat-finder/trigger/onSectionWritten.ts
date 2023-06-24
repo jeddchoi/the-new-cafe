@@ -18,13 +18,13 @@ export const onSectionWritten =
             region: "asia-northeast3",
         },
         (event) => {
-            logger.debug(`[onSectionWritten] called ${JSON.stringify(event.data)}`);
             let totalSectionsDiff = 0;
             let totalSeatsDiff = 0;
             let availableSeatsDiff = 0;
 
             const before = event.data?.before.data() as Section | null;
             const after = event.data?.after.data() as Section | null;
+            logger.debug(`[onSectionWritten] called ${JSON.stringify(before)} => ${JSON.stringify(after)}`);
 
             if (before && after) { // update
                 totalSeatsDiff = after.totalSeats - before.totalSeats;
