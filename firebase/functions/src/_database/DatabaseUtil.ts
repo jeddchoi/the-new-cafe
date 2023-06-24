@@ -10,19 +10,19 @@ const REFERENCE_SEAT_FINDER_NAME = "seatFinder";
 
 
 export class DatabaseUtil implements TransactionSupportUtil {
-    private db: Database = getDatabase();
+    private static db: Database = getDatabase();
 
     getRefPath(ref: database.Reference) {
         return ref.toString().substring(ref.root.toString().length - 1);
     }
 
     seatFinderRef(): database.Reference {
-        return this.db.ref().child(REFERENCE_SEAT_FINDER_NAME);
+        return DatabaseUtil.db.ref().child(REFERENCE_SEAT_FINDER_NAME);
     }
 
     transaction<T>(refPath: string, checkAndUpdate: (existing: (T | null)) => (T | null)): Promise<TransactionResult<T>> {
         logger.debug("[DatabaseUtil] transaction", {refPath});
-        const ref = this.db.ref(refPath);
+        const ref = DatabaseUtil.db.ref(refPath);
         let before: T | null;
         let resultCode: ResultCode;
 
@@ -70,6 +70,3 @@ export class DatabaseUtil implements TransactionSupportUtil {
         });
     }
 }
-
-
-export const databaseUtil = new DatabaseUtil();

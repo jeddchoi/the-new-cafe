@@ -1,17 +1,18 @@
-import {firestoreUtil, FirestoreUtil} from "./FirestoreUtil";
+import {FirestoreUtil} from "./FirestoreUtil";
 import {SeatPosition, seatPositionToPath} from "./model/SeatPosition";
 import {Seat} from "./model/Seat";
 import {https, logger} from "firebase-functions/v2";
 import {ResultCode} from "../seat-finder/_enum/ResultCode";
 import {SeatStateType} from "../seat-finder/_enum/SeatStateType";
 
-export default class SeatHandler {
-    private readonly firestoreUtil: FirestoreUtil;
 
+let firestoreUtil: FirestoreUtil;
+
+export default class SeatHandler {
     constructor(
         readonly userId: string,
     ) {
-        this.firestoreUtil = firestoreUtil ?? new FirestoreUtil();
+        firestoreUtil = firestoreUtil ?? new FirestoreUtil();
     }
 
     reserveSeat = (seatPosition: SeatPosition, endTime: number | null = null) => {

@@ -7,12 +7,12 @@ import {ResultCode} from "../seat-finder/_enum/ResultCode";
 import {isResultCode} from "../helper/isResultCode";
 
 export class FirestoreUtil implements TransactionSupportUtil {
-    private db: firestore.Firestore = getFirestore();
+    private static db: firestore.Firestore = getFirestore();
 
     transaction<T>(refPath: string, checkAndUpdate: (existing: (T | null)) => (T | null)): Promise<TransactionResult<T>> {
         logger.debug("[FirestoreUtil] transaction", {refPath});
 
-        const ref = this.db.doc(refPath).withConverter(<FirestoreDataConverter<T>>{
+        const ref = FirestoreUtil.db.doc(refPath).withConverter(<FirestoreDataConverter<T>>{
             toFirestore(data: T) {
                 return data;
             },
@@ -20,7 +20,7 @@ export class FirestoreUtil implements TransactionSupportUtil {
                 return snapshot.data() as T;
             },
         });
-        return this.db.runTransaction(async (transaction) => {
+        return FirestoreUtil.db.runTransaction(async (transaction) => {
             const existing = (await transaction.get(ref)).data() ?? null;
             const rollback = async () => {
                 logger.debug("[FirestoreUtil] rollback called", {refPath});
@@ -61,5 +61,3 @@ export class FirestoreUtil implements TransactionSupportUtil {
         });
     }
 }
-
-export const firestoreUtil = new FirestoreUtil();
