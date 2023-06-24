@@ -1,5 +1,6 @@
 package io.github.jeddchoi.data.firebase
 
+import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.database.FirebaseDatabase
@@ -28,7 +29,6 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
         displayName: String,
         password: String
     ): Result<Unit> {
-
         val result = auth.createUserWithEmailAndPassword(email, password).await()
         val createdUser = result?.user
         if (createdUser != null) {
@@ -36,6 +36,7 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
                 this.displayName = displayName
             }
             createdUser.updateProfile(request).await()
+
 //            val newUserState = UserState()
 //            Log.i("FirebaseAuthRepositoryImpl", "newUserStatus: $newUserState")
 //            Log.i("FirebaseAuthRepositoryImpl", "uid: ${createdUser.uid}")

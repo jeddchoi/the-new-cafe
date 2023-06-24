@@ -1,0 +1,9 @@
+{
+  "name": "",
+  "minor": "",
+  "state": "Seat_Empty",
+  "isAvailable": true,
+  "userId?": "",
+  "reserveEndTime?": 0,
+  "occupyEndTime?": 0
+}

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.SeatRepository
 import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
+import io.github.jeddchoi.data.service.SeatFinderService
 import io.github.jeddchoi.ui.model.FeedbackState
 import io.github.jeddchoi.ui.model.Message
 import io.github.jeddchoi.ui.model.UiState
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class StoreListViewModel @Inject constructor(
-    private val seatRepository: SeatRepository,
+    private val seatFinderService: SeatFinderService,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StoreListUiStateData(""))
@@ -34,7 +35,13 @@ internal class StoreListViewModel @Inject constructor(
 
     fun reserveSeat() {
         launchOneShotJob {
-            seatRepository.reserveSeat(FirebaseSeatPosition("store_1", "section_1", "seat_1"), 100)
+            seatFinderService.reserveSeat(
+                FirebaseSeatPosition(
+                    storeId = "i9sAij5mVBijR85hgraE",
+                    sectionId = "FMLYWLzKmiou1PTcrFR8",
+                    seatId = "ZlblGsMYd7IlO1DEho4H",
+                )
+            )
         }
     }
 

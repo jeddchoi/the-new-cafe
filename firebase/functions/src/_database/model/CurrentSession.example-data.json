@@ -1,0 +1,31 @@
+{
+  "session": {
+    "$uid": {
+      "sessionId": "",
+      "seatPosition": {
+        "storeId": "",
+        "sectionId": "",
+        "seatId": ""
+      },
+      "startSessionTime": 0,
+      "mainState": {
+        "startTime": 0,
+        "state": 0,
+        "timer?": {
+          "willRequestType": 0,
+          "endTime": 0,
+          "taskId": ""
+        }
+      },
+      "subState?": {
+        "startTime": 0,
+        "state": 0,
+        "timer?": {
+          "willRequestType": 0,
+          "endTime": 0,
+          "taskId": ""
+        }
+      }
+    }
+  }
+}

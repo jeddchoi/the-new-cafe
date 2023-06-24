@@ -1,0 +1,16 @@
+{
+  "history": {
+    "$userId": {
+      "$sessionId": {
+        "startTime": 0,
+        "endTime": 0,
+        "seatPosition": {
+          "storeId": "",
+          "sectionId": "",
+          "seatId": ""
+        },
+        "hasError": true
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "stateChanges": {
+    "$sessionId": {
+      "$stateChangeId": {
+        "requestType": 0,
+        "timestamp": 0,
+        "resultState": 0,
+        "reason": 0,
+        "success": true
+      }
+    }
+  }
+}
