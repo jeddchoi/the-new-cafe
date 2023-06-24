@@ -18,7 +18,7 @@ export const onTimerWritten =
         },
         (event) => {
             logger.debug(`[onTimerWritten] called ${JSON.stringify(event.data)}`);
-            seatFinderTimer = seatFinderTimer ?? new SeatFinderTimer("SeatFinder.onTimeout");
+            seatFinderTimer = seatFinderTimer ?? new SeatFinderTimer("SeatFinder-onTimeout");
             const promises = [];
             if (event.data.before.exists()) {
                 const stoppedTimer = event.data.before.val() as TimerInfo;
