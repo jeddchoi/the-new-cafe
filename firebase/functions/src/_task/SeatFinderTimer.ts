@@ -4,32 +4,36 @@ import {logger} from "firebase-functions/v2";
 import {SeatFinderRequestType} from "../seat-finder/_enum/SeatFinderRequestType";
 import {TimerPayload} from "./TimerPayload";
 
-const tasksLocation = defineString("SEAT_FINDER_TIMER_TASKS_LOCATION");
+const seatFinderTimerTasksLocation = defineString("SEAT_FINDER_TIMER_TASKS_LOCATION");
 const tasksQueueName = defineString("SEAT_FINDER_TIMER_TASKS_QUEUE_NAME");
+const seatFinderFunctionLocation = defineString("SEAT_FINDER_FUNCTION_LOCATION");
 
-export default class SeatFinderTimerHandler {
+export default class SeatFinderTimer {
     private static cloudTaskUtil: CloudTaskUtil;
+    private readonly invokeUrl:string;
 
-    constructor() {
+    constructor(
+        cloudFunctionName: string,
+    ) {
+        this.invokeUrl = `https://${seatFinderFunctionLocation.value()}-${projectID.value()}.cloudfunctions.net/${cloudFunctionName}`;
         logger.debug("[SeatFinderTimerHandler] constructor");
         // This should be called during cloud functions
-        SeatFinderTimerHandler.cloudTaskUtil = CloudTaskUtil.getInstance(
+        SeatFinderTimer.cloudTaskUtil = CloudTaskUtil.getInstance(
             projectID.value(),
-            tasksLocation.value(),
+            seatFinderTimerTasksLocation.value(),
             tasksQueueName.value(),
         );
     }
 
     startTimer(
-        timerName: string,
+        taskId: string,
         userId: string,
         willRequestType: SeatFinderRequestType,
         endTime: number,
     ) {
-        const url = "";
-        return SeatFinderTimerHandler.cloudTaskUtil.createOneShotHttpPostTask(
-            timerName,
-            url,
+        return SeatFinderTimer.cloudTaskUtil.createOneShotHttpPostTask(
+            taskId,
+            this.invokeUrl,
             Math.round(endTime / 1000),
             <TimerPayload>{
                 userId,
@@ -37,6 +41,10 @@ export default class SeatFinderTimerHandler {
                 endTime: endTime,
             }
         );
+    }
+
+    stopTimer(taskId: string) {
+        return SeatFinderTimer.cloudTaskUtil.cancelTask(taskId);
     }
     sayHello() {
         logger.debug("sayHello");

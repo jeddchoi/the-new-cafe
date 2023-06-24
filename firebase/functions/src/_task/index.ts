@@ -1,10 +1,11 @@
 import {onRequest, Request} from "firebase-functions/v2/https";
 import {Response} from "express";
-import SeatFinderTimerHandler from "./SeatFinderTimerHandler";
+import SeatFinderTimer from "./SeatFinderTimer";
 
 export const onTest =
     onRequest((req: Request, res: Response) => Promise.resolve().then(() => {
-        const timer = new SeatFinderTimerHandler();
+        const cloudFunctionName = "SeatFinder.onTimeout";
+        const timer = new SeatFinderTimer(cloudFunctionName);
         timer.sayHello();
         res.status(200);
     }));
