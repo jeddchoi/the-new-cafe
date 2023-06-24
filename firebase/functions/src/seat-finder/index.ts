@@ -1,16 +1,17 @@
 import {CallableRequest, onCall, onRequest, Request} from "firebase-functions/v2/https";
 import {ISeatFinderRequest} from "./_model/SeatFinderRequest";
 import SeatFinderHandler from "./SeatFinderHandler";
-import {https, logger} from "firebase-functions/v2";
+import {logger} from "firebase-functions/v2";
 import {Response} from "express";
 
 export const onHandleRequest =
     onCall<ISeatFinderRequest>((request: CallableRequest<ISeatFinderRequest>) => {
-        if (!request.auth?.uid) {
-            throw new https.HttpsError("unauthenticated", "User must be authenticated");
-        }
-
-        const handler = new SeatFinderHandler(request.auth.uid);
+        // if (!request.auth?.uid) {
+        //     throw new https.HttpsError("unauthenticated", "User must be authenticated");
+        // }
+        //
+        // const handler = new SeatFinderHandler(request.auth.uid);
+        const handler = new SeatFinderHandler("SAMPLE_USER_ID");
         logger.log("onHandleRequest =======", {request: request.data});
         return handler.handleSeatFinderRequest(request.data);
     });

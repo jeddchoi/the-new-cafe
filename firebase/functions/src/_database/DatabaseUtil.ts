@@ -10,7 +10,16 @@ const REFERENCE_SEAT_FINDER_NAME = "seatFinder";
 
 
 export class DatabaseUtil implements TransactionSupportUtil {
+    private static _instance: DatabaseUtil;
     private static db: Database = getDatabase();
+
+    constructor() {
+        logger.debug("[DatabaseUtil] constructor");
+    }
+    public static get Instance() {
+        logger.debug("[DatabaseUtil] Instance");
+        return this._instance || (this._instance = new this());
+    }
 
     getRefPath(ref: database.Reference) {
         return ref.toString().substring(ref.root.toString().length - 1);

@@ -29,7 +29,7 @@ function compareObjects<T>(obj1: T, obj2: T, path = "") {
                     compareObjects(value1 as unknown, value2 as unknown, currentPath); // 재귀적으로 nested 프로퍼티 비교
                 } else {
                     if (value1 !== value2) {
-                        console.log(`[${currentPath}]: ${value1} => ${value2}`);
+                        logger.debug(`[${currentPath}]: ${value1} => ${value2}`);
                     }
                 }
             }
@@ -44,7 +44,7 @@ function compareObjects<T>(obj1: T, obj2: T, path = "") {
                     compareObjects(value1 as unknown, value2 as unknown, currentPath); // 재귀적으로 nested 프로퍼티 비교
                 } else {
                     if (value1 !== value2) {
-                        console.log(`[${currentPath}]: ${value1} => ${value2}`);
+                        logger.debug(`[${currentPath}]: ${value1} => ${value2}`);
                     }
                 }
             }
@@ -60,7 +60,7 @@ function compareObjects<T>(obj1: T, obj2: T, path = "") {
                 compareObjects(value1 as unknown, value2 as unknown, currentPath); // 재귀적으로 nested 프로퍼티 비교
             } else {
                 if (value1 !== value2) {
-                    console.log(`[${currentPath}]: ${value1} => ${value2}`);
+                    logger.debug(`[${currentPath}]: ${value1} => ${value2}`);
                 }
             }
         }
@@ -75,7 +75,7 @@ function compareObjects<T>(obj1: T, obj2: T, path = "") {
                 compareObjects(value1 as unknown, value2 as unknown, currentPath); // 재귀적으로 nested 프로퍼티 비교
             } else {
                 if (value1 !== value2) {
-                    console.log(`[${currentPath}]: ${value1} => ${value2}`);
+                    logger.debug(`[${currentPath}]: ${value1} => ${value2}`);
                 }
             }
         }

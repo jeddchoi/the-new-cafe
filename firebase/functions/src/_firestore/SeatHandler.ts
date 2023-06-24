@@ -6,13 +6,11 @@ import {ResultCode} from "../seat-finder/_enum/ResultCode";
 import {SeatStateType} from "../seat-finder/_enum/SeatStateType";
 
 
-let firestoreUtil: FirestoreUtil;
-
 export default class SeatHandler {
     constructor(
         readonly userId: string,
     ) {
-        firestoreUtil = firestoreUtil ?? new FirestoreUtil();
+        logger.debug("[SeatHandler] constructor");
     }
 
     reserveSeat = (seatPosition: SeatPosition, endTime: number | null = null) => {
@@ -20,7 +18,7 @@ export default class SeatHandler {
             seatPosition,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
+        return FirestoreUtil.Instance.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.warn("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -45,7 +43,7 @@ export default class SeatHandler {
             seatPosition,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
+        return FirestoreUtil.Instance.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.error("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -70,7 +68,7 @@ export default class SeatHandler {
 
     away = (seatPosition: SeatPosition) => {
         logger.debug("[SeatHandler] leaveAway", {seatPosition});
-        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
+        return FirestoreUtil.Instance.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.error("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -95,7 +93,7 @@ export default class SeatHandler {
         logger.debug("[SeatHandler] resumeUsing", {
             seatPosition,
         });
-        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
+        return FirestoreUtil.Instance.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.error("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -128,7 +126,7 @@ export default class SeatHandler {
         logger.debug("[SeatHandler] freeSeat", {
             seatPosition,
         });
-        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
+        return FirestoreUtil.Instance.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.error("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});
@@ -159,7 +157,7 @@ export default class SeatHandler {
             seatPosition,
             endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
-        return firestoreUtil.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
+        return FirestoreUtil.Instance.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
                 logger.error("[SeatHandler] Seat not found", {seatPosition, existing});
                 throw new https.HttpsError("not-found", "Seat not found", {seatPosition, existing});

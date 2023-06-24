@@ -19,8 +19,6 @@ import {SeatFinderResult} from "./_model/SeatFinderResult";
 const REFERENCE_STATE_CHANGES_NAME = "stateChanges";
 const REFERENCE_HISTORY_NAME = "history";
 
-let databaseUtil: DatabaseUtil;
-
 export default class SeatFinderHandler {
     private readonly sessionHandler: SessionHandler;
     private readonly seatHandler: SeatHandler;
@@ -33,8 +31,7 @@ export default class SeatFinderHandler {
         this.sessionHandler = new SessionHandler(this.userId);
         this.seatHandler = new SeatHandler(this.userId);
 
-        databaseUtil = databaseUtil ?? new DatabaseUtil();
-        const seatFinderRef = databaseUtil.seatFinderRef();
+        const seatFinderRef = DatabaseUtil.Instance.seatFinderRef();
         this.stateChangesRef = seatFinderRef.child(REFERENCE_STATE_CHANGES_NAME);
         this.userHistoryRef = seatFinderRef.child(REFERENCE_HISTORY_NAME).child(userId);
     }

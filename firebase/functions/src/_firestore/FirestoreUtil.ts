@@ -7,7 +7,16 @@ import {ResultCode} from "../seat-finder/_enum/ResultCode";
 import {isResultCode} from "../helper/isResultCode";
 
 export class FirestoreUtil implements TransactionSupportUtil {
+    private static _instance: FirestoreUtil;
     private static db: firestore.Firestore = getFirestore();
+
+    constructor() {
+        logger.debug("[FirestoreUtil] constructor");
+    }
+    public static get Instance() {
+        logger.debug("[FirestoreUtil] Instance");
+        return this._instance || (this._instance = new this());
+    }
 
     transaction<T>(refPath: string, checkAndUpdate: (existing: (T | null)) => (T | null)): Promise<TransactionResult<T>> {
         logger.debug("[FirestoreUtil] transaction", {refPath});
