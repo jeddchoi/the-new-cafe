@@ -1,7 +1,7 @@
 import {SeatFinderRequestType} from "../../seat-finder/_enum/SeatFinderRequestType";
 
 export interface TimerInfo {
-    willRequestType: SeatFinderRequestType | "unblock";
+    willRequestType: SeatFinderRequestType;
     endTime: number;
     taskId: string;
 }
