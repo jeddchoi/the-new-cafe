@@ -9,12 +9,12 @@ export interface ISeatFinderRequest {
     endTime: number | null;
 }
 
-export function getEndTime(request: ISeatFinderRequest, startTime: number) {
-    if (request.durationInSeconds === null && request.endTime === null) {
+export function getEndTime(durationInSeconds : number | null, endTime: number | null, startTime: number) {
+    if (durationInSeconds === null && endTime === null) {
         return null;
-    } else if (request.durationInSeconds !== null) {
-        return startTime + request.durationInSeconds * 1000;
+    } else if (durationInSeconds !== null) {
+        return startTime + durationInSeconds * 1000;
     } else {
-        return request.endTime;
+        return endTime;
     }
 }

@@ -24,25 +24,25 @@ export const onTest =
 
         switch (request.requestType) {
             case SeatFinderRequestType.ReserveSeat: {
-                return sessionHandler.reserveSeat("NEW_SESSION_ID", existingSeatPos, current, getEndTime(request, current));
+                return sessionHandler.reserveSeat("NEW_SESSION_ID", existingSeatPos, current, getEndTime(request.durationInSeconds, request.endTime, current));
             }
             case SeatFinderRequestType.OccupySeat: {
-                return sessionHandler.occupySeat(current, getEndTime(request, current));
+                return sessionHandler.occupySeat(current, getEndTime(request.durationInSeconds, request.endTime, current));
             }
             case SeatFinderRequestType.LeaveAway: {
-                return sessionHandler.leaveAway(current, getEndTime(request, current));
+                return sessionHandler.leaveAway(current, getEndTime(request.durationInSeconds, request.endTime, current));
             }
             case SeatFinderRequestType.DoBusiness: {
-                return sessionHandler.doBusiness(current, getEndTime(request, current));
+                return sessionHandler.doBusiness(current, getEndTime(request.durationInSeconds, request.endTime, current));
             }
             case SeatFinderRequestType.ResumeUsing: {
                 return sessionHandler.resumeUsing();
             }
             case SeatFinderRequestType.ChangeMainStateEndTime: {
-                return sessionHandler.changeMainStateEndTime(current, getEndTime(request, current));
+                return sessionHandler.changeMainStateEndTime(current, getEndTime(request.durationInSeconds, request.endTime, current));
             }
             case SeatFinderRequestType.ChangeSubStateEndTime: {
-                return sessionHandler.changeSubStateEndTime(current, getEndTime(request, current));
+                return sessionHandler.changeSubStateEndTime(current, getEndTime(request.durationInSeconds, request.endTime, current));
             }
             case SeatFinderRequestType.Quit: {
                 return sessionHandler.quit();

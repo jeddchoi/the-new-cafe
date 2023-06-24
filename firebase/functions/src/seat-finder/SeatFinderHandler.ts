@@ -13,7 +13,6 @@ import {UserMainStateType} from "./_enum/UserMainStateType";
 import {SeatPosition} from "../_firestore/model/SeatPosition";
 import {SeatFinderEventBy} from "./_enum/SeatFinderEventBy";
 import {PreviousSession} from "../_database/model/PreviousSession";
-import {getEndTime, ISeatFinderRequest} from "./_model/SeatFinderRequest";
 import {SeatFinderResult} from "./_model/SeatFinderResult";
 
 const REFERENCE_STATE_CHANGES_NAME = "stateChanges";
@@ -36,17 +35,21 @@ export default class SeatFinderHandler {
         this.userHistoryRef = seatFinderRef.child(REFERENCE_HISTORY_NAME).child(userId);
     }
 
-    handleSeatFinderRequest(request: ISeatFinderRequest, isTimeout = false) {
-        logger.debug("[SeatFinderHandler] handleSeatFinderRequest", {request, isTimeout});
-        const current = new Date().getTime();
-        const endTime = getEndTime(request, current);
+    handleSeatFinderRequest(
+        requestType: SeatFinderRequestType,
+        current: number,
+        endTime: number | null,
+        seatPosition: SeatPosition | null = null,
+        isTimeout = false) {
+        logger.debug("[SeatFinderHandler] handleSeatFinderRequest", {requestType, endTime, seatPosition, isTimeout});
+
         return Promise.resolve().then(() => {
-            switch (request.requestType) {
+            switch (requestType) {
                 case SeatFinderRequestType.ReserveSeat: {
-                    if (!request.seatPosition) {
+                    if (!seatPosition) {
                         throw new https.HttpsError("invalid-argument", "Seat position is required");
                     }
-                    return this.reserveSeat(request.seatPosition, current, endTime);
+                    return this.reserveSeat(seatPosition, current, endTime);
                 }
                 case SeatFinderRequestType.OccupySeat: {
                     return this.occupySeat(current, endTime);
@@ -70,14 +73,14 @@ export default class SeatFinderHandler {
                     return this.quit();
                 }
                 default: {
-                    logger.error("Unknown request type", {request});
-                    throw new https.HttpsError("unimplemented", `Unknown request type : ${JSON.stringify(request)}`);
+                    logger.error("Unknown request type", {requestType});
+                    throw new https.HttpsError("unimplemented", `Unknown request type : ${requestType}`);
                 }
             }
         }).then((result: SeatFinderResult) => {
-            return this.addStateChange(request.requestType, current, isTimeout, result.sessionResult, result.seatResult)
+            return this.addStateChange(requestType, current, isTimeout, result.sessionResult, result.seatResult)
                 .then(() => {
-                    if (request.requestType === SeatFinderRequestType.Quit) {
+                    if (requestType === SeatFinderRequestType.Quit) {
                         if (result.sessionResult?.before) {
                             return this.cleanupSession(current, result.sessionResult?.before);
                         }

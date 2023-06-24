@@ -24,10 +24,10 @@ export const onTest =
 
         switch (request.requestType) {
             case SeatFinderRequestType.ReserveSeat: {
-                return seatHandler.reserveSeat(existingSeatPos, getEndTime(request, current));
+                return seatHandler.reserveSeat(existingSeatPos, getEndTime(request.durationInSeconds, request.endTime, current));
             }
             case SeatFinderRequestType.OccupySeat: {
-                return seatHandler.occupySeat(existingSeatPos, getEndTime(request, current));
+                return seatHandler.occupySeat(existingSeatPos, getEndTime(request.durationInSeconds, request.endTime, current));
             }
             case SeatFinderRequestType.LeaveAway:
             case SeatFinderRequestType.DoBusiness:
@@ -36,7 +36,7 @@ export const onTest =
                 return seatHandler.resumeUsing(existingSeatPos);
             case SeatFinderRequestType.ChangeMainStateEndTime:
                 // return seatHandler.changeReserveEndTime(existingSeatPos, request.getETA(current));
-                return seatHandler.changeOccupyEndTime(existingSeatPos, getEndTime(request, current));
+                return seatHandler.changeOccupyEndTime(existingSeatPos, getEndTime(request.durationInSeconds, request.endTime, current));
             case SeatFinderRequestType.Quit:
                 return seatHandler.freeSeat(existingSeatPos);
             default: {

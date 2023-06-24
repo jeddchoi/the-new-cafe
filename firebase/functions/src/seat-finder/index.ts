@@ -1,8 +1,9 @@
 import {CallableRequest, onCall, onRequest, Request} from "firebase-functions/v2/https";
-import {ISeatFinderRequest} from "./_model/SeatFinderRequest";
+import {getEndTime, ISeatFinderRequest} from "./_model/SeatFinderRequest";
 import SeatFinderHandler from "./SeatFinderHandler";
 import {logger} from "firebase-functions/v2";
 import {Response} from "express";
+import {TimerPayload} from "../_task/TimerPayload";
 
 export const onHandleRequest =
     onCall<ISeatFinderRequest>((request: CallableRequest<ISeatFinderRequest>) => {
@@ -11,20 +12,32 @@ export const onHandleRequest =
         // }
         //
         // const handler = new SeatFinderHandler(request.auth.uid);
+        const current = Date.now();
         const handler = new SeatFinderHandler("SAMPLE_USER_ID");
         logger.log("onHandleRequest =======", {request: request.data});
-        return handler.handleSeatFinderRequest(request.data);
+        return handler.handleSeatFinderRequest(
+            request.data.requestType,
+            current,
+            getEndTime(request.data.durationInSeconds, request.data.endTime, current),
+            request.data.seatPosition,
+        );
     });
 // SeatFinder.onHandleRequest({seatPosition: {storeId: "i9sAij5mVBijR85hgraE", sectionId: "FMLYWLzKmiou1PTcrFR8", seatId: "ZlblGsMYd7IlO1DEho4H"}, durationInSeconds: 100, requestType: "ReserveSeat"})
 
 
 export const onTimeout =
     onRequest((req: Request, res: Response) => Promise.resolve().then(() => {
-        const request = req.body.request as ISeatFinderRequest;
-        const userId = req.body.userId as string;
-        const handler = new SeatFinderHandler(userId);
-        logger.log("onTimeout =======", {request, userId});
-        return handler.handleSeatFinderRequest(request, true).then((result) => {
+        const current = Date.now();
+        const request = req.body as TimerPayload;
+        const handler = new SeatFinderHandler(request.userId);
+        logger.log("onTimeout =======", {request});
+        return handler.handleSeatFinderRequest(
+            request.requestType,
+            current,
+            request.endTime,
+            null,
+            true
+        ).then((result) => {
             res.status(200).send(result);
         }).catch((err) => {
             res.status(500).send({err});
