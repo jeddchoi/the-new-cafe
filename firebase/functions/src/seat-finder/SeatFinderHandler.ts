@@ -186,7 +186,12 @@ export default class SeatFinderHandler {
                     return <SeatFinderResult>{sessionResult};
                 }
                 if (!sessionResult.before) {
-                    throw ResultCode.INVALID_SESSION_STATE;
+                    return <SeatFinderResult>{
+                        sessionResult: {
+                            ...sessionResult,
+                            resultCode: ResultCode.INVALID_SESSION_STATE,
+                        },
+                    };
                 }
                 return this.seatHandler.freeSeat(sessionResult.before.seatPosition)
                     .then(async (seatResult) => {
@@ -210,7 +215,12 @@ export default class SeatFinderHandler {
                     return <SeatFinderResult>{sessionResult};
                 }
                 if (!sessionResult.after) {
-                    throw ResultCode.INVALID_SESSION_STATE;
+                    return <SeatFinderResult>{
+                        sessionResult: {
+                            ...sessionResult,
+                            resultCode: ResultCode.INVALID_SESSION_STATE,
+                        },
+                    };
                 }
                 logger.debug("[SeatFinderHandler] handleSession success", {sessionResult});
                 if (handleSeat) {
@@ -244,7 +254,7 @@ export default class SeatFinderHandler {
         const success = (sessionResult ? sessionResult.resultCode === ResultCode.OK : false) &&
             (seatResult ? seatResult.resultCode === ResultCode.OK : true);
         const sessionId = sessionResult?.after?.sessionId ?? sessionResult?.before?.sessionId;
-        if (!sessionId) throw ResultCode.INVALID_SESSION_STATE;
+        if (!sessionId) throw new https.HttpsError("data-loss", "Something is broken. This should not happen");
         return this.stateChangesRef.child(sessionId).push(<SeatFinderEvent>{
             requestType: requestType,
             timestamp: current,
