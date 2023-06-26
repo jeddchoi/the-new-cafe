@@ -35,7 +35,7 @@ object FirebaseModule {
     fun provideFirebaseFunctions(
         firebaseApp: FirebaseApp
     ): FirebaseFunctions {
-        return Firebase.functions(firebaseApp)
+        return Firebase.functions(firebaseApp, "asia-northeast3")
     }
 
     @Provides

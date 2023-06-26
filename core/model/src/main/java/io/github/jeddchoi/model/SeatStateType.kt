@@ -1,6 +1,6 @@
 package io.github.jeddchoi.model
 
-enum class SeatStatusType {
+enum class SeatStateType {
     Empty,
     Reserved,
     Occupied,

@@ -33,4 +33,8 @@
     <string name="result_unimplemented">Operation is not implemented or not supported/enabled.</string>
     <string name="result_unavailable">The service is currently unavailable. This is a most likely a transient condition and may be corrected by retrying with a backoff.</string>
     <string name="result_data_loss"> Unrecoverable data loss or corruption.</string>
+    <string name="result_rejected">Rejected. Maybe unknown error.</string>
+    <string name="result_invalid_seat_state">You cannot do the action on current seat state.</string>
+    <string name="result_invalid_session_state">You cannot do the action on current session state.</string>
+    <string name="result_corrupted">Rollback failed. May be corrupted.</string>
 </resources>

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.SeatRepository
 import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
+import io.github.jeddchoi.data.service.ResultCode
 import io.github.jeddchoi.data.service.SeatFinderService
 import io.github.jeddchoi.ui.model.FeedbackState
 import io.github.jeddchoi.ui.model.Message
@@ -35,20 +36,21 @@ internal class StoreListViewModel @Inject constructor(
 
     fun reserveSeat() {
         launchOneShotJob {
-            seatFinderService.reserveSeat(
+            val result = seatFinderService.reserveSeat(
                 FirebaseSeatPosition(
                     storeId = "i9sAij5mVBijR85hgraE",
                     sectionId = "FMLYWLzKmiou1PTcrFR8",
                     seatId = "ZlblGsMYd7IlO1DEho4H",
                 )
             )
+            Log.i("StoreList", result.toString())
         }
     }
 
     private fun launchOneShotJob(
         job: suspend () -> Unit
     ) {
-//        _uiState.value = _uiState.value.copy(isBusy = true)
+        _uiState.value = _uiState.value.copy(isBusy = true)
         viewModelScope.launch {
             try {
                 job()
@@ -86,5 +88,5 @@ internal data class StoreListUiStateData(
         isBusy: Boolean,
         canContinue: Boolean,
         messages: List<Message>
-    ): FeedbackState = StoreListUiStateData(data, isBusy, canContinue, messages)
+    ): StoreListUiStateData = StoreListUiStateData(data, isBusy, canContinue, messages)
 }
