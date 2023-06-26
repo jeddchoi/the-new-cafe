@@ -1,6 +1,7 @@
 package io.github.jeddchoi.data.firebase
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.model.CurrentUser
 import kotlinx.coroutines.CoroutineScope
@@ -17,21 +18,14 @@ class FirebaseCurrentUserRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val coroutineScope: CoroutineScope,
 ) : CurrentUserRepository {
-    override fun isUserSignedIn() = currentUser.value != null
+    override fun isUserSignedIn() = auth.currentUser != null
 
     override fun getUserId() = currentUser.value?.authId
 
     private val _currentUser = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
             trySend(
-                auth.currentUser?.let {
-                    CurrentUser(
-                        authId = it.uid,
-                        displayName = it.displayName ?: "Display name not provided",
-                        emailAddress = it.email ?: "Email not provided",
-                        isEmailVerified = it.isEmailVerified,
-                    )
-                }
+                auth.currentUser?.toCurrentUser()
             )
         }
         auth.addAuthStateListener(authStateListener)
@@ -41,6 +35,13 @@ class FirebaseCurrentUserRepositoryImpl @Inject constructor(
     }
 
     override val currentUser: StateFlow<CurrentUser?> =
-        _currentUser.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5000), null)
+        _currentUser.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5000), auth.currentUser?.toCurrentUser())
 
 }
+
+private fun FirebaseUser.toCurrentUser() = CurrentUser(
+    authId = this.uid,
+    displayName = this.displayName ?: "Display name not provided",
+    emailAddress = this.email ?: "Email not provided",
+    isEmailVerified = this.isEmailVerified,
+)
