@@ -19,6 +19,8 @@ export const onHandleRequest =
             const current = Date.now();
             const handler = new SeatFinderHandler(request.auth.uid);
             logger.log("onHandleRequest =======", {request: request.data});
+
+            logger.log(`isNull = ${request.data.endTime === null} ${request.data.endTime == null} ${request.data.endTime}`);
             return handler.handleSeatFinderRequest(
                 request.data.requestType,
                 current,

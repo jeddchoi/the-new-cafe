@@ -38,7 +38,8 @@ export default class SeatFinderHandler {
         current: number,
         endTime: number | null,
         seatPosition: SeatPosition | null = null,
-        isTimeout = false) {
+        isTimeout = false
+    ) {
         logger.debug("[SeatFinderHandler] handleSeatFinderRequest", {requestType, endTime, seatPosition, isTimeout});
 
         return Promise.resolve().then(() => {
@@ -85,7 +86,16 @@ export default class SeatFinderHandler {
                     }
                     return Promise.resolve();
                 }).then(() => {
-                    return result;
+                    return {
+                        sessionResult: result.sessionResult ? {
+                            ...result.sessionResult,
+                            rollback: undefined,
+                        } : null,
+                        seatResult: result.seatResult ? {
+                            ...result.seatResult,
+                            rollback: undefined,
+                        } : null,
+                    };
                 });
         });
     }
@@ -254,7 +264,7 @@ export default class SeatFinderHandler {
         const success = (sessionResult ? sessionResult.resultCode === ResultCode.OK : false) &&
             (seatResult ? seatResult.resultCode === ResultCode.OK : true);
         const sessionId = sessionResult?.after?.sessionId ?? sessionResult?.before?.sessionId;
-        if (!sessionId) throw new https.HttpsError("data-loss", "Something is broken. This should not happen");
+        if (!sessionId) return Promise.resolve();
         return this.stateChangesRef.child(sessionId).push(<SeatFinderEvent>{
             requestType: requestType,
             timestamp: current,

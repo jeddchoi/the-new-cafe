@@ -37,8 +37,9 @@ export default class SessionHandler {
         logger.debug("[SessionHandler] reserveSeat", {
             seatPosition,
             startTime,
-            endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
+            endTime: endTime ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
+
         return DatabaseUtil.Instance.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (existing) {
                 logger.warn("[SessionHandler] Session already exists", {existing});
@@ -66,7 +67,7 @@ export default class SessionHandler {
     occupySeat = (startTime: number, endTime: number | null = null) => {
         logger.debug("[SessionHandler] occupySeat", {
             startTime,
-            endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
+            endTime: endTime ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
         return DatabaseUtil.Instance.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
@@ -96,7 +97,7 @@ export default class SessionHandler {
     leaveAway = (startTime: number, endTime: number | null = null) => {
         logger.debug("[SessionHandler] leaveAway", {
             startTime,
-            endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
+            endTime: endTime ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
         return DatabaseUtil.Instance.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
@@ -126,7 +127,7 @@ export default class SessionHandler {
     doBusiness = (startTime: number, endTime: number | null = null) => {
         logger.debug("[SessionHandler] doBusiness", {
             startTime,
-            endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
+            endTime: endTime ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
         return DatabaseUtil.Instance.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
@@ -171,7 +172,7 @@ export default class SessionHandler {
     changeMainStateEndTime = (startTime: number, endTime: number | null = null) => {
         logger.debug("[SessionHandler] changeMainStateEndTime", {
             startTime,
-            endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
+            endTime: endTime ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
         return DatabaseUtil.Instance.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
@@ -196,7 +197,7 @@ export default class SessionHandler {
     changeSubStateEndTime = (startTime: number, endTime: number | null = null) => {
         logger.debug("[SessionHandler] changeSubStateEndTime", {
             startTime,
-            endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
+            endTime: endTime ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
         return DatabaseUtil.Instance.transaction<CurrentSession>(this.userCurrentSessionPath, (existing) => {
             if (!existing) {
