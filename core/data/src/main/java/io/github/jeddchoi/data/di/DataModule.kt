@@ -9,43 +9,37 @@ import io.github.jeddchoi.data.firebase.FirebaseAuthRepositoryImpl
 import io.github.jeddchoi.data.firebase.FirebaseCurrentUserRepositoryImpl
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository
-import io.github.jeddchoi.data.service.FirebaseSeatFinderServiceImpl
-import io.github.jeddchoi.data.service.SeatFinderService
-import io.github.jeddchoi.data.util.AuthInputValidator
+import io.github.jeddchoi.data.service.seatfinder.FirebaseSeatFinderServiceImpl
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class DataModule {
 
-    @Singleton
     @Binds
     abstract fun bindsAuthRepository(
         authRepository: FirebaseAuthRepositoryImpl,
     ): AuthRepository
 
 
-    @Singleton
-    @Binds
-    abstract fun bindsCurrentUserRepository(
-        currentUserRepository: FirebaseCurrentUserRepositoryImpl,
-    ): CurrentUserRepository
-
-    @Singleton
+    @ExperimentalSerializationApi
     @Binds
     abstract fun bindsSeatFinderService(
         seatFinderService: FirebaseSeatFinderServiceImpl,
     ): SeatFinderService
 
 
-}
+    @Singleton // this shares an internal state that requires that same instance to be used within a certain scope
+    @Binds
+    abstract fun bindsCurrentUserRepository(
+        currentUserRepository: FirebaseCurrentUserRepositoryImpl,
+    ): CurrentUserRepository
 
-@Module
-@InstallIn(SingletonComponent::class)
-object ValidatorModule {
 
     @Singleton // Provide always the same instance
     @Provides
@@ -53,9 +47,5 @@ object ValidatorModule {
         // Run this code when providing an instance of CoroutineScope
         return CoroutineScope(SupervisorJob() + Dispatchers.Default)
     }
-
-    @Provides
-    fun provideAuthInputValidator(): AuthInputValidator {
-        return AuthInputValidator
-    }
 }
+
