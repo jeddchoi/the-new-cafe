@@ -4,14 +4,19 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jeddchoi.data.repository.SeatRepository
 import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
-import io.github.jeddchoi.data.service.ResultCode
-import io.github.jeddchoi.data.service.SeatFinderService
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
+import io.github.jeddchoi.ui.model.Action
 import io.github.jeddchoi.ui.model.FeedbackState
 import io.github.jeddchoi.ui.model.Message
+import io.github.jeddchoi.ui.model.Severity
 import io.github.jeddchoi.ui.model.UiState
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -57,21 +62,21 @@ internal class StoreListViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("StoreList", e.stackTraceToString())
                 Log.e("StoreList", e.message ?: "")
-//                _uiState.value = _uiState.value.copy(
-//                    canContinue = false,
-//                    messages = _uiState.value.messages.plus(
-//                        Message(
-//                            titleId = R.string.error,
-//                            content = e.message ?: e.stackTraceToString(),
-//                            severity = Severity.ERROR,
-//                            action = listOf(Action(R.string.retry) {
-//                                launchOneShotJob(job)
-//                            }),
-//                        )
-//                    )
-//                )
+                _uiState.value = _uiState.value.copy(
+                    canContinue = false,
+                    messages = _uiState.value.messages.plus(
+                        Message(
+                            titleId = R.string.error,
+                            content = e.message ?: e.stackTraceToString(),
+                            severity = Severity.ERROR,
+                            action = listOf(Action(R.string.retry) {
+                                launchOneShotJob(job)
+                            }),
+                        )
+                    )
+                )
             } finally {
-//                _uiState.value = _uiState.value.copy(isBusy = false)
+                _uiState.value = _uiState.value.copy(isBusy = false)
             }
         }
     }

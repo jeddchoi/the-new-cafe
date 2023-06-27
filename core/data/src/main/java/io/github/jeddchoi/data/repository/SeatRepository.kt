@@ -1,8 +1,6 @@
 package io.github.jeddchoi.data.repository
 
-import android.util.Log
-import io.github.jeddchoi.data.service.FirebaseSeatFinderServiceImpl
-import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
+import io.github.jeddchoi.data.service.seatfinder.FirebaseSeatFinderServiceImpl
 import javax.inject.Inject
 import javax.inject.Singleton
 

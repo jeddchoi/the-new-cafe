@@ -1,4 +1,4 @@
-package io.github.jeddchoi.data.service
+package io.github.jeddchoi.data.service.seatfinder
 
 import android.util.Log
 import com.google.firebase.functions.FirebaseFunctions
@@ -11,12 +11,8 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.encodeToJsonElement
-import org.json.JSONObject
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -168,7 +164,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
     ) =
         sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.ChangeOverallTimeoutTime,
+                requestType = SeatFinderRequestType.ChangeMainStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
@@ -180,7 +176,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
     ) =
         sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.ChangeOverallTimeoutTime,
+                requestType = SeatFinderRequestType.ChangeMainStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
@@ -192,7 +188,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
     ) =
         sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.ChangeTemporaryTimeoutTime,
+                requestType = SeatFinderRequestType.ChangeSubStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
@@ -204,7 +200,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
     ) =
         sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.ChangeTemporaryTimeoutTime,
+                requestType = SeatFinderRequestType.ChangeSubStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )

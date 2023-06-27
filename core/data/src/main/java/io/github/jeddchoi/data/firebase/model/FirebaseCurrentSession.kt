@@ -1,6 +1,6 @@
 package io.github.jeddchoi.data.firebase.model
 
-import io.github.jeddchoi.data.service.SeatFinderRequestType
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequestType
 import io.github.jeddchoi.model.UserStateType
 import kotlinx.serialization.Serializable
 

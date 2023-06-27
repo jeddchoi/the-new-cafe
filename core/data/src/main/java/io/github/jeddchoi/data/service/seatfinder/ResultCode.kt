@@ -1,4 +1,4 @@
-package io.github.jeddchoi.data.service
+package io.github.jeddchoi.data.service.seatfinder
 
 import androidx.annotation.StringRes
 import io.github.jeddchoi.data.R

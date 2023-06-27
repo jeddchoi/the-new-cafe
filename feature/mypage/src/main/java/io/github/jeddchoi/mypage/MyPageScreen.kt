@@ -10,7 +10,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import io.github.jeddchoi.actionlog.ActionLogRoute
 import io.github.jeddchoi.mystatus.MyStatusRoute
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -27,6 +27,13 @@ internal fun MyPageScreen(
     modifier: Modifier = Modifier,
     navigateTab: MyPageNavigation.Tab = MyPageNavigation.Tab.MY_STATUS,
     pagerState: PagerState = rememberPagerState(),
+    quit: () -> Unit = {},
+    occupySeat: (Instant) -> Unit = {},
+    doBusiness: (Instant) -> Unit = {},
+    resumeUsing: () -> Unit = {},
+    leaveAway: (Instant) -> Unit = {},
+    changeMainStateEndTime: (Instant) -> Unit = {},
+    changeSubStateEndTime: (Instant) -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     var selectedTab by rememberSaveable {
@@ -52,30 +59,17 @@ internal fun MyPageScreen(
         sheetPeekHeight = 128.dp,
 
         sheetContent = {
-            Box(
-                Modifier
-                    .fillMaxWidth()
-                    .height(128.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Swipe up to expand sheet")
-            }
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(64.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text("Sheet content")
-                Spacer(Modifier.height(20.dp))
-                Button(
-                    onClick = {
-                        scope.launch { scaffoldState.bottomSheetState.partialExpand() }
-                    }
-                ) {
-                    Text("Click to collapse sheet")
-                }
-            }
+            ControlPanel(
+                scaffoldState,
+                scope,
+                quit,
+                occupySeat,
+                doBusiness,
+                resumeUsing,
+                leaveAway,
+                changeMainStateEndTime,
+                changeSubStateEndTime,
+            )
         }) { innerPadding ->
         Column(
             modifier

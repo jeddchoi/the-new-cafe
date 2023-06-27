@@ -1,4 +1,4 @@
-package io.github.jeddchoi.data.service
+package io.github.jeddchoi.data.service.seatfinder
 
 enum class SeatFinderRequestType {
     ReserveSeat,
@@ -8,8 +8,8 @@ enum class SeatFinderRequestType {
     ShiftToBusiness,
     LeaveAway,
     ResumeUsing,
-    ChangeOverallTimeoutTime,
-    ChangeTemporaryTimeoutTime,
+    ChangeMainStateEndTime,
+    ChangeSubStateEndTime,
     ;
 
     companion object {
