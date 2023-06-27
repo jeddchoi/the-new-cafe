@@ -1,10 +1,16 @@
-package io.github.jeddchoi.data.service.seatfinder
+package io.github.jeddchoi.data.firebase.service
 
 import android.util.Log
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.FirebaseFunctionsException
+import io.github.jeddchoi.data.firebase.model.FirebaseRequestResult
 import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
 import io.github.jeddchoi.data.repository.CurrentUserRepository
+import io.github.jeddchoi.data.service.seatfinder.ResultCode
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequest
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequestType
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderResult
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import io.github.jeddchoi.data.util.toJsonElement
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException

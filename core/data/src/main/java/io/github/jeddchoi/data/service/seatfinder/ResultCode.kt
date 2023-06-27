@@ -7,7 +7,6 @@ import io.github.jeddchoi.data.R
  * Result code
  * This includes success, business error and technical error
  *
- * @property value
  * @property description
  * @constructor Create empty Result code
  */

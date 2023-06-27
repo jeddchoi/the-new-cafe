@@ -1,6 +1,5 @@
-package io.github.jeddchoi.data.firebase
+package io.github.jeddchoi.data.firebase.repository
 
-import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.database.FirebaseDatabase
@@ -37,7 +36,7 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
             }
             createdUser.updateProfile(request).await()
 
-//            val newUserState = UserState()
+//            val newUserState = UserSession()
 //            Log.i("FirebaseAuthRepositoryImpl", "newUserStatus: $newUserState")
 //            Log.i("FirebaseAuthRepositoryImpl", "uid: ${createdUser.uid}")
 //            database.reference.child(REFERENCE_USER_STATUS_NAME).child(createdUser.uid).setValue(newUserState).await()

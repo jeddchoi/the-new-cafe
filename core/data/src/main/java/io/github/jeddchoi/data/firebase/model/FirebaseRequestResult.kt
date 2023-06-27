@@ -1,12 +1,15 @@
-package io.github.jeddchoi.data.service.seatfinder
+package io.github.jeddchoi.data.firebase.model
 
-import io.github.jeddchoi.data.firebase.model.FirebaseCurrentSession
-import io.github.jeddchoi.data.firebase.model.FirebaseSeat
+import io.github.jeddchoi.data.service.seatfinder.ResultCode
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequestType
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderResult
 import io.github.jeddchoi.model.UserStateType
 import kotlinx.datetime.Instant
 import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 
+@OptIn(ExperimentalSerializationApi::class)
 @Serializable
 data class FirebaseTransactionResult<T>(
     @EncodeDefault val before: T? = null,

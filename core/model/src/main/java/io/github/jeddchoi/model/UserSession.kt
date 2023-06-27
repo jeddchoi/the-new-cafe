@@ -3,22 +3,22 @@ package io.github.jeddchoi.model
 /**
  * Sealed interface that represents the current status of the user.
  */
-sealed interface UserState {
+sealed interface UserSession {
     /**
      * Represents the case where the user has no status.
      */
-    object None : UserState
+    object None : UserSession
 
-    /**
-     * Represents the case where the user is blocked by the system.
-     *
-     * @property blockedTime The time when the user was blocked.
-     * @property timeElapsedSinceBlocked The amount of time that has elapsed since the user was blocked.
-     */
-    data class Blocked(
-        val blockedTime: Long,
-        val timeElapsedSinceBlocked: Long
-    ) : UserState
+//    /**
+//     * Represents the case where the user is blocked by the system.
+//     *
+//     * @property blockedTime The time when the user was blocked.
+//     * @property timeElapsedSinceBlocked The amount of time that has elapsed since the user was blocked.
+//     */
+//    data class Blocked(
+//        val blockedTime: Long,
+//        val timeElapsedSinceBlocked: Long
+//    ) : UserSession
 
 
     /**
@@ -34,7 +34,7 @@ sealed interface UserState {
      * @property remainingTime The amount of time remaining until the user finishes current status.
      * @property elapsedTimeSinceStart The amount of time that has elapsed since the user started current status.
      */
-    sealed interface UsingSeat : UserState {
+    sealed interface UsingSeat : UserSession {
         val startTime: Long
         val timeoutLimit: Long
         val totalUsedTime: Long
