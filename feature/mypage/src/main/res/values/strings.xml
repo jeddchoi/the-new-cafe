@@ -5,4 +5,8 @@
     <string name="mypage">My Page</string>
     <string name="error">Error</string>
     <string name="retry">Retry</string>
+    <string name="quit">Quit</string>
+    <string name="occupy">Occupy</string>
+    <string name="doBusiness">Do business</string>
+    <string name="info">Info</string>
 </resources>

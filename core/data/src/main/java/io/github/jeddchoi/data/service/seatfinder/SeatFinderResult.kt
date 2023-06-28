@@ -1,5 +1,6 @@
 package io.github.jeddchoi.data.service.seatfinder
 
+import io.github.jeddchoi.model.SeatFinderRequestType
 import io.github.jeddchoi.model.UserStateType
 import kotlinx.datetime.Instant
 

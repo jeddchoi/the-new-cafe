@@ -10,8 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.ui.model.UiState
 
@@ -21,7 +21,7 @@ fun MyStatusRoute(
     modifier: Modifier = Modifier,
 
     ) {
-    val viewModel: MyStatusViewModel = viewModel()
+    val viewModel: MyStatusViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     MyStatusScreen(uiState = uiState)
@@ -49,6 +49,7 @@ internal fun MyStatusScreen(
             text = text,
             textAlign = TextAlign.Center
         )
+
     }
 }
 

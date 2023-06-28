@@ -2,17 +2,26 @@ package io.github.jeddchoi.mystatus
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.ui.model.FeedbackState
 import io.github.jeddchoi.ui.model.Message
 import io.github.jeddchoi.ui.model.UiState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
 
-internal class MyStatusViewModel : ViewModel() {
+@HiltViewModel
+internal class MyStatusViewModel @Inject constructor(
+    private val userSessionRepository: UserSessionRepository
+): ViewModel() {
 
-    private val _uiState: Flow<MyStatusUiStateData> = flow {
-        delay(1000)
-        emit(MyStatusUiStateData("MyStatus"))
+    private val _uiState: Flow<MyStatusUiStateData> = userSessionRepository.userSession.map {
+        MyStatusUiStateData(data = it.toString())
     }
 
 

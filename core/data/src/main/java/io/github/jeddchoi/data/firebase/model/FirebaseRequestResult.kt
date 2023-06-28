@@ -1,7 +1,7 @@
 package io.github.jeddchoi.data.firebase.model
 
 import io.github.jeddchoi.data.service.seatfinder.ResultCode
-import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequestType
+import io.github.jeddchoi.model.SeatFinderRequestType
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderResult
 import io.github.jeddchoi.model.UserStateType
 import kotlinx.datetime.Instant

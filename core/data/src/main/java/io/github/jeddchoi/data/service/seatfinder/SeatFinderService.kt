@@ -3,11 +3,18 @@ package io.github.jeddchoi.data.service.seatfinder
 import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
 
 interface SeatFinderService {
+
     suspend fun reserveSeat(
         seatPosition: FirebaseSeatPosition,
         endTime: Long? = null,
         durationInSeconds: Int? = null
     ): SeatFinderResult
+
+    suspend fun requestInSession(
+        seatFinderRequestType: SeatFinderUserRequestType,
+        endTime: Long? = null,
+        durationInSeconds: Int? = null
+    ) : SeatFinderResult
 
     suspend fun occupySeat(
         endTime: Long? = null,
@@ -21,11 +28,6 @@ interface SeatFinderService {
         durationInSeconds: Int? = null
     ): SeatFinderResult
 
-    suspend fun shiftToBusiness(
-        endTime: Long? = null,
-        durationInSeconds: Int? = null
-    ): SeatFinderResult
-
     suspend fun leaveAway(
         endTime: Long? = null,
         durationInSeconds: Int? = null
@@ -33,22 +35,22 @@ interface SeatFinderService {
 
     suspend fun resumeUsing(): SeatFinderResult
 
-    suspend fun changeReservationTimeoutTime(
+    suspend fun changeReservationEndTime(
         endTime: Long? = null,
         durationInSeconds: Int? = null
     ): SeatFinderResult
 
-    suspend fun changeOccupyTimeoutTime(
+    suspend fun changeOccupyEndTime(
         endTime: Long? = null,
         durationInSeconds: Int? = null
     ): SeatFinderResult
 
-    suspend fun changeBusinessTimeoutTime(
+    suspend fun changeBusinessEndTime(
         endTime: Long? = null,
         durationInSeconds: Int? = null
     ): SeatFinderResult
 
-    suspend fun changeAwayTimeoutTime(
+    suspend fun changeAwayEndTime(
         endTime: Long? = null,
         durationInSeconds: Int? = null
     ): SeatFinderResult

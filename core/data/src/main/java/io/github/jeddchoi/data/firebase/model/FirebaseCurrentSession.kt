@@ -1,7 +1,9 @@
 package io.github.jeddchoi.data.firebase.model
 
-import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequestType
+import io.github.jeddchoi.model.SeatFinderRequestType
+import io.github.jeddchoi.model.UserSession
 import io.github.jeddchoi.model.UserStateType
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -32,4 +34,15 @@ data class FirebaseCurrentSession(
     fun getCurrentStateStartTime() = subState?.startTime ?: mainState.startTime
     fun getCurrentStateEndTime() = if (subState != null) subState.timer?.endTime else mainState.timer?.endTime
     fun getRequestTypeStrAfterCurrentState() = if (subState != null) subState.timer?.willRequestType else mainState.timer?.willRequestType
+
+    fun toUserSession() = UserSession(
+        sessionId = sessionId,
+        hasFailure = hasFailure,
+        startSessionTime = Instant.fromEpochMilliseconds(startSessionTime),
+        endSessionTime = mainState.timer?.endTime?.let { Instant.fromEpochMilliseconds(it) },
+        startTime = Instant.fromEpochMilliseconds(getCurrentStateStartTime()),
+        endTime = getCurrentStateEndTime()?.let { Instant.fromEpochMilliseconds(it) },
+        currentState = UserStateType.getByValue(getCurrentStateStr()),
+        requestTypeAfterCurrentState = getRequestTypeStrAfterCurrentState()?.let { SeatFinderRequestType.getByValue(it) }
+    )
 }

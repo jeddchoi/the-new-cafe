@@ -8,10 +8,11 @@ import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.service.seatfinder.ResultCode
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequest
-import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequestType
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderResult
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
 import io.github.jeddchoi.data.util.toJsonElement
+import io.github.jeddchoi.model.SeatFinderRequestType
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
@@ -114,6 +115,25 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         )
     )
 
+    override suspend fun requestInSession(
+        seatFinderRequestType: SeatFinderUserRequestType,
+        endTime: Long?,
+        durationInSeconds: Int?
+    ): SeatFinderResult {
+        return when (seatFinderRequestType) {
+            SeatFinderUserRequestType.Reserve -> throw IllegalArgumentException("Reserved seat is not request in session")
+            SeatFinderUserRequestType.Occupy -> occupySeat(endTime, durationInSeconds)
+            SeatFinderUserRequestType.Quit -> quit()
+            SeatFinderUserRequestType.DoBusiness -> doBusiness(endTime, durationInSeconds)
+            SeatFinderUserRequestType.LeaveAway -> leaveAway(endTime, durationInSeconds)
+            SeatFinderUserRequestType.ResumeUsing -> resumeUsing()
+            SeatFinderUserRequestType.ChangeReservationEndTime -> changeReservationEndTime(endTime, durationInSeconds)
+            SeatFinderUserRequestType.ChangeOccupyEndTime -> changeOccupyEndTime(endTime, durationInSeconds)
+            SeatFinderUserRequestType.ChangeBusinessEndTime -> changeBusinessEndTime(endTime, durationInSeconds)
+            SeatFinderUserRequestType.ChangeAwayEndTime -> changeAwayEndTime(endTime, durationInSeconds)
+        }
+    }
+
     override suspend fun occupySeat(endTime: Long?, durationInSeconds: Int?) =
         sendUserActionRequest(
             SeatFinderRequest(
@@ -139,15 +159,6 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
             )
         )
 
-    override suspend fun shiftToBusiness(endTime: Long?, durationInSeconds: Int?) =
-        sendUserActionRequest(
-            SeatFinderRequest(
-                requestType = SeatFinderRequestType.ShiftToBusiness,
-                endTime = endTime,
-                durationInSeconds = durationInSeconds
-            )
-        )
-
     override suspend fun leaveAway(endTime: Long?, durationInSeconds: Int?) =
         sendUserActionRequest(
             SeatFinderRequest(
@@ -164,7 +175,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
             )
         )
 
-    override suspend fun changeReservationTimeoutTime(
+    override suspend fun changeReservationEndTime(
         endTime: Long?,
         durationInSeconds: Int?
     ) =
@@ -176,7 +187,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
             )
         )
 
-    override suspend fun changeOccupyTimeoutTime(
+    override suspend fun changeOccupyEndTime(
         endTime: Long?,
         durationInSeconds: Int?
     ) =
@@ -188,7 +199,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
             )
         )
 
-    override suspend fun changeBusinessTimeoutTime(
+    override suspend fun changeBusinessEndTime(
         endTime: Long?,
         durationInSeconds: Int?
     ) =
@@ -200,7 +211,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
             )
         )
 
-    override suspend fun changeAwayTimeoutTime(
+    override suspend fun changeAwayEndTime(
         endTime: Long?,
         durationInSeconds: Int?
     ) =

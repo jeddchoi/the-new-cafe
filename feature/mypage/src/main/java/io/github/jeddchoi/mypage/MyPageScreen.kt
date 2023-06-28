@@ -3,13 +3,29 @@
 package io.github.jeddchoi.mypage
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,23 +33,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jeddchoi.actionlog.ActionLogRoute
 import io.github.jeddchoi.mystatus.MyStatusRoute
+import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyPageScreen(
     modifier: Modifier = Modifier,
     navigateTab: MyPageNavigation.Tab = MyPageNavigation.Tab.MY_STATUS,
     pagerState: PagerState = rememberPagerState(),
-    quit: () -> Unit = {},
-    occupySeat: (Instant) -> Unit = {},
-    doBusiness: (Instant) -> Unit = {},
-    resumeUsing: () -> Unit = {},
-    leaveAway: (Instant) -> Unit = {},
-    changeMainStateEndTime: (Instant) -> Unit = {},
-    changeSubStateEndTime: (Instant) -> Unit = {},
+    uiState: UiState<MyPageUiStateData>,
 ) {
     val coroutineScope = rememberCoroutineScope()
     var selectedTab by rememberSaveable {
@@ -62,13 +72,7 @@ internal fun MyPageScreen(
             ControlPanel(
                 scaffoldState,
                 scope,
-                quit,
-                occupySeat,
-                doBusiness,
-                resumeUsing,
-                leaveAway,
-                changeMainStateEndTime,
-                changeSubStateEndTime,
+                uiState
             )
         }) { innerPadding ->
         Column(
@@ -98,6 +102,7 @@ internal fun MyPageScreen(
                     )
                 }
             }
+            // Our content for each page
             HorizontalPager(
                 state = pagerState,
                 pageCount = MyPageNavigation.tabs.size,
@@ -125,5 +130,5 @@ internal fun MyPageScreen(
 @Preview
 @Composable
 fun MyPagePreview() {
-    MyPageScreen()
+
 }

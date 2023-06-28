@@ -1,11 +1,10 @@
-package io.github.jeddchoi.data.service.seatfinder
+package io.github.jeddchoi.model
 
-enum class SeatFinderRequestType {
+enum class SeatFinderRequestType() {
     ReserveSeat,
     OccupySeat,
     Quit,
     DoBusiness,
-    ShiftToBusiness,
     LeaveAway,
     ResumeUsing,
     ChangeMainStateEndTime,

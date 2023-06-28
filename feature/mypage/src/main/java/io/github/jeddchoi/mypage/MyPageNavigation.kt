@@ -2,8 +2,10 @@ package io.github.jeddchoi.mypage
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import io.github.jeddchoi.designsystem.CafeIcons
@@ -90,15 +92,11 @@ fun NavGraphBuilder.myPageScreen(
         arguments = MyPageNavigation.arguments,
     ) { backStackEntry ->
         val viewModel: MyPageViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         MyPageScreen(
             navigateTab = MyPageNavigation.Args(backStackEntry.savedStateHandle).tab,
-            quit = viewModel::quit,
-//            occupySeat = viewModel::occupySeat,
-//            doBusiness = viewModel::doBusiness,
-//            resumeUsing = viewModel::resumeUsing,
-//            leaveAway = viewModel::leaveAway,
-
+            uiState = uiState
         )
     }
 }

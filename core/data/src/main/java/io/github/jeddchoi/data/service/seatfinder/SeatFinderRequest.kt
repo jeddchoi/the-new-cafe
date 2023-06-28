@@ -1,6 +1,7 @@
 package io.github.jeddchoi.data.service.seatfinder
 
 import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
+import io.github.jeddchoi.model.SeatFinderRequestType
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
