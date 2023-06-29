@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+
+
 pluginManagement {
     includeBuild("buildlogic")
     repositories {
@@ -21,6 +23,8 @@ rootProject.name = "The New Cafe"
 include(":app")
 
 include(":feature:profile")
+include(":feature:order")
+
 include(":feature:store")
 include(":feature:store_list")
 include(":feature:mypage")
