@@ -8,7 +8,7 @@ import {UserMainStateType} from "../seat-finder/_enum/UserMainStateType";
 import {TimerInfo} from "./model/TimerInfo";
 import {SeatFinderRequestType} from "../seat-finder/_enum/SeatFinderRequestType";
 import {UserSubStateType} from "../seat-finder/_enum/UserSubStateType";
-import {UserStateType} from "../seat-finder/_enum/UserStateType";
+import {getWillRequestType, UserStateType} from "../seat-finder/_enum/UserStateType";
 import {REFERENCE_CURRENT_SESSION_NAME, REFERENCE_SESSION_HAS_FAILURE_NAME} from "./NameConstant";
 
 export default class SessionHandler {
@@ -185,7 +185,7 @@ export default class SessionHandler {
                 mainState: {
                     ...existing.mainState,
                     timer: endTime === null ? null : <TimerInfo>{
-                        ...existing.mainState.timer,
+                        willRequestType: getWillRequestType(existing.mainState.state),
                         endTime,
                         taskId: this.getTimerTaskId(existing.mainState.state, endTime),
                     },
@@ -215,7 +215,7 @@ export default class SessionHandler {
                 subState: {
                     ...existing.subState,
                     timer: endTime === null ? null : <TimerInfo>{
-                        ...existing.subState.timer,
+                        willRequestType: getWillRequestType(existing.subState.state),
                         endTime,
                         taskId: this.getTimerTaskId(existing.subState.state, endTime),
                     },

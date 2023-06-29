@@ -9,4 +9,3 @@ if (process.env.FUNCTIONS_EMULATOR === "true") {
     exports.Firestore = require("./_firestore");
     exports.Task = require("./_task");
 }
-

@@ -3,15 +3,15 @@ import {Response} from "express";
 import {TimerPayload} from "../../_task/TimerPayload";
 import SeatFinderHandler from "../SeatFinderHandler";
 import {logger} from "firebase-functions/v2";
+import {defineList} from "firebase-functions/params";
 
-// TODO: use parameterized configuration when fixed
-const SEAT_FINDER_FUNCTION_LOCATION = "SEAT_FINDER_FUNCTION_LOCATION";
+const SEAT_FINDER_FUNCTION_LOCATION: unknown = defineList("SEAT_FINDER_FUNCTION_LOCATION");
 
 
 export const onTimeout =
     onRequest(
         {
-            region: "asia-northeast3",
+            region: <string[]>SEAT_FINDER_FUNCTION_LOCATION,
         },
         (req: Request, res: Response) => Promise.resolve().then(() => {
             const current = Date.now();
