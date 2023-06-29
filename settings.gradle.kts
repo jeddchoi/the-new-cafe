@@ -26,8 +26,6 @@ include(":feature:profile")
 include(":feature:order")
 
 include(":feature:mypage")
-include(":feature:actionlog")
-include(":feature:mystatus")
 include(":feature:authentication")
 
 include(":core:ui")

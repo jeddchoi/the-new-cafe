@@ -1,44 +1,15 @@
 package io.github.jeddchoi.profile
 
-import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import io.github.jeddchoi.designsystem.CafeIcons
-import io.github.jeddchoi.designsystem.Icon
-import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseAppUri
-import io.github.jeddchoi.ui.feature.AppNavigation.Companion.baseWebUri
-import io.github.jeddchoi.ui.feature.BottomNavigation
 import io.github.jeddchoi.ui.model.UiState
 
-/**
- * Profile navigation constants
- */
-object ProfileNavigation : BottomNavigation {
-
-    @StringRes
-    override val titleTextId: Int = R.string.profile
-
-
-    // routing
-    override val name: String = "profile"
-    override fun route(arg: String?): String = name
-
-    override val arguments: List<NamedNavArgument> = listOf()
-    override val deepLinks: List<NavDeepLink> = listOf(
-        navDeepLink { uriPattern = "$baseWebUri/${route()}" },
-        navDeepLink { uriPattern = "$baseAppUri/${route()}" }
-    )
-
-    // bottom navigation
-    override val selectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Profile_Filled)
-    override val unselectedIcon: Icon = Icon.ImageVectorIcon(CafeIcons.Profile)
-
-    @StringRes
-    override val iconTextId: Int = R.string.profile
-}
+private const val ProfileRoutePattern = "profile"
 
 /**
  * Navigate to profile
@@ -46,7 +17,7 @@ object ProfileNavigation : BottomNavigation {
  * @param navOptions
  */
 fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
-    this.navigate(ProfileNavigation.route(), navOptions)
+    this.navigate(ProfileRoutePattern, navOptions)
 }
 
 /**
@@ -62,8 +33,7 @@ fun NavGraphBuilder.profileScreen(
     onBackClick: () -> Unit,
 ) {
     composable(
-        route = ProfileNavigation.route(),
-        deepLinks = ProfileNavigation.deepLinks
+        route = ProfileRoutePattern,
     ) {
         val viewModel: ProfileViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle(UiState.InitialLoading)

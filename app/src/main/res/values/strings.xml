@@ -3,4 +3,6 @@
     <string name="profile">Profile</string>
     <string name="order">Order</string>
     <string name="mypage">My Page</string>
+    <string name="auth">Authentication</string>
+    <string name="main">Main</string>
 </resources>

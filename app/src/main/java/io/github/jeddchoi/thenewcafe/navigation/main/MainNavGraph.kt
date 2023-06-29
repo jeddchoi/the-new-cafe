@@ -8,7 +8,6 @@ import io.github.jeddchoi.mypage.myPageScreen
 import io.github.jeddchoi.order.navigateToOrder
 import io.github.jeddchoi.order.orderGraph
 import io.github.jeddchoi.order.store.navigateToStore
-import io.github.jeddchoi.profile.ProfileNavigation
 import io.github.jeddchoi.profile.profileScreen
 
 
@@ -18,7 +17,7 @@ fun MainNavGraph(
     onBackClick: () -> Unit,
     navigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
-    startDestination: String = ProfileNavigation.route(),
+    startDestination: String = BottomNavScreen.Profile.route,
 ) {
 
     NavHost(

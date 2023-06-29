@@ -5,10 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jeddchoi.authentication.SignInNavigation
-import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository
-import io.github.jeddchoi.thenewcafe.navigation.main.MainNavigation
+import io.github.jeddchoi.thenewcafe.navigation.root.RootNavScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -22,16 +20,16 @@ class SplashViewModel @Inject constructor(
     val isLoading = _isLoading.asStateFlow()
 
 
-    private val _startDestination: MutableState<String> = mutableStateOf(SignInNavigation.routeGraph)
-    val startDestination: MutableState<String> = _startDestination
+    private val _startDestination: MutableState<RootNavScreen> = mutableStateOf(RootNavScreen.Auth)
+    val startDestination: MutableState<RootNavScreen> = _startDestination
 
 
     private fun initialize() {
         viewModelScope.launch {
             if (currentUserRepository.isUserSignedIn()) {
-                _startDestination.value = MainNavigation.route()
+                _startDestination.value = RootNavScreen.Main
             } else {
-                _startDestination.value = SignInNavigation.routeGraph
+                _startDestination.value = RootNavScreen.Auth
             }
             _isLoading.emit(false)
         }

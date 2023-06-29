@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="my_status">My Status</string>
-    <string name="action_log">Action Log</string>
+    <string name="session">Session</string>
+    <string name="history">History</string>
     <string name="mypage">My Page</string>
     <string name="error">Error</string>
     <string name="retry">Retry</string>

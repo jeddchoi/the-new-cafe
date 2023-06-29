@@ -31,8 +31,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.jeddchoi.actionlog.ActionLogRoute
-import io.github.jeddchoi.mystatus.MyStatusRoute
+import io.github.jeddchoi.mypage.history.HistoryScreen
+import io.github.jeddchoi.mypage.session.SessionScreen
 import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.launch
 
@@ -41,7 +41,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun MyPageScreen(
     modifier: Modifier = Modifier,
-    navigateTab: MyPageNavigation.Tab = MyPageNavigation.Tab.MY_STATUS,
+    navigateTab: MyPageTab,
     pagerState: PagerState = rememberPagerState(),
     uiState: UiState<MyPageUiStateData>,
 ) {
@@ -55,7 +55,7 @@ internal fun MyPageScreen(
         snapshotFlow { pagerState.currentPage }.collect { page ->
             // Do something with each page change, for example:
             // viewModel.sendPageSelectedEvent(page)
-            selectedTab = MyPageNavigation.tabs[page]
+            selectedTab = MyPageTab.VALUES[page]
         }
     }
 
@@ -83,7 +83,7 @@ internal fun MyPageScreen(
         ) {
             TabRow(selectedTabIndex = selectedTab.ordinal) {
                 // Add tabs for all of our pages
-                MyPageNavigation.tabs.forEach { tab ->
+                MyPageTab.VALUES.forEach { tab ->
                     Tab(
                         text = {
                             Text(
@@ -105,7 +105,7 @@ internal fun MyPageScreen(
             // Our content for each page
             HorizontalPager(
                 state = pagerState,
-                pageCount = MyPageNavigation.tabs.size,
+                pageCount = MyPageTab.VALUES.size,
                 // Add 16.dp padding to 'center' the pages
                 contentPadding = PaddingValues(16.dp),
                 modifier = Modifier
@@ -114,10 +114,9 @@ internal fun MyPageScreen(
             ) { pageIndex ->
 
                 // Our content for each page
-                when (MyPageNavigation.tabs[pageIndex]) {
-
-                    MyPageNavigation.Tab.MY_STATUS -> MyStatusRoute()
-                    MyPageNavigation.Tab.ACTION_LOG -> ActionLogRoute()
+                when (MyPageTab.VALUES[pageIndex]) {
+                    MyPageTab.Session -> SessionScreen()
+                    MyPageTab.History -> HistoryScreen()
                 }
             }
 
