@@ -47,9 +47,9 @@ fun MainScreen(
 
 @Composable
 private fun BottomBar(
-    bottomNavigations: List<BottomNavScreen>,
+    bottomNavigations: List<MainNavScreen>,
     currentDestination: NavDestination?,
-    selectBottomNav: (BottomNavScreen) -> Unit,
+    selectBottomNav: (MainNavScreen) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CafeNavigationBar(

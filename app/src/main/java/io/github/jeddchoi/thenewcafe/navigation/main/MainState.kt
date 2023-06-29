@@ -40,11 +40,11 @@ class MainState(
      * Map of top level destinations to be used in the TopBar, BottomBar and NavRail. The key is the
      * route.
      */
-    val bottomNavigations: List<BottomNavScreen> =
-        listOf(BottomNavScreen.Profile, BottomNavScreen.Order, BottomNavScreen.MyPage)
+    val bottomNavigations: List<MainNavScreen> =
+        listOf(MainNavScreen.Profile, MainNavScreen.Order, MainNavScreen.MyPage)
 
 
-    fun onNavigateToBottomNav(bottomNavigation: BottomNavScreen) {
+    fun onNavigateToBottomNav(bottomNavigation: MainNavScreen) {
         val bottomNavOptions = navOptions {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
@@ -60,9 +60,9 @@ class MainState(
         }
 
         when (bottomNavigation) {
-            BottomNavScreen.Profile -> navController.navigateToProfile(bottomNavOptions)
-            BottomNavScreen.Order -> navController.navigateToOrder(bottomNavOptions)
-            BottomNavScreen.MyPage -> navController.navigateToMyPage(bottomNavOptions)
+            MainNavScreen.Profile -> navController.navigateToProfile(bottomNavOptions)
+            MainNavScreen.Order -> navController.navigateToOrder(bottomNavOptions)
+            MainNavScreen.MyPage -> navController.navigateToMyPage(bottomNavOptions)
         }
     }
 

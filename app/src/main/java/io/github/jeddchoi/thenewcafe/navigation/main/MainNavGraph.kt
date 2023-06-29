@@ -17,7 +17,7 @@ fun MainNavGraph(
     onBackClick: () -> Unit,
     navigateToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
-    startDestination: String = BottomNavScreen.Profile.route,
+    startDestination: String = MainNavScreen.Profile.route,
 ) {
 
     NavHost(
