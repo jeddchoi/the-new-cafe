@@ -40,8 +40,6 @@
             <option value="$PROJECT_DIR$/feature/mystatus" />
             <option value="$PROJECT_DIR$/feature/order" />
             <option value="$PROJECT_DIR$/feature/profile" />
-            <option value="$PROJECT_DIR$/feature/store" />
-            <option value="$PROJECT_DIR$/feature/store_list" />
           </set>
         </option>
       </GradleProjectSettings>

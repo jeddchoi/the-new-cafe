@@ -13,7 +13,6 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import io.github.jeddchoi.designsystem.CafeNavigationBar
 import io.github.jeddchoi.designsystem.CafeNavigationBarItem
 import io.github.jeddchoi.designsystem.Icon
-import io.github.jeddchoi.ui.feature.BottomNavigation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,9 +47,9 @@ fun MainScreen(
 
 @Composable
 private fun BottomBar(
-    bottomNavigations: List<BottomNavigation>,
+    bottomNavigations: List<BottomNavScreen>,
     currentDestination: NavDestination?,
-    selectBottomNav: (BottomNavigation) -> Unit,
+    selectBottomNav: (BottomNavScreen) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     CafeNavigationBar(
@@ -58,9 +57,7 @@ private fun BottomBar(
     ) {
         bottomNavigations.forEach { destination ->
 
-            val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
-
-
+            val selected = currentDestination.isTopLevelDestinationInHierarchy(destination.route)
             CafeNavigationBarItem(
                 selected = selected,
                 onClick = {
@@ -84,13 +81,13 @@ private fun BottomBar(
                         )
                     }
                 },
-                label = { Text(stringResource(destination.iconTextId)) },
+                label = { Text(stringResource(destination.titleId)) },
             )
         }
     }
 }
 
-fun NavDestination?.isTopLevelDestinationInHierarchy(destination: BottomNavigation) =
-    this?.hierarchy?.any { it.route?.contains(destination.name, true) ?: false } ?: false
+fun NavDestination?.isTopLevelDestinationInHierarchy(route: String) =
+    this?.hierarchy?.any { it.route?.contains(route, true) ?: false } ?: false
 
 
