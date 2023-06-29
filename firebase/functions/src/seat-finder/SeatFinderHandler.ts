@@ -29,7 +29,7 @@ export default class SeatFinderHandler {
         this.seatHandler = new SeatHandler(this.userId);
 
         const seatFinderRef = DatabaseUtil.Instance.seatFinderRef();
-        this.stateChangesRef = seatFinderRef.child(REFERENCE_STATE_CHANGES_NAME);
+        this.stateChangesRef = seatFinderRef.child(REFERENCE_STATE_CHANGES_NAME).child(userId);
         this.userHistoryRef = seatFinderRef.child(REFERENCE_HISTORY_NAME).child(userId);
     }
 
