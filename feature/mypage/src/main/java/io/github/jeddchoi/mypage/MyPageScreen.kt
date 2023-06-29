@@ -2,16 +2,16 @@
 
 package io.github.jeddchoi.mypage
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -33,98 +33,125 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jeddchoi.mypage.history.HistoryScreen
 import io.github.jeddchoi.mypage.session.SessionScreen
+import io.github.jeddchoi.ui.LogCompositions
 import io.github.jeddchoi.ui.model.UiState
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun MyPageScreen(
-    modifier: Modifier = Modifier,
     navigateTab: MyPageTab,
-    pagerState: PagerState = rememberPagerState(),
     uiState: UiState<MyPageUiStateData>,
+    modifier: Modifier = Modifier,
+    coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) {
-    val coroutineScope = rememberCoroutineScope()
+
+    LogCompositions(tag = "MyPageScreen", msg = "TabId = $navigateTab")
     var selectedTab by rememberSaveable {
         mutableStateOf(navigateTab)
     }
 
-    LaunchedEffect(pagerState) {
-        // Collect from the a snapshotFlow reading the currentPage
-        snapshotFlow { pagerState.currentPage }.collect { page ->
-            // Do something with each page change, for example:
-            // viewModel.sendPageSelectedEvent(page)
-            selectedTab = MyPageTab.VALUES[page]
+    Column(
+        modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        MyPageTabRow(selectedTab) {
+            selectedTab = it
         }
-    }
 
-    val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        rememberStandardBottomSheetState(skipHiddenState = true)
-    )
+        MyPageContent(
+            uiState = uiState,
+            selectedTab = selectedTab,
+            coroutineScope = coroutineScope,
+            onTabChanged = {
+                selectedTab = it
+            })
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 128.dp,
-
-        sheetContent = {
-            ControlPanel(
-                scaffoldState,
-                scope,
-                uiState
-            )
-        }) { innerPadding ->
-        Column(
-            modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .padding(8.dp)
-        ) {
-            TabRow(selectedTabIndex = selectedTab.ordinal) {
-                // Add tabs for all of our pages
-                MyPageTab.VALUES.forEach { tab ->
-                    Tab(
-                        text = {
-                            Text(
-                                stringResource(tab.titleId),
-                                modifier = Modifier.padding(8.dp),
-                                fontSize = 16.sp
-                            )
-                        },
-                        selected = selectedTab.ordinal == tab.ordinal,
-                        onClick = {
-                            // Animate to the selected page when clicked
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(tab.ordinal)
-                            }
-                        }
-                    )
-                }
-            }
-            // Our content for each page
-            HorizontalPager(
-                state = pagerState,
-                pageCount = MyPageTab.VALUES.size,
-                // Add 16.dp padding to 'center' the pages
-                contentPadding = PaddingValues(16.dp),
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-            ) { pageIndex ->
-
-                // Our content for each page
-                when (MyPageTab.VALUES[pageIndex]) {
-                    MyPageTab.Session -> SessionScreen()
-                    MyPageTab.History -> HistoryScreen()
-                }
-            }
-
-        }
     }
 
 }
 
+
+@Composable
+private fun MyPageTabRow(
+    selectedTab: MyPageTab,
+    onSelectTab: (MyPageTab) -> Unit
+) {
+    TabRow(selectedTabIndex = selectedTab.ordinal) {
+        // Add tabs for all of our pages
+        MyPageTab.VALUES.forEach { tab ->
+            Tab(
+                text = {
+                    Text(
+                        stringResource(tab.titleId),
+                        modifier = Modifier.padding(8.dp),
+                        fontSize = 16.sp
+                    )
+                },
+                selected = selectedTab.ordinal == tab.ordinal,
+                onClick = {
+                    onSelectTab(tab)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+private fun MyPageContent(
+    uiState: UiState<MyPageUiStateData>,
+    coroutineScope: CoroutineScope,
+    selectedTab: MyPageTab,
+    onTabChanged: (MyPageTab) -> Unit,
+    scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        rememberStandardBottomSheetState(skipHiddenState = false)
+    ),
+    pagerState: PagerState = rememberPagerState(
+        initialPage = selectedTab.ordinal,
+        initialPageOffsetFraction = 0f
+    ) {
+        MyPageTab.VALUES.size
+    },
+) {
+    LaunchedEffect(selectedTab) {
+        pagerState.animateScrollToPage(selectedTab.ordinal)
+    }
+    LaunchedEffect(pagerState) {
+        // Collect from the a snapshotFlow reading the currentPage
+        snapshotFlow { pagerState.settledPage }.collect { page ->
+            // Do something with each page change, for example:
+            // viewModel.sendPageSelectedEvent(page)
+            Log.d("Page change", "Page changed to $page")
+            onTabChanged(MyPageTab.VALUES[page])
+        }
+    }
+
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 128.dp,
+        sheetContent = {
+            ControlPanel(
+                scaffoldState,
+                coroutineScope,
+                uiState
+            )
+        },
+    ) {
+        HorizontalPager(
+//            modifier = Modifier.padding(innerPadding),
+            state = pagerState,
+        ) {
+            // Our content for each page
+            when (MyPageTab.VALUES[it]) {
+                MyPageTab.SESSION -> SessionScreen()
+                MyPageTab.HISTORY -> HistoryScreen()
+            }
+        }
+    }
+}
 
 @Preview
 @Composable

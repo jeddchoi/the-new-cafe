@@ -1,14 +1,19 @@
 package io.github.jeddchoi.mypage
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import java.util.*
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 
 
 /**
@@ -18,8 +23,8 @@ import java.util.*
  * @property titleId : string resource id of tab's title
  */
 internal enum class MyPageTab(@StringRes val titleId: Int) {
-    Session(R.string.session),
-    History(R.string.history)
+    SESSION(R.string.session),
+    HISTORY(R.string.history)
     ;
     companion object {
         val VALUES = values()
@@ -31,7 +36,7 @@ private const val MyPageRoutePattern = "mypage?$MyPageTabArg={${MyPageTabArg}}"
 internal class MyPageArgs(val tab: MyPageTab) {
     constructor(savedStateHandle: SavedStateHandle) : this(
         checkNotNull(
-            MyPageTab.valueOf(savedStateHandle[MyPageTabArg] ?: MyPageTab.Session.name)
+            MyPageTab.valueOf(savedStateHandle.get<String>(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name)
         )
     )
 }
@@ -41,7 +46,7 @@ fun NavController.navigateToMyPage(navOptions: NavOptions? = null) {
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 fun NavGraphBuilder.myPageScreen(
     onNavigateToSignIn: () -> Unit,
     navigateToStoreList: () -> Unit,
@@ -53,7 +58,15 @@ fun NavGraphBuilder.myPageScreen(
         arguments = listOf(
             navArgument(MyPageTabArg) {
                 type = NavType.StringType
-                defaultValue = MyPageTab.Session.name
+                defaultValue = MyPageTab.SESSION.name
+            }
+        ),
+        deepLinks = listOf(
+            navDeepLink {
+                uriPattern = "https://io.github.jeddchoi.thenewcafe/$MyPageRoutePattern"
+            },
+            navDeepLink {
+                uriPattern = "jeddchoi://thenewcafe/$MyPageRoutePattern"
             }
         )
     ) { backStackEntry ->
@@ -61,7 +74,7 @@ fun NavGraphBuilder.myPageScreen(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         MyPageScreen(
-            navigateTab = MyPageArgs(backStackEntry.savedStateHandle).tab,
+            navigateTab = MyPageTab.valueOf(backStackEntry.arguments?.getString(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name),
             uiState = uiState
         )
     }

@@ -1,15 +1,15 @@
 package io.github.jeddchoi.order.store
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.navigation.navOptions
+import androidx.navigation.navDeepLink
 
 private const val StoreIdArg = "storeId"
 private const val StoreRoutePattern = "stores/{$StoreIdArg}"
@@ -21,18 +21,13 @@ internal class StoreArgs(val storeId: String) {
 
 fun NavController.navigateToStore(
     storeId: String,
-    navOptions: NavOptions = navOptions {
-        popUpTo(graph.findStartDestination().id) {
-            saveState = true
-        }
-        launchSingleTop = true
-        restoreState = true
-    },
+    navOptions: NavOptions? = null,
 ) {
     navigate("stores/$storeId", navOptions)
 }
 
 
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.storeScreen(
 
 ) {
@@ -42,6 +37,14 @@ fun NavGraphBuilder.storeScreen(
             navArgument(StoreIdArg) {
                 type = NavType.StringType
                 nullable = false
+            }
+        ),
+        deepLinks = listOf(
+            navDeepLink {
+                uriPattern = "https://io.github.jeddchoi.thenewcafe/$StoreRoutePattern"
+            },
+            navDeepLink {
+                uriPattern = "jeddchoi://thenewcafe/$StoreRoutePattern"
             }
         )
     ) {

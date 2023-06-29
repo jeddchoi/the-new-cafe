@@ -1,6 +1,7 @@
 package io.github.jeddchoi.mypage
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,9 +29,11 @@ import javax.inject.Inject
 @HiltViewModel
 internal class MyPageViewModel @Inject constructor(
     private val sessionRepository: UserSessionRepository,
-    private val seatFinderService: SeatFinderService
+    private val seatFinderService: SeatFinderService,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
+    private val myPageTabArg = MyPageArgs(savedStateHandle)
 
     private val _uiState = MutableStateFlow(MyPageUiStateData())
     val uiState: StateFlow<UiState<MyPageUiStateData>> =
@@ -47,6 +50,7 @@ internal class MyPageViewModel @Inject constructor(
     private fun launchOneShotJob(
         job: suspend () -> Unit
     ) {
+
         viewModelScope.launch {
             try {
                 if (!_uiState.value.canContinue) {
@@ -111,6 +115,7 @@ internal class MyPageViewModel @Inject constructor(
     }
 
     init {
+        Log.i("MyPageViewModel", "tabId = ${myPageTabArg.tab.name}")
         viewModelScope.launch {
             sessionRepository.userSession.collectLatest { userSession ->
                 val controlButtons = mutableListOf<SeatFinderButtonState>()

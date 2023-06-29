@@ -30,8 +30,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="www.example.com"
+                    android:host="io.github.jeddchoi.thenewcafe"
                     android:scheme="https" />
+
             </intent-filter>
 
             <intent-filter>

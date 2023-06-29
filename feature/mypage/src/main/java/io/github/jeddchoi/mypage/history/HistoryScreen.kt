@@ -8,5 +8,5 @@ import io.github.jeddchoi.ui.feature.PlaceholderScreen
 internal fun HistoryScreen(
     modifier: Modifier = Modifier
 ) {
-    PlaceholderScreen(title = "History Screen")
+    PlaceholderScreen(title = "HISTORY Screen")
 }
