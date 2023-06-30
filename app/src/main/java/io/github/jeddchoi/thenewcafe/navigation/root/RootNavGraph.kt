@@ -24,14 +24,17 @@ fun RootNavGraph(
         modifier = modifier,
     ) {
 
-        authGraph(navController = navController, onBackClick = onBackClick, navigateToMain = {
-            navController.navigateToMain(navOptions = navOptions {
-                popUpTo(navController.graph.findStartDestination().id) {
-                    inclusive = true
-                }
-                launchSingleTop = true
+        authGraph(
+            navController = navController,
+            onBackClick = onBackClick,
+            navigateToMain = {
+                navController.navigateToMain(navOptions = navOptions {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        inclusive = true
+                    }
+                    launchSingleTop = true
+                })
             })
-        })
 
         mainScreen(
             navController = navController
@@ -43,6 +46,3 @@ fun RootNavGraph(
         }
     }
 }
-
-
-

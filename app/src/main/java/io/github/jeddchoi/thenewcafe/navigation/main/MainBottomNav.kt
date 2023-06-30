@@ -4,36 +4,31 @@ import androidx.annotation.StringRes
 import io.github.jeddchoi.designsystem.CafeIcons
 import io.github.jeddchoi.designsystem.Icon
 import io.github.jeddchoi.thenewcafe.R
-import io.github.jeddchoi.ui.model.NavScreen
 
-sealed class MainNavScreen(
-    override val route: String,
-    @StringRes override val titleId: Int,
-    override val selectedIcon: Icon,
-    override val unselectedIcon: Icon
-) : NavScreen {
-    object Profile : MainNavScreen(
+sealed class MainBottomNav(
+    val route: String,
+    @StringRes val titleId: Int,
+    val selectedIcon: Icon,
+    val unselectedIcon: Icon
+) {
+    object Profile : MainBottomNav(
         "profile",
         R.string.profile,
         Icon.ImageVectorIcon(CafeIcons.Profile_Filled),
         Icon.ImageVectorIcon(CafeIcons.Profile)
     )
 
-    object Order : MainNavScreen(
+    object Order : MainBottomNav(
         "order",
         R.string.order,
         Icon.ImageVectorIcon(CafeIcons.Order_Filled),
         Icon.ImageVectorIcon(CafeIcons.Order)
     )
 
-    object MyPage : MainNavScreen(
+    object MyPage : MainBottomNav(
         "mypage",
         R.string.mypage,
         Icon.ImageVectorIcon(CafeIcons.MyPage_Filled),
         Icon.ImageVectorIcon(CafeIcons.MyPage)
     )
-
-    companion object {
-        val VALUES = listOf(Profile, Order, MyPage)
-    }
 }
