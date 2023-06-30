@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 
 /**
  * Single entry point of composable world
@@ -14,6 +16,7 @@ import androidx.compose.ui.Modifier
 fun RootScreen(
     modifier: Modifier = Modifier,
     rootState: RootState = rememberRootState(),
+    mainNavController: NavHostController = rememberNavController(),
     startDestination: RootNavScreen = RootNavScreen.Auth,
 ) {
     Box(
@@ -23,7 +26,8 @@ fun RootScreen(
         // TODO: Add lottie animation
 
         RootNavGraph(
-            navController = rootState.navController,
+            rootNavController = rootState.navController,
+            mainNavController = mainNavController,
             onBackClick = rootState::onBackClick,
             startDestination = startDestination
         )

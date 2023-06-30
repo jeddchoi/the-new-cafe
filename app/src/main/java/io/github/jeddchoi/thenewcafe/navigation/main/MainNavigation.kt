@@ -1,7 +1,9 @@
 package io.github.jeddchoi.thenewcafe.navigation.main
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 
@@ -11,11 +13,15 @@ fun NavController.navigateToMain(navOptions: NavOptions? = null) {
     this.navigate(MainRoutePattern, navOptions)
 }
 
-fun NavGraphBuilder.mainScreen(navigateToSignIn: () -> Unit) {
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.mainScreen(
+    mainNavController: NavHostController,
+    navigateToSignIn: () -> Unit,
+) {
     composable(
         route = MainRoutePattern,
     ) {
-        val mainState = rememberMainState()
+        val mainState = rememberMainState(navController = mainNavController)
         MainScreen(mainState = mainState, navigateToSignIn = navigateToSignIn)
     }
 }

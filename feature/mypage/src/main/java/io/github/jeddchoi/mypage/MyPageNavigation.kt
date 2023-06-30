@@ -1,5 +1,6 @@
 package io.github.jeddchoi.mypage
 
+import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -64,9 +65,11 @@ fun NavGraphBuilder.myPageScreen(
         deepLinks = listOf(
             navDeepLink {
                 uriPattern = "https://io.github.jeddchoi.thenewcafe/$MyPageRoutePattern"
+                action = Intent.ACTION_VIEW
             },
             navDeepLink {
                 uriPattern = "jeddchoi://thenewcafe/$MyPageRoutePattern"
+                action = Intent.ACTION_VIEW
             }
         )
     ) { backStackEntry ->

@@ -39,7 +39,7 @@ fun MainScreen(
                 mainState.navController.popBackStack()
             },
             navigateToSignIn = navigateToSignIn,
-            modifier = modifier.padding(padding)
+            modifier = modifier.padding(padding),
         )
     }
 

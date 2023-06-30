@@ -1,5 +1,6 @@
 package io.github.jeddchoi.order.store_list
 
+import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -24,9 +25,11 @@ fun NavGraphBuilder.storeListScreen() {
         deepLinks = listOf(
             navDeepLink {
                 uriPattern = "https://io.github.jeddchoi.thenewcafe/$StoreListRoutePattern"
+                action = Intent.ACTION_VIEW
             },
             navDeepLink {
                 uriPattern = "jeddchoi://thenewcafe/$StoreListRoutePattern"
+                action = Intent.ACTION_VIEW
             }
         )
     ) {

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation.NavDeepLinkSaveStateControl
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -27,12 +28,12 @@ fun rememberMainState(
 }
 
 
+@OptIn(NavDeepLinkSaveStateControl::class)
 @Stable
 class MainState(
     val navController: NavHostController,
     private val coroutineScope: CoroutineScope,
 ) {
-
     val currentDestination: NavDestination?
         @Composable get() = navController.currentBackStackEntryAsState().value?.destination
 
@@ -55,6 +56,7 @@ class MainState(
             // Avoid multiple copies of the same destination when
             // reselecting the same item
             launchSingleTop = true
+
             // Restore state when reselecting a previously selected item
             restoreState = true
         }
@@ -64,6 +66,10 @@ class MainState(
             MainNavScreen.Order -> navController.navigateToOrder(bottomNavOptions)
             MainNavScreen.MyPage -> navController.navigateToMyPage(bottomNavOptions)
         }
+    }
+
+    fun sad() {
+
     }
 
     // TODO: Add reselection of BottomNavigation

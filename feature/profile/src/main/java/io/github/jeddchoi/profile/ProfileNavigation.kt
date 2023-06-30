@@ -1,5 +1,6 @@
 package io.github.jeddchoi.profile
 
+import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,9 +41,11 @@ fun NavGraphBuilder.profileScreen(
         deepLinks = listOf(
             navDeepLink {
                 uriPattern = "https://io.github.jeddchoi.thenewcafe/$ProfileRoutePattern"
+                action = Intent.ACTION_VIEW
             },
             navDeepLink {
                 uriPattern = "jeddchoi://thenewcafe/$ProfileRoutePattern"
+                action = Intent.ACTION_VIEW
             }
         )
     ) {

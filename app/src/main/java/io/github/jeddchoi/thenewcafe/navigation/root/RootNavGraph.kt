@@ -13,29 +13,32 @@ import io.github.jeddchoi.thenewcafe.navigation.main.navigateToMain
 
 @Composable
 fun RootNavGraph(
-    navController: NavHostController,
+    rootNavController: NavHostController,
+    mainNavController: NavHostController,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     startDestination: RootNavScreen = RootNavScreen.Auth
 ) {
     NavHost(
-        navController = navController,
+        navController = rootNavController,
         startDestination = startDestination.route,
         modifier = modifier,
     ) {
 
-        authGraph(navController = navController, onBackClick = onBackClick, navigateToMain = {
-            navController.navigateToMain(navOptions = navOptions {
-                popUpTo(navController.graph.findStartDestination().id) {
+        authGraph(navController = rootNavController, onBackClick = onBackClick, navigateToMain = {
+            rootNavController.navigateToMain(navOptions = navOptions {
+                popUpTo(rootNavController.graph.findStartDestination().id) {
                     inclusive = true
                 }
                 launchSingleTop = true
             })
         })
 
-        mainScreen {
-            navController.navigateToAuth(navOptions = navOptions {
-                popUpTo(navController.graph.findStartDestination().id)
+        mainScreen(
+            mainNavController = mainNavController
+        ) {
+            rootNavController.navigateToAuth(navOptions = navOptions {
+                popUpTo(rootNavController.graph.findStartDestination().id)
                 launchSingleTop = true
             })
         }
