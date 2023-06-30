@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
@@ -15,6 +16,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import io.github.jeddchoi.ui.feature.ScreenWithBottomBar
 
 
 /**
@@ -49,10 +51,11 @@ fun NavController.navigateToMyPage(navOptions: NavOptions? = null) {
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 fun NavGraphBuilder.myPageScreen(
+    navController: NavController,
+    bottomBar : @Composable () -> Unit,
     onNavigateToSignIn: () -> Unit,
     navigateToStoreList: () -> Unit,
     navigateToStore: (String) -> Unit,
-    onBackClick: () -> Unit,
 ) {
     composable(
         route = MyPageRoutePattern,
@@ -76,9 +79,14 @@ fun NavGraphBuilder.myPageScreen(
         val viewModel: MyPageViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        MyPageScreen(
-            navigateTab = MyPageTab.valueOf(backStackEntry.arguments?.getString(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name),
-            uiState = uiState
-        )
+        ScreenWithBottomBar(
+            bottomBar
+        ) {
+            MyPageScreen(
+                navigateTab = MyPageTab.valueOf(backStackEntry.arguments?.getString(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name),
+                uiState = uiState
+            )
+
+        }
     }
 }

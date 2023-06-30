@@ -1,5 +1,6 @@
 package io.github.jeddchoi.order
 
+import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -18,12 +19,16 @@ fun NavController.navigateToOrder(
 
 fun NavGraphBuilder.orderGraph(
     navController: NavController,
+    bottomBar : @Composable () -> Unit,
 ) {
     navigation(
         route = OrderGraphRoutePattern,
         startDestination = StoreListRoutePattern
     ) {
-        storeListScreen()
+        storeListScreen(
+            navController = navController,
+            bottomBar = bottomBar
+        )
         storeScreen()
     }
 }

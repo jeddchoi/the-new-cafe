@@ -2,6 +2,7 @@ package io.github.jeddchoi.profile
 
 import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -10,6 +11,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import io.github.jeddchoi.ui.feature.ScreenWithBottomBar
 import io.github.jeddchoi.ui.model.UiState
 
 private const val ProfileRoutePattern = "profile"
@@ -33,8 +35,9 @@ fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
  */
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.profileScreen(
+    navController: NavController,
+    bottomBar : @Composable () -> Unit,
     onNavigateToSignIn: () -> Unit,
-    onBackClick: () -> Unit,
 ) {
     composable(
         route = ProfileRoutePattern,
@@ -52,14 +55,20 @@ fun NavGraphBuilder.profileScreen(
         val viewModel: ProfileViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle(UiState.InitialLoading)
 
-        ProfileScreen(
-            uiState = uiState,
-            onNavigateToSignIn = onNavigateToSignIn,
-            onSignOut = {
-                viewModel.signOut()
-                onNavigateToSignIn()
-            },
-            onBackClick = onBackClick,
-        )
+        ScreenWithBottomBar(
+            bottomBar
+        ) {
+            ProfileScreen(
+                uiState = uiState,
+                onNavigateToSignIn = onNavigateToSignIn,
+                onSignOut = {
+                    viewModel.signOut()
+                    onNavigateToSignIn()
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
     }
 }

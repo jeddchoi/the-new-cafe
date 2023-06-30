@@ -31,8 +31,7 @@ import io.github.jeddchoi.thenewcafe.splash.SplashViewModel
 class MainActivity : ComponentActivity() {
 
     private val viewModel: SplashViewModel by viewModels()
-    lateinit var rootNavController: NavHostController
-    lateinit var mainNavController: NavHostController
+    lateinit var navController: NavHostController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +47,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    rootNavController = rememberNavController()
-                    mainNavController = rememberNavController()
+                    navController = rememberNavController()
 
                     RootScreen(
                         startDestination = viewModel.startDestination.value,
-                        rootState = rememberRootState(navController = rootNavController),
-                        mainNavController = mainNavController,
+                        rootState = rememberRootState(navController = navController),
                     )
                 }
             }
@@ -63,9 +60,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        val result =
-            if (rootNavController.handleDeepLink(intent)) true
-            else mainNavController.handleDeepLink(intent)
+        val result = navController.handleDeepLink(intent)
 
         Log.e("MainActivity", "new intent = ${intent?.dataString} / resut = $result")
     }
