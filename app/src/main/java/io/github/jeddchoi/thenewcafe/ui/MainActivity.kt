@@ -43,6 +43,7 @@ class MainActivity : ComponentActivity() {
                 viewModel.isLoading.value
             }
         }
+
         setContent {
             TheNewCafeTheme {
                 Surface(
@@ -60,11 +61,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-
         val result = navController.handleDeepLink(intent)
-
-        Log.e("MainActivity", "new intent = ${intent?.dataString} / resut = $result")
+        Log.e("MainActivity", "new intent = ${intent?.dataString} / result = $result")
     }
 }

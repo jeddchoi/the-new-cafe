@@ -22,6 +22,7 @@ fun NavController.navigateToMain(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.mainScreen(
     navController: NavHostController,
     navigateToSignIn: () -> Unit,
+    onBackClick: () -> Unit,
 ) {
     navigation(
         route = MainRoutePattern,

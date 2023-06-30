@@ -37,12 +37,13 @@ fun RootNavGraph(
             })
 
         mainScreen(
-            navController = navController
-        ) {
-            navController.navigateToAuth(navOptions = navOptions {
-                popUpTo(navController.graph.findStartDestination().id)
-                launchSingleTop = true
+            navController = navController,
+            onBackClick = onBackClick,
+            navigateToSignIn = {
+                navController.navigateToAuth(navOptions = navOptions {
+                    popUpTo(navController.graph.findStartDestination().id)
+                    launchSingleTop = true
+                })
             })
-        }
     }
 }

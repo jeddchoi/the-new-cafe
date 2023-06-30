@@ -1,6 +1,5 @@
 package io.github.jeddchoi.thenewcafe.navigation.main
 
-import android.util.Log
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,8 +20,9 @@ import io.github.jeddchoi.profile.navigateToProfile
 @Composable
 fun BottomBar(navController: NavHostController, currentDestination: NavDestination?) {
     val screens = listOf(MainBottomNav.Profile, MainBottomNav.Order, MainBottomNav.MyPage)
-    Log.i("Here", "1screens : ${screens.joinToString()}")
+
     BottomBar(screens = screens, currentDestination = currentDestination) {bottomNav ->
+
         val navOptions = navOptions {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
@@ -53,9 +53,7 @@ fun BottomBar(
     onBottomNavClick: (MainBottomNav) -> Unit
 ) {
     CafeNavigationBar {
-        Log.i("Here", "2screens : ${screens.joinToString()}")
         screens.forEach { destination ->
-            Log.i("Here", "3destination: $destination")
             val selected = currentDestination.isTopLevelDestinationInHierarchy(destination.route)
             CafeNavigationBarItem(
                 selected = selected,
