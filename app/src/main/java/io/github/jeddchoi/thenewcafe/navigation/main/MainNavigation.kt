@@ -1,16 +1,17 @@
 package io.github.jeddchoi.thenewcafe.navigation.main
 
+import android.content.Intent
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.navigation
+import androidx.navigation.navDeepLink
 import io.github.jeddchoi.mypage.myPageScreen
 import io.github.jeddchoi.order.navigateToOrder
 import io.github.jeddchoi.order.orderGraph
 import io.github.jeddchoi.order.store.navigateToStore
 import io.github.jeddchoi.profile.profileScreen
-import io.github.jeddchoi.thenewcafe.navigation.root.RootNavScreen
 
 private const val MainRoutePattern = "main"
 
@@ -23,8 +24,18 @@ fun NavGraphBuilder.mainScreen(
     navigateToSignIn: () -> Unit,
 ) {
     navigation(
+        route = MainRoutePattern,
+        deepLinks = listOf(
+            navDeepLink {
+                uriPattern = "https://io.github.jeddchoi.thenewcafe"
+                action = Intent.ACTION_VIEW
+            },
+            navDeepLink {
+                uriPattern = "jeddchoi://thenewcafe"
+                action = Intent.ACTION_VIEW
+            }
+        ),
         startDestination = MainBottomNav.Profile.route,
-        route = RootNavScreen.Main.route,
     ) {
 
         profileScreen(

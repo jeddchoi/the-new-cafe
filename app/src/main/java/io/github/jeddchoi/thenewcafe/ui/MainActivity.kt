@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavController
 import androidx.navigation.NavDeepLinkSaveStateControl
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        NavController.enableDeepLinkSaveState(false)
         installSplashScreen().apply {
             setKeepOnScreenCondition {
                 viewModel.isLoading.value
@@ -60,6 +62,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+
         val result = navController.handleDeepLink(intent)
 
         Log.e("MainActivity", "new intent = ${intent?.dataString} / resut = $result")

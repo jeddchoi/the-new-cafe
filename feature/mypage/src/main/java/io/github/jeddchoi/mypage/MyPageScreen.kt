@@ -107,7 +107,7 @@ private fun MyPageContent(
     selectedTab: MyPageTab,
     onTabChanged: (MyPageTab) -> Unit,
     scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        rememberStandardBottomSheetState(skipHiddenState = false)
+        rememberStandardBottomSheetState(skipHiddenState = true)
     ),
     pagerState: PagerState = rememberPagerState(
         initialPage = selectedTab.ordinal,

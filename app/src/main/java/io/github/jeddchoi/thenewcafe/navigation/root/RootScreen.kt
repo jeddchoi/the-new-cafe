@@ -33,7 +33,6 @@ fun RootScreen(
             }
         }
     ) { innerPadding ->
-
         Box(
             modifier = modifier.padding(innerPadding),
             contentAlignment = Alignment.Center
