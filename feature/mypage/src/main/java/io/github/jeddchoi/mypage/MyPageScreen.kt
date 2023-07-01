@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.sp
 import io.github.jeddchoi.mypage.history.HistoryScreen
 import io.github.jeddchoi.mypage.session.SessionScreen
 import io.github.jeddchoi.ui.LogCompositions
+import io.github.jeddchoi.ui.feature.LoadingScreen
+import io.github.jeddchoi.ui.feature.PlaceholderScreen
 import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.CoroutineScope
 
@@ -128,29 +130,46 @@ private fun MyPageContent(
             onTabChanged(MyPageTab.VALUES[page])
         }
     }
+    when (uiState) {
+        UiState.EmptyResult -> {
+            PlaceholderScreen(title = "Empty Result")
+        }
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 128.dp,
-        sheetContent = {
-            ControlPanel(
-                scaffoldState,
-                coroutineScope,
-                uiState
-            )
-        },
-    ) {
-        HorizontalPager(
-//            modifier = Modifier.padding(innerPadding),
-            state = pagerState,
-        ) {
-            // Our content for each page
-            when (MyPageTab.VALUES[it]) {
-                MyPageTab.SESSION -> SessionScreen()
-                MyPageTab.HISTORY -> HistoryScreen()
+        is UiState.Error -> {
+            PlaceholderScreen(title = "Error")
+        }
+
+        UiState.InitialLoading -> {
+            LoadingScreen()
+        }
+
+        is UiState.Success -> {
+            BottomSheetScaffold(
+                scaffoldState = scaffoldState,
+                sheetPeekHeight = 128.dp,
+                sheetContent = {
+                    ControlPanel(
+                        scaffoldState,
+                        coroutineScope,
+                        uiState.data.controlButtons
+                    )
+                },
+            ) {innerPadding ->
+                HorizontalPager(
+                    modifier = Modifier.padding(innerPadding),
+                    state = pagerState,
+                ) {
+                    // Our content for each page
+                    when (MyPageTab.VALUES[it]) {
+                        MyPageTab.SESSION -> SessionScreen()
+                        MyPageTab.HISTORY -> HistoryScreen()
+                    }
+                }
             }
+
         }
     }
+
 }
 
 @Preview

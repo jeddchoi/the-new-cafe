@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
@@ -25,14 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.commandiron.wheel_picker_compose.WheelDateTimePicker
 import com.commandiron.wheel_picker_compose.core.TimeFormat
-import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -49,44 +46,28 @@ import kotlin.time.Duration.Companion.seconds
 internal fun ColumnScope.ControlPanel(
     scaffoldState: BottomSheetScaffoldState,
     scope: CoroutineScope,
-    uiState: UiState<MyPageUiStateData>,
+    controlButtons: List<SeatFinderButtonState>,
 ) {
     var endTime by remember { mutableStateOf(Instant.DISTANT_FUTURE) }
-
-    when (uiState) {
-        UiState.EmptyResult -> {
-            Text("No result")
-        }
-
-        is UiState.Error -> {
-            Text("Error")
-        }
-
-        UiState.InitialLoading -> {
-            CircularProgressIndicator()
-        }
-
-        is UiState.Success -> {
-            Text(text = uiState.data.messages.lastOrNull()?.contentId?.let { stringResource(it) } ?: "No message")
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(value = endTime.toString(), onValueChange = {}, readOnly = true)
-                Button(onClick = {
-                    endTime = Instant.DISTANT_FUTURE
-                }) {
-                    Text("Reset")
-                }
-            }
-
-            EndTimeInput {
-                endTime = it
-            }
-
-            ControlPanelButtons(uiState.data, endTime, scope, scaffoldState)
+//    Text(text = uiState.data.messages.lastOrNull()?.contentId?.let { stringResource(it) }
+//        ?: "No message")
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OutlinedTextField(value = endTime.toString(), onValueChange = {}, readOnly = true)
+        Button(onClick = {
+            endTime = Instant.DISTANT_FUTURE
+        }) {
+            Text("Reset")
         }
     }
+
+    EndTimeInput {
+        endTime = it
+    }
+
+    ControlPanelButtons(controlButtons, endTime, scope, scaffoldState)
 }
 
 @Composable
@@ -130,7 +111,7 @@ private fun ColumnScope.EndTimeInput(onEndTimeChange: (Instant) -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ControlPanelButtons(
-    uiState: MyPageUiStateData,
+    controlButtons: List<SeatFinderButtonState>,
     endTime: Instant,
     scope: CoroutineScope,
     scaffoldState: BottomSheetScaffoldState
@@ -139,7 +120,7 @@ private fun ControlPanelButtons(
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(8.dp),
     ) {
-        items(uiState.controlButtons, span = {
+        items(controlButtons, span = {
             if (it is SeatFinderButtonState.PrimaryButton)
                 GridItemSpan(2)
             else
