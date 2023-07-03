@@ -22,3 +22,4 @@ fun ConfettiLottie(
         alignment = Alignment.Center,
     )
 }
+

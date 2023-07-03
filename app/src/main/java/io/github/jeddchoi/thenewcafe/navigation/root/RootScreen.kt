@@ -66,7 +66,7 @@ fun RootScreen(
             )
 
             ConfettiLottie(
-                Modifier.matchParentSize()
+                modifier = Modifier.matchParentSize(),
             )
         }
     }
