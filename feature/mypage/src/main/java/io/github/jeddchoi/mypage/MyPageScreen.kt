@@ -4,6 +4,7 @@ package io.github.jeddchoi.mypage
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -12,6 +13,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -151,9 +153,9 @@ private fun MyPageContent(
                         uiState.data.controlButtons
                     )
                 },
-            ) {innerPadding ->
+            ) { _ ->
                 HorizontalPager(
-                    modifier = Modifier.padding(innerPadding),
+                    modifier = Modifier.border(4.dp, MaterialTheme.colorScheme.primary),
                     state = pagerState,
                 ) {
                     // Our content for each page

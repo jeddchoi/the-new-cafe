@@ -1,5 +1,6 @@
 package io.github.jeddchoi.authentication.register
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -19,9 +20,9 @@ fun NavController.navigateToRegister(navOptions: NavOptions? = null) {
 }
 
 
-internal fun NavGraphBuilder.registerScreen(
+@OptIn(ExperimentalAnimationApi::class)
+fun NavGraphBuilder.registerScreen(
     navController: NavHostController,
-    onBackClick: () -> Unit,
     navigateToMain: () -> Unit
 ) {
     composable(
@@ -33,7 +34,7 @@ internal fun NavGraphBuilder.registerScreen(
         val authViewModel = hiltViewModel<AuthViewModel>(authEntry)
         RegisterScreen(
             viewModel = authViewModel,
-            onBackClick = onBackClick,
+            onBackClick = navController::popBackStack,
             navigateToSignInClick = {
                 navController.navigateToAuth(navOptions {
                     popUpTo(AuthGraphRoutePattern) {

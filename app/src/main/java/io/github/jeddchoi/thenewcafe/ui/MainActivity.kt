@@ -9,6 +9,8 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -18,22 +20,26 @@ import androidx.navigation.NavDeepLinkSaveStateControl
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.thenewcafe.navigation.root.RootScreen
-import io.github.jeddchoi.thenewcafe.navigation.root.rememberRootState
 import io.github.jeddchoi.thenewcafe.splash.SplashViewModel
+import javax.inject.Inject
 
 
 /**
  * Single activity which is main entry.
  * It should be kept simple.
  */
-@OptIn(NavDeepLinkSaveStateControl::class)
+@OptIn(NavDeepLinkSaveStateControl::class, ExperimentalMaterial3WindowSizeClassApi::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: SplashViewModel by viewModels()
     lateinit var navController: NavHostController
+
+    @Inject
+    lateinit var networkMonitor: NetworkMonitor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +62,10 @@ class MainActivity : ComponentActivity() {
                     navController = rememberNavController()
 
                     RootScreen(
+                        windowSizeClass = calculateWindowSizeClass(this),
+                        networkMonitor = networkMonitor,
+                        navController = navController,
                         startDestination = viewModel.startDestination.value,
-                        rootState = rememberRootState(navController = navController),
                         modifier = maxSizeModifier
                     )
 

@@ -29,7 +29,6 @@ internal fun ProfileScreen(
     uiState: UiState<ProfileUiStateData>,
     onNavigateToSignIn: () -> Unit,
     onSignOut: () -> Unit,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState()
 ) {

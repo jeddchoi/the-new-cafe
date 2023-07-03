@@ -3,9 +3,7 @@ package io.github.jeddchoi.mypage
 import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,13 +46,10 @@ fun NavController.navigateToMyPage(navOptions: NavOptions? = null) {
 }
 
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.myPageScreen(
-    navController: NavController,
-    onNavigateToSignIn: () -> Unit,
     navigateToStoreList: () -> Unit,
     navigateToStore: (String) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     composable(
         route = MyPageRoutePattern,
@@ -80,8 +75,6 @@ fun NavGraphBuilder.myPageScreen(
         MyPageScreen(
             navigateTab = MyPageTab.valueOf(backStackEntry.arguments?.getString(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name),
             uiState = uiState,
-            modifier = modifier
         )
-
     }
 }

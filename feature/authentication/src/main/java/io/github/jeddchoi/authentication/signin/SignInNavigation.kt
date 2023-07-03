@@ -15,9 +15,8 @@ import io.github.jeddchoi.authentication.register.navigateToRegister
 internal const val SignInRoutePattern = "signin"
 
 @OptIn(ExperimentalAnimationApi::class)
-internal fun NavGraphBuilder.signInScreen(
+fun NavGraphBuilder.signInScreen(
     navController: NavHostController,
-    onBackClick: () -> Unit,
     navigateToMain: () -> Unit
 ) {
     composable(
@@ -29,7 +28,7 @@ internal fun NavGraphBuilder.signInScreen(
         val authViewModel = hiltViewModel<AuthViewModel>(authEntry)
         SignInScreen(
             viewModel = authViewModel,
-            onBackClick = onBackClick,
+            onBackClick = navController::popBackStack,
             navigateToMain = navigateToMain,
             navigateToRegisterClick = {
                 navController.navigateToRegister(navOptions {
@@ -37,7 +36,6 @@ internal fun NavGraphBuilder.signInScreen(
                     launchSingleTop = true
                 })
             },
-
-            )
+        )
     }
 }

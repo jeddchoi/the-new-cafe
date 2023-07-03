@@ -5,4 +5,6 @@
     <string name="mypage">My Page</string>
     <string name="auth">Authentication</string>
     <string name="main">Main</string>
+    <string name="not_connected">⚠️ You are not connected to Internet.</string>
+    <string name="connected_again">Connected to network again</string>
 </resources>

@@ -17,9 +17,8 @@ fun ConfettiLottie(
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.confetti))
     LottieAnimation(
         composition,
-        iterations = 1,
         modifier = modifier,
         contentScale = ContentScale.Crop,
-        alignment = Alignment.Center
+        alignment = Alignment.Center,
     )
 }
