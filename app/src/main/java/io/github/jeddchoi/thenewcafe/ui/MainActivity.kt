@@ -45,10 +45,12 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        val maxSizeModifier = Modifier.fillMaxSize()
+
         setContent {
             TheNewCafeTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = maxSizeModifier,
                     color = MaterialTheme.colorScheme.background
                 ) {
                     navController = rememberNavController()
@@ -56,11 +58,12 @@ class MainActivity : ComponentActivity() {
                     RootScreen(
                         startDestination = viewModel.startDestination.value,
                         rootState = rememberRootState(navController = navController),
+                        modifier = maxSizeModifier
                     )
 
                     LaunchedEffect(Unit) {
                         navController.currentBackStack.collect {
-                            Log.e("MainActivity", "currentBackStack = ${it.joinToString("\n")}")
+                            Log.d("MainActivity", "currentBackStack = ${it.joinToString("\n")}")
                         }
                     }
                 }
@@ -72,6 +75,6 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val result = navController.handleDeepLink(intent)
-        Log.e("MainActivity", "new intent = ${intent?.dataString} / result = $result")
+        Log.d("MainActivity", "new intent = ${intent?.dataString} / result = $result")
     }
 }

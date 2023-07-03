@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -53,6 +54,7 @@ fun NavGraphBuilder.myPageScreen(
     onNavigateToSignIn: () -> Unit,
     navigateToStoreList: () -> Unit,
     navigateToStore: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     composable(
         route = MyPageRoutePattern,
@@ -77,7 +79,8 @@ fun NavGraphBuilder.myPageScreen(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         MyPageScreen(
             navigateTab = MyPageTab.valueOf(backStackEntry.arguments?.getString(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name),
-            uiState = uiState
+            uiState = uiState,
+            modifier = modifier
         )
 
     }

@@ -8,5 +8,8 @@ import io.github.jeddchoi.ui.feature.PlaceholderScreen
 internal fun StoreScreen(
     modifier: Modifier = Modifier
 ) {
-    PlaceholderScreen(title = "Store Screen")
+    PlaceholderScreen(
+        title = "Store Screen",
+        modifier = modifier
+    )
 }

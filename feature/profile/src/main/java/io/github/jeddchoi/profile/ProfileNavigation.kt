@@ -3,6 +3,7 @@ package io.github.jeddchoi.profile
 import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -35,6 +36,7 @@ fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.profileScreen(
     navController: NavController,
     onNavigateToSignIn: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     composable(
         route = ProfileRoutePattern,
@@ -62,6 +64,7 @@ fun NavGraphBuilder.profileScreen(
             onBackClick = {
                 navController.popBackStack()
             },
+            modifier = modifier
         )
     }
 }

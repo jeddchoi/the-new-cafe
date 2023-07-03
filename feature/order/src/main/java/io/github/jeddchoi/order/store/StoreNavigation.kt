@@ -2,6 +2,7 @@ package io.github.jeddchoi.order.store
 
 import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.NavController
@@ -29,9 +30,7 @@ fun NavController.navigateToStore(
 
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.storeScreen(
-
-) {
+fun NavGraphBuilder.storeScreen(modifier: Modifier) {
     composable(
         route = StoreRoutePattern,
         arguments = listOf(
@@ -52,6 +51,8 @@ fun NavGraphBuilder.storeScreen(
         )
     ) {
         val viewModel: StoreViewModel = hiltViewModel()
-        StoreScreen()
+        StoreScreen(
+            modifier = modifier
+        )
     }
 }

@@ -3,7 +3,6 @@ package io.github.jeddchoi.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.ui.model.FeedbackState
 import io.github.jeddchoi.ui.model.Message

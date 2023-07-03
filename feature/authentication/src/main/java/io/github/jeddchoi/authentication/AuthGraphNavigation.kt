@@ -1,5 +1,6 @@
 package io.github.jeddchoi.authentication
 
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -20,6 +21,7 @@ fun NavGraphBuilder.authGraph(
     navController: NavHostController,
     onBackClick: () -> Unit,
     navigateToMain: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     navigation(
         route = AuthGraphRoutePattern,

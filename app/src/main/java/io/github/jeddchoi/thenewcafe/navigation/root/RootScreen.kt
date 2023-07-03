@@ -1,13 +1,17 @@
 package io.github.jeddchoi.thenewcafe.navigation.root
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.jeddchoi.designsystem.component.lottie.ConfettiLottie
 import io.github.jeddchoi.thenewcafe.navigation.main.BottomBar
 
 /**
@@ -24,6 +28,7 @@ fun RootScreen(
     val showBottomBar by rootState.showNavigation.collectAsStateWithLifecycle(initialValue = false)
 
     Scaffold(
+        modifier = modifier,
         bottomBar = {
             if (showBottomBar) {
                 BottomBar(
@@ -34,14 +39,19 @@ fun RootScreen(
         }
     ) { innerPadding ->
         Box(
-            modifier = modifier.padding(innerPadding),
+            modifier = modifier.padding(innerPadding).border(4.dp, MaterialTheme.colorScheme.tertiary),
             contentAlignment = Alignment.Center
         ) {
-            // TODO: Add lottie animation
             RootNavGraph(
                 navController = rootState.navController,
                 onBackClick = rootState::onBackClick,
-                startDestination = startDestination
+                startDestination = startDestination,
+                modifier = modifier
+            )
+            ConfettiLottie(
+                Modifier
+                    .matchParentSize()
+                    .border(8.dp, MaterialTheme.colorScheme.primary)
             )
         }
     }

@@ -5,7 +5,6 @@ package io.github.jeddchoi.mypage
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -55,9 +54,7 @@ internal fun MyPageScreen(
     }
 
     Column(
-        modifier
-            .fillMaxSize()
-            .padding(8.dp)
+        modifier.padding(8.dp)
     ) {
         MyPageTabRow(selectedTab) {
             selectedTab = it

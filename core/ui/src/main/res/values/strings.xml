@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="empty_with_subject">No %s found</string>
+    <string name="error_with_exception">Error occured : %s</string>
+</resources>

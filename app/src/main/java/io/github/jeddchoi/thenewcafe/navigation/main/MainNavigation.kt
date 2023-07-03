@@ -1,6 +1,7 @@
 package io.github.jeddchoi.thenewcafe.navigation.main
 
 import android.content.Intent
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -23,8 +24,10 @@ fun NavGraphBuilder.mainScreen(
     navController: NavHostController,
     navigateToSignIn: () -> Unit,
     onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     navigation(
+        
         route = MainRoutePattern,
         deepLinks = listOf(
             navDeepLink {
@@ -42,9 +45,11 @@ fun NavGraphBuilder.mainScreen(
         profileScreen(
             navController = navController,
             onNavigateToSignIn = navigateToSignIn,
+            modifier = modifier 
         )
         orderGraph(
             navController = navController,
+            modifier = modifier
         )
         myPageScreen(
             navController = navController,
@@ -55,6 +60,7 @@ fun NavGraphBuilder.mainScreen(
             navigateToStore = { storeId ->
                 navController.navigateToStore(storeId)
             },
+            modifier = modifier
         )
     }
 }

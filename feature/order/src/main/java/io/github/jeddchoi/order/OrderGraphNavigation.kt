@@ -1,5 +1,6 @@
 package io.github.jeddchoi.order
 
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -18,6 +19,7 @@ fun NavController.navigateToOrder(
 
 fun NavGraphBuilder.orderGraph(
     navController: NavController,
+    modifier: Modifier = Modifier,
 ) {
     navigation(
         route = OrderGraphRoutePattern,
@@ -25,7 +27,10 @@ fun NavGraphBuilder.orderGraph(
     ) {
         storeListScreen(
             navController = navController,
+            modifier = modifier
         )
-        storeScreen()
+        storeScreen(
+            modifier = modifier
+        )
     }
 }

@@ -34,7 +34,9 @@ fun RootNavGraph(
                     }
                     launchSingleTop = true
                 })
-            })
+            },
+            modifier = modifier
+        )
 
         mainScreen(
             navController = navController,
@@ -44,6 +46,8 @@ fun RootNavGraph(
                     popUpTo(navController.graph.findStartDestination().id)
                     launchSingleTop = true
                 })
-            })
+            },
+            modifier = modifier
+        )
     }
 }
