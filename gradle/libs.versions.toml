@@ -5,6 +5,7 @@ androidxActivity = "1.7.2"
 androidxAppCompat = "1.6.1"
 androidxComposeBom = "2023.06.00"
 androidxComposeCompiler = "1.4.3"
+androidxComposeRuntime = "1.5.0-beta03"
 androidxCore = "1.10.1"
 androidxCoreSplashscreen = "1.0.1"
 androidxDatastore = "1.0.0"
@@ -37,7 +38,7 @@ androidx-compose-foundation-layout = { group = "androidx.compose.foundation", na
 androidx-compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material3-windowSizeClass = { group = "androidx.compose.material3", name = "material3-window-size-class" }
-androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "androidxComposeRuntime" } # see https://issuetracker.google.com/u/0/issues/254645321
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-compose-ui-util = { group = "androidx.compose.ui", name = "ui-util" }

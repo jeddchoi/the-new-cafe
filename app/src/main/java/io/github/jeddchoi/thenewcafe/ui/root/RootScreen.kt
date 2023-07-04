@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import io.github.jeddchoi.data.util.NetworkMonitor
@@ -32,7 +33,7 @@ fun RootScreen(
         networkMonitor = networkMonitor,
         navController = navController,
     ),
-    startDestination: RootNav = RootNav.Auth,
+    viewModel: RootViewModel = hiltViewModel()
 ) {
     val showBottomBar by rootState.showBottomBar.collectAsStateWithLifecycle(initialValue = false)
     val connectedState by rootState.connectedState.collectAsStateWithLifecycle()
@@ -60,9 +61,10 @@ fun RootScreen(
             modifier = modifier.padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
+            val shouldRedirectToAuth by viewModel.shouldRedirectToAuth.collectAsStateWithLifecycle()
             RootNavGraph(
                 navController = rootState.navController,
-                startDestination = startDestination,
+                shouldRedirectToAuth = shouldRedirectToAuth
             )
 
             ConfettiLottie(

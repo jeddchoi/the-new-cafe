@@ -3,7 +3,7 @@ package io.github.jeddchoi.thenewcafe.ui.root
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jeddchoi.data.repository.CurrentUserRepository
+import io.github.jeddchoi.data.repository.AppFlagsRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -12,13 +12,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RootViewModel @Inject constructor(
-    private val currentUserRepository: CurrentUserRepository,
+    private val appFlagsRepository: AppFlagsRepository
 ) : ViewModel() {
 
-    val startDestination: StateFlow<RootNav?> = currentUserRepository.currentUserId.map {
-        if (it != null)
-            RootNav.Main
-        else
-            RootNav.Auth
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    val shouldRedirectToAuth: StateFlow<Boolean> = appFlagsRepository.getShowMainScreenOnStart
+        .map { !it }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
 }

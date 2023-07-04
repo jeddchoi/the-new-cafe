@@ -54,10 +54,7 @@ fun NavGraphBuilder.profileScreen(
         ProfileScreen(
             uiState = uiState,
             onNavigateToSignIn = onNavigateToSignIn,
-            onSignOut = {
-                viewModel.signOut()
-                onNavigateToSignIn()
-            },
+            onSignOut = viewModel::signOut,
         )
     }
 }

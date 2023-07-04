@@ -22,7 +22,7 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
 
     override suspend fun signInWithEmail(email: String, password: String): Result<Unit> {
         auth.signInWithEmailAndPassword(email, password).await()
-        appFlagsRepository.setShowAuthScreenOnStart(false)
+        appFlagsRepository.setShowMainScreenOnStart(true)
         return Result.success(Unit)
     }
 
@@ -44,17 +44,18 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
 //            Log.i("FirebaseAuthRepositoryImpl", "uid: ${createdUser.uid}")
 //            database.reference.child(REFERENCE_USER_STATUS_NAME).child(createdUser.uid).setValue(newUserState).await()
         }
-        appFlagsRepository.setShowAuthScreenOnStart(false)
+        appFlagsRepository.setShowMainScreenOnStart(true)
         return Result.success(Unit)
     }
 
     override suspend fun signInWithGoogle(idToken: String): Result<Unit> {
-        appFlagsRepository.setShowAuthScreenOnStart(false)
+        appFlagsRepository.setShowMainScreenOnStart(true)
         TODO("Not yet implemented")
     }
 
     override suspend fun logout() {
         auth.signOut()
+        appFlagsRepository.setShowMainScreenOnStart(false)
     }
 
 

@@ -4,6 +4,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface AppFlagsRepository {
 
-    suspend fun setShowAuthScreenOnStart(value: Boolean)
-    val getShowAuthScreenOnStart : Flow<Boolean>
+    suspend fun setShowMainScreenOnStart(value: Boolean)
+    val getShowMainScreenOnStart : Flow<Boolean>
 }

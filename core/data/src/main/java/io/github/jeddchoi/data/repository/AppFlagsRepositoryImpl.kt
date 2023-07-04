@@ -10,11 +10,11 @@ import javax.inject.Inject
 class AppFlagsRepositoryImpl @Inject constructor(
     private val appFlagsDataStore: DataStore<AppFlags>
 ): AppFlagsRepository {
-    override suspend fun setShowAuthScreenOnStart(value: Boolean) {
+    override suspend fun setShowMainScreenOnStart(value: Boolean) {
         appFlagsDataStore.updateData {
-            it.toBuilder().setShowAuthScreenOnStart(value).build()
+            it.toBuilder().setShowMainScreenOnStart(value).build()
         }
     }
 
-    override val getShowAuthScreenOnStart: Flow<Boolean> = appFlagsDataStore.data.map { it.showAuthScreenOnStart }
+    override val getShowMainScreenOnStart: Flow<Boolean> = appFlagsDataStore.data.map { it.showMainScreenOnStart }
 }

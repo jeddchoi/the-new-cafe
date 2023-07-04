@@ -12,11 +12,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,14 +58,11 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     navController = rememberNavController()
-
-                    val startDestination by viewModel.startDestination.collectAsStateWithLifecycle()
                     RootScreen(
                         windowSizeClass = calculateWindowSizeClass(this),
                         networkMonitor = networkMonitor,
                         navController = navController,
                         modifier = maxSizeModifier,
-                        startDestination = startDestination
                     )
 
                     LaunchedEffect(Unit) {
@@ -75,13 +70,16 @@ class MainActivity : ComponentActivity() {
                             Log.d("MainActivity", it.joinToString("\n"))
                         }
                     }
+
                 }
             }
         }
-
-        viewModel.initialize()
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.initialize()
+    }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)

@@ -32,7 +32,6 @@ fun NavGraphBuilder.signInScreen(
             navigateToMain = navigateToMain,
             navigateToRegisterClick = {
                 navController.navigateToRegister(navOptions {
-                    popUpTo(AuthGraphRoutePattern)
                     launchSingleTop = true
                 })
             },

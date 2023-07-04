@@ -1,7 +1,9 @@
 package io.github.jeddchoi.thenewcafe.ui.root
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
@@ -22,21 +24,18 @@ import io.github.jeddchoi.thenewcafe.ui.main.navigateToMain
 @Composable
 fun RootNavGraph(
     navController: NavHostController,
+    shouldRedirectToAuth: Boolean,
     modifier: Modifier = Modifier,
-    startDestination: RootNav = RootNav.Auth
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination.route,
+        startDestination = RootNav.Main.route,
         modifier = modifier,
     ) {
-
         authGraph {
             val navigateToMain = {
                 navController.navigateToMain(navOptions = navOptions {
-                    popUpTo(RootNav.Auth.route) {
-                        inclusive = true
-                    }
+                    popUpTo(navController.graph.findStartDestination().id)
                     launchSingleTop = true
                 })
             }
@@ -47,12 +46,7 @@ fun RootNavGraph(
         mainGraph {
             profileScreen(
                 onNavigateToSignIn = {
-                    navController.navigateToAuth(navOptions = navOptions {
-                        popUpTo(RootNav.Main.route) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
-                    })
+                    navController.navigateToAuth()
                 },
             )
             orderGraph {
@@ -67,6 +61,11 @@ fun RootNavGraph(
                     navController.navigateToStore(storeId)
                 },
             )
+        }
+    }
+    LaunchedEffect(shouldRedirectToAuth) {
+        if (shouldRedirectToAuth) {
+            navController.navigateToAuth()
         }
     }
 }
