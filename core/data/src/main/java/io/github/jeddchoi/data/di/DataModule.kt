@@ -1,10 +1,15 @@
 package io.github.jeddchoi.data.di
 
+import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.github.jeddchoi.data.proto.appFlagsDataStore
+import io.github.jeddchoi.data.repository.AppFlagsRepository
+import io.github.jeddchoi.data.repository.AppFlagsRepositoryImpl
 import io.github.jeddchoi.data.util.ConnectivityManagerNetworkMonitor
 import io.github.jeddchoi.data.util.NetworkMonitor
 import kotlinx.coroutines.CoroutineScope
@@ -23,11 +28,21 @@ interface DataModule {
             // Run this code when providing an instance of CoroutineScope
             return CoroutineScope(SupervisorJob() + Dispatchers.Default)
         }
+
+        @Provides
+        fun providesAppFlagsDatastore(
+            @ApplicationContext context: Context
+        ) = context.appFlagsDataStore
     }
 
     @Binds
     fun bindsNetworkMonitor(
         networkMonitor: ConnectivityManagerNetworkMonitor,
     ): NetworkMonitor
+
+    @Binds
+    fun bindsAppFlagsRepository(
+        appFlagsRepositoryImpl: AppFlagsRepositoryImpl
+    ): AppFlagsRepository
 }
 

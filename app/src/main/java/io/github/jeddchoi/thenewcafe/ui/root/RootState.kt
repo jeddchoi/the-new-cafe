@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe.navigation.root
+package io.github.jeddchoi.thenewcafe.ui.root
 
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -32,8 +32,8 @@ fun rememberRootState(
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     navController: NavHostController = rememberNavController(),
 ): RootState {
-    return remember(navController, coroutineScope, windowSizeClass, networkMonitor) {
-        RootState(navController, coroutineScope, windowSizeClass, networkMonitor)
+    return remember(navController, coroutineScope, windowSizeClass, networkMonitor, ) {
+        RootState(navController, coroutineScope, windowSizeClass, networkMonitor, )
     }
 }
 
@@ -44,12 +44,13 @@ class RootState(
     val windowSizeClass: WindowSizeClass,
     networkMonitor: NetworkMonitor,
 ) {
+
     val currentDestination: NavDestination?
         @Composable get() = navController.currentBackStackEntryAsState().value?.destination
 
     private val isMainRoute = navController.currentBackStackEntryFlow.map { backStackEntry ->
         backStackEntry.destination.hierarchy.any {
-            it.route?.contains(RootNavScreen.Main.route, true) ?: false
+            it.route?.contains(RootNav.Main.route, true) ?: false
         }
     }
 

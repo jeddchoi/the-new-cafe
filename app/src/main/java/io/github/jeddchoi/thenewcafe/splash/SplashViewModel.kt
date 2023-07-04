@@ -1,15 +1,14 @@
 package io.github.jeddchoi.thenewcafe.splash
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.CurrentUserRepository
-import io.github.jeddchoi.thenewcafe.navigation.root.RootNavScreen
+import io.github.jeddchoi.thenewcafe.ui.root.RootNav
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,22 +19,23 @@ class SplashViewModel @Inject constructor(
     val isLoading = _isLoading.asStateFlow()
 
 
-    private val _startDestination: MutableState<RootNavScreen> = mutableStateOf(RootNavScreen.Auth)
-    val startDestination: MutableState<RootNavScreen> = _startDestination
+    private val _startDestination = MutableStateFlow(RootNav.Auth)
+    val startDestination: StateFlow<RootNav> = _startDestination
 
 
-    private fun initialize() {
-        viewModelScope.launch {
-            if (currentUserRepository.isUserSignedIn()) {
-                _startDestination.value = RootNavScreen.Main
-            } else {
-                _startDestination.value = RootNavScreen.Auth
-            }
-            _isLoading.emit(false)
+    private var initializeCalled = false
+
+    // This function is idempotent provided it is only called from the UI thread.
+    @MainThread
+    fun initialize() {
+        if (initializeCalled) return
+        initializeCalled = true
+
+        if (currentUserRepository.isUserSignedIn()) {
+            _startDestination.value = RootNav.Main
+        } else {
+            _startDestination.value = RootNav.Auth
         }
-    }
-
-    init {
-        initialize()
+        _isLoading.update { false }
     }
 }

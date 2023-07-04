@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe.navigation.root
+package io.github.jeddchoi.thenewcafe.ui.root
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.component.lottie.ConfettiLottie
-import io.github.jeddchoi.thenewcafe.navigation.main.BottomBar
+import io.github.jeddchoi.thenewcafe.ui.main.BottomBar
 
 /**
  * Single entry point of composable world
@@ -32,7 +32,7 @@ fun RootScreen(
         networkMonitor = networkMonitor,
         navController = navController,
     ),
-    startDestination: RootNavScreen = RootNavScreen.Auth,
+    startDestination: RootNav = RootNav.Auth,
 ) {
     val showBottomBar by rootState.showBottomBar.collectAsStateWithLifecycle(initialValue = false)
     val connectedState by rootState.connectedState.collectAsStateWithLifecycle()

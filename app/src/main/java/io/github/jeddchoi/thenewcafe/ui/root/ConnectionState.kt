@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe.navigation.root
+package io.github.jeddchoi.thenewcafe.ui.root
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth

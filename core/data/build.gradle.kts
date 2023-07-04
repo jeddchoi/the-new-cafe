@@ -1,9 +1,12 @@
 @file:Suppress("DSL_SCOPE_VIOLATION")
 
+import com.google.protobuf.gradle.id
+
 plugins {
     id("jeddchoi.android.library")
     id("jeddchoi.android.hilt")
     alias(libs.plugins.plugin.serialization)
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -20,6 +23,8 @@ dependencies {
     // Source: https://github.com/Kotlin/kotlinx.coroutines/tree/master/integration/kotlinx-coroutines-play-services
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.kotlinx.datetime)
+
+    implementation(libs.androidx.datastore.proto)
 
     /**
      * Firebase dependencies
@@ -39,4 +44,19 @@ dependencies {
     implementation(libs.firebase.analytics.ktx)
     // Add the dependencies for the Dynamic Links
     implementation(libs.firebase.dynamic.links.ktx)
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.18.0"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                id("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }

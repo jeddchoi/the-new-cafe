@@ -3,6 +3,7 @@ package io.github.jeddchoi.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.ui.model.FeedbackState
 import io.github.jeddchoi.ui.model.Message
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class ProfileViewModel @Inject constructor(
-    private val currentUserRepository: CurrentUserRepository
+    private val currentUserRepository: CurrentUserRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiStateData())
@@ -23,7 +25,9 @@ internal class ProfileViewModel @Inject constructor(
     val uiState: StateFlow<UiState<ProfileUiStateData>> = _uiState.asUiState(viewModelScope)
 
     fun signOut() {
-
+        viewModelScope.launch {
+            authRepository.logout()
+        }
     }
 
     init {

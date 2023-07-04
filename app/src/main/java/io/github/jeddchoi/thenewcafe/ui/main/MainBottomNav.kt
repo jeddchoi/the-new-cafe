@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe.navigation.main
+package io.github.jeddchoi.thenewcafe.ui.main
 
 import androidx.annotation.StringRes
 import io.github.jeddchoi.designsystem.CafeIcons

@@ -12,18 +12,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.navigation.NavController
-import androidx.navigation.NavDeepLinkSaveStateControl
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
-import io.github.jeddchoi.thenewcafe.navigation.root.RootScreen
 import io.github.jeddchoi.thenewcafe.splash.SplashViewModel
+import io.github.jeddchoi.thenewcafe.ui.root.RootScreen
 import javax.inject.Inject
 
 
@@ -31,7 +31,7 @@ import javax.inject.Inject
  * Single activity which is main entry.
  * It should be kept simple.
  */
-@OptIn(NavDeepLinkSaveStateControl::class, ExperimentalMaterial3WindowSizeClassApi::class)
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        NavController.enableDeepLinkSaveState(false)
+
         installSplashScreen().apply {
             setKeepOnScreenCondition {
                 viewModel.isLoading.value
@@ -61,22 +61,25 @@ class MainActivity : ComponentActivity() {
                 ) {
                     navController = rememberNavController()
 
+                    val startDestination by viewModel.startDestination.collectAsStateWithLifecycle()
                     RootScreen(
                         windowSizeClass = calculateWindowSizeClass(this),
                         networkMonitor = networkMonitor,
                         navController = navController,
-                        startDestination = viewModel.startDestination.value,
-                        modifier = maxSizeModifier
+                        modifier = maxSizeModifier,
+                        startDestination = startDestination
                     )
 
                     LaunchedEffect(Unit) {
                         navController.currentBackStack.collect {
-                            Log.d("MainActivity", "currentBackStack = ${it.joinToString("\n")}")
+                            Log.d("MainActivity", it.joinToString("\n"))
                         }
                     }
                 }
             }
         }
+
+        viewModel.initialize()
     }
 
 

@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe.navigation.main
+package io.github.jeddchoi.thenewcafe.ui.main
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text

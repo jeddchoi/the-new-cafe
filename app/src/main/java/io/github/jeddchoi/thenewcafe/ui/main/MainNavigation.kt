@@ -1,4 +1,4 @@
-package io.github.jeddchoi.thenewcafe.navigation.main
+package io.github.jeddchoi.thenewcafe.ui.main
 
 import android.content.Intent
 import androidx.navigation.NavController

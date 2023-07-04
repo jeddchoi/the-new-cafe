@@ -1,8 +1,7 @@
-package io.github.jeddchoi.thenewcafe.navigation.root
+package io.github.jeddchoi.thenewcafe.ui.root
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navOptions
@@ -17,14 +16,14 @@ import io.github.jeddchoi.order.store.navigateToStore
 import io.github.jeddchoi.order.store.storeScreen
 import io.github.jeddchoi.order.store_list.storeListScreen
 import io.github.jeddchoi.profile.profileScreen
-import io.github.jeddchoi.thenewcafe.navigation.main.mainGraph
-import io.github.jeddchoi.thenewcafe.navigation.main.navigateToMain
+import io.github.jeddchoi.thenewcafe.ui.main.mainGraph
+import io.github.jeddchoi.thenewcafe.ui.main.navigateToMain
 
 @Composable
 fun RootNavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: RootNavScreen = RootNavScreen.Auth
+    startDestination: RootNav = RootNav.Auth
 ) {
     NavHost(
         navController = navController,
@@ -35,7 +34,7 @@ fun RootNavGraph(
         authGraph {
             val navigateToMain = {
                 navController.navigateToMain(navOptions = navOptions {
-                    popUpTo(navController.graph.findStartDestination().id) {
+                    popUpTo(RootNav.Auth.route) {
                         inclusive = true
                     }
                     launchSingleTop = true
@@ -49,7 +48,9 @@ fun RootNavGraph(
             profileScreen(
                 onNavigateToSignIn = {
                     navController.navigateToAuth(navOptions = navOptions {
-                        popUpTo(navController.graph.findStartDestination().id)
+                        popUpTo(RootNav.Main.route) {
+                            inclusive = true
+                        }
                         launchSingleTop = true
                     })
                 },
