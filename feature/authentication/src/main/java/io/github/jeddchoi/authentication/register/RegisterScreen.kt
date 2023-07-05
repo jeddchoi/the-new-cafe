@@ -13,6 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.jeddchoi.authentication.AuthViewModel
 import io.github.jeddchoi.authentication.R
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.UiText
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
 import io.github.jeddchoi.ui.component.UserInputScreen
@@ -29,7 +30,7 @@ internal fun RegisterScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     UserInputScreen(
-        title = stringResource(R.string.register),
+        title = UiText.StringResource(R.string.register),
         inputFields = { inputFieldsModifier ->
 
             GeneralTextField(

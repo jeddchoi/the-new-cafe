@@ -9,4 +9,5 @@
     <string name="occupy">Occupy</string>
     <string name="doBusiness">Do business</string>
     <string name="info">Info</string>
+    <string name="empty_result">Empty Result</string>
 </resources>

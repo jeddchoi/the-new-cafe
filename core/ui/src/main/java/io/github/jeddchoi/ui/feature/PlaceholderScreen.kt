@@ -6,13 +6,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import io.github.jeddchoi.designsystem.UiText
 
 @Composable
-fun PlaceholderScreen(title: String, modifier: Modifier = Modifier) {
+fun PlaceholderScreen(
+    title: UiText,
+    modifier: Modifier = Modifier
+) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Text(title)
+        Text(title.asString())
     }
 }

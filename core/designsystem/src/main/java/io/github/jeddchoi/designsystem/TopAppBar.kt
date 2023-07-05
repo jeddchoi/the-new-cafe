@@ -1,17 +1,15 @@
 package io.github.jeddchoi.designsystem
 
-import androidx.annotation.StringRes
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeTopAppBar(
-    @StringRes titleRes: Int,
+    title: UiText,
     navigationIcon: ImageVector,
     navigationIconContentDescription: String?,
     actionIcon: ImageVector,
@@ -22,7 +20,7 @@ fun CafeTopAppBar(
     onActionClick: () -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
-        title = { Text(text = stringResource(id = titleRes)) },
+        title = { Text(text = title.asString()) },
         navigationIcon = {
             IconButton(onClick = onNavigationClick) {
                 Icon(
@@ -52,7 +50,7 @@ fun CafeTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeTopAppBar(
-    @StringRes titleRes: Int,
+    title: UiText,
     actionIcon: ImageVector,
     actionIconContentDescription: String?,
     modifier: Modifier = Modifier,
@@ -60,7 +58,7 @@ fun CafeTopAppBar(
     onActionClick: () -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
-        title = { Text(text = stringResource(id = titleRes)) },
+        title = { Text(text = title.asString()) },
         actions = {
             IconButton(onClick = onActionClick) {
                 Icon(
@@ -81,12 +79,12 @@ fun CafeTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeTopAppBar(
-    @StringRes titleRes: Int,
+    title: UiText,
     modifier: Modifier = Modifier,
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
 ) {
     CenterAlignedTopAppBar(
-        title = { Text(text = stringResource(id = titleRes)) },
+        title = { Text(text = title.asString()) },
         colors = colors,
         modifier = modifier.testTag("cafeTopAppBar"),
     )

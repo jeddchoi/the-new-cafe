@@ -29,15 +29,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.github.jeddchoi.designsystem.R
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.UiText
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
+import io.github.jeddchoi.ui.R
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun UserInputScreen(
-    title: String,
+    title: UiText,
     inputFields: @Composable ColumnScope.(Modifier) -> Unit,
     buttonText: String,
     isLoading: Boolean,
@@ -133,7 +134,7 @@ private fun UserInputOneByOneScreenPreview() {
         }
 
         UserInputScreen(
-            title = "Sign In",
+            title = UiText.StringResource(R.string.sign_in),
             inputFields = {
                 GeneralTextField(
                     value = email,

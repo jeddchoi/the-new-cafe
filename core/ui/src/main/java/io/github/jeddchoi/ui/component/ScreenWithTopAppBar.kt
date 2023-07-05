@@ -18,13 +18,14 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.UiText
 import io.github.jeddchoi.designsystem.component.BackButton
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenWithTopAppBar(
-    title: String,
+    title: UiText,
     showNavigateUp: Boolean,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -36,7 +37,7 @@ fun ScreenWithTopAppBar(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { Text(title) },
+                title = { Text(title.asString()) },
                 navigationIcon = {
                     if (showNavigateUp) {
                         BackButton(onClick = {
@@ -65,7 +66,7 @@ fun ScreenWithTopAppBarPreview() {
     TheNewCafeTheme {
         ScreenWithTopAppBar(
             modifier = Modifier.fillMaxSize(),
-            title = "Title",
+            title = UiText.DynamicString("Title"),
             showNavigateUp = true,
             onBackClick = { /*TODO*/ }) {
             repeat(20) {

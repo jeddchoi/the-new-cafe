@@ -7,17 +7,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import io.github.jeddchoi.designsystem.UiText
+import io.github.jeddchoi.ui.R
 
 
 @Composable
-fun LoadingScreen(modifier: Modifier = Modifier, title: String = "") {
+fun LoadingScreen(modifier: Modifier = Modifier, title: UiText = UiText.StringResource(R.string.loading)) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator()
-            Text(title)
+            Text(title.asString())
         }
     }
 }
