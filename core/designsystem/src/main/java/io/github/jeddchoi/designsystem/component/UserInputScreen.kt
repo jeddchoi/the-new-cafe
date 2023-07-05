@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,11 +25,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.data.util.AuthInputValidator
+import io.github.jeddchoi.designsystem.R
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.input.GeneralTextField
+import io.github.jeddchoi.designsystem.component.input.PasswordField
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -45,6 +49,7 @@ fun UserInputScreen(
     onBackClick: () -> Unit = {},
     primaryButtonEnabled: Boolean = true,
     errorMsg: String? = null,
+    onDismissErrorMsg: () -> Unit = {},
     optionalTitle: String = "",
     optionalButtonClick: () -> Unit = {},
     optionalButtonText: String = "",
@@ -68,8 +73,8 @@ fun UserInputScreen(
                 .padding(scaffoldPadding)
                 .imePadding()
                 .fillMaxSize(),
-            optionalContentOfButtonTop = if (!isKeyboardOpen) {
-                {
+            optionalContentOfButtonTop = {
+                if (!isKeyboardOpen) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -81,21 +86,34 @@ fun UserInputScreen(
                             Text(optionalButtonText, textDecoration = TextDecoration.Underline)
                         }
                     }
-                    if (errorMsg != null) {
+                }
+
+                if (errorMsg != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
                         Text(
                             text = errorMsg,
-                            style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.error)
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Start,
+                            modifier = Modifier
+                                .weight(1f)
                         )
+
+                        TextButton(onClick = onDismissErrorMsg) {
+                            Text(stringResource(R.string.dismiss), textDecoration = TextDecoration.Underline)
+                        }
                     }
                 }
-            } else null
+            }
         ) {
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
                     .align(Alignment.TopCenter)
-                    .padding(bottom = 200.dp)
-                    .fillMaxSize()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 200.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 inputFields(Modifier)
             }
@@ -122,17 +140,17 @@ private fun UserInputOneByOneScreenPreview() {
                 GeneralTextField(
                     value = email,
                     onValueChange = { email = it },
-                    placeholderMsg = "Email",
+                    labelText = "Email",
                     isError = !isEmailValid,
-                    errorMsg = "Email is invalid"
+                    supportingText = "Email is invalid"
                 )
 
                 PasswordField(
                     value = password,
                     onValueChange = { password = it },
-                    placeholderMsg = "Password",
+                    labelText = "Password",
+                    supportingText = "Password is invalid",
                     isError = !isPasswordValid,
-                    errorMsg = "Password is invalid",
                 )
             },
             buttonText = "Done",

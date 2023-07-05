@@ -18,6 +18,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,9 +71,9 @@ fun ScreenWithTopAppBarPreview() {
                 GeneralTextField(
                     value = "Hello $it",
                     onValueChange = {},
-                    placeholderMsg = "Placeholder",
+                    labelText = "Placeholder",
                     isError = false,
-                    errorMsg = "",
+                    supportingText = "",
                 )
             }
         }

@@ -18,4 +18,5 @@
     <string name="last_name">Last name</string>
     <string name="retry">Retry</string>
     <string name="error">Error</string>
+    <string name="password_generation_guide"><![CDATA[Passwords should contain three of the four character types.\n1. Uppercase letters: A–Z\n2. Lowercase letters: a–z\n3. Numbers: 0–9\n4. Symbols: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]]></string>
 </resources>

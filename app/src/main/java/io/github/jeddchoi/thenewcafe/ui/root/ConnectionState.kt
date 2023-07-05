@@ -34,7 +34,7 @@ fun ConnectionState(connectedState: ConnectedState) {
             val notConnectedMessage = stringResource(R.string.not_connected)
             Text(
                 text = notConnectedMessage,
-                color = MaterialTheme.colorScheme.error,
+                color = MaterialTheme.colorScheme.onErrorContainer,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()

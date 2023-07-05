@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 
 
 @Composable
@@ -128,9 +129,9 @@ fun ComponentWithPrimaryButtonPreview() {
                         GeneralTextField(
                             value = "Hello $it",
                             onValueChange = {},
-                            placeholderMsg = "Placeholder",
+                            labelText = "Placeholder",
                             isError = false,
-                            errorMsg = "",
+                            supportingText = "",
                         )
                     }
                 }

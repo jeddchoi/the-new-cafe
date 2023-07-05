@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.util.AuthInputValidator
+import io.github.jeddchoi.data.util.getCurrentTime
 import io.github.jeddchoi.ui.model.Action
 import io.github.jeddchoi.ui.model.Message
 import io.github.jeddchoi.ui.model.Severity
@@ -39,7 +40,11 @@ internal class AuthViewModel @Inject constructor(
     fun onDisplayNameInputChange(displayName: String) {
         val isNameValid = authInputValidator.isNameValid(displayName)
         _uiState.update {
-            it.copy(displayNameInput = displayName, isDisplayNameValid = isNameValid, userMessage = null)
+            it.copy(
+                displayNameInput = displayName,
+                isDisplayNameValid = isNameValid,
+                userMessage = null
+            )
         }
     }
 
@@ -57,7 +62,11 @@ internal class AuthViewModel @Inject constructor(
             authInputValidator.doPasswordsMatch(_uiState.value.passwordInput, confirmPassword)
 
         _uiState.update {
-            it.copy(confirmPasswordInput = confirmPassword, doPasswordsMatch = doMatch, userMessage = null)
+            it.copy(
+                confirmPasswordInput = confirmPassword,
+                doPasswordsMatch = doMatch,
+                userMessage = null
+            )
         }
     }
 
@@ -89,7 +98,8 @@ internal class AuthViewModel @Inject constructor(
     fun onRegister() {
         launchOneShotJob(job = {
             val email = uiState.value.emailInput ?: throw IllegalArgumentException("Email is empty")
-            val displayName = uiState.value.displayNameInput ?: throw IllegalArgumentException("Name is empty")
+            val displayName =
+                uiState.value.displayNameInput ?: throw IllegalArgumentException("Name is empty")
             val password =
                 uiState.value.passwordInput ?: throw IllegalArgumentException("Password is empty")
 
@@ -109,6 +119,11 @@ internal class AuthViewModel @Inject constructor(
         })
     }
 
+    fun onUserMessageDismissed() {
+        _uiState.update {
+            it.copy(userMessage = null)
+        }
+    }
 
     private fun launchOneShotJob(
         job: suspend () -> Unit,
@@ -138,7 +153,7 @@ internal class AuthViewModel @Inject constructor(
         return Message(
             titleId = R.string.error,
             severity = Severity.ERROR,
-            content = exception.message ?: exception.stackTraceToString(),
+            content = "[${getCurrentTime()}] ${exception.message ?: exception.stackTraceToString()}",
             action = listOf(
                 Action(R.string.retry) {
                     launchOneShotJob(job) { e, job ->
@@ -176,4 +191,9 @@ data class AuthUiState(
         !emailInput.isNullOrBlank() && !passwordInput.isNullOrBlank() && !confirmPasswordInput.isNullOrBlank() && !displayNameInput.isNullOrBlank()
     val isValidInfoToRegister =
         isEmailValid && isDisplayNameValid && isPasswordValid && doPasswordsMatch
+
+    val emailInputError: Boolean = !emailInput.isNullOrEmpty() && !isEmailValid
+    val displayNameInputError: Boolean = !displayNameInput.isNullOrEmpty() && !isDisplayNameValid
+    val passwordInputError: Boolean = !passwordInput.isNullOrEmpty() && !isPasswordValid
+    val confirmPasswordInputError: Boolean = !confirmPasswordInput.isNullOrEmpty() && !doPasswordsMatch
 }

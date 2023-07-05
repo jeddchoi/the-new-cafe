@@ -1,7 +1,6 @@
 package io.github.jeddchoi.data.util
 
-import java.util.Locale
-
+import java.util.regex.Pattern
 
 
 object AuthInputValidator {
@@ -49,33 +48,26 @@ object AuthInputValidator {
     }
 
 
+    /**
+     * Password validator
+     *
+     * ^                 # start-of-string
+     * (?=.*[0-9])       # a digit must occur at least once
+     * (?=.*[a-z])       # a lower case letter must occur at least once
+     * (?=.*[A-Z])       # an upper case letter must occur at least once
+     * (?=.*[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~])  # a special character must occur at least once you can replace with your special characters
+     * (?=\\S+$)         # no whitespace allowed in the entire string
+     * .{8,}             # anything, at least eight places though
+     * $                 # end-of-string
+     * @constructor Create empty Password validator
+     */
     object PasswordValidator {
-        private const val PASSWORD_MIN_LENGTH = 8
-
+        private const val PASSWORD_PATTERN =
+            "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!\"#\$%&'()*+,-./:;<=>?@\\[\\]^_`{|}~])(?=\\S+$).{8,}$"
+        private val pattern = Pattern.compile(PASSWORD_PATTERN)
         fun isSecure(password: String): Boolean {
-            if (password.length < PASSWORD_MIN_LENGTH) {
-                return false
-            }
-            val categories = arrayOf(
-                Regex("[A-Z]"),  // 영어 대문자
-                Regex("[a-z]"),  // 영어 소문자
-                Regex("[0-9]"),  // 숫자
-                Regex("[^A-Za-z0-9]")  // 특수문자
-            )
-            var numCategories = 0
-            for (category in categories) {
-                if (category.containsMatchIn(password)) {
-                    numCategories++
-                }
-            }
-            if (numCategories < 3) {
-                return false
-            }
-            val commonPasswords = listOf("password", "123456", "qwerty")  // 자주 사용되는 패스워드 목록
-            if (commonPasswords.contains(password.lowercase(Locale.ROOT))) {
-                return false
-            }
-            return true
+            val matcher = pattern.matcher(password);
+            return matcher.matches();
         }
     }
 

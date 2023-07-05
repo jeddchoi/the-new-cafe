@@ -8,10 +8,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import androidx.navigation.navOptions
 import io.github.jeddchoi.authentication.AuthGraphRoutePattern
 import io.github.jeddchoi.authentication.AuthViewModel
-import io.github.jeddchoi.authentication.navigateToAuth
 
 private const val RegisterRoutePattern = "register"
 
@@ -35,14 +33,7 @@ fun NavGraphBuilder.registerScreen(
         RegisterScreen(
             viewModel = authViewModel,
             onBackClick = navController::popBackStack,
-            navigateToSignInClick = {
-                navController.navigateToAuth(navOptions {
-                    popUpTo(AuthGraphRoutePattern) {
-                        inclusive = true
-                    }
-                    launchSingleTop = true
-                })
-            },
+            navigateToSignInClick = navController::popBackStack,
             navigateToMain = navigateToMain,
         )
     }

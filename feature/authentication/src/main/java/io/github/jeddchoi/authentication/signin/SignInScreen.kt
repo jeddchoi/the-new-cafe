@@ -1,6 +1,6 @@
 package io.github.jeddchoi.authentication.signin
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -9,15 +9,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.jeddchoi.authentication.AuthViewModel
 import io.github.jeddchoi.authentication.R
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
-import io.github.jeddchoi.designsystem.component.GeneralTextField
-import io.github.jeddchoi.designsystem.component.PasswordField
 import io.github.jeddchoi.designsystem.component.UserInputScreen
+import io.github.jeddchoi.designsystem.component.input.GeneralTextField
+import io.github.jeddchoi.designsystem.component.input.PasswordField
 
 @Composable
 internal fun SignInScreen(
@@ -36,28 +37,29 @@ internal fun SignInScreen(
             GeneralTextField(
                 value = uiState.emailInput ?: "",
                 onValueChange = { viewModel.onEmailInputChange(it) },
-                placeholderMsg = stringResource(R.string.email),
-                isError = !uiState.isEmailValid,
-                errorMsg = stringResource(R.string.email_invalid_msg),
-                modifier = inputFieldsModifier,
+                labelText = stringResource(R.string.email),
+                isError = uiState.emailInputError,
+                supportingText = if (uiState.emailInputError) stringResource(R.string.email_invalid_msg) else "",
+                modifier = inputFieldsModifier.fillMaxWidth(),
+                keyboardType = KeyboardType.Email,
             )
 
-            Column {
-                PasswordField(
-                    value = uiState.passwordInput ?: "",
-                    onValueChange = { viewModel.onPasswordInputChange(it) },
-                    placeholderMsg = stringResource(R.string.password),
-                    isError = !uiState.isPasswordValid,
-                    errorMsg = stringResource(R.string.password_invalid_msg),
-                    modifier = inputFieldsModifier
-                )
+            PasswordField(
+                value = uiState.passwordInput ?: "",
+                onValueChange = { viewModel.onPasswordInputChange(it) },
+                labelText = stringResource(R.string.password),
+                supportingText = if (uiState.passwordInputError) stringResource(R.string.password_invalid_msg) else "",
+                isError = uiState.passwordInputError,
+                modifier = inputFieldsModifier.fillMaxWidth(),
+                isLastButton = true,
+                onKeyboardDoneAction = viewModel::onSignIn
+            )
 
-                TextButton(
-                    onClick = viewModel::onPasswordForgotClick,
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text(stringResource(R.string.forgot_password))
-                }
+            TextButton(
+                onClick = viewModel::onPasswordForgotClick,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(stringResource(R.string.forgot_password))
             }
         },
         buttonText = stringResource(R.string.sign_in),
@@ -66,6 +68,7 @@ internal fun SignInScreen(
         onBackClick = onBackClick,
         primaryButtonEnabled = !uiState.isLoading && uiState.signInInfoComplete && uiState.isValidInfoToSignIn,
         errorMsg = uiState.userMessage?.content,
+        onDismissErrorMsg = viewModel::onUserMessageDismissed,
         optionalTitle = stringResource(R.string.new_user),
         optionalButtonClick = navigateToRegister,
         optionalButtonText = stringResource(R.string.register),
