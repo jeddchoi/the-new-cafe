@@ -13,9 +13,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.jeddchoi.authentication.AuthViewModel
 import io.github.jeddchoi.authentication.R
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
-import io.github.jeddchoi.ui.component.UserInputScreen
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
+import io.github.jeddchoi.ui.component.UserInputScreen
 
 
 @Composable
@@ -77,7 +77,7 @@ internal fun RegisterScreen(
         existBackStack = true,
         onBackClick = onBackClick,
         primaryButtonEnabled = !uiState.isLoading && uiState.registerInfoComplete && uiState.isValidInfoToRegister,
-        errorMsg = uiState.userMessage?.content,
+        errorMsg = uiState.userMessage?.content?.asString(),
         onDismissErrorMsg = viewModel::onUserMessageDismissed,
         optionalTitle = stringResource(R.string.already_have_an_account),
         optionalButtonClick = navigateToSignInClick,

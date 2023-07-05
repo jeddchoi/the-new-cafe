@@ -7,9 +7,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.util.AuthInputValidator
 import io.github.jeddchoi.data.util.getCurrentTime
+import io.github.jeddchoi.designsystem.UiText
 import io.github.jeddchoi.ui.model.Action
 import io.github.jeddchoi.ui.model.Message
-import io.github.jeddchoi.ui.model.Severity
+import io.github.jeddchoi.ui.model.MessageSeverity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -154,11 +155,10 @@ internal class AuthViewModel @Inject constructor(
 
     private fun getErrorMessage(exception: Throwable, job: suspend () -> Unit): Message {
         return Message(
-            title = R.string.error,
-            severity = Severity.ERROR,
-            content = "[${getCurrentTime()}] ${exception.message ?: exception.stackTraceToString()}",
+            title = UiText.StringResource(R.string.error),
+            severity = MessageSeverity.ERROR,
             action = listOf(
-                Action(R.string.retry) {
+                Action(UiText.StringResource(R.string.retry)) {
                     launchOneShotJob(job) { e, job ->
                         _uiState.update {
                             it.copy(
@@ -167,7 +167,8 @@ internal class AuthViewModel @Inject constructor(
                         }
                     }
                 }
-            )
+            ),
+            content = UiText.DynamicString("[${getCurrentTime()}] ${exception.message ?: exception.stackTraceToString()}")
         )
     }
 }
@@ -198,5 +199,6 @@ data class AuthUiState(
     val emailInputError: Boolean = !emailInput.isNullOrEmpty() && !isEmailValid
     val displayNameInputError: Boolean = !displayNameInput.isNullOrEmpty() && !isDisplayNameValid
     val passwordInputError: Boolean = !passwordInput.isNullOrEmpty() && !isPasswordValid
-    val confirmPasswordInputError: Boolean = !confirmPasswordInput.isNullOrEmpty() && !doPasswordsMatch
+    val confirmPasswordInputError: Boolean =
+        !confirmPasswordInput.isNullOrEmpty() && !doPasswordsMatch
 }

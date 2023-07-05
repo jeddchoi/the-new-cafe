@@ -8,11 +8,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
+import io.github.jeddchoi.designsystem.UiText
 import io.github.jeddchoi.model.SeatFinderRequestType
 import io.github.jeddchoi.ui.model.Action
 import io.github.jeddchoi.ui.model.FeedbackState
 import io.github.jeddchoi.ui.model.Message
-import io.github.jeddchoi.ui.model.Severity
+import io.github.jeddchoi.ui.model.MessageSeverity
 import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -65,12 +66,12 @@ internal class MyPageViewModel @Inject constructor(
                     canContinue = false,
                     messages = _uiState.value.messages.plus(
                         Message(
-                            title = R.string.error,
-                            content = e.message ?: e.stackTraceToString(),
-                            severity = Severity.ERROR,
-                            action = listOf(Action(R.string.retry) {
+                            title = UiText.StringResource(R.string.error),
+                            severity = MessageSeverity.ERROR,
+                            action = listOf(Action(UiText.StringResource(R.string.retry)) {
                                 launchOneShotJob(job)
                             }),
+                            content = UiText.DynamicString(e.message ?: e.stackTraceToString()),
                         )
                     )
                 )
@@ -105,9 +106,8 @@ internal class MyPageViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 messages = _uiState.value.messages.plus(
                     Message(
-                        title = R.string.info,
-                        contentId = result.resultCode.description,
-                        severity = Severity.ERROR,
+                        title = UiText.StringResource(R.string.info),
+                        severity = MessageSeverity.ERROR,
                     ),
                 )
             )
