@@ -6,7 +6,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import androidx.navigation.navOptions
 import io.github.jeddchoi.authentication.AuthGraphRoutePattern
 import io.github.jeddchoi.authentication.AuthViewModel
 import io.github.jeddchoi.authentication.register.navigateToRegister
@@ -25,16 +24,12 @@ fun NavGraphBuilder.signInScreen(
         val authEntry = remember(backStackEntry) {
             navController.getBackStackEntry(AuthGraphRoutePattern)
         }
-        val authViewModel = hiltViewModel<AuthViewModel>(authEntry)
+        val authViewModel : AuthViewModel = hiltViewModel(authEntry)
         SignInScreen(
             viewModel = authViewModel,
             onBackClick = navController::popBackStack,
             navigateToMain = navigateToMain,
-            navigateToRegisterClick = {
-                navController.navigateToRegister(navOptions {
-                    launchSingleTop = true
-                })
-            },
+            navigateToRegister = navController::navigateToRegister,
         )
     }
 }

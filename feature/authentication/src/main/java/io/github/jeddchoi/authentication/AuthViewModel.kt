@@ -6,12 +6,16 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.util.AuthInputValidator
-import io.github.jeddchoi.ui.model.*
-import kotlinx.coroutines.delay
+import io.github.jeddchoi.ui.model.Action
+import io.github.jeddchoi.ui.model.Message
+import io.github.jeddchoi.ui.model.Severity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,150 +24,156 @@ internal class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _uiState: MutableStateFlow<AuthScreenData> = MutableStateFlow(AuthScreenData())
+    private val _uiState: MutableStateFlow<AuthUiState> = MutableStateFlow(AuthUiState())
 
-    val uiState: StateFlow<UiState<AuthScreenData>> =
-        _uiState.onStart { delay(4_000) }
-            .asUiState(viewModelScope)
+    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
 
-    fun onEmailChange(email: String) {
-
+    fun onEmailInputChange(email: String) {
         val isEmailValid = authInputValidator.isValidEmail(email)
-        _uiState.value = _uiState.value.copy(email = email, isEmailValid = isEmailValid)
+        _uiState.update {
+            it.copy(emailInput = email, isEmailValid = isEmailValid, userMessage = null)
+        }
     }
 
-    fun onDisplayNameChange(displayName: String) {
+    fun onDisplayNameInputChange(displayName: String) {
         val isNameValid = authInputValidator.isNameValid(displayName)
-        _uiState.value = _uiState.value.copy(displayName = displayName, isDisplayNameValid = isNameValid)
+        _uiState.update {
+            it.copy(displayNameInput = displayName, isDisplayNameValid = isNameValid, userMessage = null)
+        }
     }
 
 
-    fun onPasswordChange(password: String, isRegister: Boolean = false) {
+    fun onPasswordInputChange(password: String, isRegister: Boolean = false) {
         val isPasswordValid =
             if (isRegister) authInputValidator.isPasswordValid(password) else password.isNotBlank()
-        _uiState.value = _uiState.value.copy(password = password, isPasswordValid = isPasswordValid)
+        _uiState.update {
+            it.copy(passwordInput = password, isPasswordValid = isPasswordValid, userMessage = null)
+        }
     }
 
-    fun onConfirmPasswordChange(confirmPassword: String) {
-        val password = _uiState.value.password
-        val doMatch = authInputValidator.doPasswordsMatch(password, confirmPassword)
-        _uiState.value =
-            _uiState.value.copy(confirmPassword = confirmPassword, doPasswordsMatch = doMatch)
+    fun onConfirmPasswordInputChange(confirmPassword: String) {
+        val doMatch =
+            authInputValidator.doPasswordsMatch(_uiState.value.passwordInput, confirmPassword)
+
+        _uiState.update {
+            it.copy(confirmPasswordInput = confirmPassword, doPasswordsMatch = doMatch, userMessage = null)
+        }
     }
 
     fun onPasswordForgotClick() {
-
+        // TODO: Implement this
     }
 
     fun onSignIn() {
-        val email = _uiState.value.email
-        val password = _uiState.value.password
-
-        launchOneShotJob {
-            val result = authRepository.signInWithEmail(email, password)
-            if (result.isSuccess) {
-                _uiState.value = _uiState.value.copy(isSignInSuccessful = true)
-            } else {
-                _uiState.value =
-                    _uiState.value.copy(isSignInSuccessful = false, canContinue = false)
+        launchOneShotJob(job = {
+            val email = uiState.value.emailInput ?: throw IllegalArgumentException("Email is empty")
+            val password =
+                uiState.value.passwordInput ?: throw IllegalArgumentException("Password is empty")
+            authRepository.signInWithEmail(email, password)
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(isSignInTaskCompleted = true)
+                    }
+                }
+        }, onError = { e, job ->
+            _uiState.update {
+                it.copy(
+                    isSignInTaskCompleted = false,
+                    userMessage = getErrorMessage(e, job)
+                )
             }
-        }
+        })
     }
 
     fun onRegister() {
-        val email = _uiState.value.email
-        val displayName = _uiState.value.displayName
-        val password = _uiState.value.password
+        launchOneShotJob(job = {
+            val email = uiState.value.emailInput ?: throw IllegalArgumentException("Email is empty")
+            val displayName = uiState.value.displayNameInput ?: throw IllegalArgumentException("Name is empty")
+            val password =
+                uiState.value.passwordInput ?: throw IllegalArgumentException("Password is empty")
 
-        launchOneShotJob {
-            val result = authRepository.registerWithEmail(email, displayName, password)
-            if (result.isSuccess) {
-                _uiState.value = _uiState.value.copy(isRegisterSuccessful = true)
-            } else {
-                _uiState.value =
-                    _uiState.value.copy(isRegisterSuccessful = false, canContinue = false)
+            authRepository.registerWithEmail(email, displayName, password)
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(isRegisterTaskCompleted = true)
+                    }
+                }
+        }, onError = { e, job ->
+            _uiState.update {
+                it.copy(
+                    isRegisterTaskCompleted = false,
+                    userMessage = getErrorMessage(e, job)
+                )
             }
-        }
+        })
     }
 
 
     private fun launchOneShotJob(
-        job: suspend () -> Unit
+        job: suspend () -> Unit,
+        onError: (Exception, suspend () -> Unit) -> Unit
     ) {
-        _uiState.value = _uiState.value.copy(isBusy = true)
+        _uiState.update {
+            it.copy(isLoading = true, userMessage = null)
+        }
         viewModelScope.launch {
             try {
-                job()
+                withContext(Dispatchers.IO) {
+                    job()
+                }
             } catch (e: Exception) {
                 Log.e("Auth", e.stackTraceToString())
-                _uiState.value = _uiState.value.copy(
-                    canContinue = false,
-                    messages = _uiState.value.messages.plus(
-                        Message(
-                            titleId = R.string.error,
-                            content = e.message ?: e.stackTraceToString(),
-                            severity = Severity.ERROR,
-                            action = listOf(Action(R.string.retry) {
-                                launchOneShotJob(job)
-                            }),
-                        )
-                    )
-                )
+                onError(e, job)
             } finally {
-                _uiState.value = _uiState.value.copy(isBusy = false)
+                _uiState.update {
+                    it.copy(isLoading = false)
+                }
             }
         }
+
     }
 
-
-    init {
-        Log.i("Auth", System.identityHashCode(authRepository).toString() )
+    private fun getErrorMessage(exception: Throwable, job: suspend () -> Unit): Message {
+        return Message(
+            titleId = R.string.error,
+            severity = Severity.ERROR,
+            content = exception.message ?: exception.stackTraceToString(),
+            action = listOf(
+                Action(R.string.retry) {
+                    launchOneShotJob(job) { e, job ->
+                        _uiState.update {
+                            it.copy(
+                                userMessage = getErrorMessage(e, job)
+                            )
+                        }
+                    }
+                }
+            )
+        )
     }
 }
 
 
-internal data class AuthScreenData(
-    val email: String = "",
-    val displayName: String = "",
-    val password: String = "",
-    val confirmPassword: String = "",
+data class AuthUiState(
+    val emailInput: String? = null,
     val isEmailValid: Boolean = false,
+    val displayNameInput: String? = null,
     val isDisplayNameValid: Boolean = false,
+    val passwordInput: String? = null,
     val isPasswordValid: Boolean = false,
+    val confirmPasswordInput: String? = null,
     val doPasswordsMatch: Boolean = false,
-    val isSignInSuccessful: Boolean = false,
-    val isRegisterSuccessful: Boolean = false,
-    override val isBusy: Boolean = false,
-    override val canContinue: Boolean = true,
-    override val messages: List<Message> = emptyList()
-) : FeedbackState {
-
-    val signInInfoComplete = email.isNotEmpty() && password.isNotEmpty()
+    val isSignInTaskCompleted: Boolean = false,
+    val isRegisterTaskCompleted: Boolean = false,
+    val isLoading: Boolean = false,
+    val userMessage: Message? = null
+) {
+    val signInInfoComplete = !emailInput.isNullOrBlank() && !passwordInput.isNullOrBlank()
     val isValidInfoToSignIn = isEmailValid && isPasswordValid
 
     val registerInfoComplete =
-        email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && displayName.isNotEmpty()
+        !emailInput.isNullOrBlank() && !passwordInput.isNullOrBlank() && !confirmPasswordInput.isNullOrBlank() && !displayNameInput.isNullOrBlank()
     val isValidInfoToRegister =
         isEmailValid && isDisplayNameValid && isPasswordValid && doPasswordsMatch
-
-    override fun copy(
-        isBusy: Boolean,
-        canContinue: Boolean,
-        messages: List<Message>
-    ): AuthScreenData = AuthScreenData(
-        email,
-        displayName,
-        password,
-        confirmPassword,
-        isEmailValid,
-        isDisplayNameValid,
-        isPasswordValid,
-        doPasswordsMatch,
-        isSignInSuccessful,
-        isRegisterSuccessful,
-        isBusy,
-        canContinue,
-        messages
-    )
 }

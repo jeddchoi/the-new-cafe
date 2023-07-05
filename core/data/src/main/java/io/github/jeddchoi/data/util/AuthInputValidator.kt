@@ -1,6 +1,6 @@
 package io.github.jeddchoi.data.util
 
-import java.util.*
+import java.util.Locale
 
 
 
@@ -18,7 +18,7 @@ object AuthInputValidator {
         return NameValidator.isValidName(name)
     }
 
-    fun doPasswordsMatch(password: String, confirmPassword: String): Boolean {
+    fun doPasswordsMatch(password: String?, confirmPassword: String): Boolean {
         return password == confirmPassword
     }
 

@@ -17,6 +17,6 @@ class RootViewModel @Inject constructor(
 
     val shouldRedirectToAuth: StateFlow<Boolean> = appFlagsRepository.getShowMainScreenOnStart
         .map { !it }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
 }
