@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -28,7 +27,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PasswordField(
     value: String,
@@ -43,7 +41,6 @@ fun PasswordField(
     var showPassword by remember { mutableStateOf(false) }
 
     val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     OutlinedTextField(
         value = value,
@@ -66,7 +63,6 @@ fun PasswordField(
             onNext = { focusManager.moveFocus(FocusDirection.Down) },
             onDone = {
                 focusManager.clearFocus()
-                keyboardController?.hide()
                 onKeyboardDoneAction()
             },
         ),

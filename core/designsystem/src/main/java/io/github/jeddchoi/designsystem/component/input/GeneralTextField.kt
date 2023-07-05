@@ -10,12 +10,10 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun GeneralTextField(
     value: String,
@@ -30,7 +28,6 @@ fun GeneralTextField(
 
     ) {
     val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -52,7 +49,6 @@ fun GeneralTextField(
             onNext = { focusManager.moveFocus(FocusDirection.Down) },
             onDone = {
                 focusManager.clearFocus()
-                keyboardController?.hide()
                 onKeyboardDoneAction()
             },
         ),

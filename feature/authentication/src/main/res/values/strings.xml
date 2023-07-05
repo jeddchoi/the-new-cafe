@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sign_in">Sign In</string>
-    <string name="register">Register</string>
+    <string name="sign_in">Sign In ></string>
+    <string name="register">Register ></string>
     <string name="email">Email</string>
     <string name="email_invalid_msg">Email is invalid</string>
     <string name="password">Password</string>

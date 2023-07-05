@@ -74,9 +74,11 @@ internal class AuthViewModel @Inject constructor(
         // TODO: Implement this
     }
 
+    // TODO: check pre conditions
     fun onSignIn() {
         launchOneShotJob(job = {
             val email = uiState.value.emailInput ?: throw IllegalArgumentException("Email is empty")
+
             val password =
                 uiState.value.passwordInput ?: throw IllegalArgumentException("Password is empty")
             authRepository.signInWithEmail(email, password)
@@ -95,6 +97,7 @@ internal class AuthViewModel @Inject constructor(
         })
     }
 
+    // TODO: check pre conditions
     fun onRegister() {
         launchOneShotJob(job = {
             val email = uiState.value.emailInput ?: throw IllegalArgumentException("Email is empty")
