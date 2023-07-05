@@ -1,52 +1,38 @@
 package io.github.jeddchoi.designsystem.component
 
 import android.util.Log
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.pinnedScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.data.util.AuthInputValidator
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import kotlinx.coroutines.CoroutineScope
 
-@OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class,
-    ExperimentalFoundationApi::class
-)
 @Composable
 fun UserInputScreen(
     title: String,
@@ -59,82 +45,31 @@ fun UserInputScreen(
     onBackClick: () -> Unit = {},
     primaryButtonEnabled: Boolean = true,
     errorMsg: String? = null,
-    userInfoComplete: Boolean = false,
     optionalTitle: String = "",
     optionalButtonClick: () -> Unit = {},
     optionalButtonText: String = "",
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
     val isKeyboardOpen by keyboardAsState()
-    Scaffold(
-        modifier = modifier
-            .fillMaxSize(),
+
+    ScreenWithTopAppBar(
+        title = title,
+        showNavigateUp = existBackStack,
+        onBackClick = onBackClick,
+        modifier = modifier,
     ) { scaffoldPadding ->
-
-        Column(modifier = Modifier.padding(scaffoldPadding)) {
-            if (!isKeyboardOpen) {
-                LargeTopAppBar(
-                    title = {
-                        Text(title)
-                    },
-                    navigationIcon = {
-                        if (existBackStack) {
-                            BackButton(onClick = {
-                                onBackClick()
-                            })
-                        }
-                    },
-                )
-            } else {
-                TopAppBar(
-                    title = {
-                        Text(title)
-                    },
-                    navigationIcon = {
-                        if (existBackStack) {
-                            BackButton(onClick = {
-                                onBackClick()
-                            })
-                        }
-                    },
-                    scrollBehavior = pinnedScrollBehavior()
-                )
-            }
-
-
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .imePadding()
-                    .fillMaxSize()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(bottom = 112.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-//                    val bringIntoViewRequester = remember { BringIntoViewRequester() }
-//                    val coroutineScope = rememberCoroutineScope()
-
-                    inputFields(
-                        Modifier
-//                        .bringIntoViewRequester(bringIntoViewRequester)
-//                        .onFocusChanged {
-//                            if (it.isFocused) {
-//                                coroutineScope.launch {
-//                                    // This sends a request to all parents that asks them to scroll so
-//                                    // that this item is brought into view.
-//                                    bringIntoViewRequester.bringIntoView()
-//                                }
-//                            }
-//                        }
-//                        .focusTarget()
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
+        ComponentWithBottomPrimaryButton(
+            buttonEnabled = primaryButtonEnabled,
+            buttonText = buttonText,
+            onButtonClick = onPrimaryButtonClick,
+            isLoading = isLoading,
+            showGradientBackground = true,
+            modifier = Modifier
+                .padding(scaffoldPadding)
+                .imePadding()
+                .fillMaxSize(),
+            optionalContentOfButtonTop = if (!isKeyboardOpen) {
+                {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -143,23 +78,26 @@ fun UserInputScreen(
                         Text(text = optionalTitle)
                         Spacer(modifier = modifier.width(8.dp))
                         TextButton(onClick = optionalButtonClick) {
-                            Text(optionalButtonText, style = MaterialTheme.typography.labelLarge)
+                            Text(optionalButtonText, textDecoration = TextDecoration.Underline)
                         }
                     }
+                    if (errorMsg != null) {
+                        Text(
+                            text = errorMsg,
+                            style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.error)
+                        )
+                    }
                 }
-
-                PrimaryButton(
-                    enabled = primaryButtonEnabled,
-                    buttonText = buttonText,
-                    onClick = {
-                        onPrimaryButtonClick()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomCenter),
-                    isLoading = isLoading,
-                    message = errorMsg
-                )
+            } else null
+        ) {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .align(Alignment.TopCenter)
+                    .padding(bottom = 200.dp)
+                    .fillMaxSize()
+            ) {
+                inputFields(Modifier)
             }
         }
     }
@@ -180,7 +118,6 @@ private fun UserInputOneByOneScreenPreview() {
 
         UserInputScreen(
             title = "Sign In",
-            onBackClick = { /*TODO*/ },
             inputFields = {
                 GeneralTextField(
                     value = email,
@@ -199,20 +136,15 @@ private fun UserInputOneByOneScreenPreview() {
                 )
             },
             buttonText = "Done",
+            isLoading = true,
             onPrimaryButtonClick = {
                 Log.i("SignInScreen", "email : $email, password : $password")
             },
+            onBackClick = { /*TODO*/ },
             primaryButtonEnabled = !isEmailValid || !isPasswordValid,
-            errorMsg = "Some input is invalid",
-            userInfoComplete = email.isNotEmpty() && password.isNotEmpty(),
-            isLoading = true
+            errorMsg = "Some input is invalid"
         )
     }
 }
 
 
-@Composable
-fun keyboardAsState(): State<Boolean> {
-    val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-    return rememberUpdatedState(isImeVisible)
-}

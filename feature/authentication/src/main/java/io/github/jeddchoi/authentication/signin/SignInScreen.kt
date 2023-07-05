@@ -32,7 +32,6 @@ internal fun SignInScreen(
 
     UserInputScreen(
         title = stringResource(R.string.sign_in),
-        onBackClick = onBackClick,
         inputFields = { inputFieldsModifier ->
             GeneralTextField(
                 value = uiState.emailInput ?: "",
@@ -40,7 +39,7 @@ internal fun SignInScreen(
                 placeholderMsg = stringResource(R.string.email),
                 isError = !uiState.isEmailValid,
                 errorMsg = stringResource(R.string.email_invalid_msg),
-                modifier = inputFieldsModifier
+                modifier = inputFieldsModifier,
             )
 
             Column {
@@ -62,11 +61,11 @@ internal fun SignInScreen(
             }
         },
         buttonText = stringResource(R.string.sign_in),
-        onPrimaryButtonClick = viewModel::onSignIn,
-        primaryButtonEnabled = !uiState.isLoading && uiState.signInInfoComplete && uiState.isValidInfoToSignIn,
         isLoading = uiState.isLoading,
+        onPrimaryButtonClick = viewModel::onSignIn,
+        onBackClick = onBackClick,
+        primaryButtonEnabled = !uiState.isLoading && uiState.signInInfoComplete && uiState.isValidInfoToSignIn,
         errorMsg = uiState.userMessage?.content,
-        userInfoComplete = uiState.signInInfoComplete,
         optionalTitle = stringResource(R.string.new_user),
         optionalButtonClick = navigateToRegister,
         optionalButtonText = stringResource(R.string.register),

@@ -1,11 +1,15 @@
 package io.github.jeddchoi.authentication.register
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.jeddchoi.authentication.AuthViewModel
@@ -28,8 +32,6 @@ internal fun RegisterScreen(
 
     UserInputScreen(
         title = stringResource(R.string.register),
-        existBackStack = true,
-        onBackClick = onBackClick,
         inputFields = { inputFieldsModifier ->
 
             GeneralTextField(
@@ -40,7 +42,6 @@ internal fun RegisterScreen(
                 errorMsg = stringResource(R.string.name_invalid),
                 modifier = inputFieldsModifier
             )
-
 
             GeneralTextField(
                 value = uiState.emailInput ?: "",
@@ -70,11 +71,12 @@ internal fun RegisterScreen(
             )
         },
         buttonText = stringResource(R.string.register),
-        onPrimaryButtonClick = viewModel::onRegister,
-        primaryButtonEnabled = !uiState.isLoading && uiState.registerInfoComplete && uiState.isValidInfoToRegister,
         isLoading = uiState.isLoading,
+        onPrimaryButtonClick = viewModel::onRegister,
+        existBackStack = true,
+        onBackClick = onBackClick,
+        primaryButtonEnabled = !uiState.isLoading && uiState.registerInfoComplete && uiState.isValidInfoToRegister,
         errorMsg = uiState.userMessage?.content,
-        userInfoComplete = uiState.registerInfoComplete,
         optionalTitle = stringResource(R.string.already_have_an_account),
         optionalButtonClick = navigateToSignInClick,
         optionalButtonText = stringResource(R.string.sign_in),
