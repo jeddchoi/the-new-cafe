@@ -1,13 +1,17 @@
 package io.github.jeddchoi.designsystem
 
-import androidx.annotation.DrawableRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.Store
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.DataUsage
+import androidx.compose.material.icons.rounded.Error
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.ShoppingBasket
+import androidx.compose.material.icons.rounded.Store
+import androidx.compose.material.icons.rounded.Warning
 
 object CafeIcons {
     val Profile = Icons.Rounded.AccountCircle
@@ -25,10 +29,3 @@ object CafeIcons {
 
 }
 
-/**
- * A sealed class to make dealing with [ImageVector] and [DrawableRes] icons easier.
- */
-sealed class Icon {
-    data class ImageVectorIcon(val imageVector: ImageVector) : Icon()
-    data class DrawableResourceIcon(@DrawableRes val id: Int) : Icon()
-}

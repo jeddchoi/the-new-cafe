@@ -154,7 +154,7 @@ internal class AuthViewModel @Inject constructor(
 
     private fun getErrorMessage(exception: Throwable, job: suspend () -> Unit): Message {
         return Message(
-            titleId = R.string.error,
+            title = R.string.error,
             severity = Severity.ERROR,
             content = "[${getCurrentTime()}] ${exception.message ?: exception.stackTraceToString()}",
             action = listOf(

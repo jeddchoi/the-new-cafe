@@ -1,4 +1,4 @@
-package io.github.jeddchoi.designsystem.component
+package io.github.jeddchoi.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +25,8 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.PrimaryButton
+import io.github.jeddchoi.designsystem.component.fadingEdge
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 
 

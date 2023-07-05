@@ -7,4 +7,10 @@
     <string name="main">Main</string>
     <string name="not_connected">⚠️ You are not connected to Internet.</string>
     <string name="connected_again">Connected to network again</string>
+    <string name="desc_profile_selected">Profile tab selected</string>
+    <string name="desc_order_selected">Order tab selected</string>
+    <string name="desc_mypage_selected">My page tab selected</string>
+    <string name="desc_profile_unselected">Profile tab unselected</string>
+    <string name="desc_order_unselected">Order tab unselected</string>
+    <string name="desc_mypage_unselected">My page tab unselected</string>
 </resources>

@@ -65,7 +65,7 @@ internal class MyPageViewModel @Inject constructor(
                     canContinue = false,
                     messages = _uiState.value.messages.plus(
                         Message(
-                            titleId = R.string.error,
+                            title = R.string.error,
                             content = e.message ?: e.stackTraceToString(),
                             severity = Severity.ERROR,
                             action = listOf(Action(R.string.retry) {
@@ -105,7 +105,7 @@ internal class MyPageViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 messages = _uiState.value.messages.plus(
                     Message(
-                        titleId = R.string.info,
+                        title = R.string.info,
                         contentId = result.resultCode.description,
                         severity = Severity.ERROR,
                     ),

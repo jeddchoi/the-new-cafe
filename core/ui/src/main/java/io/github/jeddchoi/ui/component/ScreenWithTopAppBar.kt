@@ -1,4 +1,4 @@
-package io.github.jeddchoi.designsystem.component
+package io.github.jeddchoi.ui.component
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -18,6 +18,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.BackButton
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 
 @OptIn(ExperimentalMaterial3Api::class)

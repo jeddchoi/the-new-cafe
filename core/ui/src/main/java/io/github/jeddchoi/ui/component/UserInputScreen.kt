@@ -1,4 +1,4 @@
-package io.github.jeddchoi.designsystem.component
+package io.github.jeddchoi.ui.component
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,7 +29,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.github.jeddchoi.data.util.AuthInputValidator
 import io.github.jeddchoi.designsystem.R
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
@@ -128,10 +126,10 @@ private fun UserInputOneByOneScreenPreview() {
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         val isEmailValid by remember(email) {
-            derivedStateOf { AuthInputValidator.EmailValidator.isValidEmail(email) }
+            mutableStateOf(true)
         }
         val isPasswordValid by remember(password) {
-            derivedStateOf { AuthInputValidator.PasswordValidator.isSecure(password) }
+            mutableStateOf(true)
         }
 
         UserInputScreen(

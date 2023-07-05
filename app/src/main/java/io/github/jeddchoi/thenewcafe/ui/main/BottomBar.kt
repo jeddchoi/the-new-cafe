@@ -1,9 +1,7 @@
 package io.github.jeddchoi.thenewcafe.ui.main
 
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -12,7 +10,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import io.github.jeddchoi.designsystem.CafeNavigationBar
 import io.github.jeddchoi.designsystem.CafeNavigationBarItem
-import io.github.jeddchoi.designsystem.Icon
 import io.github.jeddchoi.mypage.navigateToMyPage
 import io.github.jeddchoi.order.navigateToOrder
 import io.github.jeddchoi.profile.navigateToProfile
@@ -59,21 +56,10 @@ fun BottomBar(
                 selected = selected,
                 onClick = { onBottomNavClick(destination) },
                 icon = {
-                    val icon = if (selected) {
-                        destination.selectedIcon
+                    if (selected) {
+                        destination.selectedIcon.IconComposable()
                     } else {
-                        destination.unselectedIcon
-                    }
-                    when (icon) {
-                        is Icon.ImageVectorIcon -> Icon(
-                            imageVector = icon.imageVector,
-                            contentDescription = null,
-                        )
-
-                        is Icon.DrawableResourceIcon -> Icon(
-                            painter = painterResource(id = icon.id),
-                            contentDescription = null,
-                        )
+                        destination.unselectedIcon.IconComposable()
                     }
                 },
                 label = { Text(stringResource(destination.titleId)) },
