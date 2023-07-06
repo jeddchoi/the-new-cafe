@@ -29,6 +29,7 @@ internal fun RegisterScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     UserInputScreen(
+        modifier = modifier,
         title = io.github.jeddchoi.common.UiText.StringResource(R.string.register),
         inputFields = { inputFieldsModifier ->
 

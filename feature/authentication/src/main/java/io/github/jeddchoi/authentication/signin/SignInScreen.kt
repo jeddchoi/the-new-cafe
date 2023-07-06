@@ -32,6 +32,7 @@ internal fun SignInScreen(
 
 
     UserInputScreen(
+        modifier = modifier,
         title = io.github.jeddchoi.common.UiText.StringResource(R.string.sign_in),
         inputFields = { inputFieldsModifier ->
             GeneralTextField(
