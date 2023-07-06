@@ -2,6 +2,7 @@ package io.github.jeddchoi.common
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.Store
@@ -31,5 +32,7 @@ object CafeIcons {
 
     val Visibility = Icons.Default.Visibility
     val VisibilityOff = Icons.Default.VisibilityOff
+
+    val ArrowBack = Icons.Filled.ArrowBack
 }
 
