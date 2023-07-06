@@ -1,9 +1,9 @@
 package io.github.jeddchoi.thenewcafe.ui.main
 
 import androidx.annotation.StringRes
-import io.github.jeddchoi.designsystem.CafeIcons
-import io.github.jeddchoi.designsystem.UiIcon
-import io.github.jeddchoi.designsystem.UiText
+import io.github.jeddchoi.common.CafeIcons
+import io.github.jeddchoi.common.UiIcon
+import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.thenewcafe.R
 
 sealed class MainBottomNav(

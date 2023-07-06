@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.jeddchoi.designsystem.UiText
+import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.mypage.history.HistoryScreen
 import io.github.jeddchoi.mypage.session.SessionScreen
 import io.github.jeddchoi.ui.feature.LoadingScreen
@@ -129,11 +129,11 @@ private fun MyPageContent(
     }
     when (uiState) {
         UiState.EmptyResult -> {
-            PlaceholderScreen(title = UiText.StringResource(R.string.empty_result))
+            PlaceholderScreen(title = io.github.jeddchoi.common.UiText.StringResource(R.string.empty_result))
         }
 
         is UiState.Error -> {
-            PlaceholderScreen(title = UiText.StringResource(R.string.error))
+            PlaceholderScreen(title = io.github.jeddchoi.common.UiText.StringResource(R.string.error))
         }
 
         UiState.InitialLoading -> {

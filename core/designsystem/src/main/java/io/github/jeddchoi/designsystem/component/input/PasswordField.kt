@@ -3,9 +3,6 @@ package io.github.jeddchoi.designsystem.component.input
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -15,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
@@ -25,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import io.github.jeddchoi.common.CafeIcons
 
 
 @Composable
@@ -32,7 +29,7 @@ fun PasswordField(
     value: String,
     onValueChange: (String) -> Unit,
     labelText: String,
-    supportingText: String,
+    supportingText: io.github.jeddchoi.common.UiText?,
     isError: Boolean,
     modifier: Modifier = Modifier,
     isLastButton: Boolean = false,
@@ -51,7 +48,7 @@ fun PasswordField(
         },
         isError = isError,
         supportingText = {
-            Text(text = supportingText)
+            supportingText?.asString()?.let { Text(text = it) }
         },
         singleLine = true,
         modifier = modifier,
@@ -72,7 +69,7 @@ fun PasswordField(
                 onClick = { showPassword = !showPassword }
             ) {
                 Icon(
-                    imageVector = if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                    imageVector = if (showPassword) CafeIcons.Visibility else CafeIcons.VisibilityOff,
                     tint = Color.Gray,
                     contentDescription = "Password Toggle"
                 )

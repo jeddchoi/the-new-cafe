@@ -6,13 +6,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import io.github.jeddchoi.common.UiText
 
 @Composable
 fun GeneralTextField(
@@ -20,13 +20,12 @@ fun GeneralTextField(
     onValueChange: (String) -> Unit,
     labelText: String,
     isError: Boolean,
-    supportingText: String,
+    supportingText: io.github.jeddchoi.common.UiText?,
     modifier: Modifier = Modifier,
     keyboardType: KeyboardType = KeyboardType.Text,
     isLastButton: Boolean = false,
     onKeyboardDoneAction: () -> Unit = {},
-
-    ) {
+) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
         value = value,
@@ -37,7 +36,7 @@ fun GeneralTextField(
         },
         isError = isError,
         supportingText = {
-            Text(text = supportingText)
+            supportingText?.asString()?.let { Text(text = it) }
         },
         singleLine = true,
         modifier = modifier,

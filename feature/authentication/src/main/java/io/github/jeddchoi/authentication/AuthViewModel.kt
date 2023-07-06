@@ -4,10 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.util.AuthInputValidator
 import io.github.jeddchoi.data.util.getCurrentTime
-import io.github.jeddchoi.designsystem.UiText
 import io.github.jeddchoi.ui.model.Action
 import io.github.jeddchoi.ui.model.Message
 import io.github.jeddchoi.ui.model.MessageSeverity
@@ -31,58 +31,77 @@ internal class AuthViewModel @Inject constructor(
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
 
-    fun onEmailInputChange(email: String) {
-        val isEmailValid = authInputValidator.isValidEmail(email)
+    fun checkEmailInput(email: String): Boolean {
+        val (isEmailValid, supportingText) = authInputValidator.isValidEmail(email)
         _uiState.update {
-            it.copy(emailInput = email, isEmailValid = isEmailValid, userMessage = null)
+            it.copy(
+                emailInput = email,
+                isEmailValid = isEmailValid,
+                userMessage = null,
+                emailSupportingText = supportingText
+            )
         }
+        return isEmailValid
     }
 
-    fun onDisplayNameInputChange(displayName: String) {
-        val isNameValid = authInputValidator.isNameValid(displayName)
+    fun checkDisplayNameInput(displayName: String): Boolean {
+        val (isNameValid, supportingText) = authInputValidator.isNameValid(displayName)
         _uiState.update {
             it.copy(
                 displayNameInput = displayName,
                 isDisplayNameValid = isNameValid,
-                userMessage = null
+                userMessage = null,
+                displayNameSupportingText = supportingText
             )
         }
+        return isNameValid
     }
 
 
-    fun onPasswordInputChange(password: String, isRegister: Boolean = false) {
-        val isPasswordValid =
-            if (isRegister) authInputValidator.isPasswordValid(password) else password.isNotBlank()
+    fun checkPasswordInput(password: String, isRegister: Boolean = false): Boolean {
+        val (isPasswordValid, supportingText) = authInputValidator.isPasswordValid(
+            password,
+            isRegister
+        )
+
         _uiState.update {
-            it.copy(passwordInput = password, isPasswordValid = isPasswordValid, userMessage = null)
+            it.copy(
+                passwordInput = password,
+                isPasswordValid = isPasswordValid,
+                userMessage = null,
+                passwordSupportingText = supportingText,
+            )
         }
+        return isPasswordValid
     }
 
-    fun onConfirmPasswordInputChange(confirmPassword: String) {
-        val doMatch =
-            authInputValidator.doPasswordsMatch(_uiState.value.passwordInput, confirmPassword)
+    fun checkConfirmPasswordInput(confirmPassword: String): Boolean {
+        val (doMatch, supportingText) = authInputValidator.doPasswordsMatch(
+            _uiState.value.passwordInput,
+            confirmPassword
+        )
 
         _uiState.update {
             it.copy(
                 confirmPasswordInput = confirmPassword,
                 doPasswordsMatch = doMatch,
-                userMessage = null
+                userMessage = null,
+                confirmPasswordSupportingText = supportingText,
             )
         }
+        return doMatch
     }
 
     fun onPasswordForgotClick() {
         // TODO: Implement this
     }
 
-    // TODO: check pre conditions
     fun onSignIn() {
         launchOneShotJob(job = {
-            val email = uiState.value.emailInput ?: throw IllegalArgumentException("Email is empty")
+            if (!checkEmailInput(uiState.value.emailInput)) return@launchOneShotJob
+            if (!checkPasswordInput(uiState.value.passwordInput)) return@launchOneShotJob
 
-            val password =
-                uiState.value.passwordInput ?: throw IllegalArgumentException("Password is empty")
-            authRepository.signInWithEmail(email, password)
+            authRepository.signInWithEmail(uiState.value.emailInput, uiState.value.passwordInput)
                 .onSuccess {
                     _uiState.update {
                         it.copy(isSignInTaskCompleted = true)
@@ -92,22 +111,24 @@ internal class AuthViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isSignInTaskCompleted = false,
-                    userMessage = getErrorMessage(e, job)
+                    userMessage = getErrorMessage(exceptionToUiText(e), job)
                 )
             }
         })
     }
 
-    // TODO: check pre conditions
     fun onRegister() {
         launchOneShotJob(job = {
-            val email = uiState.value.emailInput ?: throw IllegalArgumentException("Email is empty")
-            val displayName =
-                uiState.value.displayNameInput ?: throw IllegalArgumentException("Name is empty")
-            val password =
-                uiState.value.passwordInput ?: throw IllegalArgumentException("Password is empty")
+            if (!checkDisplayNameInput(uiState.value.displayNameInput)) return@launchOneShotJob
+            if (!checkEmailInput(uiState.value.emailInput)) return@launchOneShotJob
+            if (!checkPasswordInput(uiState.value.passwordInput, true)) return@launchOneShotJob
+            if (!checkConfirmPasswordInput(uiState.value.confirmPasswordInput)) return@launchOneShotJob
 
-            authRepository.registerWithEmail(email, displayName, password)
+            authRepository.registerWithEmail(
+                uiState.value.emailInput,
+                uiState.value.displayNameInput,
+                uiState.value.passwordInput
+            )
                 .onSuccess {
                     _uiState.update {
                         it.copy(isRegisterTaskCompleted = true)
@@ -117,7 +138,7 @@ internal class AuthViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isRegisterTaskCompleted = false,
-                    userMessage = getErrorMessage(e, job)
+                    userMessage = getErrorMessage(exceptionToUiText(e), job)
                 )
             }
         })
@@ -131,7 +152,7 @@ internal class AuthViewModel @Inject constructor(
 
     private fun launchOneShotJob(
         job: suspend () -> Unit,
-        onError: (Exception, suspend () -> Unit) -> Unit
+        onError: (Throwable, suspend () -> Unit) -> Unit
     ) {
         _uiState.update {
             it.copy(isLoading = true, userMessage = null)
@@ -141,7 +162,7 @@ internal class AuthViewModel @Inject constructor(
                 withContext(Dispatchers.IO) {
                     job()
                 }
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 Log.e("Auth", e.stackTraceToString())
                 onError(e, job)
             } finally {
@@ -153,7 +174,11 @@ internal class AuthViewModel @Inject constructor(
 
     }
 
-    private fun getErrorMessage(exception: Throwable, job: suspend () -> Unit): Message {
+
+    private fun exceptionToUiText(exception: Throwable) =
+        UiText.DynamicString("[${getCurrentTime()}] ${exception.message ?: exception.stackTraceToString()}")
+
+    private fun getErrorMessage(content: UiText, job: suspend () -> Unit): Message {
         return Message(
             title = UiText.StringResource(R.string.error),
             severity = MessageSeverity.ERROR,
@@ -162,27 +187,35 @@ internal class AuthViewModel @Inject constructor(
                     launchOneShotJob(job) { e, job ->
                         _uiState.update {
                             it.copy(
-                                userMessage = getErrorMessage(e, job)
+                                userMessage = getErrorMessage(exceptionToUiText(e), job)
                             )
                         }
                     }
                 }
             ),
-            content = UiText.DynamicString("[${getCurrentTime()}] ${exception.message ?: exception.stackTraceToString()}")
+            content = content
         )
     }
 }
 
 
 data class AuthUiState(
-    val emailInput: String? = null,
+    val emailInput: String = "",
     val isEmailValid: Boolean = false,
-    val displayNameInput: String? = null,
+    val emailSupportingText: UiText? = null,
+
+    val displayNameInput: String = "",
     val isDisplayNameValid: Boolean = false,
-    val passwordInput: String? = null,
+    val displayNameSupportingText: UiText? = null,
+
+    val passwordInput: String = "",
     val isPasswordValid: Boolean = false,
-    val confirmPasswordInput: String? = null,
+    val passwordSupportingText: UiText? = null,
+
+    val confirmPasswordInput: String = "",
     val doPasswordsMatch: Boolean = false,
+    val confirmPasswordSupportingText: UiText? = null,
+
     val isSignInTaskCompleted: Boolean = false,
     val isRegisterTaskCompleted: Boolean = false,
     val isLoading: Boolean = false,

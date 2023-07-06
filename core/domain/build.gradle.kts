@@ -7,5 +7,6 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:common"))
     testImplementation(project(":core:testing"))
 }

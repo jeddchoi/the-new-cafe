@@ -1,4 +1,4 @@
-package io.github.jeddchoi.designsystem
+package io.github.jeddchoi.common
 
 import android.content.Context
 import androidx.compose.runtime.Composable

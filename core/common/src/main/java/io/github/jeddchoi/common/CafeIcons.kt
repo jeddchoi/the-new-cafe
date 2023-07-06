@@ -1,10 +1,12 @@
-package io.github.jeddchoi.designsystem
+package io.github.jeddchoi.common
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.Store
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.DataUsage
 import androidx.compose.material.icons.rounded.Error
@@ -27,5 +29,7 @@ object CafeIcons {
     val Warning = Icons.Rounded.Warning
     val Error = Icons.Rounded.Error
 
+    val Visibility = Icons.Default.Visibility
+    val VisibilityOff = Icons.Default.VisibilityOff
 }
 

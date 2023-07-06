@@ -16,7 +16,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.jeddchoi.authentication.AuthViewModel
 import io.github.jeddchoi.authentication.R
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
-import io.github.jeddchoi.designsystem.UiText
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
 import io.github.jeddchoi.ui.component.UserInputScreen
@@ -33,23 +32,23 @@ internal fun SignInScreen(
 
 
     UserInputScreen(
-        title = UiText.StringResource(R.string.sign_in),
+        title = io.github.jeddchoi.common.UiText.StringResource(R.string.sign_in),
         inputFields = { inputFieldsModifier ->
             GeneralTextField(
-                value = uiState.emailInput ?: "",
-                onValueChange = { viewModel.onEmailInputChange(it) },
+                value = uiState.emailInput,
+                onValueChange = { viewModel.checkEmailInput(it) },
                 labelText = stringResource(R.string.email),
                 isError = uiState.emailInputError,
-                supportingText = if (uiState.emailInputError) stringResource(R.string.email_invalid_msg) else "",
+                supportingText = uiState.emailSupportingText,
                 modifier = inputFieldsModifier.fillMaxWidth(),
                 keyboardType = KeyboardType.Email,
             )
 
             PasswordField(
-                value = uiState.passwordInput ?: "",
-                onValueChange = { viewModel.onPasswordInputChange(it) },
+                value = uiState.passwordInput,
+                onValueChange = { viewModel.checkPasswordInput(it) },
                 labelText = stringResource(R.string.password),
-                supportingText = if (uiState.passwordInputError) stringResource(R.string.password_invalid_msg) else "",
+                supportingText = uiState.passwordSupportingText,
                 isError = uiState.passwordInputError,
                 modifier = inputFieldsModifier.fillMaxWidth(),
                 isLastButton = true,
@@ -71,7 +70,10 @@ internal fun SignInScreen(
         errorMsg = uiState.userMessage?.content?.asString(),
         onDismissErrorMsg = viewModel::onUserMessageDismissed,
         optionalTitle = stringResource(R.string.new_user),
-        optionalButtonClick = navigateToRegister,
+        optionalButtonClick = {
+            navigateToRegister()
+            viewModel.onUserMessageDismissed()
+        },
         optionalButtonText = stringResource(R.string.register),
     )
 

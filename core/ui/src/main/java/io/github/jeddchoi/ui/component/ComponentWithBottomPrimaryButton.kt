@@ -41,6 +41,7 @@ fun ComponentWithBottomPrimaryButton(
     optionalContentOfButtonTop: (@Composable ColumnScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
+
     Box(
         modifier = modifier
     ) {
@@ -133,7 +134,7 @@ fun ComponentWithPrimaryButtonPreview() {
                             onValueChange = {},
                             labelText = "Placeholder",
                             isError = false,
-                            supportingText = "",
+                            supportingText = null,
                         )
                     }
                 }

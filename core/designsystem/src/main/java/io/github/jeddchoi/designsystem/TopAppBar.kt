@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.testTag
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeTopAppBar(
-    title: UiText,
+    title: io.github.jeddchoi.common.UiText,
     navigationIcon: ImageVector,
     navigationIconContentDescription: String?,
     actionIcon: ImageVector,
@@ -50,7 +50,7 @@ fun CafeTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeTopAppBar(
-    title: UiText,
+    title: io.github.jeddchoi.common.UiText,
     actionIcon: ImageVector,
     actionIconContentDescription: String?,
     modifier: Modifier = Modifier,
@@ -79,7 +79,7 @@ fun CafeTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeTopAppBar(
-    title: UiText,
+    title: io.github.jeddchoi.common.UiText,
     modifier: Modifier = Modifier,
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
 ) {

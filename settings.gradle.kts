@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":core:common")
+
+
 
 
 pluginManagement {
@@ -29,6 +32,7 @@ include(":feature:mypage")
 include(":feature:authentication")
 
 include(":core:ui")
+include(":core:common")
 include(":core:data")
 include(":core:designsystem")
 include(":core:domain")

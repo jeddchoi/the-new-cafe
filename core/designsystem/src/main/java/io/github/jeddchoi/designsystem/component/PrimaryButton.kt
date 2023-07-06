@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
@@ -22,9 +23,13 @@ fun PrimaryButton(
     enabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val focusManager = LocalFocusManager.current
     Button(
         enabled = enabled,
-        onClick = onClick,
+        onClick = {
+            onClick()
+            focusManager.clearFocus()
+        },
         modifier = modifier.requiredHeight(56.dp),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(

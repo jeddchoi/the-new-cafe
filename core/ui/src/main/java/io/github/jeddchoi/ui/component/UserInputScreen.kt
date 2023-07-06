@@ -30,7 +30,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
-import io.github.jeddchoi.designsystem.UiText
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
 import io.github.jeddchoi.ui.R
@@ -38,7 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun UserInputScreen(
-    title: UiText,
+    title: io.github.jeddchoi.common.UiText,
     inputFields: @Composable ColumnScope.(Modifier) -> Unit,
     buttonText: String,
     isLoading: Boolean,
@@ -134,21 +133,21 @@ private fun UserInputOneByOneScreenPreview() {
         }
 
         UserInputScreen(
-            title = UiText.StringResource(R.string.sign_in),
+            title = io.github.jeddchoi.common.UiText.StringResource(R.string.sign_in),
             inputFields = {
                 GeneralTextField(
                     value = email,
                     onValueChange = { email = it },
                     labelText = "Email",
                     isError = !isEmailValid,
-                    supportingText = "Email is invalid"
+                    supportingText = io.github.jeddchoi.common.UiText.DynamicString("Email is invalid")
                 )
 
                 PasswordField(
                     value = password,
                     onValueChange = { password = it },
                     labelText = "Password",
-                    supportingText = "Password is invalid",
+                    supportingText = io.github.jeddchoi.common.UiText.DynamicString("Password is invalid"),
                     isError = !isPasswordValid,
                 )
             },

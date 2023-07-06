@@ -1,4 +1,4 @@
-package io.github.jeddchoi.designsystem
+package io.github.jeddchoi.common
 
 import androidx.annotation.DrawableRes
 import androidx.compose.material3.Icon
