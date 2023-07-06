@@ -15,13 +15,37 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 
+enum class BottomButtonType {
+    Primary,
+    Secondary,
+    Tertiary,
+    ;
+
+    @Composable
+    fun textColor() =
+        when (this) {
+            Primary -> MaterialTheme.colorScheme.onPrimaryContainer
+            Secondary -> MaterialTheme.colorScheme.onSecondaryContainer
+            Tertiary -> MaterialTheme.colorScheme.onTertiaryContainer
+        }
+
+    @Composable
+    fun containerColor() =
+        when (this) {
+            Primary -> MaterialTheme.colorScheme.primaryContainer
+            Secondary -> MaterialTheme.colorScheme.secondaryContainer
+            Tertiary -> MaterialTheme.colorScheme.tertiaryContainer
+        }
+}
+
 @Composable
-fun PrimaryButton(
+fun BottomButton(
     buttonText: String,
     isLoading: Boolean,
     onClick: () -> Unit,
     enabled: Boolean,
     modifier: Modifier = Modifier,
+    type: BottomButtonType = BottomButtonType.Primary
 ) {
     val focusManager = LocalFocusManager.current
     Button(
@@ -33,10 +57,9 @@ fun PrimaryButton(
         modifier = modifier.requiredHeight(56.dp),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            containerColor = type.containerColor(),
         ),
         contentPadding = ButtonDefaults.TextButtonContentPadding,
-        elevation = ButtonDefaults.buttonElevation(0.dp, 0.dp),
     ) {
         if (isLoading) {
             CircularProgressIndicator()
@@ -44,7 +67,7 @@ fun PrimaryButton(
             Text(
                 text = buttonText,
                 fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = type.textColor()
             )
         }
     }
@@ -54,7 +77,7 @@ fun PrimaryButton(
 @Composable
 fun PrimaryButtonPreview() {
     TheNewCafeTheme {
-        PrimaryButton(
+        BottomButton(
             buttonText = "HELLO", isLoading = false, onClick = { /*TODO*/ }, enabled = true,
             modifier = Modifier.fillMaxWidth()
         )

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,16 +27,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.BottomButton
+import io.github.jeddchoi.designsystem.component.BottomButtonType
 import io.github.jeddchoi.designsystem.component.fadingEdge
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 
 
 @Composable
-fun ComponentWithBottomPrimaryButton(
-    buttonEnabled: Boolean,
-    buttonText: String,
-    onButtonClick: () -> Unit,
-    isLoading: Boolean,
+fun ComponentWithBottomTwoButtons(
+    primaryButtonEnabled: Boolean,
+    primaryButtonText: String,
+    onPrimaryButtonClick: () -> Unit,
+    isPrimaryLoading: Boolean,
+    secondaryButtonEnabled: Boolean,
+    secondaryButtonText: String,
+    onSecondaryButtonClick: () -> Unit,
+    isSecondaryLoading: Boolean,
     showGradientBackground: Boolean,
     modifier: Modifier = Modifier,
     optionalContentOfButtonTop: (@Composable ColumnScope.() -> Unit)? = null,
@@ -72,7 +78,9 @@ fun ComponentWithBottomPrimaryButton(
 
             // primary button with optional content on top
             Column(
-                modifier = maxWidthModifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp).heightIn(min = 80.dp),
+                modifier = maxWidthModifier
+                    .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                    .heightIn(min = 80.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Bottom,
             ) {
@@ -80,14 +88,28 @@ fun ComponentWithBottomPrimaryButton(
                     optionalContentOfButtonTop()
                 }
 
-                BottomButton(
-                    enabled = buttonEnabled,
-                    buttonText = buttonText,
-                    onClick = onButtonClick,
-                    isLoading = isLoading,
-                    modifier = maxWidthModifier
-                        .padding(top = 8.dp),
-                )
+                Row(
+                    modifier = maxWidthModifier.padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    BottomButton(
+                        enabled = secondaryButtonEnabled,
+                        buttonText = secondaryButtonText,
+                        onClick = onSecondaryButtonClick,
+                        isLoading = isSecondaryLoading,
+                        modifier = maxWidthModifier.weight(1f),
+                        type = BottomButtonType.Secondary,
+                    )
+                    BottomButton(
+                        enabled = primaryButtonEnabled,
+                        buttonText = primaryButtonText,
+                        onClick = onPrimaryButtonClick,
+                        isLoading = isPrimaryLoading,
+                        modifier = maxWidthModifier.weight(1f),
+                        type = BottomButtonType.Primary,
+                    )
+                }
             }
         }
     }
@@ -96,31 +118,26 @@ fun ComponentWithBottomPrimaryButton(
 
 @Preview(device = Devices.PHONE, showBackground = true, showSystemUi = true)
 @Composable
-fun ComponentWithPrimaryButtonPreview() {
+fun ComponentWithTwoButtonsPreview() {
     TheNewCafeTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize()
         ) { scaffoldPadding ->
-            ComponentWithBottomPrimaryButton(
-                buttonEnabled = true,
-                buttonText = "Hello",
-                onButtonClick = { /*TODO*/ },
-                isLoading = false,
+            ComponentWithBottomTwoButtons(
+                primaryButtonEnabled = true,
+                primaryButtonText = "Primary",
+                onPrimaryButtonClick = { /*TODO*/ },
+                isPrimaryLoading = false,
+                secondaryButtonEnabled = false,
+                secondaryButtonText = "Secondary",
+                onSecondaryButtonClick = {},
+                isSecondaryLoading = false,
                 showGradientBackground = true,
                 modifier = Modifier
                     .padding(scaffoldPadding)
                     .imePadding()
                     .fillMaxSize(),
                 optionalContentOfButtonTop = null,
-//                {
-//                    Text(
-//                        text = LoremIpsum(5).values.joinToString(),
-//                        style = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.error)
-//                    )
-//                    TextButton(onClick = {}) {
-//                        Text("Do another option", textDecoration = TextDecoration.Underline)
-//                    }
-//                }
             ) {
                 Column(
                     modifier = Modifier
