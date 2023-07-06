@@ -20,7 +20,7 @@ fun GeneralTextField(
     onValueChange: (String) -> Unit,
     labelText: String,
     isError: Boolean,
-    supportingText: io.github.jeddchoi.common.UiText?,
+    supportingText: UiText?,
     modifier: Modifier = Modifier,
     keyboardType: KeyboardType = KeyboardType.Text,
     isLastButton: Boolean = false,

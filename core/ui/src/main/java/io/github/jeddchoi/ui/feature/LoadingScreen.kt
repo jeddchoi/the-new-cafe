@@ -12,7 +12,7 @@ import io.github.jeddchoi.ui.R
 
 
 @Composable
-fun LoadingScreen(modifier: Modifier = Modifier, title: io.github.jeddchoi.common.UiText = io.github.jeddchoi.common.UiText.StringResource(R.string.loading)) {
+fun LoadingScreen(modifier: Modifier = Modifier, title: UiText = UiText.StringResource(R.string.loading)) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center

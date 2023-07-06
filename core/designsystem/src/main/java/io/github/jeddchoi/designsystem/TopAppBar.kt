@@ -5,11 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import io.github.jeddchoi.common.UiText
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeTopAppBar(
-    title: io.github.jeddchoi.common.UiText,
+    title: UiText,
     navigationIcon: ImageVector,
     navigationIconContentDescription: String?,
     actionIcon: ImageVector,
@@ -50,7 +51,7 @@ fun CafeTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeTopAppBar(
-    title: io.github.jeddchoi.common.UiText,
+    title: UiText,
     actionIcon: ImageVector,
     actionIconContentDescription: String?,
     modifier: Modifier = Modifier,
@@ -79,7 +80,7 @@ fun CafeTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CafeTopAppBar(
-    title: io.github.jeddchoi.common.UiText,
+    title: UiText,
     modifier: Modifier = Modifier,
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
 ) {

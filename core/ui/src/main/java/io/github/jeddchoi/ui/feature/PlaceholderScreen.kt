@@ -10,7 +10,7 @@ import io.github.jeddchoi.common.UiText
 
 @Composable
 fun PlaceholderScreen(
-    title: io.github.jeddchoi.common.UiText,
+    title: UiText,
     modifier: Modifier = Modifier
 ) {
     Box(

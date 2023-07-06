@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.common.CafeIcons
+import io.github.jeddchoi.common.UiText
 
 
 @Composable
@@ -29,7 +30,7 @@ fun PasswordField(
     value: String,
     onValueChange: (String) -> Unit,
     labelText: String,
-    supportingText: io.github.jeddchoi.common.UiText?,
+    supportingText: UiText?,
     isError: Boolean,
     modifier: Modifier = Modifier,
     isLastButton: Boolean = false,

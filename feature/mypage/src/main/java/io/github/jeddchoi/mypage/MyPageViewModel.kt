@@ -5,10 +5,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
-import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.model.SeatFinderRequestType
 import io.github.jeddchoi.ui.model.Action
 import io.github.jeddchoi.ui.model.FeedbackState
@@ -66,12 +66,12 @@ internal class MyPageViewModel @Inject constructor(
                     canContinue = false,
                     messages = _uiState.value.messages.plus(
                         Message(
-                            title = io.github.jeddchoi.common.UiText.StringResource(R.string.error),
+                            title = UiText.StringResource(R.string.error),
                             severity = MessageSeverity.ERROR,
-                            action = listOf(Action(io.github.jeddchoi.common.UiText.StringResource(R.string.retry)) {
+                            action = listOf(Action(UiText.StringResource(R.string.retry)) {
                                 launchOneShotJob(job)
                             }),
-                            content = io.github.jeddchoi.common.UiText.DynamicString(e.message ?: e.stackTraceToString()),
+                            content = UiText.DynamicString(e.message ?: e.stackTraceToString()),
                         )
                     )
                 )
@@ -106,7 +106,7 @@ internal class MyPageViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 messages = _uiState.value.messages.plus(
                     Message(
-                        title = io.github.jeddchoi.common.UiText.StringResource(R.string.info),
+                        title = UiText.StringResource(R.string.info),
                         severity = MessageSeverity.ERROR,
                     ),
                 )

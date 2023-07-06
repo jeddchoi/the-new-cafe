@@ -129,11 +129,11 @@ private fun MyPageContent(
     }
     when (uiState) {
         UiState.EmptyResult -> {
-            PlaceholderScreen(title = io.github.jeddchoi.common.UiText.StringResource(R.string.empty_result))
+            PlaceholderScreen(title = UiText.StringResource(R.string.empty_result))
         }
 
         is UiState.Error -> {
-            PlaceholderScreen(title = io.github.jeddchoi.common.UiText.StringResource(R.string.error))
+            PlaceholderScreen(title = UiText.StringResource(R.string.error))
         }
 
         UiState.InitialLoading -> {

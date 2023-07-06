@@ -11,7 +11,7 @@ internal fun StoreScreen(
     modifier: Modifier = Modifier
 ) {
     PlaceholderScreen(
-        title = io.github.jeddchoi.common.UiText.StringResource(R.string.store),
+        title = UiText.StringResource(R.string.store),
         modifier = modifier
     )
 }

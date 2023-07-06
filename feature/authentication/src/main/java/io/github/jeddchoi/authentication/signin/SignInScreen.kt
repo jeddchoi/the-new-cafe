@@ -15,6 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.jeddchoi.authentication.AuthViewModel
 import io.github.jeddchoi.authentication.R
+import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
@@ -33,7 +34,7 @@ internal fun SignInScreen(
 
     UserInputScreen(
         modifier = modifier,
-        title = io.github.jeddchoi.common.UiText.StringResource(R.string.sign_in),
+        title = UiText.StringResource(R.string.sign_in),
         inputFields = { inputFieldsModifier ->
             GeneralTextField(
                 value = uiState.emailInput,
