@@ -183,14 +183,8 @@ internal class AuthViewModel @Inject constructor(
             title = UiText.StringResource(R.string.error),
             severity = MessageSeverity.ERROR,
             action = listOf(
-                Action(UiText.StringResource(R.string.retry)) {
-                    launchOneShotJob(job) { e, job ->
-                        _uiState.update {
-                            it.copy(
-                                userMessage = getErrorMessage(exceptionToUiText(e), job)
-                            )
-                        }
-                    }
+                Action(UiText.StringResource(io.github.jeddchoi.ui.R.string.dismiss)) {
+                    onUserMessageDismissed()
                 }
             ),
             content = content

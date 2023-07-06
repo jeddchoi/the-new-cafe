@@ -1,10 +1,10 @@
 package io.github.jeddchoi.ui.component
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -24,7 +23,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,24 +32,21 @@ import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
 import io.github.jeddchoi.ui.R
+import io.github.jeddchoi.ui.model.Message
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun UserInputScreen(
     title: UiText,
     inputFields: @Composable ColumnScope.(Modifier) -> Unit,
-    buttonText: String,
-    isLoading: Boolean,
-    onPrimaryButtonClick: () -> Unit,
+    bottomButtons: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
     existBackStack: Boolean = false,
     onBackClick: () -> Unit = {},
-    primaryButtonEnabled: Boolean = true,
-    errorMsg: String? = null,
-    onDismissErrorMsg: () -> Unit = {},
-    optionalTitle: String = "",
+    optionalTitle: UiText? = null,
     optionalButtonClick: () -> Unit = {},
-    optionalButtonText: String = "",
+    optionalButtonText: UiText? = null,
+    userMessage: Message? = null,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
     val isKeyboardOpen by keyboardAsState()
@@ -62,45 +57,56 @@ fun UserInputScreen(
         onBackClick = onBackClick,
         modifier = modifier,
     ) { scaffoldPadding ->
-        ComponentWithBottomPrimaryButton(
-            buttonEnabled = primaryButtonEnabled,
-            buttonText = buttonText,
-            onButtonClick = onPrimaryButtonClick,
-            isLoading = isLoading,
+        ComponentWithBottomButtons(
+            bottomButtons = bottomButtons,
             showGradientBackground = true,
             modifier = Modifier
                 .padding(scaffoldPadding)
                 .imePadding()
                 .fillMaxSize(),
             optionalContentOfButtonTop = {
-                if (!isKeyboardOpen) {
+                if (!isKeyboardOpen && optionalTitle != null) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text(text = optionalTitle)
+                        Text(text = optionalTitle.asString())
                         Spacer(modifier = modifier.width(8.dp))
-                        TextButton(onClick = optionalButtonClick) {
-                            Text(optionalButtonText, textDecoration = TextDecoration.Underline)
+                        optionalButtonText?.asString()?.let {
+                            TextButton(onClick = optionalButtonClick) {
+                                Text(it, textDecoration = TextDecoration.Underline)
+                            }
                         }
                     }
                 }
 
-                if (errorMsg != null) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = errorMsg,
-                            color = MaterialTheme.colorScheme.error,
-                            textAlign = TextAlign.Start,
-                            modifier = Modifier
-                                .weight(1f)
-                        )
+                if (userMessage != null) {
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = userMessage.title.asString(),
+                                color = userMessage.severity.textColor(),
+                                textAlign = TextAlign.Start,
+                                modifier = Modifier.weight(1f)
+                            )
 
-                        TextButton(onClick = onDismissErrorMsg) {
-                            Text(stringResource(R.string.dismiss), textDecoration = TextDecoration.Underline)
+                            userMessage.action.forEach {
+                                TextButton(onClick = it.action) {
+                                    Text(
+                                        text = it.title.asString(),
+                                        textDecoration = TextDecoration.Underline
+                                    )
+                                }
+                            }
+                        }
+                        userMessage.content?.asString()?.let {
+                            Text(
+                                text = it,
+                                textAlign = TextAlign.Start,
+                            )
                         }
                     }
                 }
@@ -152,14 +158,9 @@ private fun UserInputOneByOneScreenPreview() {
                     isError = !isPasswordValid,
                 )
             },
-            buttonText = "Done",
-            isLoading = true,
-            onPrimaryButtonClick = {
-                Log.i("SignInScreen", "email : $email, password : $password")
-            },
+            bottomButtons = {},
             onBackClick = { /*TODO*/ },
-            primaryButtonEnabled = !isEmailValid || !isPasswordValid,
-            errorMsg = "Some input is invalid"
+            userMessage = null
         )
     }
 }

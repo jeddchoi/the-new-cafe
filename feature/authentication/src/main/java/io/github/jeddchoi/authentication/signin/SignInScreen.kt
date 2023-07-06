@@ -17,6 +17,8 @@ import io.github.jeddchoi.authentication.AuthViewModel
 import io.github.jeddchoi.authentication.R
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.BottomButton
+import io.github.jeddchoi.designsystem.component.BottomButtonType
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
 import io.github.jeddchoi.ui.component.UserInputScreen
@@ -33,7 +35,6 @@ internal fun SignInScreen(
 
 
     UserInputScreen(
-        modifier = modifier,
         title = UiText.StringResource(R.string.sign_in),
         inputFields = { inputFieldsModifier ->
             GeneralTextField(
@@ -64,19 +65,34 @@ internal fun SignInScreen(
                 Text(stringResource(R.string.forgot_password))
             }
         },
-        buttonText = stringResource(R.string.sign_in),
-        isLoading = uiState.isLoading,
-        onPrimaryButtonClick = viewModel::onSignIn,
+        bottomButtons = {
+            val maxWidthModifier = Modifier.fillMaxWidth().weight(1f)
+            BottomButton(
+                enabled = !uiState.isLoading,
+                text = UiText.StringResource(R.string.sign_in_later),
+                onClick = navigateToMain,
+                isLoading = false,
+                type = BottomButtonType.FilledTonal,
+                modifier = maxWidthModifier,
+            )
+            BottomButton(
+                enabled = !uiState.isLoading && uiState.signInInfoComplete && uiState.isValidInfoToSignIn,
+                text = UiText.StringResource(R.string.sign_in),
+                onClick = viewModel::onSignIn,
+                isLoading = uiState.isLoading,
+                type = BottomButtonType.Filled,
+                modifier = maxWidthModifier,
+            )
+        },
+        modifier = modifier,
         onBackClick = onBackClick,
-        primaryButtonEnabled = !uiState.isLoading && uiState.signInInfoComplete && uiState.isValidInfoToSignIn,
-        errorMsg = uiState.userMessage?.content?.asString(),
-        onDismissErrorMsg = viewModel::onUserMessageDismissed,
-        optionalTitle = stringResource(R.string.new_user),
+        optionalTitle = UiText.StringResource(R.string.new_user),
         optionalButtonClick = {
             navigateToRegister()
             viewModel.onUserMessageDismissed()
         },
-        optionalButtonText = stringResource(R.string.register),
+        optionalButtonText = UiText.StringResource(R.string.register),
+        userMessage = uiState.userMessage,
     )
 
     LaunchedEffect(uiState.isSignInTaskCompleted) {

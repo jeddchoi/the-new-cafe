@@ -14,6 +14,7 @@ import io.github.jeddchoi.authentication.AuthViewModel
 import io.github.jeddchoi.authentication.R
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.BottomButton
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
 import io.github.jeddchoi.ui.component.UserInputScreen
@@ -30,7 +31,6 @@ internal fun RegisterScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     UserInputScreen(
-        modifier = modifier,
         title = UiText.StringResource(R.string.register),
         inputFields = { inputFieldsModifier ->
 
@@ -73,20 +73,26 @@ internal fun RegisterScreen(
                 onKeyboardDoneAction = viewModel::onRegister
             )
         },
-        buttonText = stringResource(R.string.register),
-        isLoading = uiState.isLoading,
-        onPrimaryButtonClick = viewModel::onRegister,
+        bottomButtons = {
+            val maxWidthModifier = Modifier.fillMaxWidth()
+            BottomButton(
+                text = UiText.StringResource(R.string.register),
+                isLoading = uiState.isLoading,
+                onClick = viewModel::onRegister,
+                enabled = !uiState.isLoading && uiState.registerInfoComplete && uiState.isValidInfoToRegister,
+                modifier = maxWidthModifier
+            )
+        },
+        modifier = modifier,
         existBackStack = true,
         onBackClick = onBackClick,
-        primaryButtonEnabled = !uiState.isLoading && uiState.registerInfoComplete && uiState.isValidInfoToRegister,
-        errorMsg = uiState.userMessage?.content?.asString(),
-        onDismissErrorMsg = viewModel::onUserMessageDismissed,
-        optionalTitle = stringResource(R.string.already_have_an_account),
+        optionalTitle = UiText.StringResource(R.string.already_have_an_account),
         optionalButtonClick = {
             navigateToSignInClick()
             viewModel.onUserMessageDismissed()
         },
-        optionalButtonText = stringResource(R.string.sign_in),
+        optionalButtonText = UiText.StringResource(R.string.sign_in),
+        userMessage = uiState.userMessage,
     )
 
     LaunchedEffect(uiState.isRegisterTaskCompleted) {
