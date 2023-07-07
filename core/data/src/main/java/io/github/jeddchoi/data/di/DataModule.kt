@@ -12,6 +12,7 @@ import io.github.jeddchoi.data.repository.AppFlagsRepository
 import io.github.jeddchoi.data.repository.AppFlagsRepositoryImpl
 import io.github.jeddchoi.data.util.ConnectivityManagerNetworkMonitor
 import io.github.jeddchoi.data.util.NetworkMonitor
+import io.github.jeddchoi.data.util.TickHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -33,6 +34,12 @@ interface DataModule {
         fun providesAppFlagsDatastore(
             @ApplicationContext context: Context
         ) = context.appFlagsDataStore
+
+        @Singleton
+        @Provides
+        fun providesTickHandler(
+            coroutineScope: CoroutineScope,
+        ) = TickHandler(coroutineScope)
     }
 
     @Binds
@@ -44,5 +51,6 @@ interface DataModule {
     fun bindsAppFlagsRepository(
         appFlagsRepositoryImpl: AppFlagsRepositoryImpl
     ): AppFlagsRepository
+
 }
 

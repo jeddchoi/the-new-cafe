@@ -7,9 +7,10 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import javax.inject.Inject
 
 
-class TickHandler(
+class TickHandler @Inject constructor(
     private val externalScope: CoroutineScope,
     private val tickIntervalMs: Long = 1000
 ) {

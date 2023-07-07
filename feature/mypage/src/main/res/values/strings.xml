@@ -10,4 +10,5 @@
     <string name="doBusiness">Do business</string>
     <string name="info">Info</string>
     <string name="empty_result">Empty Result</string>
+    <string name="not_authenticated">You need to sign in</string>
 </resources>

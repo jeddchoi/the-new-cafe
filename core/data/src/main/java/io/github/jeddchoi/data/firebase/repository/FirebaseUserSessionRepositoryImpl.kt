@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ktx.values
 import io.github.jeddchoi.data.firebase.model.FirebaseCurrentSession
+import io.github.jeddchoi.data.firebase.model.toUserSession
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.model.UserSession
@@ -21,10 +22,9 @@ class FirebaseUserSessionRepositoryImpl @Inject constructor(
     override val userSession: Flow<UserSession?> = currentUserRepository.currentUserId.transform {
         Log.i("FirebaseUserSessionRepositoryImpl", "currentUserId: $it")
         if (it != null) {
-
             emitAll(database.getReference("seatFinder/session/${it}").values<FirebaseCurrentSession>().map {session->
                 Log.i("FirebaseUserSessionRepositoryImpl", "session: $session")
-                session?.toUserSession()
+                session.toUserSession()
             })
         } else {
             emit(null)

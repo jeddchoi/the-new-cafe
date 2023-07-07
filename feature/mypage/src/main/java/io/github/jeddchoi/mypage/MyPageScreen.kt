@@ -37,7 +37,6 @@ import io.github.jeddchoi.mypage.history.HistoryScreen
 import io.github.jeddchoi.mypage.session.SessionScreen
 import io.github.jeddchoi.ui.feature.LoadingScreen
 import io.github.jeddchoi.ui.feature.PlaceholderScreen
-import io.github.jeddchoi.ui.model.UiState
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -45,7 +44,7 @@ import kotlinx.coroutines.CoroutineScope
 @Composable
 internal fun MyPageScreen(
     navigateTab: MyPageTab,
-    uiState: UiState<MyPageUiStateData>,
+    uiState: MyPageUiState,
     modifier: Modifier = Modifier,
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) {
@@ -101,7 +100,7 @@ private fun MyPageTabRow(
 @Composable
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 private fun MyPageContent(
-    uiState: UiState<MyPageUiStateData>,
+    uiState: MyPageUiState,
     coroutineScope: CoroutineScope,
     selectedTab: MyPageTab,
     onTabChanged: (MyPageTab) -> Unit,
@@ -127,45 +126,48 @@ private fun MyPageContent(
             onTabChanged(MyPageTab.VALUES[page])
         }
     }
-    when (uiState) {
-        UiState.EmptyResult -> {
-            PlaceholderScreen(title = UiText.StringResource(R.string.empty_result))
-        }
 
-        is UiState.Error -> {
-            PlaceholderScreen(title = UiText.StringResource(R.string.error))
-        }
-
-        UiState.InitialLoading -> {
-            LoadingScreen()
-        }
-
-        is UiState.Success -> {
-            BottomSheetScaffold(
-                scaffoldState = scaffoldState,
-                sheetPeekHeight = 128.dp,
-                sheetContent = {
-                    ControlPanel(
-                        scaffoldState,
-                        coroutineScope,
-                        uiState.data.controlButtons
-                    )
-                },
-            ) { _ ->
-                HorizontalPager(
-                    modifier = Modifier.border(4.dp, MaterialTheme.colorScheme.primary),
-                    state = pagerState,
-                ) {
-                    // Our content for each page
-                    when (MyPageTab.VALUES[it]) {
-                        MyPageTab.SESSION -> SessionScreen()
-                        MyPageTab.HISTORY -> HistoryScreen()
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 128.dp,
+        sheetContent = {
+            ControlPanel(
+                scaffoldState,
+                coroutineScope,
+                emptyList()
+            )
+        },
+    ) { _ ->
+        HorizontalPager(
+            modifier = Modifier.border(4.dp, MaterialTheme.colorScheme.primary),
+            state = pagerState,
+        ) {
+            // Our content for each page
+            when (MyPageTab.VALUES[it]) {
+                MyPageTab.SESSION -> {
+                    when (uiState) {
+                        MyPageUiState.InitialLoading -> LoadingScreen()
+                        MyPageUiState.NotAuthenticated -> PlaceholderScreen(title = UiText.StringResource(R.string.not_authenticated))
+                        is MyPageUiState.Error -> PlaceholderScreen(title = UiText.StringResource(R.string.error))
+                        is MyPageUiState.Success -> {
+                            SessionScreen(uiState.displayedUserSession)
+                        }
+                    }
+                }
+                MyPageTab.HISTORY -> {
+                    when (uiState) {
+                        MyPageUiState.InitialLoading -> LoadingScreen()
+                        MyPageUiState.NotAuthenticated -> PlaceholderScreen(title = UiText.StringResource(R.string.not_authenticated))
+                        is MyPageUiState.Error -> PlaceholderScreen(title = UiText.StringResource(R.string.error))
+                        is MyPageUiState.Success -> {
+                            HistoryScreen()
+                        }
                     }
                 }
             }
-
         }
     }
+
 
 }
 

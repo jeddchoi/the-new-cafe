@@ -2,6 +2,7 @@ package io.github.jeddchoi.ui.feature
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -14,7 +15,7 @@ import io.github.jeddchoi.ui.R
 @Composable
 fun LoadingScreen(modifier: Modifier = Modifier, title: UiText = UiText.StringResource(R.string.loading)) {
     Box(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
