@@ -26,9 +26,9 @@ import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 @Composable
 fun ScreenWithTopAppBar(
     title: UiText,
-    showNavigateUp: Boolean,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    showNavigateUp: Boolean = false,
+    onBackClick: () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit = {}
 ) {
     val topAppBarScrollState = rememberTopAppBarState()
@@ -62,11 +62,11 @@ fun keyboardAsState(): State<Boolean> {
 
 @Preview
 @Composable
-fun ScreenWithTopAppBarPreview() {
+private fun ScreenWithTopAppBarPreview() {
     TheNewCafeTheme {
         ScreenWithTopAppBar(
-            modifier = Modifier.fillMaxSize(),
             title = UiText.DynamicString("Title"),
+            modifier = Modifier.fillMaxSize(),
             showNavigateUp = true,
             onBackClick = { /*TODO*/ }) {
             repeat(20) {

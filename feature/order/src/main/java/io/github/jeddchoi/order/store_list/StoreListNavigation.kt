@@ -19,7 +19,9 @@ fun NavController.navigateToStoreList(
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.storeListScreen() {
+fun NavGraphBuilder.storeListScreen(
+    navigateToStore: (String) -> Unit,
+) {
     composable(
         route = StoreListRoutePattern,
         deepLinks = listOf(
@@ -34,6 +36,9 @@ fun NavGraphBuilder.storeListScreen() {
         )
     ) {
         val viewModel: StoreListViewModel = hiltViewModel()
-        StoreListScreen()
+        StoreListScreen(
+            viewModel = viewModel,
+            navigateToStore = navigateToStore
+        )
     }
 }

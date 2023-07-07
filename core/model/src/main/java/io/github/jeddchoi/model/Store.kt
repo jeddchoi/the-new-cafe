@@ -1,6 +1,7 @@
 package io.github.jeddchoi.model
 
 data class Store(
+    val id: String = "",
     val acceptsReservation: Boolean = false,
     val name: String = "",
     val photoUrl: String? = null,
@@ -8,4 +9,6 @@ data class Store(
     val totalSeats: Int = 0,
     val totalSections: Int = 0,
     val uuid: String = "",
-)
+) {
+    fun seatsStat() = "${totalAvailableSeats}/${totalSeats}"
+}

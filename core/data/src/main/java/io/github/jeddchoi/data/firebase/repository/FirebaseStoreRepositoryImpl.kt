@@ -1,5 +1,6 @@
 package io.github.jeddchoi.data.firebase.repository
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
 import io.github.jeddchoi.data.firebase.model.FirebaseStore
@@ -12,11 +13,11 @@ import javax.inject.Inject
 
 class FirebaseStoreRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore
-) : StoreRepository{
-    override val stores: Flow<List<Store>> = firestore.collection("stores").dataObjects<FirebaseStore>().map {firebaseStores ->
+) : StoreRepository {
+    override val stores: Flow<List<Store>> = firestore.collection("stores").dataObjects<FirebaseStore>().map { firebaseStores ->
         firebaseStores.map {
+            Log.i("FirebaseStoreRepositoryImpl", it.toString())
             it.toStore()
         }
     }
-
 }

@@ -50,7 +50,11 @@ fun RootNavGraph(
                 },
             )
             orderGraph {
-                storeListScreen()
+                storeListScreen(
+                    navigateToStore = { storeId ->
+                        navController.navigateToStore(storeId)
+                    }
+                )
                 storeScreen()
             }
             myPageScreen(

@@ -7,12 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.component.lottie.EmptyLottie
 import io.github.jeddchoi.ui.R
 
 @Composable
 fun EmptyResultScreen(
-    subject: String,
+    subject: UiText,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -21,6 +22,6 @@ fun EmptyResultScreen(
         verticalArrangement = Arrangement.Center,
     ) {
         EmptyLottie()
-        Text(stringResource(id = R.string.empty_with_subject, subject))
+        Text(stringResource(id = R.string.empty_with_subject, subject.asString()))
     }
 }

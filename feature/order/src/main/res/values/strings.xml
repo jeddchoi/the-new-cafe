@@ -2,4 +2,5 @@
 <resources>
     <string name="store">Store</string>
     <string name="store_list">Store List</string>
+    <string name="store_list_title">Browse stores</string>
 </resources>

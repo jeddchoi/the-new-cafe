@@ -173,6 +173,6 @@ private fun MyPageContent(
 
 @Preview
 @Composable
-fun MyPagePreview() {
+private fun MyPagePreview() {
 
 }

@@ -53,9 +53,9 @@ fun UserInputScreen(
 
     ScreenWithTopAppBar(
         title = title,
+        modifier = modifier,
         showNavigateUp = existBackStack,
         onBackClick = onBackClick,
-        modifier = modifier,
     ) { scaffoldPadding ->
         ComponentWithBottomButtons(
             bottomButtons = bottomButtons,

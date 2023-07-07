@@ -1,10 +1,12 @@
 package io.github.jeddchoi.data.firebase.model
 
+import com.google.firebase.firestore.DocumentId
 import io.github.jeddchoi.model.Store
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class FirebaseStore(
+    @DocumentId val id: String = "",
     val acceptsReservation: Boolean? = false,
     val name: String? = "",
     val photoUrl: String? = "",
@@ -16,6 +18,7 @@ data class FirebaseStore(
 
 
 fun FirebaseStore.toStore() = Store(
+    id = id,
     acceptsReservation = acceptsReservation ?: false,
     name = name ?: "Not provided store name",
     photoUrl = photoUrl,

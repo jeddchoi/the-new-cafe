@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.CircularProfilePicture
 import io.github.jeddchoi.ui.feature.EmptyResultScreen
@@ -50,7 +51,7 @@ internal fun ProfileScreen(
         when (uiState) {
             UiState.EmptyResult -> {
                 item {
-                    EmptyResultScreen(subject = stringResource(id = R.string.profile))
+                    EmptyResultScreen(subject = UiText.StringResource(id = R.string.profile))
                 }
             }
 

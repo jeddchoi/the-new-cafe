@@ -119,7 +119,7 @@ fun BottomButton(
 
 @Preview(showBackground = true)
 @Composable
-fun PrimaryButtonPreview() {
+private fun PrimaryButtonPreview() {
     TheNewCafeTheme {
         BottomButton(
             text = UiText.DynamicString(""),

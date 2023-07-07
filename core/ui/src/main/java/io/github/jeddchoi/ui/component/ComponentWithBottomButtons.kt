@@ -96,7 +96,7 @@ fun ComponentWithBottomButtons(
 
 @Preview(device = Devices.PHONE, showBackground = true, showSystemUi = true)
 @Composable
-fun ComponentWithBottomButtonsPreview() {
+private fun ComponentWithBottomButtonsPreview() {
     TheNewCafeTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize()

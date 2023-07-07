@@ -146,5 +146,5 @@ private fun ControlPanelButtons(
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun ControlPanelPreview() {
+private fun ControlPanelPreview() {
 }
