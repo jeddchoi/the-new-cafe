@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface StoreRepository {
     val stores: Flow<List<Store>>
+    fun getStoreDetail(storeId: String): Flow<Store?>
 }

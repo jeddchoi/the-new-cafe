@@ -40,9 +40,7 @@ fun ScreenWithTopAppBar(
                 title = { Text(title.asString()) },
                 navigationIcon = {
                     if (showNavigateUp) {
-                        BackButton(onClick = {
-                            onBackClick()
-                        })
+                        BackButton(onClick = onBackClick)
                     }
                 },
                 scrollBehavior = scrollBehavior

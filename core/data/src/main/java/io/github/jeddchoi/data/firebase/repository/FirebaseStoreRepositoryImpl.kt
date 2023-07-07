@@ -20,4 +20,8 @@ class FirebaseStoreRepositoryImpl @Inject constructor(
             it.toStore()
         }
     }
+
+    override fun getStoreDetail(storeId: String) = firestore.document("stores/${storeId}").dataObjects<FirebaseStore>().map {
+        it?.toStore()
+    }
 }

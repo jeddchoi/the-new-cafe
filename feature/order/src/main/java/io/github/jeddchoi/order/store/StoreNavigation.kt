@@ -29,7 +29,9 @@ fun NavController.navigateToStore(
 
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.storeScreen() {
+fun NavGraphBuilder.storeScreen(
+    onBackClick: () -> Unit
+) {
     composable(
         route = StoreRoutePattern,
         arguments = listOf(
@@ -50,6 +52,6 @@ fun NavGraphBuilder.storeScreen() {
         )
     ) {
         val viewModel: StoreViewModel = hiltViewModel()
-        StoreScreen()
+        StoreScreen(viewModel, onBackClick = onBackClick)
     }
 }
