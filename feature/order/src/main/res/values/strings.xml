@@ -3,4 +3,8 @@
     <string name="store">Store</string>
     <string name="store_list">Store List</string>
     <string name="store_list_title">Browse stores</string>
+    <string name="reserve_seat">Reserve seat</string>
+    <string name="cancel_reservation">Cancel reservation</string>
+    <string name="quit_and_reserve">Quit and reserve</string>
+    <string name="sign_in_before_reservation">Sign in before reservation</string>
 </resources>

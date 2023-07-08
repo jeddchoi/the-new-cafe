@@ -10,7 +10,7 @@ import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
 import io.github.jeddchoi.data.util.TickHandler
 import io.github.jeddchoi.mypage.session.DisplayedUserSession
 import io.github.jeddchoi.mypage.session.toDisplayedUserSession
-import io.github.jeddchoi.ui.model.Message
+import io.github.jeddchoi.common.Message
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch

@@ -2,8 +2,10 @@ package io.github.jeddchoi.order.store
 
 import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -30,7 +32,8 @@ fun NavController.navigateToStore(
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.storeScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    navigateToSignIn: () -> Unit,
 ) {
     composable(
         route = StoreRoutePattern,
@@ -52,6 +55,15 @@ fun NavGraphBuilder.storeScreen(
         )
     ) {
         val viewModel: StoreViewModel = hiltViewModel()
-        StoreScreen(viewModel, onBackClick = onBackClick)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        StoreScreen(
+            uiState = uiState,
+            onSelect = viewModel::onSelect,
+            onBackClick = onBackClick,
+            reserve = viewModel::reserve,
+            quit = viewModel::quit,
+            changeSeat = viewModel::quitAndReserve,
+            navigateToSignIn = navigateToSignIn
+        )
     }
 }

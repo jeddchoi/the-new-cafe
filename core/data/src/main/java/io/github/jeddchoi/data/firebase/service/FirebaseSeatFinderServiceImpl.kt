@@ -4,7 +4,7 @@ import android.util.Log
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.FirebaseFunctionsException
 import io.github.jeddchoi.data.firebase.model.FirebaseRequestResult
-import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
+import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.service.seatfinder.ResultCode
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequest
@@ -103,7 +103,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
     )
 
     override suspend fun reserveSeat(
-        seatPosition: FirebaseSeatPosition,
+        seatPosition: SeatPosition,
         endTime: Long?,
         durationInSeconds: Int?
     ) = sendUserActionRequest(

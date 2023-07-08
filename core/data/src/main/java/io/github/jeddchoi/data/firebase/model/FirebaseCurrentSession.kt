@@ -1,6 +1,7 @@
 package io.github.jeddchoi.data.firebase.model
 
 import io.github.jeddchoi.model.SeatFinderRequestType
+import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.model.UserSession
 import io.github.jeddchoi.model.UserStateType
 import kotlinx.datetime.Instant
@@ -24,7 +25,7 @@ data class FirebasePartialUserState(
 @Serializable
 data class FirebaseCurrentSession(
     val sessionId: String = "",
-    val seatPosition: FirebaseSeatPosition = FirebaseSeatPosition(),
+    val seatPosition: SeatPosition = SeatPosition(),
     val startSessionTime: Long = 0,
     val hasFailure: Boolean = false,
     val mainState: FirebasePartialUserState = FirebasePartialUserState(),
@@ -57,5 +58,6 @@ fun FirebaseCurrentSession?.toUserSession() =
                 SeatFinderRequestType.getByValue(
                     it
                 )
-            }
+            },
+            seatPosition = seatPosition,
         )

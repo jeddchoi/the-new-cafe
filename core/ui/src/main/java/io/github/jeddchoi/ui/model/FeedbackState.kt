@@ -1,5 +1,7 @@
 package io.github.jeddchoi.ui.model
 
+import io.github.jeddchoi.common.Message
+
 interface FeedbackState {
     val isBusy: Boolean
     val canContinue: Boolean

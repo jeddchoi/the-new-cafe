@@ -1,11 +1,11 @@
 package io.github.jeddchoi.data.service.seatfinder
 
-import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
+import io.github.jeddchoi.model.SeatPosition
 
 interface SeatFinderService {
 
     suspend fun reserveSeat(
-        seatPosition: FirebaseSeatPosition,
+        seatPosition: SeatPosition,
         endTime: Long? = null,
         durationInSeconds: Int? = null
     ): SeatFinderResult

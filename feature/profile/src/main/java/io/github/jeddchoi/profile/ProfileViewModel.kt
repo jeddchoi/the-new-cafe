@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.ui.model.FeedbackState
-import io.github.jeddchoi.ui.model.Message
+import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.ui.model.UiState
 import io.github.jeddchoi.ui.model.asUiState
 import kotlinx.coroutines.flow.MutableStateFlow

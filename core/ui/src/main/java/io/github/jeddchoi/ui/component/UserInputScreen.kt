@@ -32,7 +32,7 @@ import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
 import io.github.jeddchoi.ui.R
-import io.github.jeddchoi.ui.model.Message
+import io.github.jeddchoi.common.Message
 import kotlinx.coroutines.CoroutineScope
 
 @Composable

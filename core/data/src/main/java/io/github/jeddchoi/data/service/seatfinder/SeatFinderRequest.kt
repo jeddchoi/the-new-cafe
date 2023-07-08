@@ -1,7 +1,7 @@
 package io.github.jeddchoi.data.service.seatfinder
 
-import io.github.jeddchoi.data.firebase.model.FirebaseSeatPosition
 import io.github.jeddchoi.model.SeatFinderRequestType
+import io.github.jeddchoi.model.SeatPosition
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SeatFinderRequest(
     val requestType: SeatFinderRequestType,
-    @EncodeDefault val seatPosition: FirebaseSeatPosition? = null,
+    @EncodeDefault val seatPosition: SeatPosition? = null,
     @EncodeDefault val endTime: Long? = null,
     @EncodeDefault val durationInSeconds: Int? = null,
 )

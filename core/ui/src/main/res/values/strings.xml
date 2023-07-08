@@ -2,9 +2,6 @@
 <resources>
     <string name="empty_with_subject">No %s found</string>
     <string name="error_with_exception">Error occurred : %s</string>
-    <string name="desc_info_message">Information message</string>
-    <string name="desc_warning_message">Warning message</string>
-    <string name="desc_error_message">Error message</string>
     <string name="loading">Loading …</string>
     <string name="sign_in">Sign In</string>
     <string name="dismiss">Dismiss</string>

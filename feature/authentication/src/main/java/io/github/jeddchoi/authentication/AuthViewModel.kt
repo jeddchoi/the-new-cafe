@@ -4,13 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jeddchoi.common.Action
+import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.common.UiText
+import io.github.jeddchoi.common.toErrorMessage
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.util.AuthInputValidator
-import io.github.jeddchoi.data.util.getCurrentTime
-import io.github.jeddchoi.ui.model.Action
-import io.github.jeddchoi.ui.model.Message
-import io.github.jeddchoi.ui.model.MessageSeverity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -111,7 +110,7 @@ internal class AuthViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isSignInTaskCompleted = false,
-                    userMessage = getErrorMessage(exceptionToUiText(e), job)
+                    userMessage = e.toErrorMessage(Action.Dismiss { onUserMessageDismissed() })
                 )
             }
         })
@@ -138,7 +137,7 @@ internal class AuthViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isRegisterTaskCompleted = false,
-                    userMessage = getErrorMessage(exceptionToUiText(e), job)
+                    userMessage =  e.toErrorMessage(Action.Dismiss { onUserMessageDismissed() })
                 )
             }
         })
@@ -173,25 +172,7 @@ internal class AuthViewModel @Inject constructor(
         }
 
     }
-
-
-    private fun exceptionToUiText(exception: Throwable) =
-        UiText.DynamicString("[${getCurrentTime()}] ${exception.message ?: exception.stackTraceToString()}")
-
-    private fun getErrorMessage(content: UiText, job: suspend () -> Unit): Message {
-        return Message(
-            title = UiText.StringResource(R.string.error),
-            severity = MessageSeverity.ERROR,
-            action = listOf(
-                Action(UiText.StringResource(io.github.jeddchoi.ui.R.string.dismiss)) {
-                    onUserMessageDismissed()
-                }
-            ),
-            content = content
-        )
-    }
 }
-
 
 data class AuthUiState(
     val emailInput: String = "",

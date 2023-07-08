@@ -45,7 +45,7 @@ fun ScreenWithTopAppBar(
                 },
                 scrollBehavior = scrollBehavior
             )
-        }
+        },
     ) { scaffoldPadding ->
         content(scaffoldPadding)
     }

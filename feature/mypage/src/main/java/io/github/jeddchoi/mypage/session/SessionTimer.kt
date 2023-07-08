@@ -19,4 +19,9 @@ data class SessionTimer(
         endTime?.isDistantFuture == false &&
                 remainingTime?.isFinite() == true &&
                 totalTime?.isFinite() == true
+
+
+    override fun toString(): String {
+        return "SessionTimer(startTime=$startTime, endTime=$endTime, elapsedTime=${elapsedTime.inWholeSeconds}, remainingTime=${remainingTime?.inWholeSeconds}, totalTime=${totalTime?.inWholeSeconds})"
+    }
 }

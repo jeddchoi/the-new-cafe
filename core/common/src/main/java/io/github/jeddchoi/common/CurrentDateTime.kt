@@ -1,4 +1,4 @@
-package io.github.jeddchoi.data.util
+package io.github.jeddchoi.common
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone

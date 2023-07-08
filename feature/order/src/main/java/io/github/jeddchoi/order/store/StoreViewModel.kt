@@ -1,22 +1,35 @@
 package io.github.jeddchoi.order.store
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.data.repository.StoreRepository
+import io.github.jeddchoi.data.repository.UserSessionRepository
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
+import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.model.Store
+import io.github.jeddchoi.model.UserStateAndUsedSeatPosition
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 internal class StoreViewModel @Inject constructor(
     private val storeRepository: StoreRepository,
+    private val seatFinderService: SeatFinderService,
+    private val userSessionRepository: UserSessionRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val storeArgs = StoreArgs(savedStateHandle)
@@ -35,23 +48,154 @@ internal class StoreViewModel @Inject constructor(
             }
         }
 
+    private val oneShotActionState = MutableStateFlow(OneShotActionState())
+
     val uiState = combine(
         storeDetail,
-        sectionWithSeats
-    ) { store, sections ->
+        sectionWithSeats,
+        oneShotActionState,
+        userSessionRepository.userStateAndUsedSeatPosition,
+    ) { store, sections, oneShotActionState, userStateAndUsedSeatPosition ->
         if (store == null) {
             StoreUiState.NotFound
         } else {
-            StoreUiState.Success(store, sections)
+            StoreUiState.Success(
+                store = store,
+                sectionWithSeats = sections,
+                isLoading = oneShotActionState.isLoading,
+                userMessage = oneShotActionState.userMessage,
+                selectedSeat = oneShotActionState.selectedSeat,
+                userStateAndUsedSeatPosition = userStateAndUsedSeatPosition,
+            )
         }
     }
         .catch { StoreUiState.Error(it) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StoreUiState.Loading)
+
+    fun onSelect(sectionId: String, seatId: String) {
+        val newSelectedSeat = SelectedSeat(sectionId, seatId)
+        oneShotActionState.update {
+            if (it.selectedSeat?.equals(newSelectedSeat) == true) {
+                it.copy(selectedSeat = null)
+            } else {
+                it.copy(selectedSeat = newSelectedSeat)
+            }
+        }
+    }
+
+    fun reserve() {
+        launchOneShotJob(
+            job = {
+                val selectedSeat = oneShotActionState.value.selectedSeat ?: return@launchOneShotJob
+                seatFinderService.reserveSeat(
+                    SeatPosition(
+                        storeId = storeArgs.storeId,
+                        sectionId = selectedSeat.sectionId,
+                        seatId = selectedSeat.seatId,
+                    )
+                )
+            },
+            onError = { e, job ->
+
+            }
+        )
+    }
+
+    fun quit() {
+        launchOneShotJob(
+            job = {
+                seatFinderService.quit()
+            },
+            onError = { e, job ->
+
+            }
+        )
+    }
+
+    fun quitAndReserve() {
+        launchOneShotJob(
+            job = {
+                val selectedSeat = oneShotActionState.value.selectedSeat ?: return@launchOneShotJob
+                seatFinderService.quit()
+                seatFinderService.reserveSeat(
+                    SeatPosition(
+                        storeId = storeArgs.storeId,
+                        sectionId = selectedSeat.sectionId,
+                        seatId = selectedSeat.seatId,
+                    )
+                )
+            },
+            onError = { e, job ->
+
+            }
+        )
+    }
+
+    private fun launchOneShotJob(
+        job: suspend () -> Unit,
+        onError: (Throwable, suspend () -> Unit) -> Unit
+    ) {
+        oneShotActionState.update {
+            it.copy(isLoading = true, userMessage = null)
+        }
+        viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    job()
+                }
+            } catch (e: Throwable) {
+                Log.e("StoreViewModel", e.stackTraceToString())
+                onError(e, job)
+            } finally {
+                oneShotActionState.update {
+                    it.copy(isLoading = false)
+                }
+            }
+        }
+    }
+
 }
+
+
+data class SelectedSeat(
+    val sectionId: String,
+    val seatId: String,
+)
+
+data class OneShotActionState(
+    val selectedSeat: SelectedSeat? = null,
+    val isLoading: Boolean = false,
+    val userMessage: Message? = null,
+)
+
 
 sealed class StoreUiState {
     object Loading : StoreUiState()
     object NotFound : StoreUiState()
-    data class Success(val store: Store, val sectionWithSeats: List<SectionWithSeats>) : StoreUiState()
+    data class Success(
+        val store: Store,
+        val sectionWithSeats: List<SectionWithSeats>,
+        val selectedSeat: SelectedSeat? = null,
+        val isLoading: Boolean = false,
+        val userMessage: Message? = null,
+        val userStateAndUsedSeatPosition: UserStateAndUsedSeatPosition = UserStateAndUsedSeatPosition(
+            null,
+            null
+        ),
+    ) : StoreUiState() {
+
+        /**
+         * Selected same used seat?
+         * if null, it means not selected or not signed in or not used
+         */
+        val selectedUsedSeat = with(userStateAndUsedSeatPosition.seatPosition) {
+            if (this == null || selectedSeat == null) {
+                null
+            } else {
+                this.storeId == store.id && this.sectionId == selectedSeat.sectionId && this.seatId == seatId
+            }
+        }
+    }
+
     data class Error(val exception: Throwable) : StoreUiState()
 }

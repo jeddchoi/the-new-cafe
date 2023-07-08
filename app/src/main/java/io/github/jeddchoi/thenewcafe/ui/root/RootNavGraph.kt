@@ -55,7 +55,9 @@ fun RootNavGraph(
                         navController.navigateToStore(storeId)
                     }
                 )
-                storeScreen(navController::navigateUp)
+                storeScreen(navController::navigateUp) {
+                    navController.navigateToAuth()
+                }
             }
             myPageScreen(
                 navigateToStoreList = {
