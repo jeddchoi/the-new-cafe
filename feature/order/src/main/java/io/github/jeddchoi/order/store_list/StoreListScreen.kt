@@ -8,9 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.model.Store
 import io.github.jeddchoi.order.R
@@ -21,26 +19,26 @@ import io.github.jeddchoi.ui.feature.LoadingScreen
 
 @Composable
 internal fun StoreListScreen(
-    viewModel: StoreListViewModel,
+    uiState: StoreListUiState,
     navigateToStore: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ScreenWithTopAppBar(
         title = UiText.StringResource(R.string.store_list_title),
+        modifier = modifier,
     ) {scaffoldPadding ->
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
         val modifierWithPadding = Modifier.padding(scaffoldPadding)
 
-        when (val result = uiState) {
+        when (uiState) {
             StoreListUiState.Loading -> LoadingScreen(modifier = modifierWithPadding)
             StoreListUiState.EmptyList -> EmptyResultScreen(subject = UiText.StringResource(R.string.store), modifier = modifierWithPadding)
             is StoreListUiState.Success -> {
-                uiState as StoreListUiState.Success
                 LazyColumn(
                     modifier = modifierWithPadding.fillMaxSize()
                 ) {
                     items(
-                        result.stores,
+                        uiState.stores,
                         key = { it.uuid },
                     ) { store ->
                         StoreListItem(store, onClick = navigateToStore)

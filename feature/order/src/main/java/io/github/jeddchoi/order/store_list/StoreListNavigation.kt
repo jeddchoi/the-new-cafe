@@ -2,7 +2,9 @@ package io.github.jeddchoi.order.store_list
 
 import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -36,8 +38,9 @@ fun NavGraphBuilder.storeListScreen(
         )
     ) {
         val viewModel: StoreListViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         StoreListScreen(
-            viewModel = viewModel,
+            uiState = uiState,
             navigateToStore = navigateToStore
         )
     }
