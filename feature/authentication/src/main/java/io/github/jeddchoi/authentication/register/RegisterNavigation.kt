@@ -1,8 +1,10 @@
 package io.github.jeddchoi.authentication.register
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -30,11 +32,18 @@ fun NavGraphBuilder.registerScreen(
             navController.getBackStackEntry(AuthGraphRoutePattern)
         }
         val authViewModel = hiltViewModel<AuthViewModel>(authEntry)
+        val uiState by authViewModel.uiState.collectAsStateWithLifecycle()
         RegisterScreen(
-            viewModel = authViewModel,
+            uiState = uiState,
             onBackClick = navController::popBackStack,
             navigateToSignInClick = navController::popBackStack,
             navigateToMain = navigateToMain,
+            changeDisplayNameInput = authViewModel::checkDisplayNameInput,
+            changeEmailInput = authViewModel::checkEmailInput,
+            changePasswordInput = authViewModel::checkPasswordInput,
+            changeConfirmPasswordInput = authViewModel::checkConfirmPasswordInput,
+            register = authViewModel::register,
+            dismissUserMessage = authViewModel::dismissUserMessage
         )
     }
 }

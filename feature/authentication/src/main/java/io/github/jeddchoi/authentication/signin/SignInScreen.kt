@@ -13,6 +13,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.jeddchoi.authentication.AuthUiState
 import io.github.jeddchoi.authentication.AuthViewModel
 import io.github.jeddchoi.authentication.R
 import io.github.jeddchoi.common.UiText
@@ -25,13 +26,18 @@ import io.github.jeddchoi.ui.component.UserInputScreen
 
 @Composable
 internal fun SignInScreen(
-    viewModel: AuthViewModel,
-    onBackClick: () -> Unit,
-    navigateToMain: () -> Unit,
-    navigateToRegister: () -> Unit,
+    uiState: AuthUiState,
     modifier: Modifier = Modifier,
+    clickBack: () -> Unit = {},
+    navigateToMain: () -> Unit = {},
+    navigateToRegister: () -> Unit = {},
+    changeEmailInput: (String) -> Unit = {},
+    changePasswordInput: (String) -> Unit = {},
+    forgotPassword: () -> Unit = {},
+    signIn: () -> Unit = {},
+    signInLater: () -> Unit = {},
+    dismissUserMessage: () -> Unit = {},
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
 
     UserInputScreen(
@@ -39,7 +45,7 @@ internal fun SignInScreen(
         inputFields = { inputFieldsModifier ->
             GeneralTextField(
                 value = uiState.emailInput,
-                onValueChange = { viewModel.checkEmailInput(it) },
+                onValueChange = changeEmailInput,
                 labelText = stringResource(R.string.email),
                 isError = uiState.emailInputError,
                 supportingText = uiState.emailSupportingText,
@@ -49,28 +55,30 @@ internal fun SignInScreen(
 
             PasswordField(
                 value = uiState.passwordInput,
-                onValueChange = { viewModel.checkPasswordInput(it) },
+                onValueChange = changePasswordInput,
                 labelText = stringResource(R.string.password),
                 supportingText = uiState.passwordSupportingText,
                 isError = uiState.passwordInputError,
                 modifier = inputFieldsModifier.fillMaxWidth(),
                 isLastButton = true,
-                onKeyboardDoneAction = viewModel::onSignIn
+                onKeyboardDoneAction = signIn
             )
 
             TextButton(
-                onClick = viewModel::onPasswordForgotClick,
+                onClick = forgotPassword,
                 modifier = Modifier.align(Alignment.End)
             ) {
                 Text(stringResource(R.string.forgot_password))
             }
         },
         bottomButtons = {
-            val maxWidthModifier = Modifier.fillMaxWidth().weight(1f)
+            val maxWidthModifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
             BottomButton(
                 enabled = !uiState.isLoading,
                 text = UiText.StringResource(R.string.sign_in_later),
-                onClick = navigateToMain,
+                onClick = signInLater,
                 isLoading = false,
                 type = BottomButtonType.FilledTonal,
                 modifier = maxWidthModifier,
@@ -78,18 +86,18 @@ internal fun SignInScreen(
             BottomButton(
                 enabled = !uiState.isLoading && uiState.signInInfoComplete && uiState.isValidInfoToSignIn,
                 text = UiText.StringResource(R.string.sign_in),
-                onClick = viewModel::onSignIn,
+                onClick = signIn,
                 isLoading = uiState.isLoading,
                 type = BottomButtonType.Filled,
                 modifier = maxWidthModifier,
             )
         },
         modifier = modifier,
-        onBackClick = onBackClick,
+        onBackClick = clickBack,
         optionalTitle = UiText.StringResource(R.string.new_user),
         optionalButtonClick = {
             navigateToRegister()
-            viewModel.onUserMessageDismissed()
+            dismissUserMessage()
         },
         optionalButtonText = UiText.StringResource(R.string.register),
         userMessage = uiState.userMessage,
@@ -107,12 +115,12 @@ internal fun SignInScreen(
 @Composable
 private fun SignInScreenPreview() {
     TheNewCafeTheme {
+        val viewModel: AuthViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         SignInScreen(
-            viewModel = hiltViewModel(),
-            onBackClick = { },
-            navigateToRegister = {
-
-            },
+            uiState = uiState,
+            clickBack = { },
+            navigateToRegister = {},
             navigateToMain = {}
         )
     }

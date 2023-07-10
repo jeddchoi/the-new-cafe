@@ -8,6 +8,7 @@ import io.github.jeddchoi.common.Action
 import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.common.toErrorMessage
+import io.github.jeddchoi.data.repository.AppFlagsRepository
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.util.AuthInputValidator
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 internal class AuthViewModel @Inject constructor(
     private val authInputValidator: AuthInputValidator,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val appFlagsRepository: AppFlagsRepository,
 ) : ViewModel() {
 
     private val _uiState: MutableStateFlow<AuthUiState> = MutableStateFlow(AuthUiState())
@@ -91,11 +93,11 @@ internal class AuthViewModel @Inject constructor(
         return doMatch
     }
 
-    fun onPasswordForgotClick() {
+    fun forgotPassword() {
         // TODO: Implement this
     }
 
-    fun onSignIn() {
+    fun signIn() {
         launchOneShotJob(job = {
             if (!checkEmailInput(uiState.value.emailInput)) return@launchOneShotJob
             if (!checkPasswordInput(uiState.value.passwordInput)) return@launchOneShotJob
@@ -105,18 +107,25 @@ internal class AuthViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(isSignInTaskCompleted = true)
                     }
+                    appFlagsRepository.setShowMainScreenOnStart(true)
                 }
         }, onError = { e, job ->
             _uiState.update {
                 it.copy(
                     isSignInTaskCompleted = false,
-                    userMessage = e.toErrorMessage(Action.Dismiss { onUserMessageDismissed() })
+                    userMessage = e.toErrorMessage(Action.Dismiss { dismissUserMessage() })
                 )
             }
         })
     }
 
-    fun onRegister() {
+    fun signInLater() {
+        viewModelScope.launch {
+            appFlagsRepository.setShowMainScreenOnStart(true)
+        }
+    }
+
+    fun register() {
         launchOneShotJob(job = {
             if (!checkDisplayNameInput(uiState.value.displayNameInput)) return@launchOneShotJob
             if (!checkEmailInput(uiState.value.emailInput)) return@launchOneShotJob
@@ -132,18 +141,19 @@ internal class AuthViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(isRegisterTaskCompleted = true)
                     }
+                    appFlagsRepository.setShowMainScreenOnStart(true)
                 }
         }, onError = { e, job ->
             _uiState.update {
                 it.copy(
                     isRegisterTaskCompleted = false,
-                    userMessage =  e.toErrorMessage(Action.Dismiss { onUserMessageDismissed() })
+                    userMessage = e.toErrorMessage(Action.Dismiss { dismissUserMessage() })
                 )
             }
         })
     }
 
-    fun onUserMessageDismissed() {
+    fun dismissUserMessage() {
         _uiState.update {
             it.copy(userMessage = null)
         }
