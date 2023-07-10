@@ -3,8 +3,10 @@ package io.github.jeddchoi.order.store
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import io.github.jeddchoi.common.CafeIcons
 import io.github.jeddchoi.common.Message
+import io.github.jeddchoi.common.UiIcon
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.component.BottomButton
 import io.github.jeddchoi.model.Store
@@ -112,7 +116,7 @@ private fun SectionWithSeatsScreen(
         title = UiText.DynamicString(store.name),
         showNavigateUp = true,
         onBackClick = onBackClick,
-        modifier = modifier
+        modifier = modifier.fillMaxSize()
     ) { scaffoldPadding ->
         ComponentWithBottomButtons(
             bottomButtons = {
@@ -163,8 +167,8 @@ private fun SectionWithSeatsScreen(
         ) {
             LazyColumn(
                 modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
                     .align(Alignment.TopCenter)
-                    .padding(start = 16.dp, end = 16.dp, bottom = 200.dp)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Center
             ) {
@@ -175,14 +179,21 @@ private fun SectionWithSeatsScreen(
                     item {
                         Text(text = sectionWithSeats.section.toString())
                     }
-                    items(sectionWithSeats.seats) { seat ->
+                    items(sectionWithSeats.seats, key = { it.id }) { seat ->
+                        val isSelected =
+                            selectedSeat?.seatId == seat.id && selectedSeat.sectionId == sectionWithSeats.section.id
                         ListItem(
                             modifier = Modifier
                                 .selectable(
-                                    selected = selectedSeat?.seatId == seat.id && selectedSeat.sectionId == sectionWithSeats.section.id,
+                                    selected = isSelected,
                                     onClick = { onSelect(sectionWithSeats.section.id, seat.id) }
                                 )
                                 .fillMaxWidth(),
+                            leadingContent = {
+                                if (isSelected) {
+                                    UiIcon.ImageVectorIcon(CafeIcons.Checked).IconComposable()
+                                }
+                            },
                             headlineContent = {
                                 Text(text = seat.name)
                             },
@@ -191,11 +202,14 @@ private fun SectionWithSeatsScreen(
                             },
                             trailingContent = {
                                 Text(text = seat.isAvailable.toString())
-                            }
+                            },
+                            tonalElevation = if (isSelected) 4.dp else 0.dp
                         )
                     }
+                    item {
+                        Spacer(modifier = Modifier.height(200.dp))
+                    }
                 }
-
             }
         }
     }

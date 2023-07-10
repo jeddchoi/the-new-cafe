@@ -38,8 +38,13 @@ class FirebaseCurrentUserRepositoryImpl @Inject constructor(
     }
 
     override val currentUser: StateFlow<CurrentUser?> =
-        _currentUser.stateIn(coroutineScope, SharingStarted.WhileSubscribed(5000), auth.currentUser?.toCurrentUser())
-    override val currentUserId: Flow<String?> = currentUser.map { it?.authId }.distinctUntilChanged()
+        _currentUser.stateIn(
+            coroutineScope,
+            SharingStarted.WhileSubscribed(5000),
+            auth.currentUser?.toCurrentUser()
+        )
+    override val currentUserId: Flow<String?> =
+        currentUser.map { it?.authId }.distinctUntilChanged()
 
 }
 

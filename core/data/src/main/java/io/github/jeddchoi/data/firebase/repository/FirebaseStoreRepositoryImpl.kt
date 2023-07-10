@@ -21,7 +21,6 @@ class FirebaseStoreRepositoryImpl @Inject constructor(
     override val stores =
         firestore.collection("stores").dataObjects<FirebaseStore>().map { firebaseStores ->
             firebaseStores.map {
-                Log.i("FirebaseStoreRepositoryImpl#stores", it.toString())
                 it.toStore()
             }
         }
@@ -34,7 +33,6 @@ class FirebaseStoreRepositoryImpl @Inject constructor(
     override fun sections(storeId: String) =
         firestore.collection("stores/${storeId}/sections").dataObjects<FirebaseSection>()
             .map { firebaseSections ->
-                Log.i("FirebaseStoreRepositoryImpl#sections", firebaseSections.joinToString("\n"))
                 firebaseSections.map {
                     it.toSection()
                 }
@@ -43,7 +41,6 @@ class FirebaseStoreRepositoryImpl @Inject constructor(
     override fun getSectionDetail(storeId: String, sectionId: String) =
         firestore.document("stores/${storeId}/sections/${sectionId}").dataObjects<FirebaseSection>()
             .map {
-                Log.i("FirebaseStoreRepositoryImpl#getSectionDetail", it.toString())
                 it?.toSection()
             }
 

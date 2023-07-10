@@ -9,7 +9,6 @@ import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.model.UserSession
 import io.github.jeddchoi.model.UserStateAndUsedSeatPosition
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transform
@@ -36,7 +35,7 @@ class FirebaseUserSessionRepositoryImpl @Inject constructor(
             seatPosition = if (it is UserSession.UsingSeat) it.seatPosition else null,
             userState = it?.currentState
         )
-    }.distinctUntilChanged()
+    }
 
 }
 

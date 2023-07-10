@@ -5,7 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jeddchoi.common.Action
 import io.github.jeddchoi.common.Message
+import io.github.jeddchoi.common.toErrorMessage
 import io.github.jeddchoi.data.repository.StoreRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -51,11 +54,17 @@ internal class StoreViewModel @Inject constructor(
     private val oneShotActionState = MutableStateFlow(OneShotActionState())
 
     val uiState = combine(
-        storeDetail,
-        sectionWithSeats,
-        oneShotActionState,
-        userSessionRepository.userStateAndUsedSeatPosition,
+        storeDetail.onEach { Log.d("uiState", "storeDetail : $it") },
+        sectionWithSeats.onEach { Log.d("uiState", "sectionWithSeats : $it") },
+        oneShotActionState.onEach { Log.d("uiState", "oneShotActionState : $it") },
+        userSessionRepository.userStateAndUsedSeatPosition.onEach {
+            Log.d(
+                "uiState",
+                "userStateAndUsedSeatPosition : $it"
+            )
+        },
     ) { store, sections, oneShotActionState, userStateAndUsedSeatPosition ->
+        Log.d("uiState", "$store\n$sections\n$oneShotActionState\n$userStateAndUsedSeatPosition")
         if (store == null) {
             StoreUiState.NotFound
         } else {
@@ -69,7 +78,10 @@ internal class StoreViewModel @Inject constructor(
             )
         }
     }
-        .catch { StoreUiState.Error(it) }
+        .catch {
+            Log.e("uiState", "Error : $it")
+            StoreUiState.Error(it)
+        }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StoreUiState.Loading)
 
     fun onSelect(sectionId: String, seatId: String) {
@@ -96,7 +108,11 @@ internal class StoreViewModel @Inject constructor(
                 )
             },
             onError = { e, job ->
-
+                oneShotActionState.update {
+                    it.copy(
+                        userMessage = e.toErrorMessage(Action.Retry { launchOneShotJob(job) })
+                    )
+                }
             }
         )
     }
@@ -107,7 +123,11 @@ internal class StoreViewModel @Inject constructor(
                 seatFinderService.quit()
             },
             onError = { e, job ->
-
+                oneShotActionState.update {
+                    it.copy(
+                        userMessage = e.toErrorMessage(Action.Retry { launchOneShotJob(job) })
+                    )
+                }
             }
         )
     }
@@ -126,14 +146,18 @@ internal class StoreViewModel @Inject constructor(
                 )
             },
             onError = { e, job ->
-
+                oneShotActionState.update {
+                    it.copy(
+                        userMessage = e.toErrorMessage(Action.Retry { launchOneShotJob(job) })
+                    )
+                }
             }
         )
     }
 
     private fun launchOneShotJob(
         job: suspend () -> Unit,
-        onError: (Throwable, suspend () -> Unit) -> Unit
+        onError: (Throwable, suspend () -> Unit) -> Unit = { _, _ -> }
     ) {
         oneShotActionState.update {
             it.copy(isLoading = true, userMessage = null)
@@ -144,7 +168,7 @@ internal class StoreViewModel @Inject constructor(
                     job()
                 }
             } catch (e: Throwable) {
-                Log.e("StoreViewModel", e.stackTraceToString())
+                Log.e("launchOneShotJob", e.stackTraceToString())
                 onError(e, job)
             } finally {
                 oneShotActionState.update {
@@ -192,7 +216,7 @@ sealed class StoreUiState {
             if (this == null || selectedSeat == null) {
                 null
             } else {
-                this.storeId == store.id && this.sectionId == selectedSeat.sectionId && this.seatId == seatId
+                this.storeId == store.id && this.sectionId == selectedSeat.sectionId && this.seatId == selectedSeat.seatId
             }
         }
     }
