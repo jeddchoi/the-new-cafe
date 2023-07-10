@@ -1,94 +1,65 @@
 package io.github.jeddchoi.profile
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
-import io.github.jeddchoi.designsystem.component.CircularProfilePicture
-import io.github.jeddchoi.ui.feature.EmptyResultScreen
-import io.github.jeddchoi.ui.feature.ErrorScreen
-import io.github.jeddchoi.ui.feature.LoadingScreen
-import io.github.jeddchoi.ui.model.UiState
+import io.github.jeddchoi.ui.component.ScreenWithTopAppBar
+import io.github.jeddchoi.ui.fullscreen.ErrorScreen
+import io.github.jeddchoi.ui.fullscreen.LoadingScreen
+import io.github.jeddchoi.ui.fullscreen.NotAuthenticatedScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProfileScreen(
-    uiState: UiState<ProfileUiStateData>,
-    onNavigateToSignIn: () -> Unit,
-    onSignOut: () -> Unit,
+    uiState: ProfileUiState,
     modifier: Modifier = Modifier,
-    lazyListState: LazyListState = rememberLazyListState()
+    lazyListState: LazyListState = rememberLazyListState(),
+    navigateToSignIn: () -> Unit = {},
+    signOut: () -> Unit = {},
 ) {
+    when (uiState) {
+        ProfileUiState.InitialLoading -> {
+            LoadingScreen(modifier)
+        }
 
-    LazyColumn(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        item {
-            MediumTopAppBar(
-                modifier = Modifier.fillMaxWidth(),
-                title = {
-                    Text(text = stringResource(id = R.string.profile))
-                },
+        ProfileUiState.NotAuthenticated -> {
+            NotAuthenticatedScreen(
+                modifier = modifier,
+                navigateToSignIn = navigateToSignIn
             )
         }
 
-        when (uiState) {
-            UiState.EmptyResult -> {
-                item {
-                    EmptyResultScreen(subject = UiText.StringResource(id = R.string.profile))
-                }
-            }
-
-            is UiState.Error -> {
-                item {
-                    ErrorScreen(exception = uiState.exception, modifier = modifier)
-                }
-            }
-
-            is UiState.InitialLoading -> {
-                item {
-                    LoadingScreen(modifier)
-                }
-            }
-
-            is UiState.Success -> {
-                item {
-                    CircularProfilePicture(image = painterResource(id = R.drawable.sample_avatar))
-                }
-
-                item {
+        is ProfileUiState.Success -> {
+            ScreenWithTopAppBar(
+                title = UiText.StringResource(R.string.profile),
+            ) {
+                Column(
+                    modifier = modifier.fillMaxSize(),
+                ) {
                     Text(
-                        text = uiState.data.toString(),
-                        textAlign = TextAlign.Center
+                        text = uiState.profile.toString()
                     )
-                }
-                item {
-                    Button(onClick = onNavigateToSignIn) {
-                        Text(text = stringResource(id = R.string.navigate_to_sign_in))
-                    }
-                }
-                item {
-                    Button(onClick = onSignOut) {
-                        Text(text = stringResource(id = R.string.sign_out))
-                    }
+                    Text(
+                        text = uiState.feedback.toString()
+                    )
+
                 }
             }
+        }
+
+        is ProfileUiState.Error -> {
+            ErrorScreen(exception = uiState.exception, modifier = modifier)
         }
     }
 }
@@ -98,8 +69,8 @@ internal fun ProfileScreen(
 @Composable
 private fun ProfileScreenPreview() {
     TheNewCafeTheme {
-//        AccountScreen(
-////            UiState.Success(ProfileUiStateData("Hello!")),
-//        )
+        val viewModel: ProfileViewModel = hiltViewModel()
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        ProfileScreen(uiState = uiState)
     }
 }

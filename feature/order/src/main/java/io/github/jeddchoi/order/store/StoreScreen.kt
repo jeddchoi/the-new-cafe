@@ -30,9 +30,9 @@ import io.github.jeddchoi.model.Store
 import io.github.jeddchoi.order.R
 import io.github.jeddchoi.ui.component.ComponentWithBottomButtons
 import io.github.jeddchoi.ui.component.ScreenWithTopAppBar
-import io.github.jeddchoi.ui.feature.EmptyResultScreen
-import io.github.jeddchoi.ui.feature.ErrorScreen
-import io.github.jeddchoi.ui.feature.LoadingScreen
+import io.github.jeddchoi.ui.fullscreen.EmptyResultScreen
+import io.github.jeddchoi.ui.fullscreen.ErrorScreen
+import io.github.jeddchoi.ui.fullscreen.LoadingScreen
 
 @Composable
 internal fun StoreScreen(
@@ -82,15 +82,15 @@ internal fun StoreScreen(
             SectionWithSeatsScreen(
                 store = uiState.store,
                 sectionsWithSeats = uiState.sectionWithSeats,
-                onBackClick = onBackClick,
+                modifier = modifier,
                 isLoading = uiState.isLoading,
+                userMessage = uiState.userMessage,
                 buttonText = buttonText,
-                onButtonClick = onClick,
                 buttonEnabled = !uiState.isLoading && enabled,
                 selectedSeat = uiState.selectedSeat,
-                modifier = modifier,
-                userMessage = uiState.userMessage,
-                onSelect = onSelect
+                onSelect = onSelect,
+                onBackClick = onBackClick,
+                onButtonClick = onClick
             )
         }
 
@@ -102,15 +102,15 @@ internal fun StoreScreen(
 private fun SectionWithSeatsScreen(
     store: Store,
     sectionsWithSeats: List<SectionWithSeats>,
-    onBackClick: () -> Unit,
-    isLoading: Boolean,
-    buttonText: UiText,
-    onButtonClick: () -> Unit,
-    buttonEnabled: Boolean,
-    onSelect: (String, String) -> Unit,
     modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
     userMessage: Message? = null,
+    buttonText: UiText = UiText.PlaceHolder,
+    buttonEnabled: Boolean = false,
     selectedSeat: SelectedSeat? = null,
+    onSelect: (String, String) -> Unit = { _, _ -> },
+    onBackClick: () -> Unit = {},
+    onButtonClick: () -> Unit = {},
 ) {
     ScreenWithTopAppBar(
         title = UiText.DynamicString(store.name),

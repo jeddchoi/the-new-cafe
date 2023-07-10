@@ -1,4 +1,4 @@
-package io.github.jeddchoi.ui.feature
+package io.github.jeddchoi.ui.component
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding

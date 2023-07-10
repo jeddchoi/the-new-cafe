@@ -20,11 +20,13 @@ import dagger.hilt.components.SingletonComponent
 import io.github.jeddchoi.data.firebase.repository.FirebaseAuthRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseCurrentUserRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseStoreRepositoryImpl
+import io.github.jeddchoi.data.firebase.repository.FirebaseUserProfileRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionRepositoryImpl
 import io.github.jeddchoi.data.firebase.service.FirebaseSeatFinderServiceImpl
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.repository.StoreRepository
+import io.github.jeddchoi.data.repository.UserProfileRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -104,5 +106,10 @@ abstract class FirebaseModule {
     abstract fun bindsStoreRepository(
         storeRepositoryImpl: FirebaseStoreRepositoryImpl,
     ): StoreRepository
+
+    @Binds
+    abstract fun bindsUserProfileRepository(
+        userProfileRepositoryImpl: FirebaseUserProfileRepositoryImpl,
+    ): UserProfileRepository
 
 }

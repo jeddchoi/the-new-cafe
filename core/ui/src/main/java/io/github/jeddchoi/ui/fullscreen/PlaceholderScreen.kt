@@ -1,4 +1,4 @@
-package io.github.jeddchoi.ui.feature
+package io.github.jeddchoi.ui.fullscreen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

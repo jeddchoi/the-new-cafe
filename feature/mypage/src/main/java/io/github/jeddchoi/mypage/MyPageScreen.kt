@@ -35,8 +35,10 @@ import androidx.compose.ui.unit.sp
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.mypage.history.HistoryScreen
 import io.github.jeddchoi.mypage.session.SessionScreen
-import io.github.jeddchoi.ui.feature.LoadingScreen
-import io.github.jeddchoi.ui.feature.PlaceholderScreen
+import io.github.jeddchoi.ui.fullscreen.ErrorScreen
+import io.github.jeddchoi.ui.fullscreen.LoadingScreen
+import io.github.jeddchoi.ui.fullscreen.NotAuthenticatedScreen
+import io.github.jeddchoi.ui.fullscreen.PlaceholderScreen
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -104,6 +106,7 @@ private fun MyPageContent(
     coroutineScope: CoroutineScope,
     selectedTab: MyPageTab,
     onTabChanged: (MyPageTab) -> Unit,
+    modifier: Modifier = Modifier,
     scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         rememberStandardBottomSheetState(skipHiddenState = true)
     ),
@@ -146,18 +149,44 @@ private fun MyPageContent(
             when (MyPageTab.VALUES[it]) {
                 MyPageTab.SESSION -> {
                     when (uiState) {
-                        MyPageUiState.InitialLoading -> LoadingScreen()
-                        MyPageUiState.NotAuthenticated -> PlaceholderScreen(title = UiText.StringResource(R.string.not_authenticated))
-                        is MyPageUiState.Error -> PlaceholderScreen(title = UiText.StringResource(R.string.error))
+                        MyPageUiState.InitialLoading -> {
+                            LoadingScreen(
+                                modifier = modifier,
+                            )
+                        }
+
+                        MyPageUiState.NotAuthenticated -> {
+                            NotAuthenticatedScreen(
+                                modifier = modifier,
+
+                                )
+                        }
+
+                        is MyPageUiState.Error -> {
+                            ErrorScreen(
+                                exception = uiState.exception,
+                                modifier = modifier,
+                            )
+                        }
+
                         is MyPageUiState.Success -> {
-                            SessionScreen(uiState.displayedUserSession)
+                            SessionScreen(
+                                uiState.displayedUserSession,
+                                modifier = modifier,
+                            )
                         }
                     }
                 }
+
                 MyPageTab.HISTORY -> {
                     when (uiState) {
                         MyPageUiState.InitialLoading -> LoadingScreen()
-                        MyPageUiState.NotAuthenticated -> PlaceholderScreen(title = UiText.StringResource(R.string.not_authenticated))
+                        MyPageUiState.NotAuthenticated -> PlaceholderScreen(
+                            title = UiText.StringResource(
+                                R.string.not_authenticated
+                            )
+                        )
+
                         is MyPageUiState.Error -> PlaceholderScreen(title = UiText.StringResource(R.string.error))
                         is MyPageUiState.Success -> {
                             HistoryScreen()

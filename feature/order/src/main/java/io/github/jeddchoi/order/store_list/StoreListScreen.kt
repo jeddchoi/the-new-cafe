@@ -13,15 +13,15 @@ import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.model.Store
 import io.github.jeddchoi.order.R
 import io.github.jeddchoi.ui.component.ScreenWithTopAppBar
-import io.github.jeddchoi.ui.feature.EmptyResultScreen
-import io.github.jeddchoi.ui.feature.ErrorScreen
-import io.github.jeddchoi.ui.feature.LoadingScreen
+import io.github.jeddchoi.ui.fullscreen.EmptyResultScreen
+import io.github.jeddchoi.ui.fullscreen.ErrorScreen
+import io.github.jeddchoi.ui.fullscreen.LoadingScreen
 
 @Composable
 internal fun StoreListScreen(
     uiState: StoreListUiState,
-    navigateToStore: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToStore: (String) -> Unit = {},
 ) {
     ScreenWithTopAppBar(
         title = UiText.StringResource(R.string.store_list_title),
@@ -54,8 +54,8 @@ internal fun StoreListScreen(
 @Composable
 fun StoreListItem(
     store: Store,
-    onClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (String) -> Unit = {},
 ) {
     ListItem(
         headlineContent = {

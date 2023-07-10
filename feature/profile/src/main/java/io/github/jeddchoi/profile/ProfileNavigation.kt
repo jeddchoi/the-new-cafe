@@ -10,7 +10,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
-import io.github.jeddchoi.ui.model.UiState
 
 private const val ProfileRoutePattern = "profile"
 
@@ -49,12 +48,11 @@ fun NavGraphBuilder.profileScreen(
         )
     ) {
         val viewModel: ProfileViewModel = hiltViewModel()
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle(UiState.InitialLoading)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         ProfileScreen(
             uiState = uiState,
-            onNavigateToSignIn = onNavigateToSignIn,
-            onSignOut = viewModel::signOut,
+            navigateToSignIn = onNavigateToSignIn,
         )
     }
 }

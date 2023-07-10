@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.mypage.R
-import io.github.jeddchoi.ui.feature.PlaceholderScreen
+import io.github.jeddchoi.ui.fullscreen.PlaceholderScreen
 
 @Composable
 internal fun HistoryScreen(

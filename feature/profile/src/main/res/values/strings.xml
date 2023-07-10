@@ -4,4 +4,5 @@
     <string name="show_my_status">Show My Status</string>
     <string name="navigate_to_sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
+    <string name="not_authenticated">You are not authenticated</string>
 </resources>

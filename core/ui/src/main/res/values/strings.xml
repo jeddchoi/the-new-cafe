@@ -5,4 +5,5 @@
     <string name="loading">Loading …</string>
     <string name="sign_in">Sign In</string>
     <string name="dismiss">Dismiss</string>
+    <string name="not_authenticated">You need to sign in to see this page</string>
 </resources>

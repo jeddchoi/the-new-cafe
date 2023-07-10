@@ -15,7 +15,10 @@ import io.github.jeddchoi.order.navigateToOrder
 import io.github.jeddchoi.profile.navigateToProfile
 
 @Composable
-fun BottomBar(navController: NavHostController, currentDestination: NavDestination?) {
+fun BottomBar(
+    navController: NavHostController,
+    currentDestination: NavDestination?
+) {
     val screens = listOf(MainBottomNav.Profile, MainBottomNav.Order, MainBottomNav.MyPage)
 
     BottomBar(screens = screens, currentDestination = currentDestination) {bottomNav ->

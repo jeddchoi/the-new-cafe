@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import io.github.jeddchoi.common.UiText
-import io.github.jeddchoi.ui.feature.PlaceholderScreen
+import io.github.jeddchoi.ui.fullscreen.PlaceholderScreen
 
 @Composable
 internal fun SessionScreen(

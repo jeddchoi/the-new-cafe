@@ -18,4 +18,8 @@ sealed class UiText {
         is DynamicString -> value
         is StringResource -> context.getString(id, *args)
     }
+
+    companion object {
+        val PlaceHolder = DynamicString("Placeholder")
+    }
 }

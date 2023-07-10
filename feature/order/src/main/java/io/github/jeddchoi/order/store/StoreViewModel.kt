@@ -193,7 +193,7 @@ data class OneShotActionState(
 )
 
 
-sealed class StoreUiState {
+internal sealed class StoreUiState {
     object Loading : StoreUiState()
     object NotFound : StoreUiState()
     data class Success(
