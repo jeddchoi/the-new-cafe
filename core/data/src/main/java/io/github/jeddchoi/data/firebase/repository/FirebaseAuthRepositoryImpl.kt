@@ -2,19 +2,16 @@ package io.github.jeddchoi.data.firebase.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
-import com.google.firebase.database.FirebaseDatabase
 import io.github.jeddchoi.data.repository.AuthRepository
+import io.github.jeddchoi.data.repository.UserProfileRepository
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
-const val REFERENCE_USER_STATUS_NAME = "users_status"
-
-
 @Singleton
 class FirebaseAuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
-    private val database: FirebaseDatabase,
+    private val userProfileRepository: UserProfileRepository,
 ) : AuthRepository {
 
 
@@ -36,10 +33,11 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
             }
             createdUser.updateProfile(request).await()
 
-//            val newUserState = UserSession()
-//            Log.i("FirebaseAuthRepositoryImpl", "newUserStatus: $newUserState")
-//            Log.i("FirebaseAuthRepositoryImpl", "uid: ${createdUser.uid}")
-//            database.reference.child(REFERENCE_USER_STATUS_NAME).child(createdUser.uid).setValue(newUserState).await()
+            userProfileRepository.createUserProfile(
+                displayName = displayName,
+                emailAddress = email,
+                isAnonymous = false,
+            )
         }
         return Result.success(Unit)
     }

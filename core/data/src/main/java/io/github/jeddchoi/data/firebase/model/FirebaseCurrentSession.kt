@@ -9,35 +9,35 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class FirebaseTimerInfo(
-    val willRequestType: String = SeatFinderRequestType.ReserveSeat.name,
-    val endTime: Long = 0,
-    val taskName: String = "",
+    val willRequestType: String? = null,
+    val endTime: Long? = null,
+    val taskName: String? = null,
 )
 
 @Serializable
 data class FirebasePartialUserState(
-    val startTime: Long = 0,
-    val state: String = UserStateType.None.name,
+    val startTime: Long? = null,
+    val state: String? = null,
     val timer: FirebaseTimerInfo? = null,
 )
 
 
 @Serializable
 data class FirebaseCurrentSession(
-    val sessionId: String = "",
-    val seatPosition: SeatPosition = SeatPosition(),
-    val startSessionTime: Long = 0,
-    val hasFailure: Boolean = false,
-    val mainState: FirebasePartialUserState = FirebasePartialUserState(),
+    val sessionId: String? = null,
+    val seatPosition: SeatPosition? = null,
+    val startSessionTime: Long? = null,
+    val hasFailure: Boolean? = null,
+    val mainState: FirebasePartialUserState? = null,
     val subState: FirebasePartialUserState? = null,
 ) {
-    fun getCurrentStateStr() = subState?.state ?: mainState.state
-    fun getCurrentStateStartTime() = subState?.startTime ?: mainState.startTime
+    fun getCurrentStateStr() = subState?.state ?: mainState?.state
+    fun getCurrentStateStartTime() = subState?.startTime ?: mainState?.startTime
     fun getCurrentStateEndTime() =
-        if (subState != null) subState.timer?.endTime else mainState.timer?.endTime
+        if (subState != null) subState.timer?.endTime else mainState?.timer?.endTime
 
     fun getRequestTypeStrAfterCurrentState() =
-        if (subState != null) subState.timer?.willRequestType else mainState.timer?.willRequestType
+        if (subState != null) subState.timer?.willRequestType else mainState?.timer?.willRequestType
 
 
 }
@@ -47,11 +47,11 @@ fun FirebaseCurrentSession?.toUserSession() =
         UserSession.None
     else
         UserSession.UsingSeat(
-            sessionId = sessionId,
-            hasFailure = hasFailure,
-            startSessionTime = Instant.fromEpochMilliseconds(startSessionTime),
-            endSessionTime = mainState.timer?.endTime?.let { Instant.fromEpochMilliseconds(it) },
-            startTime = Instant.fromEpochMilliseconds(getCurrentStateStartTime()),
+            sessionId = sessionId ?: "",
+            hasFailure = hasFailure ?: false,
+            startSessionTime = startSessionTime?.let { Instant.fromEpochMilliseconds(it) } ?: Instant.DISTANT_PAST,
+            endSessionTime = mainState?.timer?.endTime?.let { Instant.fromEpochMilliseconds(it) },
+            startTime = getCurrentStateStartTime()?.let { Instant.fromEpochMilliseconds(it) } ?: Instant.DISTANT_PAST,
             endTime = getCurrentStateEndTime()?.let { Instant.fromEpochMilliseconds(it) },
             currentState = UserStateType.getByValue(getCurrentStateStr()),
             requestTypeAfterCurrentState = getRequestTypeStrAfterCurrentState()?.let {

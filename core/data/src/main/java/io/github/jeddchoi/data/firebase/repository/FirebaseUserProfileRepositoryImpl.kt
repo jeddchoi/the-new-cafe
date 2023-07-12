@@ -1,7 +1,9 @@
 package io.github.jeddchoi.data.firebase.repository
 
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ktx.values
+import io.github.jeddchoi.data.firebase.model.FirebasePrivateInfo
 import io.github.jeddchoi.data.firebase.model.FirebaseUserProfile
 import io.github.jeddchoi.data.firebase.model.toUserProfile
 import io.github.jeddchoi.data.repository.CurrentUserRepository
@@ -16,7 +18,7 @@ import javax.inject.Inject
 class FirebaseUserProfileRepositoryImpl @Inject constructor(
     private val currentUserRepository: CurrentUserRepository,
     private val database: FirebaseDatabase,
-): UserProfileRepository{
+) : UserProfileRepository {
     override val userProfile: Flow<UserProfile?> = currentUserRepository.currentUserId.transform {
         if (it != null) {
             emitAll(
@@ -27,6 +29,30 @@ class FirebaseUserProfileRepositoryImpl @Inject constructor(
         } else { // not signed in
             emit(null)
         }
-
     }
+
+    override suspend fun createUserProfile(
+        displayName: String,
+        emailAddress: String,
+        isAnonymous: Boolean
+    ) {
+        currentUserRepository.getUserId()?.let {
+            database.getReference("users/${it}/profile").setValue(
+                mapOf(
+                    FirebaseUserProfile::displayName.name to displayName,
+                    FirebaseUserProfile::emailAddress.name to emailAddress,
+                    "${FirebaseUserProfile::privateInfo.name}/${FirebasePrivateInfo::creationTime}" to ServerValue.TIMESTAMP,
+                    "${FirebaseUserProfile::privateInfo.name}/${FirebasePrivateInfo::isAnonymous}" to isAnonymous,
+                    "${FirebaseUserProfile::privateInfo.name}/${FirebasePrivateInfo::lastSignInTime}" to ServerValue.TIMESTAMP,
+                )
+            )
+        }
+    }
+
+    override suspend fun updateUserProfile(updateValues: Map<String, Any>) {
+        currentUserRepository.getUserId()?.let {
+            database.getReference("users/${it}/profile").updateChildren(updateValues)
+        }
+    }
+
 }

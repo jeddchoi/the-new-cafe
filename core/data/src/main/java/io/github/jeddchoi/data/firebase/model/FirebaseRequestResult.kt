@@ -1,8 +1,8 @@
 package io.github.jeddchoi.data.firebase.model
 
 import io.github.jeddchoi.data.service.seatfinder.ResultCode
-import io.github.jeddchoi.model.SeatFinderRequestType
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderResult
+import io.github.jeddchoi.model.SeatFinderRequestType
 import io.github.jeddchoi.model.UserStateType
 import kotlinx.datetime.Instant
 import kotlinx.serialization.EncodeDefault
@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 data class FirebaseTransactionResult<T>(
     @EncodeDefault val before: T? = null,
     @EncodeDefault val after: T? = null,
-    val resultCode: String = ResultCode.REJECTED.name,
+    val resultCode: String? = null,
 )
 
 @Serializable

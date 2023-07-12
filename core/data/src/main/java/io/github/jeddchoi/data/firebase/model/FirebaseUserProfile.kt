@@ -1,5 +1,6 @@
 package io.github.jeddchoi.data.firebase.model
 
+import com.google.firebase.firestore.ServerTimestamp
 import io.github.jeddchoi.model.Sex
 import io.github.jeddchoi.model.UserProfile
 import kotlinx.datetime.Instant
@@ -9,7 +10,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FirebasePrivateInfo(
     val isAnonymous: Boolean? = null,
-    val creationTime: Long? = null,
+    @ServerTimestamp val creationTime: Long? = null,
     val lastSignInTime: Long? = null,
     val emailVerified: Boolean? = null,
     val sex: Int? = null,
