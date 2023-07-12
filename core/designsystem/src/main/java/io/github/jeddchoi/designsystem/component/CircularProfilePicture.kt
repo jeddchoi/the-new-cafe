@@ -8,13 +8,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.github.jeddchoi.designsystem.R
 
 @Composable
-fun CircularProfilePicture(image: Painter, modifier: Modifier = Modifier) {
+fun CircularProfilePicture(
+    image: Painter,
+    modifier: Modifier = Modifier
+) {
     Image(
         painter = image,
-        contentDescription = "avatar",
+        contentDescription = stringResource(id = R.string.profile_picture_desc),
         contentScale = ContentScale.Crop,            // crop the image if it's not a square
         modifier = modifier
             .size(64.dp)

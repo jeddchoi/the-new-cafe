@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,13 +26,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
 import io.github.jeddchoi.ui.R
-import io.github.jeddchoi.common.Message
-import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun UserInputScreen(
@@ -42,12 +40,11 @@ fun UserInputScreen(
     bottomButtons: @Composable RowScope.() -> Unit,
     modifier: Modifier = Modifier,
     existBackStack: Boolean = false,
-    onBackClick: () -> Unit = {},
+    clickBack: () -> Unit = {},
     optionalTitle: UiText? = null,
-    optionalButtonClick: () -> Unit = {},
+    clickOptionalButton: () -> Unit = {},
     optionalButtonText: UiText? = null,
     userMessage: Message? = null,
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
 ) {
     val isKeyboardOpen by keyboardAsState()
 
@@ -55,15 +52,15 @@ fun UserInputScreen(
         title = title,
         modifier = modifier,
         showNavigateUp = existBackStack,
-        onBackClick = onBackClick,
+        onBackClick = clickBack,
     ) { scaffoldPadding ->
         ComponentWithBottomButtons(
-            bottomButtons = bottomButtons,
-            showGradientBackground = true,
             modifier = Modifier
                 .padding(scaffoldPadding)
                 .imePadding()
                 .fillMaxSize(),
+            bottomButtons = bottomButtons,
+            showGradientBackground = true,
             optionalContentOfButtonTop = {
                 if (!isKeyboardOpen && optionalTitle != null) {
                     Row(
@@ -74,7 +71,7 @@ fun UserInputScreen(
                         Text(text = optionalTitle.asString())
                         Spacer(modifier = modifier.width(8.dp))
                         optionalButtonText?.asString()?.let {
-                            TextButton(onClick = optionalButtonClick) {
+                            TextButton(onClick = clickOptionalButton) {
                                 Text(it, textDecoration = TextDecoration.Underline)
                             }
                         }
@@ -144,7 +141,7 @@ private fun UserInputOneByOneScreenPreview() {
             inputFields = {
                 GeneralTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    changeValue = { email = it },
                     labelText = "Email",
                     isError = !isEmailValid,
                     supportingText = UiText.DynamicString("Email is invalid")
@@ -152,14 +149,14 @@ private fun UserInputOneByOneScreenPreview() {
 
                 PasswordField(
                     value = password,
-                    onValueChange = { password = it },
+                    changeValue = { password = it },
                     labelText = "Password",
                     supportingText = UiText.DynamicString("Password is invalid"),
                     isError = !isPasswordValid,
                 )
             },
             bottomButtons = {},
-            onBackClick = { /*TODO*/ },
+            clickBack = { /*TODO*/ },
             userMessage = null
         )
     }

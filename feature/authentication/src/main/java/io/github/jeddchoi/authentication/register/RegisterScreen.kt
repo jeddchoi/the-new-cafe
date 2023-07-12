@@ -43,7 +43,7 @@ internal fun RegisterScreen(
 
             GeneralTextField(
                 value = uiState.displayNameInput,
-                onValueChange = changeDisplayNameInput,
+                changeValue = changeDisplayNameInput,
                 labelText = stringResource(R.string.display_name),
                 isError = uiState.displayNameInputError,
                 supportingText = uiState.displayNameSupportingText,
@@ -52,7 +52,7 @@ internal fun RegisterScreen(
 
             GeneralTextField(
                 value = uiState.emailInput,
-                onValueChange = changeEmailInput,
+                changeValue = changeEmailInput,
                 labelText = stringResource(R.string.email),
                 isError = uiState.emailInputError,
                 supportingText = uiState.emailSupportingText,
@@ -62,22 +62,22 @@ internal fun RegisterScreen(
 
             PasswordField(
                 value = uiState.passwordInput,
-                onValueChange = changePasswordInput,
+                changeValue = changePasswordInput,
+                modifier = inputFieldsModifier.fillMaxWidth(),
                 labelText = stringResource(R.string.password),
                 supportingText = uiState.passwordSupportingText,
-                isError = uiState.passwordInputError,
-                modifier = inputFieldsModifier.fillMaxWidth()
+                isError = uiState.passwordInputError
             )
 
             PasswordField(
                 value = uiState.confirmPasswordInput,
-                onValueChange = changeConfirmPasswordInput,
+                changeValue = changeConfirmPasswordInput,
+                modifier = inputFieldsModifier.fillMaxWidth(),
                 labelText = stringResource(R.string.confirm_password),
                 supportingText = uiState.confirmPasswordSupportingText,
                 isError = uiState.confirmPasswordInputError,
-                modifier = inputFieldsModifier.fillMaxWidth(),
                 isLastButton = true,
-                onKeyboardDoneAction = register
+                pressKeyboardDone = register
             )
         },
         bottomButtons = {
@@ -85,16 +85,16 @@ internal fun RegisterScreen(
             BottomButton(
                 text = UiText.StringResource(R.string.register),
                 isLoading = uiState.isLoading,
-                onClick = register,
+                click = register,
                 enabled = !uiState.isLoading && uiState.registerInfoComplete && uiState.isValidInfoToRegister,
                 modifier = maxWidthModifier
             )
         },
         modifier = modifier,
         existBackStack = true,
-        onBackClick = onBackClick,
+        clickBack = onBackClick,
         optionalTitle = UiText.StringResource(R.string.already_have_an_account),
-        optionalButtonClick = {
+        clickOptionalButton = {
             navigateToSignInClick()
             dismissUserMessage()
         },

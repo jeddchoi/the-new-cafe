@@ -8,8 +8,8 @@ import io.github.jeddchoi.common.CafeIcons
 
 @Composable
 fun BackButton(
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
 ) {
     IconButton(onClick = onClick, modifier = modifier) {
         Icon(CafeIcons.ArrowBack, "backIcon")

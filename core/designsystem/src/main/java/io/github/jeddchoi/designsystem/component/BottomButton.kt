@@ -29,16 +29,16 @@ enum class BottomButtonType {
 
 @Composable
 fun BottomButton(
-    text: UiText,
-    isLoading: Boolean,
-    onClick: () -> Unit,
-    enabled: Boolean,
     modifier: Modifier = Modifier,
-    type: BottomButtonType = BottomButtonType.Filled
+    text: UiText = UiText.PlaceHolder,
+    isLoading: Boolean = false,
+    enabled: Boolean = true,
+    type: BottomButtonType = BottomButtonType.Filled,
+    click: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
     val onButtonClick = {
-        onClick()
+        click()
         focusManager.clearFocus()
     }
     val shape = RoundedCornerShape(12.dp)
@@ -124,7 +124,7 @@ private fun PrimaryButtonPreview() {
         BottomButton(
             text = UiText.DynamicString(""),
             isLoading = false,
-            onClick = { /*TODO*/ },
+            click = { /*TODO*/ },
             enabled = true,
             modifier = Modifier.fillMaxWidth()
         )

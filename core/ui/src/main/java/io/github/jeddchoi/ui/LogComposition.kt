@@ -11,7 +11,7 @@ class Ref(var value: Int)
 // copied at the call site to ensure that its logging only recompositions from the
 // original call site.
 @Composable
-inline fun LogCompositions(tag: String, msg: String) {
+fun LogCompositions(tag: String, msg: String) {
     val ref = remember { Ref(0) }
     SideEffect { ref.value++ }
     Log.d(tag, "Compositions: $msg ${ref.value}")

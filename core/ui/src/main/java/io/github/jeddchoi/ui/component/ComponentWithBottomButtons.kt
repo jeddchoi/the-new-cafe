@@ -36,9 +36,9 @@ import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 
 @Composable
 fun ComponentWithBottomButtons(
-    bottomButtons: @Composable RowScope.() -> Unit,
-    showGradientBackground: Boolean,
     modifier: Modifier = Modifier,
+    bottomButtons: @Composable RowScope.() -> Unit = {},
+    showGradientBackground: Boolean = true,
     optionalContentOfButtonTop: (@Composable ColumnScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
@@ -102,13 +102,17 @@ private fun ComponentWithBottomButtonsPreview() {
             modifier = Modifier.fillMaxSize()
         ) { scaffoldPadding ->
             ComponentWithBottomButtons(
+                modifier = Modifier
+                    .padding(scaffoldPadding)
+                    .imePadding()
+                    .fillMaxSize(),
                 bottomButtons = {
                     val maxWidthModifier = Modifier.fillMaxWidth()
                     BottomButton(
                         text = UiText.DynamicString("Secondary"),
                         isLoading = false,
                         enabled = true,
-                        onClick = {},
+                        click = {},
                         modifier = maxWidthModifier.weight(1f),
                         type = BottomButtonType.Outlined,
                     )
@@ -116,16 +120,12 @@ private fun ComponentWithBottomButtonsPreview() {
                         text = UiText.DynamicString("Primary"),
                         isLoading = false,
                         enabled = true,
-                        onClick = {},
+                        click = {},
                         modifier = maxWidthModifier.weight(1f),
                         type = BottomButtonType.Filled,
                     )
                 },
                 showGradientBackground = true,
-                modifier = Modifier
-                    .padding(scaffoldPadding)
-                    .imePadding()
-                    .fillMaxSize(),
                 optionalContentOfButtonTop = null,
             ) {
                 Column(
@@ -137,7 +137,7 @@ private fun ComponentWithBottomButtonsPreview() {
                     repeat(20) {
                         GeneralTextField(
                             value = "Hello $it",
-                            onValueChange = {},
+                            changeValue = {},
                             labelText = "Placeholder",
                             isError = false,
                             supportingText = null,

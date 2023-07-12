@@ -11,7 +11,7 @@ import kotlinx.serialization.serializer
 
 
 @OptIn(InternalSerializationApi::class)
-fun Any?.toJsonElement(json: Json = Json): JsonElement =
+internal fun Any?.toJsonElement(json: Json = Json): JsonElement =
     when (this) {
         null -> JsonNull
         is Map<*, *> -> this.toJsonElement()

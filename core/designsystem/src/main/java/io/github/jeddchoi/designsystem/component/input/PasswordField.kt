@@ -28,13 +28,13 @@ import io.github.jeddchoi.common.UiText
 @Composable
 fun PasswordField(
     value: String,
-    onValueChange: (String) -> Unit,
-    labelText: String,
-    supportingText: UiText?,
-    isError: Boolean,
+    changeValue: (String) -> Unit,
     modifier: Modifier = Modifier,
+    labelText: String = "",
+    supportingText: UiText? = null,
+    isError: Boolean = false,
     isLastButton: Boolean = false,
-    onKeyboardDoneAction: () -> Unit = {},
+    pressKeyboardDone: () -> Unit = {},
 ) {
     var showPassword by remember { mutableStateOf(false) }
 
@@ -42,7 +42,7 @@ fun PasswordField(
 
     OutlinedTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = changeValue,
         shape = RoundedCornerShape(15.dp),
         label = {
             Text(text = labelText)
@@ -61,7 +61,7 @@ fun PasswordField(
             onNext = { focusManager.moveFocus(FocusDirection.Down) },
             onDone = {
                 focusManager.clearFocus()
-                onKeyboardDoneAction()
+                pressKeyboardDone()
             },
         ),
         visualTransformation = if (!showPassword) PasswordVisualTransformation() else VisualTransformation.None,

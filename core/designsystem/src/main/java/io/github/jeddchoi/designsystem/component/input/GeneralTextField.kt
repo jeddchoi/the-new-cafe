@@ -17,19 +17,19 @@ import io.github.jeddchoi.common.UiText
 @Composable
 fun GeneralTextField(
     value: String,
-    onValueChange: (String) -> Unit,
-    labelText: String,
-    isError: Boolean,
-    supportingText: UiText?,
+    changeValue: (String) -> Unit,
     modifier: Modifier = Modifier,
+    labelText: String = "",
+    isError: Boolean = false,
+    supportingText: UiText? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
     isLastButton: Boolean = false,
-    onKeyboardDoneAction: () -> Unit = {},
+    pressKeyboardDone: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
     OutlinedTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = changeValue,
         shape = RoundedCornerShape(15.dp),
         label = {
             Text(text = labelText)
@@ -48,7 +48,7 @@ fun GeneralTextField(
             onNext = { focusManager.moveFocus(FocusDirection.Down) },
             onDone = {
                 focusManager.clearFocus()
-                onKeyboardDoneAction()
+                pressKeyboardDone()
             },
         ),
     )

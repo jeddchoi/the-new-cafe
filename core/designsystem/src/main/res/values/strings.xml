@@ -2,4 +2,5 @@
 <resources>
     <string name="expand_description">Expand</string>
     <string name="collapse_desciption">Collapse</string>
+    <string name="profile_picture_desc">Profile picture</string>
 </resources>

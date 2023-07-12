@@ -119,20 +119,20 @@ private fun SectionWithSeatsScreen(
         modifier = modifier.fillMaxSize()
     ) { scaffoldPadding ->
         ComponentWithBottomButtons(
+            modifier = Modifier
+                .padding(scaffoldPadding)
+                .imePadding()
+                .fillMaxSize(),
             bottomButtons = {
                 BottomButton(
                     text = buttonText,
                     isLoading = isLoading,
-                    onClick = onButtonClick,
+                    click = onButtonClick,
                     enabled = buttonEnabled,
                     modifier = Modifier.fillMaxWidth()
                 )
             },
             showGradientBackground = true,
-            modifier = Modifier
-                .padding(scaffoldPadding)
-                .imePadding()
-                .fillMaxSize(),
             optionalContentOfButtonTop = {
                 if (userMessage != null) {
                     Column {

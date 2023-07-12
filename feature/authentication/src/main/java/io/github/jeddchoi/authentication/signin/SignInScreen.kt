@@ -45,7 +45,7 @@ internal fun SignInScreen(
         inputFields = { inputFieldsModifier ->
             GeneralTextField(
                 value = uiState.emailInput,
-                onValueChange = changeEmailInput,
+                changeValue = changeEmailInput,
                 labelText = stringResource(R.string.email),
                 isError = uiState.emailInputError,
                 supportingText = uiState.emailSupportingText,
@@ -55,13 +55,13 @@ internal fun SignInScreen(
 
             PasswordField(
                 value = uiState.passwordInput,
-                onValueChange = changePasswordInput,
+                changeValue = changePasswordInput,
+                modifier = inputFieldsModifier.fillMaxWidth(),
                 labelText = stringResource(R.string.password),
                 supportingText = uiState.passwordSupportingText,
                 isError = uiState.passwordInputError,
-                modifier = inputFieldsModifier.fillMaxWidth(),
                 isLastButton = true,
-                onKeyboardDoneAction = signIn
+                pressKeyboardDone = signIn
             )
 
             TextButton(
@@ -78,7 +78,7 @@ internal fun SignInScreen(
             BottomButton(
                 enabled = !uiState.isLoading,
                 text = UiText.StringResource(R.string.sign_in_later),
-                onClick = signInLater,
+                click = signInLater,
                 isLoading = false,
                 type = BottomButtonType.FilledTonal,
                 modifier = maxWidthModifier,
@@ -86,16 +86,16 @@ internal fun SignInScreen(
             BottomButton(
                 enabled = !uiState.isLoading && uiState.signInInfoComplete && uiState.isValidInfoToSignIn,
                 text = UiText.StringResource(R.string.sign_in),
-                onClick = signIn,
+                click = signIn,
                 isLoading = uiState.isLoading,
                 type = BottomButtonType.Filled,
                 modifier = maxWidthModifier,
             )
         },
         modifier = modifier,
-        onBackClick = clickBack,
+        clickBack = clickBack,
         optionalTitle = UiText.StringResource(R.string.new_user),
-        optionalButtonClick = {
+        clickOptionalButton = {
             navigateToRegister()
             dismissUserMessage()
         },

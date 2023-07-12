@@ -31,7 +31,7 @@ fun NotAuthenticatedScreen(
         BottomButton(
             text = UiText.StringResource(R.string.sign_in),
             isLoading = false,
-            onClick = navigateToSignIn,
+            click = navigateToSignIn,
             enabled = true,
         )
     }
