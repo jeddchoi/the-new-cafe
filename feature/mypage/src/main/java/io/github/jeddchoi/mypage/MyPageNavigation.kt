@@ -4,8 +4,10 @@ import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -30,16 +32,16 @@ internal enum class MyPageTab(@StringRes val titleId: Int) {
         val VALUES = values()
     }
 }
-private const val MyPageTabArg = "tabId"
+internal const val MyPageTabArg = "tabId"
 private const val MyPageRoutePattern = "mypage?$MyPageTabArg={${MyPageTabArg}}"
 
-internal class MyPageArgs(val tab: MyPageTab) {
-    constructor(savedStateHandle: SavedStateHandle) : this(
-        checkNotNull(
-            MyPageTab.valueOf(savedStateHandle.get<String>(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name)
-        )
-    )
-}
+//internal class MyPageArgs(val tab: MyPageTab) {
+//    constructor(savedStateHandle: SavedStateHandle) : this(
+//        checkNotNull(
+//            MyPageTab.valueOf(savedStateHandle.get<String>(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name)
+//        )
+//    )
+//}
 
 fun NavController.navigateToMyPage(navOptions: NavOptions? = null) {
     this.navigate(MyPageRoutePattern, navOptions)
@@ -48,8 +50,8 @@ fun NavController.navigateToMyPage(navOptions: NavOptions? = null) {
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.myPageScreen(
-    navigateToStoreList: () -> Unit,
-    navigateToStore: (String) -> Unit,
+    navigateToStoreList: () -> Unit = {},
+    navigateToStore: (String) -> Unit = {},
 ) {
     composable(
         route = MyPageRoutePattern,
@@ -72,9 +74,17 @@ fun NavGraphBuilder.myPageScreen(
     ) { backStackEntry ->
         val viewModel: MyPageViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val myPageTabArg = backStackEntry.arguments?.getString(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name
+
+        var selectedTab by rememberSaveable(myPageTabArg) {
+            mutableStateOf(MyPageTab.valueOf(myPageTabArg))
+        }
         MyPageScreen(
-            navigateTab = MyPageTab.valueOf(backStackEntry.arguments?.getString(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name),
+            selectedTab = selectedTab,
             uiState = uiState,
+            selectTab = {
+                selectedTab = it
+            }
         )
     }
 }

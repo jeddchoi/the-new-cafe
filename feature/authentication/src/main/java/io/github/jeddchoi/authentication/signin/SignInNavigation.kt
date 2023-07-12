@@ -18,7 +18,7 @@ internal const val SignInRoutePattern = "signin"
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.signInScreen(
     navController: NavHostController,
-    navigateToMain: () -> Unit
+    navigateToMain: () -> Unit = {}
 ) {
     composable(
         route = SignInRoutePattern,

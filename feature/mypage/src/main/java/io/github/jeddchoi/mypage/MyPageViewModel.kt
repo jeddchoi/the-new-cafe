@@ -4,13 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
 import io.github.jeddchoi.data.util.TickHandler
 import io.github.jeddchoi.mypage.session.DisplayedUserSession
 import io.github.jeddchoi.mypage.session.toDisplayedUserSession
-import io.github.jeddchoi.common.Message
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -26,7 +26,8 @@ internal class MyPageViewModel @Inject constructor(
     private val tickHandler: TickHandler,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val myPageTabArg = MyPageArgs(savedStateHandle)
+
+
 
     val uiState: StateFlow<MyPageUiState> =
         tickHandler.tickFlow.combine(sessionRepository.userSession) { current, userSession ->
@@ -75,24 +76,6 @@ internal sealed class MyPageUiState {
     data class Error(val exception: Throwable) : MyPageUiState()
 }
 
-//internal data class MyPageUiStateData(
-//    val controlButtons: List<SeatFinderButtonState> = listOf(),
-//    override val isBusy: Boolean = false,
-//    override val canContinue: Boolean = true,
-//    override val messages: List<Message> = emptyList()
-//) : FeedbackState {
-//    override fun copy(
-//        isBusy: Boolean,
-//        canContinue: Boolean,
-//        messages: List<Message>
-//    ): MyPageUiStateData = MyPageUiStateData(
-//        controlButtons,
-//        isBusy,
-//        canContinue,
-//        messages
-//    )
-//}
-//
 sealed interface SeatFinderButtonState {
     val name: String
     val isEnabled: Boolean

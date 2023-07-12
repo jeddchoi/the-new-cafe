@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
@@ -30,8 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.commandiron.wheel_picker_compose.WheelDateTimePicker
 import com.commandiron.wheel_picker_compose.core.TimeFormat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -41,16 +38,14 @@ import kotlinx.datetime.toLocalDateTime
 import java.time.ZoneId
 import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ColumnScope.ControlPanel(
-    scaffoldState: BottomSheetScaffoldState,
-    scope: CoroutineScope,
-    controlButtons: List<SeatFinderButtonState>,
+    modifier: Modifier = Modifier,
+    controlButtons: List<SeatFinderButtonState> = emptyList(),
+    expandPartially: () -> Unit = {},
 ) {
     var endTime by remember { mutableStateOf(Instant.DISTANT_FUTURE) }
-//    Text(text = uiState.data.messages.lastOrNull()?.contentId?.let { stringResource(it) }
-//        ?: "No message")
+
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -67,7 +62,11 @@ internal fun ColumnScope.ControlPanel(
         endTime = it
     }
 
-    ControlPanelButtons(controlButtons, endTime, scope, scaffoldState)
+    ControlPanelButtons(
+        controlButtons = controlButtons,
+        endTime = endTime,
+        expandPartially = expandPartially,
+    )
 }
 
 @Composable
@@ -108,13 +107,12 @@ private fun ColumnScope.EndTimeInput(onEndTimeChange: (Instant) -> Unit) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ControlPanelButtons(
-    controlButtons: List<SeatFinderButtonState>,
+    modifier: Modifier = Modifier,
+    controlButtons: List<SeatFinderButtonState> = emptyList(),
     endTime: Instant,
-    scope: CoroutineScope,
-    scaffoldState: BottomSheetScaffoldState
+    expandPartially: () -> Unit,
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -129,7 +127,7 @@ private fun ControlPanelButtons(
             Button(
                 onClick = {
                     it.onClick(endTime)
-                    scope.launch { scaffoldState.bottomSheetState.partialExpand() }
+                    expandPartially()
                 },
                 modifier = Modifier
                     .height(72.dp)

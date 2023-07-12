@@ -23,7 +23,7 @@ fun NavController.navigateToRegister(navOptions: NavOptions? = null) {
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.registerScreen(
     navController: NavHostController,
-    navigateToMain: () -> Unit
+    navigateToMain: () -> Unit = {}
 ) {
     composable(
         route = RegisterRoutePattern,
