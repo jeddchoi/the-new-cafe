@@ -1,6 +1,6 @@
 package io.github.jeddchoi.common
 
 open class OneShotFeedbackUiState(
-    val userMessage: Message? = null,
-    val isLoading: Boolean = false,
+    open val userMessage: Message? = null,
+    open val isLoading: Boolean = false,
 )

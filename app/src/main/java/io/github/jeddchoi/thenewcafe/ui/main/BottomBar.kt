@@ -52,9 +52,9 @@ fun BottomBar(
                 },
                 icon = {
                     if (selected) {
-                        destination.selectedIcon.IconComposable()
+                        destination.selectedIcon.ToComposable()
                     } else {
-                        destination.unselectedIcon.IconComposable()
+                        destination.unselectedIcon.ToComposable()
                     }
                 },
                 label = { Text(stringResource(destination.titleId)) },

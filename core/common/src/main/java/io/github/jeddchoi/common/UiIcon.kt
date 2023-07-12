@@ -23,7 +23,7 @@ sealed class UiIcon {
     ) : UiIcon()
 
     @Composable
-    fun IconComposable() = when (this) {
+    fun ToComposable() = when (this) {
         is ImageVectorIcon ->
             Icon(
                 imageVector = imageVector,

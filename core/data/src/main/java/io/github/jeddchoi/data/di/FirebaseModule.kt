@@ -29,7 +29,6 @@ import io.github.jeddchoi.data.repository.StoreRepository
 import io.github.jeddchoi.data.repository.UserProfileRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
-import kotlinx.serialization.ExperimentalSerializationApi
 import javax.inject.Singleton
 
 
@@ -75,7 +74,6 @@ abstract class FirebaseModule {
         ): FirebaseFirestore {
             return Firebase.firestore(firebaseApp)
         }
-
     }
 
     @Binds
@@ -84,7 +82,6 @@ abstract class FirebaseModule {
     ): AuthRepository
 
 
-    @ExperimentalSerializationApi
     @Binds
     abstract fun bindsSeatFinderService(
         seatFinderService: FirebaseSeatFinderServiceImpl,

@@ -4,7 +4,6 @@ import android.util.Log
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.FirebaseFunctionsException
 import io.github.jeddchoi.data.firebase.model.FirebaseRequestResult
-import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.service.seatfinder.ResultCode
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequest
@@ -13,6 +12,7 @@ import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
 import io.github.jeddchoi.data.util.toJsonElement
 import io.github.jeddchoi.model.SeatFinderRequestType
+import io.github.jeddchoi.model.SeatPosition
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
@@ -26,7 +26,7 @@ import javax.inject.Singleton
 
 const val CLOUD_FUNCTION_USER_ACTION_HANDLE = "SeatFinder-onHandleRequest"
 
-@ExperimentalSerializationApi
+@OptIn(ExperimentalSerializationApi::class)
 @Singleton
 class FirebaseSeatFinderServiceImpl @Inject constructor(
     private val currentUserRepository: CurrentUserRepository,

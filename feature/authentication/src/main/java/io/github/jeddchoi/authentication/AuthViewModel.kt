@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.common.Action
 import io.github.jeddchoi.common.Message
+import io.github.jeddchoi.common.OneShotFeedbackUiState
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.common.toErrorMessage
 import io.github.jeddchoi.data.repository.AppFlagsRepository
@@ -94,7 +95,16 @@ internal class AuthViewModel @Inject constructor(
     }
 
     fun forgotPassword() {
-        // TODO: Implement this
+        launchOneShotJob(job = {
+            if (!checkEmailInput(uiState.value.emailInput)) return@launchOneShotJob
+            authRepository.sendPasswordResetEmail(uiState.value.emailInput)
+        }, onError = { e, job ->
+            _uiState.update {
+                it.copy(
+                    userMessage = e.toErrorMessage(Action.Dismiss { dismissUserMessage() })
+                )
+            }
+        })
     }
 
     fun signIn() {
@@ -203,20 +213,22 @@ data class AuthUiState(
 
     val isSignInTaskCompleted: Boolean = false,
     val isRegisterTaskCompleted: Boolean = false,
-    val isLoading: Boolean = false,
-    val userMessage: Message? = null
-) {
-    val signInInfoComplete = !emailInput.isNullOrBlank() && !passwordInput.isNullOrBlank()
+
+    val openPasswordForgotDialog: Boolean = false,
+    override val isLoading: Boolean = false,
+    override val userMessage: Message? = null
+) : OneShotFeedbackUiState() {
+    val signInInfoComplete = emailInput.isNotBlank() && passwordInput.isNotBlank()
     val isValidInfoToSignIn = isEmailValid && isPasswordValid
 
     val registerInfoComplete =
-        !emailInput.isNullOrBlank() && !passwordInput.isNullOrBlank() && !confirmPasswordInput.isNullOrBlank() && !displayNameInput.isNullOrBlank()
+        emailInput.isNotBlank() && passwordInput.isNotBlank() && confirmPasswordInput.isNotBlank() && displayNameInput.isNotBlank()
     val isValidInfoToRegister =
         isEmailValid && isDisplayNameValid && isPasswordValid && doPasswordsMatch
 
-    val emailInputError: Boolean = !emailInput.isNullOrEmpty() && !isEmailValid
-    val displayNameInputError: Boolean = !displayNameInput.isNullOrEmpty() && !isDisplayNameValid
-    val passwordInputError: Boolean = !passwordInput.isNullOrEmpty() && !isPasswordValid
+    val emailInputError: Boolean = emailInput.isNotEmpty() && !isEmailValid
+    val displayNameInputError: Boolean = displayNameInput.isNotEmpty() && !isDisplayNameValid
+    val passwordInputError: Boolean = passwordInput.isNotEmpty() && !isPasswordValid
     val confirmPasswordInputError: Boolean =
-        !confirmPasswordInput.isNullOrEmpty() && !doPasswordsMatch
+        confirmPasswordInput.isNotEmpty() && !doPasswordsMatch
 }
