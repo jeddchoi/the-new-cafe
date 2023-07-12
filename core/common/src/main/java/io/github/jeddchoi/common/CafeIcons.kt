@@ -5,16 +5,18 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.Store
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.DataUsage
 import androidx.compose.material.icons.rounded.Error
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.ShoppingBasket
 import androidx.compose.material.icons.rounded.Store
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material.icons.rounded.Warning
 
 object CafeIcons {
@@ -31,11 +33,14 @@ object CafeIcons {
     val Warning = Icons.Rounded.Warning
     val Error = Icons.Rounded.Error
 
-    val Visibility = Icons.Default.Visibility
-    val VisibilityOff = Icons.Default.VisibilityOff
+    val Visibility = Icons.Rounded.Visibility
+    val VisibilityOff = Icons.Rounded.VisibilityOff
 
     val ArrowBack = Icons.Rounded.ArrowBack
 
     val Checked = Icons.Rounded.CheckCircle
+
+    val ExpandMore = Icons.Rounded.ExpandMore
+    val ExpandLess = Icons.Rounded.ExpandLess
 }
 

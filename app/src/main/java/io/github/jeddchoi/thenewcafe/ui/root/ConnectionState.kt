@@ -18,12 +18,11 @@ fun ConnectionState(connectedState: ConnectedState) {
     when (connectedState) {
         ConnectedState.CONNECTED -> {}
         ConnectedState.FOUND_CONNECTION -> {
-            val connectingMessage = stringResource(R.string.connected_again)
             Surface(
                 color = colorResource(id = R.color.positive_background),
             ) {
                 Text(
-                    text = connectingMessage,
+                    text = stringResource(R.string.connected_again),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -31,9 +30,8 @@ fun ConnectionState(connectedState: ConnectedState) {
             }
         }
         ConnectedState.LOST -> {
-            val notConnectedMessage = stringResource(R.string.not_connected)
             Text(
-                text = notConnectedMessage,
+                text = stringResource(R.string.not_connected),
                 color = MaterialTheme.colorScheme.onErrorContainer,
                 textAlign = TextAlign.Center,
                 modifier = Modifier

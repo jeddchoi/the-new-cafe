@@ -12,9 +12,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,6 +25,7 @@ import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.thenewcafe.splash.SplashViewModel
 import io.github.jeddchoi.thenewcafe.ui.root.RootScreen
+import io.github.jeddchoi.thenewcafe.ui.root.RootViewModel
 import javax.inject.Inject
 
 
@@ -57,12 +61,17 @@ class MainActivity : ComponentActivity() {
                     modifier = maxSizeModifier,
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val rootViewModel: RootViewModel = hiltViewModel()
+                    val redirectToAuth by rootViewModel.redirectToAuth.collectAsStateWithLifecycle()
+
                     navController = rememberNavController()
+
                     RootScreen(
                         windowSizeClass = calculateWindowSizeClass(this),
                         networkMonitor = networkMonitor,
-                        navController = navController,
                         modifier = maxSizeModifier,
+                        navController = navController,
+                        redirectToAuth = redirectToAuth
                     )
 
                     LaunchedEffect(Unit) {

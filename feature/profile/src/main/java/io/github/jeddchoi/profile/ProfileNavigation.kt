@@ -25,14 +25,14 @@ fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
 /**
  * Bridge to Profile screen
  *
- * @param onNavigateToSignIn
+ * @param navigateToAuth
  * @param onBackClick
  * @receiver
  * @receiver
  */
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.profileScreen(
-    onNavigateToSignIn: () -> Unit,
+    navigateToAuth: () -> Unit,
 ) {
     composable(
         route = ProfileRoutePattern,
@@ -52,7 +52,7 @@ fun NavGraphBuilder.profileScreen(
 
         ProfileScreen(
             uiState = uiState,
-            navigateToSignIn = onNavigateToSignIn,
+            navigateToSignIn = navigateToAuth,
         )
     }
 }

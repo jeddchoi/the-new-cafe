@@ -80,7 +80,7 @@ internal class StoreViewModel @Inject constructor(
     }
         .catch {
             Log.e("uiState", "Error : $it")
-            StoreUiState.Error(it)
+            emit(StoreUiState.Error(it))
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StoreUiState.Loading)
 

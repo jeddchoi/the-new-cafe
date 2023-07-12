@@ -7,7 +7,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
 
-private const val MainRoutePattern = "main"
+internal const val MainRoutePattern = "main"
 
 fun NavController.navigateToMain(navOptions: NavOptions? = null) {
     this.navigate(MainRoutePattern, navOptions)

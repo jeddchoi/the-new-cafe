@@ -33,7 +33,7 @@ fun NavController.navigateToStore(
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.storeScreen(
     onBackClick: () -> Unit,
-    navigateToSignIn: () -> Unit,
+    navigateToAuth: () -> Unit,
 ) {
     composable(
         route = StoreRoutePattern,
@@ -63,7 +63,7 @@ fun NavGraphBuilder.storeScreen(
             reserve = viewModel::reserve,
             quit = viewModel::quit,
             changeSeat = viewModel::quitAndReserve,
-            navigateToSignIn = navigateToSignIn
+            navigateToSignIn = navigateToAuth
         )
     }
 }

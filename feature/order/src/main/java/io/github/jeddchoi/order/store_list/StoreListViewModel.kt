@@ -20,7 +20,7 @@ internal class StoreListViewModel @Inject constructor(
             if (it.isEmpty()) StoreListUiState.EmptyList
             else StoreListUiState.Success(it)
         }
-        .catch { StoreListUiState.Error(it) }
+        .catch { emit(StoreListUiState.Error(it)) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StoreListUiState.Loading)
 }
 

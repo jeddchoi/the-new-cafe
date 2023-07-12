@@ -31,7 +31,7 @@ internal class ProfileViewModel @Inject constructor(
         }
     }.catch {
         Log.e("uiState", it.stackTraceToString())
-        ProfileUiState.Error(it)
+        emit(ProfileUiState.Error(it))
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProfileUiState.InitialLoading)
 
 

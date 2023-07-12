@@ -5,7 +5,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 /**
  * Now in Android navigation bar with content slot. Wraps Material 3 [NavigationBar].
@@ -21,7 +20,6 @@ fun CafeNavigationBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        tonalElevation = 0.dp,
         content = content,
     )
 }

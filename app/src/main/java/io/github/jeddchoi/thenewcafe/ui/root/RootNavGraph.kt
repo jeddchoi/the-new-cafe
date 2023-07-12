@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import io.github.jeddchoi.authentication.authGraph
 import io.github.jeddchoi.authentication.navigateToAuth
@@ -18,19 +19,20 @@ import io.github.jeddchoi.order.store.navigateToStore
 import io.github.jeddchoi.order.store.storeScreen
 import io.github.jeddchoi.order.store_list.storeListScreen
 import io.github.jeddchoi.profile.profileScreen
+import io.github.jeddchoi.thenewcafe.ui.main.MainRoutePattern
 import io.github.jeddchoi.thenewcafe.ui.main.mainGraph
 import io.github.jeddchoi.thenewcafe.ui.main.navigateToMain
 
 @Composable
 fun RootNavGraph(
-    navController: NavHostController,
-    shouldRedirectToAuth: Boolean,
     modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+    redirectToAuth: Boolean = false,
 ) {
     NavHost(
-        navController = navController,
-        startDestination = RootNav.Main.route,
         modifier = modifier,
+        navController = navController,
+        startDestination = MainRoutePattern,
     ) {
         authGraph {
             val navigateToMain = {
@@ -39,38 +41,37 @@ fun RootNavGraph(
                     launchSingleTop = true
                 })
             }
-            signInScreen(navController, navigateToMain)
-            registerScreen(navController, navigateToMain)
+            signInScreen(
+                navController = navController,
+                navigateToMain = navigateToMain,
+            )
+            registerScreen(
+                navController = navController,
+                navigateToMain = navigateToMain,
+            )
         }
 
         mainGraph {
             profileScreen(
-                onNavigateToSignIn = {
-                    navController.navigateToAuth()
-                },
+                navigateToAuth = navController::navigateToAuth,
             )
             orderGraph {
                 storeListScreen(
-                    navigateToStore = { storeId ->
-                        navController.navigateToStore(storeId)
-                    }
+                    navigateToStore = navController::navigateToStore
                 )
-                storeScreen(navController::navigateUp) {
-                    navController.navigateToAuth()
-                }
+                storeScreen(
+                    onBackClick = navController::navigateUp,
+                    navigateToAuth = navController::navigateToAuth
+                )
             }
             myPageScreen(
-                navigateToStoreList = {
-                    navController.navigateToOrder()
-                },
-                navigateToStore = { storeId ->
-                    navController.navigateToStore(storeId)
-                },
+                navigateToStoreList = navController::navigateToOrder,
+                navigateToStore = navController::navigateToStore,
             )
         }
     }
-    LaunchedEffect(shouldRedirectToAuth) {
-        if (shouldRedirectToAuth) {
+    LaunchedEffect(redirectToAuth) {
+        if (redirectToAuth) {
             navController.navigateToAuth()
         }
     }

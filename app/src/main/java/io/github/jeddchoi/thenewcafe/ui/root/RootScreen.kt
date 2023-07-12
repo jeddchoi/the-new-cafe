@@ -2,6 +2,7 @@ package io.github.jeddchoi.thenewcafe.ui.root
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -10,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.component.lottie.ConfettiLottie
 import io.github.jeddchoi.thenewcafe.ui.main.BottomBar
@@ -26,19 +27,18 @@ import io.github.jeddchoi.thenewcafe.ui.main.BottomBar
 fun RootScreen(
     windowSizeClass: WindowSizeClass,
     networkMonitor: NetworkMonitor,
-    navController: NavHostController,
     modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
     rootState: RootState = rememberRootState(
         windowSizeClass = windowSizeClass,
         networkMonitor = networkMonitor,
         navController = navController,
     ),
-    viewModel: RootViewModel = hiltViewModel()
+    redirectToAuth: Boolean = false,
+    showConfetti: Boolean = false,
 ) {
     val showBottomBar by rootState.showBottomBar.collectAsStateWithLifecycle(initialValue = false)
     val connectedState by rootState.connectedState.collectAsStateWithLifecycle()
-
-
 
     Scaffold(
         modifier = modifier,
@@ -50,7 +50,8 @@ fun RootScreen(
                 if (showBottomBar) {
                     BottomBar(
                         navController = rootState.navController,
-                        currentDestination = rootState.currentDestination
+                        currentDestination = rootState.currentDestination,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
                 ConnectionState(connectedState)
@@ -58,18 +59,20 @@ fun RootScreen(
         },
     ) { innerPadding ->
         Box(
-            modifier = modifier.padding(innerPadding),
+            modifier = Modifier.padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
-            val shouldRedirectToAuth by viewModel.shouldRedirectToAuth.collectAsStateWithLifecycle()
-            RootNavGraph(
-                navController = rootState.navController,
-                shouldRedirectToAuth = shouldRedirectToAuth
-            )
 
-            ConfettiLottie(
-                modifier = Modifier.matchParentSize(),
+            RootNavGraph(
+                modifier = Modifier.fillMaxSize(),
+                navController = rootState.navController,
+                redirectToAuth = redirectToAuth
             )
+            if (showConfetti) {
+                ConfettiLottie(
+                    modifier = Modifier.matchParentSize(),
+                )
+            }
         }
     }
 }

@@ -14,6 +14,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.github.jeddchoi.data.util.ConnectedState
 import io.github.jeddchoi.data.util.NetworkMonitor
+import io.github.jeddchoi.thenewcafe.ui.main.MainRoutePattern
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
@@ -50,7 +51,7 @@ class RootState(
 
     private val isMainRoute = navController.currentBackStackEntryFlow.map { backStackEntry ->
         backStackEntry.destination.hierarchy.any {
-            it.route?.contains(RootNav.Main.route, true) ?: false
+            it.route?.contains(MainRoutePattern, true) ?: false
         }
     }
 
