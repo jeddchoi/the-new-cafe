@@ -28,7 +28,6 @@ internal class MyPageViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-
     val uiState: StateFlow<MyPageUiState> =
         tickHandler.tickFlow.combine(sessionRepository.userSession) { current, userSession ->
             if (userSession != null) {

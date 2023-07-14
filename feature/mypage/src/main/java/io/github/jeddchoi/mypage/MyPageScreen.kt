@@ -5,7 +5,9 @@ package io.github.jeddchoi.mypage
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -27,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jeddchoi.mypage.history.HistoryScreen
+import io.github.jeddchoi.mypage.session.DisplayedUserSession
 import io.github.jeddchoi.mypage.session.SessionScreen
 import io.github.jeddchoi.ui.fullscreen.ErrorScreen
 import io.github.jeddchoi.ui.fullscreen.LoadingScreen
@@ -99,27 +102,54 @@ private fun MyPageWithBottomSheet(
     ),
     selectTab: (MyPageTab) -> Unit = {},
 ) {
-    BottomSheetScaffold(
-        modifier = modifier,
-        scaffoldState = bottomSheetScaffoldState,
-        sheetPeekHeight = 128.dp,
-        sheetContent = {
-            ControlPanel()
-        },
-    ) { _ ->
-        MyPageWithPager(
-            uiState = uiState,
-            modifier = modifier,
-            selectedTab = selectedTab,
-            selectTab = selectTab,
-        )
+
+    when (uiState) {
+        MyPageUiState.InitialLoading -> {
+            LoadingScreen(
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+
+        MyPageUiState.NotAuthenticated -> {
+            NotAuthenticatedScreen(
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+
+        is MyPageUiState.Success -> {
+            BottomSheetScaffold(
+                modifier = modifier,
+                scaffoldState = bottomSheetScaffoldState,
+                sheetPeekHeight = 128.dp,
+                sheetContent = {
+                    ControlPanel(
+                        modifier = Modifier.height(250.dp),
+                        displayedUserSession = uiState.displayedUserSession,
+                    )
+                },
+            ) { _ ->
+                MyPageWithPager(
+                    displayedUserSession = uiState.displayedUserSession,
+                    modifier = Modifier.fillMaxSize(),
+                    selectedTab = selectedTab,
+                    selectTab = selectTab,
+                )
+            }
+        }
+
+        is MyPageUiState.Error -> {
+            ErrorScreen(
+                exception = uiState.exception,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
     }
 }
 
 @Composable
 @OptIn(ExperimentalFoundationApi::class)
 private fun MyPageWithPager(
-    uiState: MyPageUiState,
+    displayedUserSession: DisplayedUserSession,
     modifier: Modifier = Modifier,
     selectedTab: MyPageTab = MyPageTab.SESSION,
     pagerState: PagerState = rememberPagerState(
@@ -143,42 +173,22 @@ private fun MyPageWithPager(
     }
 
     HorizontalPager(
+        modifier = modifier,
         state = pagerState,
     ) {
         // Our content for each page
-        when (uiState) {
-            MyPageUiState.InitialLoading -> {
-                LoadingScreen(
-                    modifier = modifier,
+        when (MyPageTab.VALUES[it]) {
+            MyPageTab.SESSION -> {
+                SessionScreen(
+                    displayedUserSession = displayedUserSession,
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
 
-            MyPageUiState.NotAuthenticated -> {
-                NotAuthenticatedScreen(
-                    modifier = modifier,
+            MyPageTab.HISTORY -> {
+                HistoryScreen(
+                    modifier = Modifier.fillMaxSize(),
                 )
-            }
-
-            is MyPageUiState.Error -> {
-                ErrorScreen(
-                    exception = uiState.exception,
-                    modifier = modifier,
-                )
-            }
-
-            is MyPageUiState.Success -> {
-                when (MyPageTab.VALUES[it]) {
-                    MyPageTab.SESSION -> {
-                        SessionScreen(
-                            uiState.displayedUserSession,
-                            modifier = modifier,
-                        )
-                    }
-
-                    MyPageTab.HISTORY -> {
-                        HistoryScreen()
-                    }
-                }
             }
         }
     }

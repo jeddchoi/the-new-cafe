@@ -11,4 +11,7 @@
     <string name="info">Info</string>
     <string name="empty_result">Empty Result</string>
     <string name="not_authenticated">You need to sign in</string>
+    <string name="end_time">End time</string>
+    <string name="duration_in_seconds">Duration(sec)</string>
+    <string name="reset">Reset</string>
 </resources>

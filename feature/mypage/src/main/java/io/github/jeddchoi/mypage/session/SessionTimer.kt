@@ -20,8 +20,15 @@ data class SessionTimer(
                 remainingTime?.isFinite() == true &&
                 totalTime?.isFinite() == true
 
+    fun progress(remaining: Boolean) = if (hasEndTime && isStarted) {
+        if (remaining) remainingTime?.inWholeSeconds?.div(totalTime?.inWholeSeconds ?: 1L)?.toFloat()
+        else elapsedTime.inWholeSeconds.div(totalTime?.inWholeSeconds ?: 1L).toFloat()
+    } else {
+        null
+    }
 
     override fun toString(): String {
         return "SessionTimer(startTime=$startTime, endTime=$endTime, elapsedTime=${elapsedTime.inWholeSeconds}, remainingTime=${remainingTime?.inWholeSeconds}, totalTime=${totalTime?.inWholeSeconds})"
     }
 }
+

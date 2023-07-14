@@ -44,4 +44,17 @@
     <string name="name_register_guide">Name should be shorter than 20 bytes</string>
     <string name="password_isnt_same">Your password and confirmation password must match</string>
     <string name="length_limit_msg">This should be shorter than %d</string>
+
+
+    <string name="reserve">Reserve</string>
+    <string name="occupy">Occupy</string>
+    <string name="quit">Quit</string>
+    <string name="do_business">Do business</string>
+    <string name="leave_away">Leave away</string>
+    <string name="resume_using">Resume using</string>
+    <string name="change_reservation_end_time">Change reservation end time</string>
+    <string name="change_occupy_end_time">Change occupy end time</string>
+    <string name="change_business_end_time">Change business end time</string>
+    <string name="change_away_end_time">Change away end time</string>
+
 </resources>

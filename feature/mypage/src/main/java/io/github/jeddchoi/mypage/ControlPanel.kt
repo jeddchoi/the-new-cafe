@@ -1,23 +1,14 @@
 package io.github.jeddchoi.mypage
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,79 +20,116 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.commandiron.wheel_picker_compose.WheelDateTimePicker
 import com.commandiron.wheel_picker_compose.core.TimeFormat
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toJavaLocalDateTime
-import kotlinx.datetime.toKotlinInstant
-import kotlinx.datetime.toLocalDateTime
+import io.github.jeddchoi.common.UiText
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
+import io.github.jeddchoi.designsystem.component.BottomButton
+import io.github.jeddchoi.designsystem.component.SegmentedControl
+import io.github.jeddchoi.mypage.session.DisplayedUserSession
+import io.github.jeddchoi.ui.component.ComponentWithBottomButtons
+import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
-import kotlin.time.Duration.Companion.seconds
 
 @Composable
 internal fun ColumnScope.ControlPanel(
+    displayedUserSession: DisplayedUserSession,
     modifier: Modifier = Modifier,
-    controlButtons: List<SeatFinderButtonState> = emptyList(),
     expandPartially: () -> Unit = {},
 ) {
-    var endTime by remember { mutableStateOf(Instant.DISTANT_FUTURE) }
-
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        OutlinedTextField(value = endTime.toString(), onValueChange = {}, readOnly = true)
-        Button(onClick = {
-            endTime = Instant.DISTANT_FUTURE
-        }) {
-            Text("Reset")
-        }
+    var selectedItemIdx by remember {
+        mutableIntStateOf(0)
+    }
+    var duration: Int? by remember {
+        mutableStateOf(null)
+    }
+    var endTime: Long? by remember {
+        mutableStateOf(null)
     }
 
-    EndTimeInput {
-        endTime = it
-    }
-
-    ControlPanelButtons(
-        controlButtons = controlButtons,
+    EndTimeInput(
+        modifier = modifier,
+        selectedItemIdx = selectedItemIdx,
+        selectItem = {
+            selectedItemIdx = it
+        },
+        duration = duration,
+        changeDuration = {
+            duration = it
+        },
         endTime = endTime,
-        expandPartially = expandPartially,
+        changeEndTime = {
+            endTime = it
+        },
     )
+
+//    ControlPanelButtons(
+//        endTime = endTime,
+//        expandPartially = expandPartially,
+//    )
 }
 
 @Composable
-private fun ColumnScope.EndTimeInput(onEndTimeChange: (Instant) -> Unit) {
-    var offsetSeconds by remember { mutableStateOf(50f) }
+private fun EndTimeInput(
+    modifier: Modifier = Modifier,
+    selectedItemIdx: Int = 0,
+    selectItem: (Int) -> Unit = {},
+    duration: Int? = null,
+    changeDuration: (Int?) -> Unit = {},
+    endTime: Long? = null,
+    changeEndTime: (Long?) -> Unit = {},
+) {
 
-    val current = Clock.System.now()
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 8.dp)
-    ) {
-
-
-        Text(text = "${offsetSeconds.toInt()} seconds")
-        Slider(
-            modifier = Modifier.semantics { contentDescription = "Localized Description" },
-            value = offsetSeconds,
-            onValueChange = {
-                offsetSeconds = it
-                onEndTimeChange(current.plus(it.toInt().seconds))
-            },
-            valueRange = 0f..100f,
-            steps = 19,
-        )
-
-
-        WheelDateTimePicker(
-            startDateTime = current.toLocalDateTime(TimeZone.currentSystemDefault())
-                .toJavaLocalDateTime(),
-            timeFormat = TimeFormat.HOUR_24,
-            rowCount = 5,
-        ) { snappedDateTime ->
-            onEndTimeChange(
-                snappedDateTime.atZone(ZoneId.systemDefault()).toInstant().toKotlinInstant()
+    ComponentWithBottomButtons(
+        bottomButtons = {
+            BottomButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = UiText.StringResource(R.string.reset),
+                click = {
+                    changeDuration(null)
+                    changeEndTime(null)
+                }
             )
+        }
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = modifier.padding(horizontal = 8.dp)
+        ) {
+
+            SegmentedControl(
+                items = listOf(
+                    UiText.StringResource(R.string.duration_in_seconds),
+                    UiText.StringResource(R.string.end_time)
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                selectedItemIndex = selectedItemIdx,
+                onItemSelection = selectItem
+            )
+
+            if (selectedItemIdx == 0) {
+
+                Slider(
+                    modifier = Modifier.semantics { contentDescription = "Localized Description" },
+                    value = duration?.toFloat() ?: 50f,
+                    onValueChange = {
+                        changeDuration(it.toInt())
+                    },
+                    valueRange = 0f..100f,
+                    steps = 19,
+                )
+            } else {
+
+                WheelDateTimePicker(
+                    startDateTime = endTime?.let { Instant.ofEpochSecond(it).atZone(ZoneId.systemDefault()).toLocalDateTime() }
+                        ?: LocalDateTime.now(),
+                    timeFormat = TimeFormat.HOUR_24,
+                    rowCount = 5,
+                ) { snappedDateTime ->
+                    changeEndTime(
+                        snappedDateTime.atZone(ZoneId.systemDefault()).toEpochSecond()
+                    )
+                }
+            }
         }
     }
 }
@@ -110,36 +138,61 @@ private fun ColumnScope.EndTimeInput(onEndTimeChange: (Instant) -> Unit) {
 @Composable
 private fun ControlPanelButtons(
     modifier: Modifier = Modifier,
-    controlButtons: List<SeatFinderButtonState> = emptyList(),
-    endTime: Instant,
-    expandPartially: () -> Unit,
+    duration: Int? = null,
+    endTime: Long? = null,
+    clickButton: (SeatFinderUserRequestType) -> Unit = {},
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        contentPadding = PaddingValues(8.dp),
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        items(controlButtons, span = {
-            if (it is SeatFinderButtonState.PrimaryButton)
-                GridItemSpan(2)
-            else
-                GridItemSpan(1)
-        }) {
-            Button(
-                onClick = {
-                    it.onClick(endTime)
-                    expandPartially()
-                },
-                modifier = Modifier
-                    .height(72.dp)
-                    .padding(8.dp),
-                enabled = it.isEnabled
-            ) {
-                Text(it.name)
-            }
+        SeatFinderUserRequestType.VALUES.forEach {
+
         }
+
     }
+
+
+//    LazyVerticalGrid(
+//        columns = GridCells.Fixed(2),
+//        contentPadding = PaddingValues(8.dp),
+//    ) {
+//        items(controlButtons, span = {
+//            if (it is SeatFinderButtonState.PrimaryButton)
+//                GridItemSpan(2)
+//            else
+//                GridItemSpan(1)
+//        }) {
+//            Button(
+//                onClick = {
+//                    it.onClick(endTime)
+//                    expandPartially()
+//                },
+//                modifier = Modifier
+//                    .height(72.dp)
+//                    .padding(8.dp),
+//                enabled = it.isEnabled
+//            ) {
+//                Text(it.name)
+//            }
+//        }
+//    }
 }
 
+
+@Composable
+fun ControlPanelButton(
+    requestType: SeatFinderUserRequestType,
+    clickButton: (SeatFinderUserRequestType) -> Unit = {},
+) {
+    BottomButton(
+        text = requestType.toUiText(),
+        click = {
+            clickButton(requestType)
+        }
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
