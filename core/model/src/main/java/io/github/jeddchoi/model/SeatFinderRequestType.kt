@@ -1,14 +1,14 @@
 package io.github.jeddchoi.model
 
-enum class SeatFinderRequestType() {
-    ReserveSeat,
-    OccupySeat,
-    Quit,
-    DoBusiness,
-    LeaveAway,
-    ResumeUsing,
-    ChangeMainStateEndTime,
-    ChangeSubStateEndTime,
+enum class SeatFinderRequestType(val resultState: UserStateType?) {
+    ReserveSeat(UserStateType.Reserved),
+    OccupySeat(UserStateType.Occupied),
+    Quit(UserStateType.None),
+    DoBusiness(UserStateType.OnBusiness),
+    LeaveAway(UserStateType.Away),
+    ResumeUsing(UserStateType.Occupied),
+    ChangeMainStateEndTime(null),
+    ChangeSubStateEndTime(null),
     ;
 
     companion object {

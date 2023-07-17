@@ -84,7 +84,8 @@ fun NavGraphBuilder.myPageScreen(
             uiState = uiState,
             selectTab = {
                 selectedTab = it
-            }
+            },
+            sendRequest = viewModel::sendRequest
         )
     }
 }

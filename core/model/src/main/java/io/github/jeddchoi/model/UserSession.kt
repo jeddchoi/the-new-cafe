@@ -16,7 +16,7 @@ sealed class UserSession {
         val endSessionTime: Instant? = null,
         val startTime: Instant = Instant.DISTANT_PAST,
         val endTime: Instant? = null,
-        val seatPosition: SeatPosition? = null,
+        val seatPosition: SeatPosition = SeatPosition(),
         override val currentState: UserStateType = UserStateType.Reserved,
         val requestTypeAfterCurrentState: SeatFinderRequestType? = null,
     ) : UserSession()

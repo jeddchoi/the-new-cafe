@@ -20,6 +20,6 @@ enum class SeatFinderUserRequestType(@StringRes val title: Int, val availableSta
 
     fun toUiText() = UiText.StringResource(title)
     companion object {
-        val VALUES = values().toList()
+        val RequestTypesInSession = values().toList().drop(1)
     }
 }

@@ -1,20 +1,26 @@
 package io.github.jeddchoi.mypage.session
 
+import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
+import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.model.UserSession
 import io.github.jeddchoi.model.UserStateType
+import io.github.jeddchoi.mypage.R
 import kotlinx.datetime.Instant
 
 /**
  * Sealed interface that represents the current status of the user.
  */
 sealed interface DisplayedUserSession {
+    val stateName: UiText
     fun canDo(action: SeatFinderUserRequestType): Boolean
 
     /**
      * Represents the case where the user has no status.
      */
     object None : DisplayedUserSession {
+        override val stateName: UiText = UiText.StringResource(R.string.user_session_none)
+
         override fun canDo(action: SeatFinderUserRequestType): Boolean =
             when (action) {
                 SeatFinderUserRequestType.Reserve -> true
@@ -29,10 +35,6 @@ sealed interface DisplayedUserSession {
                 SeatFinderUserRequestType.ChangeBusinessEndTime,
                 SeatFinderUserRequestType.ChangeAwayEndTime -> false
             }
-
-        override fun toString(): String {
-            return "None"
-        }
     }
 
     /**
@@ -42,7 +44,9 @@ sealed interface DisplayedUserSession {
     sealed interface UsingSeat : DisplayedUserSession {
         val sessionTimer: SessionTimer
         val currentStateTimer: SessionTimer
-
+        val hasFailure: Boolean
+        val seatPosition: SeatPosition
+        val resultStateAfterCurrentState: UserStateType?
 
         /**
          * Represents the case where the user has reserved a seat but has not yet started using it.
@@ -50,7 +54,12 @@ sealed interface DisplayedUserSession {
         data class Reserved(
             override val sessionTimer: SessionTimer,
             override val currentStateTimer: SessionTimer,
+            override val hasFailure: Boolean,
+            override val seatPosition: SeatPosition,
+            override val resultStateAfterCurrentState: UserStateType?,
         ) : UsingSeat {
+            override val stateName: UiText = UiText.StringResource(R.string.user_session_reserved)
+
             override fun canDo(action: SeatFinderUserRequestType): Boolean =
                 when (action) {
                     SeatFinderUserRequestType.Quit,
@@ -74,7 +83,11 @@ sealed interface DisplayedUserSession {
         data class Occupied(
             override val sessionTimer: SessionTimer,
             override val currentStateTimer: SessionTimer,
+            override val hasFailure: Boolean,
+            override val seatPosition: SeatPosition,
+            override val resultStateAfterCurrentState: UserStateType?,
         ) : UsingSeat {
+            override val stateName: UiText = UiText.StringResource(R.string.user_session_occupied)
             override fun canDo(action: SeatFinderUserRequestType): Boolean =
                 when (action) {
                     SeatFinderUserRequestType.Quit,
@@ -97,7 +110,11 @@ sealed interface DisplayedUserSession {
         data class Away(
             override val sessionTimer: SessionTimer,
             override val currentStateTimer: SessionTimer,
+            override val hasFailure: Boolean,
+            override val seatPosition: SeatPosition,
+            override val resultStateAfterCurrentState: UserStateType?,
         ) : UsingSeat {
+            override val stateName: UiText = UiText.StringResource(R.string.user_session_away)
             override fun canDo(action: SeatFinderUserRequestType): Boolean =
                 when (action) {
                     SeatFinderUserRequestType.Quit,
@@ -120,7 +137,11 @@ sealed interface DisplayedUserSession {
         data class OnBusiness(
             override val sessionTimer: SessionTimer,
             override val currentStateTimer: SessionTimer,
+            override val hasFailure: Boolean,
+            override val seatPosition: SeatPosition,
+            override val resultStateAfterCurrentState: UserStateType?,
         ) : UsingSeat {
+            override val stateName: UiText = UiText.StringResource(R.string.user_session_on_business)
             override fun canDo(action: SeatFinderUserRequestType): Boolean =
                 when (action) {
                     SeatFinderUserRequestType.Quit,
@@ -146,6 +167,7 @@ fun UserSession.toDisplayedUserSession(current: Instant): DisplayedUserSession {
         }
 
         is UserSession.UsingSeat -> {
+            this.currentState
             val sessionTimer = SessionTimer(
                 startTime = startSessionTime,
                 endTime = endSessionTime,
@@ -164,29 +186,36 @@ fun UserSession.toDisplayedUserSession(current: Instant): DisplayedUserSession {
                 UserStateType.None -> DisplayedUserSession.None
                 UserStateType.Reserved -> DisplayedUserSession.UsingSeat.Reserved(
                     sessionTimer = sessionTimer,
-                    currentStateTimer = currentStateTimer
+                    currentStateTimer = currentStateTimer,
+                    hasFailure = hasFailure,
+                    seatPosition = seatPosition,
+                    resultStateAfterCurrentState = requestTypeAfterCurrentState?.resultState,
                 )
 
                 UserStateType.Occupied -> DisplayedUserSession.UsingSeat.Occupied(
                     sessionTimer = sessionTimer,
-                    currentStateTimer = currentStateTimer
+                    currentStateTimer = currentStateTimer,
+                    hasFailure = hasFailure,
+                    seatPosition = seatPosition,
+                    resultStateAfterCurrentState = requestTypeAfterCurrentState?.resultState,
                 )
 
                 UserStateType.Away -> DisplayedUserSession.UsingSeat.Away(
                     sessionTimer = sessionTimer,
-                    currentStateTimer = currentStateTimer
+                    currentStateTimer = currentStateTimer,
+                    hasFailure = hasFailure,
+                    seatPosition = seatPosition,
+                    resultStateAfterCurrentState = requestTypeAfterCurrentState?.resultState,
                 )
 
                 UserStateType.OnBusiness -> DisplayedUserSession.UsingSeat.OnBusiness(
                     sessionTimer = sessionTimer,
-                    currentStateTimer = currentStateTimer
+                    currentStateTimer = currentStateTimer,
+                    hasFailure = hasFailure,
+                    seatPosition = seatPosition,
+                    resultStateAfterCurrentState = requestTypeAfterCurrentState?.resultState,
                 )
             }
         }
     }
 }
-
-
-//        fun remainingTime(current:Instant) = etc?.minus(current)
-//        fun elapsedTimeSinceStart(current: Instant) = current - startTime
-//        fun elapsedTimeSinceStartSession(current: Instant) = current - startSessionTime

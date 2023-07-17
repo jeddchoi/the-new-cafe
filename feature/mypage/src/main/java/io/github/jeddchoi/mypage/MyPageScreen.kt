@@ -2,12 +2,12 @@
 
 package io.github.jeddchoi.mypage
 
+import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -15,6 +15,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -22,18 +23,24 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
+import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.mypage.history.HistoryScreen
 import io.github.jeddchoi.mypage.session.DisplayedUserSession
 import io.github.jeddchoi.mypage.session.SessionScreen
+import io.github.jeddchoi.mypage.session.SessionTimer
 import io.github.jeddchoi.ui.fullscreen.ErrorScreen
 import io.github.jeddchoi.ui.fullscreen.LoadingScreen
 import io.github.jeddchoi.ui.fullscreen.NotAuthenticatedScreen
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,6 +50,7 @@ internal fun MyPageScreen(
     modifier: Modifier = Modifier,
     selectedTab: MyPageTab = MyPageTab.SESSION,
     selectTab: (MyPageTab) -> Unit = {},
+    sendRequest: (SeatFinderUserRequestType, Int?, Long?) -> Unit = { _, _, _ -> },
 ) {
     Column(
         modifier = modifier.padding(8.dp)
@@ -56,7 +64,8 @@ internal fun MyPageScreen(
         MyPageWithBottomSheet(
             uiState = uiState,
             selectedTab = selectedTab,
-            selectTab = selectTab
+            selectTab = selectTab,
+            sendRequest = sendRequest
         )
     }
 }
@@ -101,8 +110,9 @@ private fun MyPageWithBottomSheet(
         rememberStandardBottomSheetState(skipHiddenState = true)
     ),
     selectTab: (MyPageTab) -> Unit = {},
+    sendRequest: (SeatFinderUserRequestType, Int?, Long?) -> Unit = { _, _, _ -> },
 ) {
-
+    val coroutineScope = rememberCoroutineScope()
     when (uiState) {
         MyPageUiState.InitialLoading -> {
             LoadingScreen(
@@ -123,8 +133,13 @@ private fun MyPageWithBottomSheet(
                 sheetPeekHeight = 128.dp,
                 sheetContent = {
                     ControlPanel(
-                        modifier = Modifier.height(250.dp),
                         displayedUserSession = uiState.displayedUserSession,
+                        sendRequest = sendRequest,
+                        expandPartially = {
+                            coroutineScope.launch {
+                                bottomSheetScaffoldState.bottomSheetState.partialExpand()
+                            }
+                        }
                     )
                 },
             ) { _ ->
@@ -194,8 +209,28 @@ private fun MyPageWithPager(
     }
 }
 
-@Preview
+@Preview(showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL
+)
+@Preview(showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
 @Composable
 private fun MyPagePreview() {
+    TheNewCafeTheme {
+        Surface {
+            MyPageScreen(
+                uiState = MyPageUiState.Success(
+                    displayedUserSession = DisplayedUserSession.UsingSeat.Occupied(
+                        SessionTimer(),
+                        SessionTimer(),
+                        hasFailure = false,
+                        seatPosition = SeatPosition(),
+                        resultStateAfterCurrentState = null,
+                    )
+                )
+            )
+        }
+    }
 
 }

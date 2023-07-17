@@ -1,6 +1,8 @@
 package io.github.jeddchoi.data.service.seatfinder
 
 import androidx.annotation.StringRes
+import io.github.jeddchoi.common.Message
+import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.data.R
 
 /**
@@ -50,3 +52,9 @@ enum class ResultCode(@StringRes val description: Int) {
             input?.let { VALUES.firstOrNull { code -> code.name == input } } ?: UNKNOWN
     }
 }
+
+fun ResultCode.toMessage() = Message(
+    title = UiText.DynamicString(name),
+    severity = if (this == ResultCode.OK) Message.Severity.INFO else Message.Severity.ERROR,
+    content = UiText.StringResource(description),
+)

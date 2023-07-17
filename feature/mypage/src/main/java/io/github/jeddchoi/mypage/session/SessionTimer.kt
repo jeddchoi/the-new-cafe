@@ -1,7 +1,7 @@
 package io.github.jeddchoi.mypage.session
 
+import android.util.Log
 import kotlinx.datetime.Instant
-import kotlinx.datetime.isDistantFuture
 import kotlinx.datetime.isDistantPast
 import kotlin.time.Duration
 
@@ -12,19 +12,22 @@ data class SessionTimer(
     val remainingTime: Duration? = null,
     val totalTime: Duration? = null,
 ) {
-    val isStarted =
+    private val isStarted =
         startTime.isDistantPast.not() &&
-                elapsedTime == Duration.ZERO
-    val hasEndTime =
-        endTime?.isDistantFuture == false &&
+                elapsedTime != Duration.ZERO
+    private val hasEndTime =
+        endTime != null &&
                 remainingTime?.isFinite() == true &&
                 totalTime?.isFinite() == true
 
-    fun progress(remaining: Boolean) = if (hasEndTime && isStarted) {
-        if (remaining) remainingTime?.inWholeSeconds?.div(totalTime?.inWholeSeconds ?: 1L)?.toFloat()
-        else elapsedTime.inWholeSeconds.div(totalTime?.inWholeSeconds ?: 1L).toFloat()
-    } else {
-        null
+    fun progress(remaining: Boolean): Float? {
+        Log.i("SessionTimer", "hasEndTime : $hasEndTime, isStarted : $isStarted")
+        return if (hasEndTime && isStarted) {
+            if (remaining) remainingTime?.inWholeSeconds?.div(totalTime?.inWholeSeconds?.toFloat() ?: 1f)?.coerceIn(0f, 1f)
+            else elapsedTime.inWholeSeconds.div(totalTime?.inWholeSeconds?.toFloat() ?: 1f).coerceIn(0f, 1f)
+        } else {
+            null
+        }
     }
 
     override fun toString(): String {

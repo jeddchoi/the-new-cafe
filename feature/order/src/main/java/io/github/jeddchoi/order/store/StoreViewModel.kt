@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.common.Action
 import io.github.jeddchoi.common.Message
+import io.github.jeddchoi.common.OneShotFeedbackUiState
 import io.github.jeddchoi.common.toErrorMessage
 import io.github.jeddchoi.data.repository.StoreRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
@@ -188,9 +189,9 @@ data class SelectedSeat(
 
 data class OneShotActionState(
     val selectedSeat: SelectedSeat? = null,
-    val isLoading: Boolean = false,
-    val userMessage: Message? = null,
-)
+    override val isLoading: Boolean = false,
+    override val userMessage: Message? = null,
+) : OneShotFeedbackUiState()
 
 
 internal sealed class StoreUiState {

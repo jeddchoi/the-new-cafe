@@ -59,5 +59,5 @@ fun FirebaseCurrentSession?.toUserSession() =
                     it
                 )
             },
-            seatPosition = seatPosition,
+            seatPosition = seatPosition ?: SeatPosition(),
         )
