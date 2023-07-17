@@ -115,7 +115,7 @@ private fun SectionWithSeatsScreen(
     ScreenWithTopAppBar(
         title = UiText.DynamicString(store.name),
         showNavigateUp = true,
-        onBackClick = onBackClick,
+        clickBack = onBackClick,
         modifier = modifier.fillMaxSize()
     ) { scaffoldPadding ->
         ComponentWithBottomButtons(

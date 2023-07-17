@@ -52,7 +52,7 @@ fun UserInputScreen(
         title = title,
         modifier = modifier,
         showNavigateUp = existBackStack,
-        onBackClick = clickBack,
+        clickBack = clickBack,
     ) { scaffoldPadding ->
         ComponentWithBottomButtons(
             modifier = Modifier

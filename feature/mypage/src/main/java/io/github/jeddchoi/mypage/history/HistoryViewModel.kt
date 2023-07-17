@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.common.OneShotFeedbackUiState
 import io.github.jeddchoi.data.repository.UserSessionHistoryRepository
+import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.model.UserSessionHistory
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,10 +19,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class HistoryViewModel @Inject constructor(
-    val userSessionHistoryRepository: UserSessionHistoryRepository
+    val userSessionHistoryRepository: UserSessionHistoryRepository,
+    val userSessionRepository: UserSessionRepository,
 ) : ViewModel() {
 
     val histories = userSessionHistoryRepository.getHistories().cachedIn(viewModelScope)
+
+    val currentSession = userSessionRepository.userSession
     val uiState: StateFlow<HistoryUiState> = histories.map {
         HistoryUiState.Success(
             history = it

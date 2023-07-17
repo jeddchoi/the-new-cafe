@@ -23,6 +23,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -31,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
@@ -57,7 +59,7 @@ internal fun MyPageScreen(
     navigateToHistoryDetail: (String) -> Unit = {},
 ) {
     Column(
-        modifier = modifier.padding(8.dp)
+        modifier = modifier
     ) {
         MyPageTabRow(
             selectedTab = selectedTab,
@@ -211,10 +213,12 @@ private fun MyPageWithPager(
             MyPageTab.HISTORY -> {
                 val viewModel: HistoryViewModel = hiltViewModel()
                 val pagingHistories = viewModel.histories.collectAsLazyPagingItems()
+                val currentSession by viewModel.currentSession.collectAsStateWithLifecycle(null)
                 HistoryScreen(
                     modifier = Modifier.fillMaxSize(),
                     pagingHistories = pagingHistories,
-                    navigateToHistoryDetail = navigateToHistoryDetail
+                    navigateToHistoryDetail = navigateToHistoryDetail,
+                    currentSession = currentSession
                 )
             }
         }

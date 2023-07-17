@@ -23,6 +23,7 @@ import io.github.jeddchoi.data.firebase.repository.FirebaseAuthRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseCurrentUserRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseStoreRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserProfileRepositoryImpl
+import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionHistoryDetailRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionHistoryRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.UserSessionHistoryPagingSource
@@ -31,6 +32,7 @@ import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.repository.StoreRepository
 import io.github.jeddchoi.data.repository.UserProfileRepository
+import io.github.jeddchoi.data.repository.UserSessionHistoryDetailRepository
 import io.github.jeddchoi.data.repository.UserSessionHistoryRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
@@ -136,6 +138,11 @@ abstract class FirebaseModule {
     abstract fun bindsUserProfileRepository(
         userProfileRepositoryImpl: FirebaseUserProfileRepositoryImpl,
     ): UserProfileRepository
+
+    @Binds
+    abstract fun bindsUserSessionHistoryDetailRepository(
+        historyDetailRepositoryImpl: FirebaseUserSessionHistoryDetailRepositoryImpl,
+    ): UserSessionHistoryDetailRepository
 
 
 }

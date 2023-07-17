@@ -3,9 +3,11 @@ package io.github.jeddchoi.historydetail
 import android.content.Intent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -53,13 +55,14 @@ fun NavGraphBuilder.historyDetailScreen(
                 action = Intent.ACTION_VIEW
             }
         )
-    ) {backStackEntry ->
+    ) { backStackEntry ->
         val viewModel: HistoryDetailViewModel = hiltViewModel()
 
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         HistoryDetailScreen(
-            sessionId = backStackEntry.arguments?.getString(HistoryDetailArg) ?: "Unknown session id",
             clickBack = clickBack,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            uiState = uiState,
         )
     }
 }

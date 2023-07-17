@@ -23,7 +23,7 @@ fun ScreenWithTopAppBar(
     title: UiText,
     modifier: Modifier = Modifier,
     showNavigateUp: Boolean = false,
-    onBackClick: () -> Unit = {},
+    clickBack: () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit = {}
 ) {
     val topAppBarScrollState = rememberTopAppBarState()
@@ -35,7 +35,7 @@ fun ScreenWithTopAppBar(
                 title = { Text(title.asString()) },
                 navigationIcon = {
                     if (showNavigateUp) {
-                        BackButton(onClick = onBackClick)
+                        BackButton(onClick = clickBack)
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -55,7 +55,7 @@ private fun ScreenWithTopAppBarPreview() {
             title = UiText.DynamicString("Title"),
             modifier = Modifier.fillMaxSize(),
             showNavigateUp = true,
-            onBackClick = { /*TODO*/ }) {
+            clickBack = { /*TODO*/ }) {
             repeat(20) {
                 GeneralTextField(
                     value = "Hello $it",
