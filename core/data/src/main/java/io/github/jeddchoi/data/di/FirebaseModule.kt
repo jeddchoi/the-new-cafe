@@ -1,6 +1,8 @@
 package io.github.jeddchoi.data.di
 
 import android.content.Context
+import android.nfc.tech.MifareUltralight.PAGE_SIZE
+import androidx.paging.PagingConfig
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -21,12 +23,15 @@ import io.github.jeddchoi.data.firebase.repository.FirebaseAuthRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseCurrentUserRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseStoreRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserProfileRepositoryImpl
+import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionHistoryRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionRepositoryImpl
+import io.github.jeddchoi.data.firebase.repository.UserSessionHistoryPagingSource
 import io.github.jeddchoi.data.firebase.service.FirebaseSeatFinderServiceImpl
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.repository.StoreRepository
 import io.github.jeddchoi.data.repository.UserProfileRepository
+import io.github.jeddchoi.data.repository.UserSessionHistoryRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import javax.inject.Singleton
@@ -74,6 +79,29 @@ abstract class FirebaseModule {
         ): FirebaseFirestore {
             return Firebase.firestore(firebaseApp)
         }
+
+        @Provides
+        fun provideProductsRepository(
+            source: UserSessionHistoryPagingSource,
+            config: PagingConfig
+        ): UserSessionHistoryRepository = FirebaseUserSessionHistoryRepositoryImpl(
+            source = source,
+            config = config
+        )
+
+        @Provides
+        fun provideProductsPagingSource(
+            database: FirebaseDatabase,
+            currentUserRepository: CurrentUserRepository
+        ) = UserSessionHistoryPagingSource(
+            db = database.reference,
+            currentUserRepository = currentUserRepository
+        )
+
+        @Provides
+        fun providePagingConfig() = PagingConfig(
+            pageSize = PAGE_SIZE
+        )
     }
 
     @Binds
@@ -108,5 +136,6 @@ abstract class FirebaseModule {
     abstract fun bindsUserProfileRepository(
         userProfileRepositoryImpl: FirebaseUserProfileRepositoryImpl,
     ): UserProfileRepository
+
 
 }

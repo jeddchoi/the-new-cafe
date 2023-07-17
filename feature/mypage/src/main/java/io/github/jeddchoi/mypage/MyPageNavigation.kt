@@ -52,6 +52,7 @@ fun NavController.navigateToMyPage(navOptions: NavOptions? = null) {
 fun NavGraphBuilder.myPageScreen(
     navigateToStoreList: () -> Unit = {},
     navigateToStore: (String) -> Unit = {},
+    navigateToHistoryDetail: (String) -> Unit = {},
 ) {
     composable(
         route = MyPageRoutePattern,
@@ -85,7 +86,8 @@ fun NavGraphBuilder.myPageScreen(
             selectTab = {
                 selectedTab = it
             },
-            sendRequest = viewModel::sendRequest
+            sendRequest = viewModel::sendRequest,
+            navigateToHistoryDetail = navigateToHistoryDetail,
         )
     }
 }

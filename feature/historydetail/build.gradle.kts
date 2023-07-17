@@ -4,14 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "io.github.jeddchoi.mypage"
+    namespace = "io.github.jeddchoi.historydetail"
 }
 
 dependencies {
+
     implementation(project(":core:common"))
     implementation(libs.kotlinx.datetime)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.wheel.picker.compose)
 
-    implementation(libs.androidx.paging.compose)
 }

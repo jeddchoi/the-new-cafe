@@ -30,10 +30,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.mypage.history.HistoryScreen
+import io.github.jeddchoi.mypage.history.HistoryViewModel
 import io.github.jeddchoi.mypage.session.DisplayedUserSession
 import io.github.jeddchoi.mypage.session.SessionScreen
 import io.github.jeddchoi.mypage.session.SessionTimer
@@ -51,6 +54,7 @@ internal fun MyPageScreen(
     selectedTab: MyPageTab = MyPageTab.SESSION,
     selectTab: (MyPageTab) -> Unit = {},
     sendRequest: (SeatFinderUserRequestType, Int?, Long?) -> Unit = { _, _, _ -> },
+    navigateToHistoryDetail: (String) -> Unit = {},
 ) {
     Column(
         modifier = modifier.padding(8.dp)
@@ -65,7 +69,8 @@ internal fun MyPageScreen(
             uiState = uiState,
             selectedTab = selectedTab,
             selectTab = selectTab,
-            sendRequest = sendRequest
+            sendRequest = sendRequest,
+            navigateToHistoryDetail = navigateToHistoryDetail,
         )
     }
 }
@@ -111,6 +116,7 @@ private fun MyPageWithBottomSheet(
     ),
     selectTab: (MyPageTab) -> Unit = {},
     sendRequest: (SeatFinderUserRequestType, Int?, Long?) -> Unit = { _, _, _ -> },
+    navigateToHistoryDetail: (String) -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     when (uiState) {
@@ -148,6 +154,7 @@ private fun MyPageWithBottomSheet(
                     modifier = Modifier.fillMaxSize(),
                     selectedTab = selectedTab,
                     selectTab = selectTab,
+                    navigateToHistoryDetail = navigateToHistoryDetail,
                 )
             }
         }
@@ -174,6 +181,7 @@ private fun MyPageWithPager(
         MyPageTab.VALUES.size
     },
     selectTab: (MyPageTab) -> Unit = {},
+    navigateToHistoryDetail: (String) -> Unit = {},
 ) {
 
     LaunchedEffect(selectedTab) {
@@ -201,8 +209,12 @@ private fun MyPageWithPager(
             }
 
             MyPageTab.HISTORY -> {
+                val viewModel: HistoryViewModel = hiltViewModel()
+                val pagingHistories = viewModel.histories.collectAsLazyPagingItems()
                 HistoryScreen(
                     modifier = Modifier.fillMaxSize(),
+                    pagingHistories = pagingHistories,
+                    navigateToHistoryDetail = navigateToHistoryDetail
                 )
             }
         }

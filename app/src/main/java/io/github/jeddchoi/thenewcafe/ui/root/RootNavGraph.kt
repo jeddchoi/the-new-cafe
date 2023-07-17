@@ -12,6 +12,8 @@ import io.github.jeddchoi.authentication.authGraph
 import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.authentication.register.registerScreen
 import io.github.jeddchoi.authentication.signin.signInScreen
+import io.github.jeddchoi.historydetail.historyDetailScreen
+import io.github.jeddchoi.historydetail.navigateToHistoryDetail
 import io.github.jeddchoi.mypage.myPageScreen
 import io.github.jeddchoi.order.navigateToOrder
 import io.github.jeddchoi.order.orderGraph
@@ -67,8 +69,13 @@ fun RootNavGraph(
             myPageScreen(
                 navigateToStoreList = navController::navigateToOrder,
                 navigateToStore = navController::navigateToStore,
+                navigateToHistoryDetail = navController::navigateToHistoryDetail
             )
         }
+
+        historyDetailScreen(
+            clickBack = navController::popBackStack
+        )
     }
     LaunchedEffect(redirectToAuth) {
         if (redirectToAuth) {

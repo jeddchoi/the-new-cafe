@@ -45,7 +45,7 @@ internal fun SessionScreen(
         Column(
             modifier = modifier
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 200.dp),
+                .padding(top = 16.dp, bottom = 200.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

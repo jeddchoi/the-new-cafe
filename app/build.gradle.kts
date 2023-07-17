@@ -52,6 +52,8 @@ dependencies {
     implementation(project(":feature:mypage"))
     implementation(project(":feature:order"))
     implementation(project(":feature:authentication"))
+    implementation(project(":feature:historydetail"))
+
 
     implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))

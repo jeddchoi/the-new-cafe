@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":feature:historydetail")
+
+
 include(":core:common")
 
 
@@ -30,6 +33,7 @@ include(":feature:order")
 
 include(":feature:mypage")
 include(":feature:authentication")
+include(":feature:historydetail")
 
 include(":core:ui")
 include(":core:common")

@@ -26,6 +26,7 @@ dependencies {
     implementation(libs.kotlinx.datetime)
 
     implementation(libs.androidx.datastore.proto)
+    implementation(libs.androidx.paging.compose)
 
     /**
      * Firebase dependencies
