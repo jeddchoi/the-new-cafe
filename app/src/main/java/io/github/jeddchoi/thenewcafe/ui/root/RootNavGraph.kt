@@ -15,6 +15,7 @@ import io.github.jeddchoi.authentication.signin.signInScreen
 import io.github.jeddchoi.historydetail.historyDetailScreen
 import io.github.jeddchoi.historydetail.navigateToHistoryDetail
 import io.github.jeddchoi.mypage.myPageScreen
+import io.github.jeddchoi.mypage.navigateToMyPage
 import io.github.jeddchoi.order.navigateToOrder
 import io.github.jeddchoi.order.orderGraph
 import io.github.jeddchoi.order.store.navigateToStore
@@ -63,13 +64,30 @@ fun RootNavGraph(
                 )
                 storeScreen(
                     onBackClick = navController::navigateUp,
-                    navigateToAuth = navController::navigateToAuth
+                    navigateToAuth = navController::navigateToAuth,
+                    navigateToMyPage = {
+                        navController.navigateToMyPage(navOptions {
+                            // Pop up to the start destination of the graph to
+                            // avoid building up a large stack of destinations
+                            // on the back stack as users select items
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            // Avoid multiple copies of the same destination when
+                            // reselecting the same item
+                            launchSingleTop = true
+
+                            // Restore state when reselecting a previously selected item
+                            restoreState = true
+                        })
+                    },
                 )
             }
             myPageScreen(
                 navigateToStoreList = navController::navigateToOrder,
                 navigateToStore = navController::navigateToStore,
-                navigateToHistoryDetail = navController::navigateToHistoryDetail
+                navigateToHistoryDetail = navController::navigateToHistoryDetail,
+                navigateToSignIn = navController::navigateToAuth
             )
         }
 

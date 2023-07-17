@@ -32,6 +32,8 @@ internal fun HistoryScreen(
     val refresh = pagingHistories.loadState.refresh
     val append = pagingHistories.loadState.append
 
+
+
     LazyColumn(
         modifier = modifier
     ) {

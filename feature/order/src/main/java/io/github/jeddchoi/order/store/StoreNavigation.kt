@@ -34,6 +34,7 @@ fun NavController.navigateToStore(
 fun NavGraphBuilder.storeScreen(
     onBackClick: () -> Unit,
     navigateToAuth: () -> Unit,
+    navigateToMyPage: () -> Unit,
 ) {
     composable(
         route = StoreRoutePattern,
@@ -60,10 +61,16 @@ fun NavGraphBuilder.storeScreen(
             uiState = uiState,
             onSelect = viewModel::onSelect,
             onBackClick = onBackClick,
-            reserve = viewModel::reserve,
+            reserve = {
+                viewModel.reserve()
+                navigateToMyPage()
+            },
             quit = viewModel::quit,
-            changeSeat = viewModel::quitAndReserve,
-            navigateToSignIn = navigateToAuth
+            changeSeat = {
+                viewModel.quitAndReserve()
+                navigateToMyPage()
+            },
+            navigateToSignIn = navigateToAuth,
         )
     }
 }

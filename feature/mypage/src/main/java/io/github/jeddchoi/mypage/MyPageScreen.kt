@@ -57,6 +57,7 @@ internal fun MyPageScreen(
     selectTab: (MyPageTab) -> Unit = {},
     sendRequest: (SeatFinderUserRequestType, Int?, Long?) -> Unit = { _, _, _ -> },
     navigateToHistoryDetail: (String) -> Unit = {},
+    navigateToSignIn: () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -73,6 +74,7 @@ internal fun MyPageScreen(
             selectTab = selectTab,
             sendRequest = sendRequest,
             navigateToHistoryDetail = navigateToHistoryDetail,
+            navigateToSignIn = navigateToSignIn
         )
     }
 }
@@ -119,6 +121,7 @@ private fun MyPageWithBottomSheet(
     selectTab: (MyPageTab) -> Unit = {},
     sendRequest: (SeatFinderUserRequestType, Int?, Long?) -> Unit = { _, _, _ -> },
     navigateToHistoryDetail: (String) -> Unit = {},
+    navigateToSignIn: () -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     when (uiState) {
@@ -131,6 +134,7 @@ private fun MyPageWithBottomSheet(
         MyPageUiState.NotAuthenticated -> {
             NotAuthenticatedScreen(
                 modifier = Modifier.fillMaxSize(),
+                navigateToSignIn = navigateToSignIn,
             )
         }
 

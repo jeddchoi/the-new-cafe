@@ -53,6 +53,7 @@ fun NavGraphBuilder.myPageScreen(
     navigateToStoreList: () -> Unit = {},
     navigateToStore: (String) -> Unit = {},
     navigateToHistoryDetail: (String) -> Unit = {},
+    navigateToSignIn: () -> Unit = {},
 ) {
     composable(
         route = MyPageRoutePattern,
@@ -88,6 +89,7 @@ fun NavGraphBuilder.myPageScreen(
             },
             sendRequest = viewModel::sendRequest,
             navigateToHistoryDetail = navigateToHistoryDetail,
+            navigateToSignIn = navigateToSignIn
         )
     }
 }
