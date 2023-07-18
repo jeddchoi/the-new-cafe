@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="desc_info_message">Information message</string>
+    <string name="desc_warning_message">Warning message</string>
+    <string name="desc_error_message">Error message</string>
+    <string name="error">Error</string>
+    <string name="retry">Retry</string>
+    <string name="dimiss">Dismiss</string>
+
+</resources>

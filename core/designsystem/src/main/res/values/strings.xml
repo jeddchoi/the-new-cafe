@@ -1,2 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="expand_description">Expand</string>
+    <string name="collapse_desciption">Collapse</string>
+    <string name="profile_picture_desc">Profile picture</string>
 </resources>

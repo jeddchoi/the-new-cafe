@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="my_status">My Status</string>
-    <string name="action_log">Action Log</string>
+    <string name="session">Session</string>
+    <string name="history">History</string>
     <string name="mypage">My Page</string>
+    <string name="error">Error</string>
+    <string name="retry">Retry</string>
+    <string name="quit">Quit</string>
+    <string name="occupy">Occupy</string>
+    <string name="doBusiness">Do business</string>
+    <string name="info">Info</string>
+    <string name="empty_result">Empty Result</string>
+    <string name="not_authenticated">You need to sign in</string>
+    <string name="end_time">End time</string>
+    <string name="duration_in_seconds">Duration(sec)</string>
+    <string name="reset">Reset</string>
+    <string name="user_session">User session</string>
+    <string name="session_start_time">Session start time</string>
+    <string name="user_session_none">Not in session</string>
+    <string name="user_session_reserved">Seat reserved</string>
+    <string name="user_session_occupied">Occupying the seat</string>
+    <string name="user_session_away">Away from the seat</string>
+    <string name="user_session_on_business">Doing your business away from the seat</string>
+    <string name="user_session_state">Your session state</string>
+    <string name="user_session_state_check">State check</string>
+    <string name="has_error">Has error</string>
+    <string name="good">Good</string>
+    <string name="user_session_seat_position">Seat position</string>
+    <string name="none">None</string>
+    <string name="user_session_state_after_timeout">"After timeout, It will be changed to "</string>
+    <string name="not_available">N/A</string>
+    <string name="session_timer_start_time">Start time</string>
+    <string name="session_timer_end_time">End time</string>
+    <string name="session_timer_elapsed_time">Elapsed time</string>
+    <string name="session_timer_remaining_time">Remaining time</string>
+    <string name="session_timer_total_time">Total time</string>
+    <string name="user_session_overall_timer">Overall session</string>
+    <string name="user_session_current_state_timer">Current state</string>
+    <string name="user_session_history">User session history</string>
 </resources>

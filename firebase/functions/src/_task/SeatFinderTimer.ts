@@ -1,12 +1,12 @@
 import CloudTaskUtil from "./CloudTaskUtil";
-import {defineString, projectID} from "firebase-functions/params";
+import {defineList, defineString, projectID} from "firebase-functions/params";
 import {logger} from "firebase-functions/v2";
 import {SeatFinderRequestType} from "../seat-finder/_enum/SeatFinderRequestType";
 import {TimerPayload} from "./TimerPayload";
 
 const seatFinderTimerTasksLocation = defineString("SEAT_FINDER_TIMER_TASKS_LOCATION");
 const tasksQueueName = defineString("SEAT_FINDER_TIMER_TASKS_QUEUE_NAME");
-const seatFinderFunctionLocation = defineString("SEAT_FINDER_FUNCTION_LOCATION");
+const SEAT_FINDER_FUNCTION_LOCATION = defineList("SEAT_FINDER_FUNCTION_LOCATION");
 
 export default class SeatFinderTimer {
     private static cloudTaskUtil: CloudTaskUtil;
@@ -15,8 +15,8 @@ export default class SeatFinderTimer {
     constructor(
         cloudFunctionName: string,
     ) {
-        this.invokeUrl = `https://${seatFinderFunctionLocation.value()}-${projectID.value()}.cloudfunctions.net/${cloudFunctionName}`;
-        logger.debug("[SeatFinderTimerHandler] constructor");
+        this.invokeUrl = `https://${SEAT_FINDER_FUNCTION_LOCATION.value()}-${projectID.value()}.cloudfunctions.net/${cloudFunctionName}`;
+        logger.debug(`[SeatFinderTimerHandler] constructor ${this.invokeUrl}`);
         // This should be called during cloud functions
         SeatFinderTimer.cloudTaskUtil = CloudTaskUtil.getInstance(
             projectID.value(),

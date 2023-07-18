@@ -16,7 +16,7 @@ export default class SeatHandler {
     reserveSeat = (seatPosition: SeatPosition, endTime: number | null = null) => {
         logger.debug("[SeatHandler] reserveSeat", {
             seatPosition,
-            endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
+            endTime: endTime ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
         return FirestoreUtil.Instance.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
@@ -41,7 +41,7 @@ export default class SeatHandler {
     occupySeat = (seatPosition: SeatPosition, endTime: number | null = null) => {
         logger.debug("[SeatHandler] occupySeat", {
             seatPosition,
-            endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
+            endTime: endTime ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
         return FirestoreUtil.Instance.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {
@@ -155,7 +155,7 @@ export default class SeatHandler {
     private changeEndTime = (target: SeatStateType.Reserved | SeatStateType.Occupied, seatPosition: SeatPosition, endTime: number | null = null) => {
         logger.debug("[SeatHandler] changeReserveEndTime", {
             seatPosition,
-            endTime: endTime !== null ? new Date(endTime).toLocaleTimeString() : "no deadline",
+            endTime: endTime ? new Date(endTime).toLocaleTimeString() : "no deadline",
         });
         return FirestoreUtil.Instance.transaction<Seat>(seatPositionToPath(seatPosition), (existing) => {
             if (!existing) {

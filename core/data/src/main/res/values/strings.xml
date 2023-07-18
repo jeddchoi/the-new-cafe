@@ -33,4 +33,28 @@
     <string name="result_unimplemented">Operation is not implemented or not supported/enabled.</string>
     <string name="result_unavailable">The service is currently unavailable. This is a most likely a transient condition and may be corrected by retrying with a backoff.</string>
     <string name="result_data_loss"> Unrecoverable data loss or corruption.</string>
+    <string name="result_rejected">Rejected. Maybe unknown error.</string>
+    <string name="result_invalid_seat_state">You cannot do the action on current seat state.</string>
+    <string name="result_invalid_session_state">You cannot do the action on current session state.</string>
+    <string name="result_corrupted">Rollback failed. May be corrupted.</string>
+
+    <string name="empty_input">This should not be empty or contains only whitespaces</string>
+    <string name="email_invalid_msg">Email is invalid</string>
+    <string name="password_generation_guide"><![CDATA[Passwords should contain three of the four character types\n1. Uppercase letters: A–Z\n2. Lowercase letters: a–z\n3. Numbers: 0–9\n4. Symbols: !"#$%%&'()*+,-./:;<=>?@[\]^_`{|}~]]></string>
+    <string name="name_register_guide">Name should be shorter than 20 bytes</string>
+    <string name="password_isnt_same">Your password and confirmation password must match</string>
+    <string name="length_limit_msg">This should be shorter than %d</string>
+
+
+    <string name="reserve">Reserve</string>
+    <string name="occupy">Occupy</string>
+    <string name="quit">Quit</string>
+    <string name="do_business">Do business</string>
+    <string name="leave_away">Leave away</string>
+    <string name="resume_using">Resume using</string>
+    <string name="change_reservation_end_time">Change reservation end time</string>
+    <string name="change_occupy_end_time">Change occupy end time</string>
+    <string name="change_business_end_time">Change business end time</string>
+    <string name="change_away_end_time">Change away end time</string>
+
 </resources>

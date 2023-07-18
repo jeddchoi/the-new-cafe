@@ -29,7 +29,7 @@ export default class SeatFinderHandler {
         this.seatHandler = new SeatHandler(this.userId);
 
         const seatFinderRef = DatabaseUtil.Instance.seatFinderRef();
-        this.stateChangesRef = seatFinderRef.child(REFERENCE_STATE_CHANGES_NAME);
+        this.stateChangesRef = seatFinderRef.child(REFERENCE_STATE_CHANGES_NAME).child(userId);
         this.userHistoryRef = seatFinderRef.child(REFERENCE_HISTORY_NAME).child(userId);
     }
 
@@ -38,7 +38,8 @@ export default class SeatFinderHandler {
         current: number,
         endTime: number | null,
         seatPosition: SeatPosition | null = null,
-        isTimeout = false) {
+        isTimeout = false
+    ) {
         logger.debug("[SeatFinderHandler] handleSeatFinderRequest", {requestType, endTime, seatPosition, isTimeout});
 
         return Promise.resolve().then(() => {
@@ -85,7 +86,16 @@ export default class SeatFinderHandler {
                     }
                     return Promise.resolve();
                 }).then(() => {
-                    return result;
+                    return {
+                        sessionResult: result.sessionResult ? {
+                            ...result.sessionResult,
+                            rollback: undefined,
+                        } : null,
+                        seatResult: result.seatResult ? {
+                            ...result.seatResult,
+                            rollback: undefined,
+                        } : null,
+                    };
                 });
         });
     }
@@ -186,7 +196,12 @@ export default class SeatFinderHandler {
                     return <SeatFinderResult>{sessionResult};
                 }
                 if (!sessionResult.before) {
-                    throw ResultCode.INVALID_SESSION_STATE;
+                    return <SeatFinderResult>{
+                        sessionResult: {
+                            ...sessionResult,
+                            resultCode: ResultCode.INVALID_SESSION_STATE,
+                        },
+                    };
                 }
                 return this.seatHandler.freeSeat(sessionResult.before.seatPosition)
                     .then(async (seatResult) => {
@@ -210,7 +225,12 @@ export default class SeatFinderHandler {
                     return <SeatFinderResult>{sessionResult};
                 }
                 if (!sessionResult.after) {
-                    throw ResultCode.INVALID_SESSION_STATE;
+                    return <SeatFinderResult>{
+                        sessionResult: {
+                            ...sessionResult,
+                            resultCode: ResultCode.INVALID_SESSION_STATE,
+                        },
+                    };
                 }
                 logger.debug("[SeatFinderHandler] handleSession success", {sessionResult});
                 if (handleSeat) {
@@ -244,7 +264,7 @@ export default class SeatFinderHandler {
         const success = (sessionResult ? sessionResult.resultCode === ResultCode.OK : false) &&
             (seatResult ? seatResult.resultCode === ResultCode.OK : true);
         const sessionId = sessionResult?.after?.sessionId ?? sessionResult?.before?.sessionId;
-        if (!sessionId) throw ResultCode.INVALID_SESSION_STATE;
+        if (!sessionId) return Promise.resolve();
         return this.stateChangesRef.child(sessionId).push(<SeatFinderEvent>{
             requestType: requestType,
             timestamp: current,

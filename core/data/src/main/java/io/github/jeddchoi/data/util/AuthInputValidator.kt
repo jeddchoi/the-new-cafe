@@ -1,25 +1,36 @@
 package io.github.jeddchoi.data.util
 
-import java.util.*
-
+import io.github.jeddchoi.common.UiText
+import io.github.jeddchoi.data.R
+import java.util.regex.Pattern
 
 
 object AuthInputValidator {
+    private val emptyInputGuide = UiText.StringResource(R.string.empty_input)
+    private val passwordMatchGuide = UiText.StringResource(R.string.password_isnt_same)
+    private val invalidEmailGuide = UiText.StringResource(R.string.email_invalid_msg)
 
-    fun isValidEmail(email: String): Boolean {
+
+    fun isValidEmail(email: String): Pair<Boolean, UiText?> {
         return EmailValidator.isValidEmail(email)
     }
 
-    fun isPasswordValid(password: String): Boolean {
-        return PasswordValidator.isSecure(password)
+    fun isPasswordValid(password: String, isRegister: Boolean): Pair<Boolean, UiText?> {
+        return PasswordValidator.isSecure(password, isRegister)
     }
 
-    fun isNameValid(name: String): Boolean {
+    fun isNameValid(name: String): Pair<Boolean, UiText?> {
         return NameValidator.isValidName(name)
     }
 
-    fun doPasswordsMatch(password: String, confirmPassword: String): Boolean {
-        return password == confirmPassword
+    fun doPasswordsMatch(password: String?, confirmPassword: String): Pair<Boolean, UiText?> {
+        if (confirmPassword.isBlank()) {
+            return Pair(false, emptyInputGuide)
+        }
+        if (password != confirmPassword) {
+            return Pair(false, passwordMatchGuide)
+        }
+        return Pair(true, null)
     }
 
 
@@ -33,49 +44,63 @@ object AuthInputValidator {
                     "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
                     ")+$"
 
-        fun isValidEmail(email: String): Boolean {
-            return email.isNotBlank() && EMAIL_REGEX.toRegex().matches(email)
+        fun isValidEmail(email: String): Pair<Boolean, UiText?> {
+            if (email.isBlank()) {
+                return Pair(false, emptyInputGuide)
+            }
+            if (EMAIL_REGEX.toRegex().matches(email).not()) {
+                return Pair(false, invalidEmailGuide)
+            }
+            return Pair(true, null)
         }
     }
 
 
     object NameValidator {
-        private const val NAME_REGEX = "^[a-zA-Z ]+\$"
-        private const val MAX_NAME_LENGTH = 50
+        private const val MAX_NAME_LENGTH = 20
+        private val lengthLimitGuide = UiText.StringResource(R.string.length_limit_msg, MAX_NAME_LENGTH)
 
-        fun isValidName(name: String): Boolean {
-            return name.isNotBlank() && name.matches(NAME_REGEX.toRegex()) && name.length <= MAX_NAME_LENGTH
+        fun isValidName(name: String): Pair<Boolean, UiText?> {
+            if (name.isBlank()) {
+                return Pair(false, emptyInputGuide)
+            }
+            if (name.length > MAX_NAME_LENGTH) {
+                return Pair(false, lengthLimitGuide)
+            }
+            return Pair(true, null)
         }
     }
 
 
+    /**
+     * Password validator
+     *
+     * ^                 # start-of-string
+     * (?=.*[0-9])       # a digit must occur at least once
+     * (?=.*[a-z])       # a lower case letter must occur at least once
+     * (?=.*[A-Z])       # an upper case letter must occur at least once
+     * (?=.*[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~])  # a special character must occur at least once you can replace with your special characters
+     * (?=\\S+$)         # no whitespace allowed in the entire string
+     * .{8,}             # anything, at least eight places though
+     * $                 # end-of-string
+     * @constructor Create empty Password validator
+     */
     object PasswordValidator {
-        private const val PASSWORD_MIN_LENGTH = 8
+        private const val PASSWORD_PATTERN =
+            "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!\"#\$%&'()*+,-./:;<=>?@\\[\\]^_`{|}~])(?=\\S+$).{8,}$"
+        private val pattern = Pattern.compile(PASSWORD_PATTERN)
+        private val passwordGenerationGuide = UiText.StringResource(R.string.password_generation_guide)
 
-        fun isSecure(password: String): Boolean {
-            if (password.length < PASSWORD_MIN_LENGTH) {
-                return false
+        fun isSecure(password: String, isRegister: Boolean): Pair<Boolean, UiText?> {
+            if (password.isBlank()) {
+                return Pair(false, emptyInputGuide)
             }
-            val categories = arrayOf(
-                Regex("[A-Z]"),  // 영어 대문자
-                Regex("[a-z]"),  // 영어 소문자
-                Regex("[0-9]"),  // 숫자
-                Regex("[^A-Za-z0-9]")  // 특수문자
-            )
-            var numCategories = 0
-            for (category in categories) {
-                if (category.containsMatchIn(password)) {
-                    numCategories++
-                }
+            val matcher = pattern.matcher(password)
+            if (isRegister && !matcher.matches()) {
+                return Pair(false, passwordGenerationGuide)
             }
-            if (numCategories < 3) {
-                return false
-            }
-            val commonPasswords = listOf("password", "123456", "qwerty")  // 자주 사용되는 패스워드 목록
-            if (commonPasswords.contains(password.lowercase(Locale.ROOT))) {
-                return false
-            }
-            return true
+
+            return Pair(true, null)
         }
     }
 

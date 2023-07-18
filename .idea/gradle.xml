@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/buildlogic" />
             <option value="$PROJECT_DIR$/buildlogic/convention" />
             <option value="$PROJECT_DIR$/core" />
+            <option value="$PROJECT_DIR$/core/common" />
             <option value="$PROJECT_DIR$/core/data" />
             <option value="$PROJECT_DIR$/core/designsystem" />
             <option value="$PROJECT_DIR$/core/domain" />
@@ -34,13 +35,11 @@
             <option value="$PROJECT_DIR$/core/testing" />
             <option value="$PROJECT_DIR$/core/ui" />
             <option value="$PROJECT_DIR$/feature" />
-            <option value="$PROJECT_DIR$/feature/actionlog" />
             <option value="$PROJECT_DIR$/feature/authentication" />
+            <option value="$PROJECT_DIR$/feature/historydetail" />
             <option value="$PROJECT_DIR$/feature/mypage" />
-            <option value="$PROJECT_DIR$/feature/mystatus" />
+            <option value="$PROJECT_DIR$/feature/order" />
             <option value="$PROJECT_DIR$/feature/profile" />
-            <option value="$PROJECT_DIR$/feature/store" />
-            <option value="$PROJECT_DIR$/feature/store_list" />
           </set>
         </option>
       </GradleProjectSettings>

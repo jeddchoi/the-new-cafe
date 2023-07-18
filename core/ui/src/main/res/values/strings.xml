@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="empty_with_subject">No %s found</string>
+    <string name="error_with_exception">[Error] %s</string>
+    <string name="loading">Loading …</string>
+    <string name="sign_in">Sign In</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="not_authenticated">You need to sign in to see this page</string>
+    <string name="view_stacktrace_error">View stacktrace error details</string>
+</resources>

@@ -1,6 +1,7 @@
 package io.github.jeddchoi.data.repository
 
 import io.github.jeddchoi.model.CurrentUser
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface CurrentUserRepository {
@@ -20,4 +21,5 @@ interface CurrentUserRepository {
      */
     val currentUser: StateFlow<CurrentUser?>
 
+    val currentUserId: Flow<String?>
 }

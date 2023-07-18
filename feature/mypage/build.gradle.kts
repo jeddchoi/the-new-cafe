@@ -8,6 +8,10 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:mystatus"))
-    implementation(project(":feature:actionlog"))
+    implementation(project(":core:common"))
+    implementation(libs.kotlinx.datetime)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.wheel.picker.compose)
+
+    implementation(libs.androidx.paging.compose)
 }

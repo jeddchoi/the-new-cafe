@@ -1,5 +1,13 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":feature:historydetail")
+
+
+include(":core:common")
+
+
+
+
 pluginManagement {
     includeBuild("buildlogic")
     repositories {
@@ -14,20 +22,21 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
     }
 }
 rootProject.name = "The New Cafe"
 include(":app")
 
 include(":feature:profile")
-include(":feature:store")
-include(":feature:store_list")
+include(":feature:order")
+
 include(":feature:mypage")
-include(":feature:actionlog")
-include(":feature:mystatus")
 include(":feature:authentication")
+include(":feature:historydetail")
 
 include(":core:ui")
+include(":core:common")
 include(":core:data")
 include(":core:designsystem")
 include(":core:domain")

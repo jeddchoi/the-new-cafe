@@ -5,6 +5,15 @@ enum class UserStateType {
     Reserved,
     Occupied,
     Away,
-    OnBusiness,
-    Blocked,
+    OnBusiness;
+
+
+    companion object {
+        private val VALUES = values()
+        fun getByValue(input: String?) =
+            input?.let {
+                val userStateStr = it.substringAfter("_")
+                VALUES.firstOrNull { code -> code.name == userStateStr }
+            } ?: None
+    }
 }

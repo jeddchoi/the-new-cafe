@@ -26,6 +26,11 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
 
     @Suppress("UNUSED_VARIABLE")
     buildTypes {
@@ -43,15 +48,17 @@ android {
 
 dependencies {
 
-    implementation(project(":feature:store"))
-    implementation(project(":feature:store_list"))
     implementation(project(":feature:profile"))
     implementation(project(":feature:mypage"))
+    implementation(project(":feature:order"))
     implementation(project(":feature:authentication"))
+    implementation(project(":feature:historydetail"))
+
 
     implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:data"))
+    implementation(project(":core:common"))
 
 
     implementation(libs.androidx.activity.compose)
@@ -59,6 +66,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.material3.windowSizeClass)
 
     testImplementation(kotlin("test"))
     testImplementation(project(":core:testing"))
