@@ -9,10 +9,12 @@ import io.github.jeddchoi.data.firebase.model.toUserStateChange
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.repository.UserSessionHistoryDetailRepository
 import io.github.jeddchoi.model.UserStateChange
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.transform
 import javax.inject.Inject
 
@@ -55,6 +57,6 @@ class FirebaseUserSessionHistoryDetailRepositoryImpl @Inject constructor(
             } else { // not signed in
                 emit(emptyList())
             }
-        }
+        }.flowOn(Dispatchers.IO)
 
 }

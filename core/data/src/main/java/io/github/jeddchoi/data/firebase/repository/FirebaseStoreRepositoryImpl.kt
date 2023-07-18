@@ -11,7 +11,9 @@ import io.github.jeddchoi.data.firebase.model.toSection
 import io.github.jeddchoi.data.firebase.model.toStore
 import io.github.jeddchoi.data.repository.StoreRepository
 import io.github.jeddchoi.model.Seat
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -23,12 +25,12 @@ class FirebaseStoreRepositoryImpl @Inject constructor(
             firebaseStores.map {
                 it.toStore()
             }
-        }
+        }.flowOn(Dispatchers.IO)
 
     override fun getStoreDetail(storeId: String) =
         firestore.document("stores/${storeId}").dataObjects<FirebaseStore>().map {
             it?.toStore()
-        }
+        }.flowOn(Dispatchers.IO)
 
     override fun sections(storeId: String) =
         firestore.collection("stores/${storeId}/sections").dataObjects<FirebaseSection>()
@@ -36,13 +38,13 @@ class FirebaseStoreRepositoryImpl @Inject constructor(
                 firebaseSections.map {
                     it.toSection()
                 }
-            }
+            }.flowOn(Dispatchers.IO)
 
     override fun getSectionDetail(storeId: String, sectionId: String) =
         firestore.document("stores/${storeId}/sections/${sectionId}").dataObjects<FirebaseSection>()
             .map {
                 it?.toSection()
-            }
+            }.flowOn(Dispatchers.IO)
 
     override fun seats(storeId: String, sectionId: String): Flow<List<Seat>> {
         Log.i("FirebaseStoreRepositoryImpl#seats", "seats $storeId $sectionId")
@@ -53,7 +55,7 @@ class FirebaseStoreRepositoryImpl @Inject constructor(
                 firebaseSeats.map {
                     it.toSeat()
                 }
-            }
+            }.flowOn(Dispatchers.IO)
     }
 
     override fun getSeatDetail(storeId: String, sectionId: String, seatId: String) =
@@ -62,6 +64,6 @@ class FirebaseStoreRepositoryImpl @Inject constructor(
             .map {
                 Log.i("FirebaseStoreRepositoryImpl#getSeatDetail", it.toString())
                 it?.toSeat()
-            }
+            }.flowOn(Dispatchers.IO)
 
 }

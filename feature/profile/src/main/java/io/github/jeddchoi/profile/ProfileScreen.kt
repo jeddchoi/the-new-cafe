@@ -3,11 +3,13 @@ package io.github.jeddchoi.profile
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,7 +38,9 @@ internal fun ProfileScreen(
         ProfileUiState.NotAuthenticated -> {
             NotAuthenticatedScreen(
                 modifier = modifier,
-                navigateToSignIn = navigateToSignIn
+                navigateToSignIn = {
+                    signOut()
+                }
             )
         }
 
@@ -45,7 +49,7 @@ internal fun ProfileScreen(
                 title = UiText.StringResource(R.string.profile),
             ) {
                 Column(
-                    modifier = modifier.fillMaxSize(),
+                    modifier = modifier.padding(it).fillMaxSize(),
                 ) {
                     Text(
                         text = uiState.profile.toString()
@@ -53,7 +57,13 @@ internal fun ProfileScreen(
                     Text(
                         text = uiState.feedback.toString()
                     )
-
+                    Button(
+                        onClick = signOut
+                    ) {
+                        Text(
+                            text = stringResource(R.string.sign_out)
+                        )
+                    }
                 }
             }
         }
@@ -71,6 +81,7 @@ private fun ProfileScreenPreview() {
     TheNewCafeTheme {
         val viewModel: ProfileViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        ProfileScreen(uiState = uiState)
+        ProfileScreen(
+            uiState = uiState)
     }
 }

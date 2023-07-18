@@ -17,9 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.model.UserSession
 import io.github.jeddchoi.model.UserSessionHistory
+import io.github.jeddchoi.mypage.R
+import io.github.jeddchoi.ui.fullscreen.EmptyResultScreen
 import kotlinx.datetime.Instant
 
 @Composable
@@ -33,63 +36,75 @@ internal fun HistoryScreen(
     val append = pagingHistories.loadState.append
 
 
-
-    LazyColumn(
-        modifier = modifier
-    ) {
-        items(pagingHistories.itemCount) { item ->
-            pagingHistories[item]?.let { history ->
-                UserSessionHistoryCard(
-                    startTime = history.startTime,
-                    endTime = history.endTime,
-                    seatPosition = history.seatPosition,
-                    sessionId = history.sessionId,
-                    hasFailure = history.hasFailure,
-                    modifier = Modifier
-                        .clickable {
-                            navigateToHistoryDetail(history.sessionId)
-                        }
-                        .fillMaxWidth()
-                )
-            }
-        }
-
-        when (currentSession) {
-            null,
-            UserSession.None -> {}
-            is UserSession.UsingSeat -> {
-                item {
+    if (pagingHistories.itemCount == 0) {
+        EmptyResultScreen(
+            subject = UiText.StringResource(R.string.user_session_history),
+            modifier = modifier,
+        )
+    } else {
+        LazyColumn(
+            modifier = modifier
+        ) {
+            items(pagingHistories.itemCount) { item ->
+                pagingHistories[item]?.let { history ->
                     UserSessionHistoryCard(
-                        startTime = currentSession.startTime,
-                        endTime = currentSession.endTime,
-                        seatPosition = currentSession.seatPosition,
-                        sessionId = currentSession.sessionId,
-                        hasFailure = currentSession.hasFailure,
-                        normalContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        startTime = history.startTime,
+                        endTime = history.endTime,
+                        seatPosition = history.seatPosition,
+                        sessionId = history.sessionId,
+                        hasFailure = history.hasFailure,
                         modifier = Modifier
                             .clickable {
-                                navigateToHistoryDetail(currentSession.sessionId)
+                                navigateToHistoryDetail(history.sessionId)
                             }
                             .fillMaxWidth()
                     )
                 }
             }
 
+            when (currentSession) {
+                null,
+                UserSession.None -> {
+                }
+
+                is UserSession.UsingSeat -> {
+                    item {
+                        UserSessionHistoryCard(
+                            startTime = currentSession.startTime,
+                            endTime = currentSession.endTime,
+                            seatPosition = currentSession.seatPosition,
+                            sessionId = currentSession.sessionId,
+                            hasFailure = currentSession.hasFailure,
+                            normalContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            modifier = Modifier
+                                .clickable {
+                                    navigateToHistoryDetail(currentSession.sessionId)
+                                }
+                                .fillMaxWidth()
+                        )
+                    }
+                }
+
+            }
+
+            item {
+                Spacer(
+                    modifier = Modifier.height(200.dp)
+                )
+            }
         }
 
-        item {
-            Spacer(
-                modifier = Modifier.height(200.dp)
-            )
-        }
-    }
+        pagingHistories.loadState.apply {
+            when {
+                refresh is LoadState.Loading -> CircularProgressIndicator()
+                refresh is LoadState.Error -> Log.e(
+                    "HistoryScreen",
+                    "refresh error ${refresh.error}"
+                )
 
-    pagingHistories.loadState.apply {
-        when {
-            refresh is LoadState.Loading -> CircularProgressIndicator()
-            refresh is LoadState.Error -> Log.e("HistoryScreen", "refresh error ${refresh.error}")
-            append is LoadState.Loading -> CircularProgressIndicator()
-            append is LoadState.Error -> Log.e("HistoryScreen", "refresh error ${append.error}")
+                append is LoadState.Loading -> CircularProgressIndicator()
+                append is LoadState.Error -> Log.e("HistoryScreen", "refresh error ${append.error}")
+            }
         }
     }
 }

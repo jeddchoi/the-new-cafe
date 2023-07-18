@@ -12,7 +12,9 @@ import io.github.jeddchoi.data.firebase.model.toUserSessionHistory
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.repository.UserSessionHistoryRepository
 import io.github.jeddchoi.model.UserSessionHistory
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
 
 class FirebaseUserSessionHistoryRepositoryImpl (
@@ -22,9 +24,8 @@ class FirebaseUserSessionHistoryRepositoryImpl (
     override fun getHistories(): Flow<PagingData<UserSessionHistory>> = Pager(
         config = config
     ) {
-
         source
-    }.flow
+    }.flow.flowOn(Dispatchers.IO)
 }
 
 

@@ -36,4 +36,5 @@
     <string name="session_timer_total_time">Total time</string>
     <string name="user_session_overall_timer">Overall session</string>
     <string name="user_session_current_state_timer">Current state</string>
+    <string name="user_session_history">User session history</string>
 </resources>

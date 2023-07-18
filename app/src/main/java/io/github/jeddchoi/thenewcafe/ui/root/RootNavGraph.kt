@@ -55,8 +55,14 @@ fun RootNavGraph(
         }
 
         mainGraph {
+            val navigateToAuth = {
+                navController.navigateToAuth(navOptions = navOptions {
+                    popUpTo(navController.graph.findStartDestination().id)
+                    launchSingleTop = true
+                })
+            }
             profileScreen(
-                navigateToAuth = navController::navigateToAuth,
+                navigateToAuth = navigateToAuth,
             )
             orderGraph {
                 storeListScreen(
@@ -64,7 +70,7 @@ fun RootNavGraph(
                 )
                 storeScreen(
                     onBackClick = navController::navigateUp,
-                    navigateToAuth = navController::navigateToAuth,
+                    navigateToAuth = navigateToAuth,
                     navigateToMyPage = {
                         navController.navigateToMyPage(navOptions {
                             // Pop up to the start destination of the graph to
@@ -87,7 +93,7 @@ fun RootNavGraph(
                 navigateToStoreList = navController::navigateToOrder,
                 navigateToStore = navController::navigateToStore,
                 navigateToHistoryDetail = navController::navigateToHistoryDetail,
-                navigateToSignIn = navController::navigateToAuth
+                navigateToSignIn = navigateToAuth
             )
         }
 
