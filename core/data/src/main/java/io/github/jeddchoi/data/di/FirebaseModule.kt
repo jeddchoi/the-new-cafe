@@ -1,9 +1,7 @@
 package io.github.jeddchoi.data.di
 
-import android.content.Context
 import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import androidx.paging.PagingConfig
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -17,7 +15,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.github.jeddchoi.data.firebase.repository.FirebaseAuthRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseCurrentUserRepositoryImpl
@@ -44,42 +41,24 @@ import javax.inject.Singleton
 abstract class FirebaseModule {
     companion object {
         @Provides
-        @Singleton
-        fun provideFirebaseApp(@ApplicationContext context: Context): FirebaseApp {
-            return FirebaseApp.initializeApp(context)!!
-        }
-
-
-        @Provides
-        @Singleton
-        fun provideFirebaseFunctions(
-            firebaseApp: FirebaseApp
-        ): FirebaseFunctions {
-            return Firebase.functions(firebaseApp, "asia-northeast3")
+        fun provideFirebaseFunctions(): FirebaseFunctions {
+            return Firebase.functions("asia-northeast3")
         }
 
         @Provides
-        @Singleton
         fun provideFirebaseAuth(
-            firebaseApp: FirebaseApp
         ): FirebaseAuth {
-            return Firebase.auth(firebaseApp)
+            return Firebase.auth
         }
 
         @Provides
-        @Singleton
-        fun provideFirebaseRealtimeDatabase(
-            firebaseApp: FirebaseApp
-        ): FirebaseDatabase {
-            return Firebase.database(firebaseApp)
+        fun provideFirebaseRealtimeDatabase(): FirebaseDatabase {
+            return Firebase.database
         }
 
         @Provides
-        @Singleton
-        fun provideFirebaseFirestore(
-            firebaseApp: FirebaseApp
-        ): FirebaseFirestore {
-            return Firebase.firestore(firebaseApp)
+        fun provideFirebaseFirestore(): FirebaseFirestore {
+            return Firebase.firestore
         }
 
         @Provides

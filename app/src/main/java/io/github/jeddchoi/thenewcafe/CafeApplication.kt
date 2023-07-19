@@ -24,6 +24,7 @@ class CafeApplication : Application() {
             )
             StrictMode.setVmPolicy(
                 VmPolicy.Builder()
+
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
                     .penaltyLog()
