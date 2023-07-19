@@ -14,5 +14,5 @@ class Ref(var value: Int)
 fun LogCompositions(tag: String, msg: String) {
     val ref = remember { Ref(0) }
     SideEffect { ref.value++ }
-    Log.d(tag, "Compositions: $msg ${ref.value}")
+    Log.d("LOG_COMPOSITIONS", "$msg ${ref.value}")
 }

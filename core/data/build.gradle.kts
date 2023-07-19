@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":core:common"))
     testImplementation(project(":core:testing"))
 
+    implementation(libs.timber)
     implementation(libs.kotlinx.serialization.json)
     // Source: https://github.com/Kotlin/kotlinx.coroutines/tree/master/integration/kotlinx-coroutines-play-services
     implementation(libs.kotlinx.coroutines.play.services)

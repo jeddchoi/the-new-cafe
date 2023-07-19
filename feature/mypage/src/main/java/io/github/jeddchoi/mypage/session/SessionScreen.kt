@@ -1,7 +1,6 @@
 package io.github.jeddchoi.mypage.session
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -140,7 +139,6 @@ private fun SessionTimerCircularIndicators(
                 val value =
                     displayedUserSession.currentStateTimer.progress(true)
                         ?: 0f
-                Log.i("innerProgress", value.toString())
                 value
             }
         }
@@ -150,7 +148,6 @@ private fun SessionTimerCircularIndicators(
                 val value =
                     displayedUserSession.sessionTimer.progress(true)
                         ?: 0f
-                Log.i("outerProgress", value.toString())
                 value
             }
         }

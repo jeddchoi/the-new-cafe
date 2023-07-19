@@ -15,6 +15,7 @@ import io.github.jeddchoi.designsystem.CafeNavigationBarItem
 import io.github.jeddchoi.mypage.navigateToMyPage
 import io.github.jeddchoi.order.navigateToOrder
 import io.github.jeddchoi.profile.navigateToProfile
+import timber.log.Timber
 
 @Composable
 fun BottomBar(
@@ -30,6 +31,7 @@ fun BottomBar(
             CafeNavigationBarItem(
                 selected = selected,
                 onClick = {
+                    Timber.v("✅")
                     val navOptions = navOptions {
                         // Pop up to the start destination of the graph to
                         // avoid building up a large stack of destinations
@@ -64,5 +66,7 @@ fun BottomBar(
 }
 
 
-private fun NavDestination?.isTopLevelDestinationInHierarchy(route: String) =
-    this?.hierarchy?.any { it.route?.contains(route, true) ?: false } ?: false
+private fun NavDestination?.isTopLevelDestinationInHierarchy(route: String): Boolean {
+    Timber.v("✅ $route")
+    return this?.hierarchy?.any { it.route?.contains(route, true) ?: false } ?: false
+}

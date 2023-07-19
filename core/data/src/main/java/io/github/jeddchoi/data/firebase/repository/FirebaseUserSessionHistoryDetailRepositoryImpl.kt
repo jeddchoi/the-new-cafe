@@ -15,15 +15,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transform
+import timber.log.Timber
 import javax.inject.Inject
 
 class FirebaseUserSessionHistoryDetailRepositoryImpl @Inject constructor(
     val currentUserRepository: CurrentUserRepository,
     val database: FirebaseDatabase,
 ) : UserSessionHistoryDetailRepository {
-    override fun getStateChanges(sessionId: String): Flow<List<UserStateChange>> =
-        currentUserRepository.currentUserId.transform { currentUserId ->
+    override fun getStateChanges(sessionId: String): Flow<List<UserStateChange>> {
+        Timber.v("✅ $sessionId")
+        return currentUserRepository.currentUserId.transform { currentUserId ->
             if (currentUserId != null) {
                 val ref =
                     database.getReference("seatFinder/stateChanges/${currentUserId}/$sessionId")
@@ -57,6 +60,7 @@ class FirebaseUserSessionHistoryDetailRepositoryImpl @Inject constructor(
             } else { // not signed in
                 emit(emptyList())
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
+    }
 
 }

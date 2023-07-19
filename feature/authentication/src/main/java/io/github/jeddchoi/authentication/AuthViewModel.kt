@@ -1,6 +1,5 @@
 package io.github.jeddchoi.authentication
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,6 +34,7 @@ internal class AuthViewModel @Inject constructor(
 
 
     fun checkEmailInput(email: String): Boolean {
+        Timber.v("✅ $email")
         val (isEmailValid, supportingText) = authInputValidator.isValidEmail(email)
         _uiState.update {
             it.copy(
@@ -47,6 +48,7 @@ internal class AuthViewModel @Inject constructor(
     }
 
     fun checkDisplayNameInput(displayName: String): Boolean {
+        Timber.v("✅ $displayName")
         val (isNameValid, supportingText) = authInputValidator.isNameValid(displayName)
         _uiState.update {
             it.copy(
@@ -61,6 +63,7 @@ internal class AuthViewModel @Inject constructor(
 
 
     fun checkPasswordInput(password: String, isRegister: Boolean = false): Boolean {
+        Timber.v("✅ $password, $isRegister")
         val (isPasswordValid, supportingText) = authInputValidator.isPasswordValid(
             password,
             isRegister
@@ -78,6 +81,7 @@ internal class AuthViewModel @Inject constructor(
     }
 
     fun checkConfirmPasswordInput(confirmPassword: String): Boolean {
+        Timber.v("✅ $confirmPassword")
         val (doMatch, supportingText) = authInputValidator.doPasswordsMatch(
             _uiState.value.passwordInput,
             confirmPassword
@@ -95,6 +99,7 @@ internal class AuthViewModel @Inject constructor(
     }
 
     fun forgotPassword() {
+        Timber.v("✅")
         launchOneShotJob(job = {
             if (!checkEmailInput(uiState.value.emailInput)) return@launchOneShotJob
             authRepository.sendPasswordResetEmail(uiState.value.emailInput)
@@ -108,6 +113,7 @@ internal class AuthViewModel @Inject constructor(
     }
 
     fun signIn() {
+        Timber.v("✅")
         launchOneShotJob(job = {
             if (!checkEmailInput(uiState.value.emailInput)) return@launchOneShotJob
             if (!checkPasswordInput(uiState.value.passwordInput)) return@launchOneShotJob
@@ -130,12 +136,14 @@ internal class AuthViewModel @Inject constructor(
     }
 
     fun signInLater() {
+        Timber.v("✅")
         viewModelScope.launch {
             appFlagsRepository.setShowMainScreenOnStart(true)
         }
     }
 
     fun register() {
+        Timber.v("✅")
         launchOneShotJob(job = {
             if (!checkDisplayNameInput(uiState.value.displayNameInput)) return@launchOneShotJob
             if (!checkEmailInput(uiState.value.emailInput)) return@launchOneShotJob
@@ -164,6 +172,7 @@ internal class AuthViewModel @Inject constructor(
     }
 
     fun dismissUserMessage() {
+        Timber.v("✅")
         _uiState.update {
             it.copy(userMessage = null)
         }
@@ -173,6 +182,7 @@ internal class AuthViewModel @Inject constructor(
         job: suspend () -> Unit,
         onError: (Throwable, suspend () -> Unit) -> Unit
     ) {
+        Timber.v("✅")
         _uiState.update {
             it.copy(isLoading = true, userMessage = null)
         }
@@ -182,7 +192,7 @@ internal class AuthViewModel @Inject constructor(
                     job()
                 }
             } catch (e: Throwable) {
-                Log.e("Auth", e.stackTraceToString())
+                Timber.e(e)
                 onError(e, job)
             } finally {
                 _uiState.update {

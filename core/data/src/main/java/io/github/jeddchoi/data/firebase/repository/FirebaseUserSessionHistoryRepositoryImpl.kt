@@ -15,7 +15,9 @@ import io.github.jeddchoi.model.UserSessionHistory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 
 class FirebaseUserSessionHistoryRepositoryImpl (
     private val source: UserSessionHistoryPagingSource,
@@ -25,7 +27,7 @@ class FirebaseUserSessionHistoryRepositoryImpl (
         config = config
     ) {
         source
-    }.flow.flowOn(Dispatchers.IO)
+    }.flow.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
 }
 
 
@@ -37,6 +39,7 @@ class UserSessionHistoryPagingSource(
         null
 
     override suspend fun load(params: LoadParams<DataSnapshot>): LoadResult<DataSnapshot, UserSessionHistory> = try {
+        Timber.v("✅ ${params.key}")
         val currentUserId =
             currentUserRepository.getUserId() ?: throw RuntimeException("User not signed in")
         val queryUserSessionHistoryNames =

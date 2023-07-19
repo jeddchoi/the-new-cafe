@@ -1,6 +1,5 @@
 package io.github.jeddchoi.data.firebase.repository
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import io.github.jeddchoi.data.repository.AuthRepository
@@ -8,6 +7,7 @@ import io.github.jeddchoi.data.repository.UserProfileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,7 +20,7 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
 
     override suspend fun signInWithEmail(email: String, password: String): Result<Unit> =
         withContext(Dispatchers.IO) {
-
+            Timber.v("✅ $email, $password")
             auth.signInWithEmailAndPassword(email, password).await()
             return@withContext Result.success(Unit)
         }
@@ -31,7 +31,7 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
         displayName: String,
         password: String
     ): Result<Unit> = withContext(Dispatchers.IO) {
-        Log.d("registerWithEmail", "email: $email, displayName: $displayName, password: $password")
+        Timber.v("✅ $email, $displayName, $password")
         val result = auth.createUserWithEmailAndPassword(email, password).await()
         val createdUser = result?.user
         if (createdUser != null) {
@@ -54,17 +54,19 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
 
     override suspend fun signInWithGoogle(idToken: String): Result<Unit> =
         withContext(Dispatchers.IO) {
+            Timber.v("✅ $idToken")
             TODO("Not yet implemented")
         }
 
     override suspend fun logout() = withContext(Dispatchers.IO) {
-        Log.d("FirebaseAuthRepositoryImpl", "logout")
+        Timber.v("✅")
         auth.signOut()
     }
 
 
     override suspend fun sendPasswordResetEmail(email: String): Result<Unit> =
         withContext(Dispatchers.IO) {
+            Timber.v("✅ $email")
             auth.sendPasswordResetEmail(email).await()
             return@withContext Result.success(Unit)
         }

@@ -3,7 +3,6 @@
 package io.github.jeddchoi.mypage
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,6 +45,7 @@ import io.github.jeddchoi.ui.fullscreen.ErrorScreen
 import io.github.jeddchoi.ui.fullscreen.LoadingScreen
 import io.github.jeddchoi.ui.fullscreen.NotAuthenticatedScreen
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -196,7 +196,7 @@ private fun MyPageWithPager(
     LaunchedEffect(pagerState) {
         // Collect from the a snapshotFlow reading the currentPage
         snapshotFlow { pagerState.settledPage }.collect { page ->
-            Log.d("Page change", "Page changed to $page")
+            Timber.v("Page changed to $page")
             selectTab(MyPageTab.VALUES[page])
         }
     }

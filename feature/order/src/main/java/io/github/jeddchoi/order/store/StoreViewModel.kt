@@ -1,6 +1,5 @@
 package io.github.jeddchoi.order.store
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,6 +26,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,7 +45,7 @@ internal class StoreViewModel @Inject constructor(
                 storeRepository.seats(storeArgs.storeId, section.id)
                     .map { seats -> section to seats }
             }
-            combine(temp) { combined ->
+            combine(temp.onEach { Timber.v("💥 $it") }) { combined ->
                 combined.map { (section, seats) ->
                     SectionWithSeats(section, seats)
                 }
@@ -55,17 +55,11 @@ internal class StoreViewModel @Inject constructor(
     private val oneShotActionState = MutableStateFlow(OneShotActionState())
 
     val uiState = combine(
-        storeDetail.onEach { Log.d("uiState", "storeDetail : $it") },
-        sectionWithSeats.onEach { Log.d("uiState", "sectionWithSeats : $it") },
-        oneShotActionState.onEach { Log.d("uiState", "oneShotActionState : $it") },
-        userSessionRepository.userStateAndUsedSeatPosition.onEach {
-            Log.d(
-                "uiState",
-                "userStateAndUsedSeatPosition : $it"
-            )
-        },
+        storeDetail.onEach{Timber.v("💥 $it")},
+        sectionWithSeats.onEach{Timber.v("💥 $it")},
+        oneShotActionState.onEach{Timber.v("💥 $it")},
+        userSessionRepository.userStateAndUsedSeatPosition.onEach{Timber.v("💥 $it")},
     ) { store, sections, oneShotActionState, userStateAndUsedSeatPosition ->
-        Log.d("uiState", "$store\n$sections\n$oneShotActionState\n$userStateAndUsedSeatPosition")
         if (store == null) {
             StoreUiState.NotFound
         } else {
@@ -80,12 +74,14 @@ internal class StoreViewModel @Inject constructor(
         }
     }
         .catch {
-            Log.e("uiState", "Error : $it")
+            Timber.e(it)
             emit(StoreUiState.Error(it))
         }
+        .onEach { Timber.v("💥 $it") }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StoreUiState.Loading)
 
-    fun onSelect(sectionId: String, seatId: String) {
+    fun selectSeat(sectionId: String, seatId: String) {
+        Timber.v("✅ $sectionId $seatId")
         val newSelectedSeat = SelectedSeat(sectionId, seatId)
         oneShotActionState.update {
             if (it.selectedSeat?.equals(newSelectedSeat) == true) {
@@ -97,6 +93,7 @@ internal class StoreViewModel @Inject constructor(
     }
 
     fun reserve() {
+        Timber.v("✅")
         launchOneShotJob(
             job = {
                 val selectedSeat = oneShotActionState.value.selectedSeat ?: return@launchOneShotJob
@@ -119,6 +116,7 @@ internal class StoreViewModel @Inject constructor(
     }
 
     fun quit() {
+        Timber.v("✅")
         launchOneShotJob(
             job = {
                 seatFinderService.quit()
@@ -134,6 +132,7 @@ internal class StoreViewModel @Inject constructor(
     }
 
     fun quitAndReserve() {
+        Timber.v("✅")
         launchOneShotJob(
             job = {
                 val selectedSeat = oneShotActionState.value.selectedSeat ?: return@launchOneShotJob
@@ -160,6 +159,7 @@ internal class StoreViewModel @Inject constructor(
         job: suspend () -> Unit,
         onError: (Throwable, suspend () -> Unit) -> Unit = { _, _ -> }
     ) {
+        Timber.v("✅")
         oneShotActionState.update {
             it.copy(isLoading = true, userMessage = null)
         }
@@ -169,7 +169,7 @@ internal class StoreViewModel @Inject constructor(
                     job()
                 }
             } catch (e: Throwable) {
-                Log.e("launchOneShotJob", e.stackTraceToString())
+                Timber.e(e)
                 onError(e, job)
             } finally {
                 oneShotActionState.update {

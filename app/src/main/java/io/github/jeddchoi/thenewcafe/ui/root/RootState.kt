@@ -20,9 +20,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transform
+import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -58,9 +60,12 @@ class RootState(
     private val isCompact = snapshotFlow { windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact }
 
 
-    val showBottomBar = combine(isMainRoute, isCompact) {isMainRoute, isCompact ->
+    val showBottomBar = combine(
+        isMainRoute.onEach{Timber.v("💥 $it")},
+        isCompact.onEach{Timber.v("💥 $it")},
+    ) {isMainRoute, isCompact ->
         isMainRoute && isCompact
-    }
+    }.onEach { Timber.v("💥 $it") }
     
     val connectedState = networkMonitor.isOnline
         .map(Boolean::not) // isOffline
@@ -80,6 +85,7 @@ class RootState(
                 }
             }
         }
+        .onEach { Timber.v("💥 $it") }
         .stateIn(
             scope = coroutineScope,
             started = SharingStarted.WhileSubscribed(5_000),

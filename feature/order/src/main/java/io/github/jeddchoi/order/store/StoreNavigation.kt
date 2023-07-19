@@ -59,7 +59,7 @@ fun NavGraphBuilder.storeScreen(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         StoreScreen(
             uiState = uiState,
-            onSelect = viewModel::onSelect,
+            onSelect = viewModel::selectSeat,
             onBackClick = onBackClick,
             reserve = {
                 viewModel.reserve()

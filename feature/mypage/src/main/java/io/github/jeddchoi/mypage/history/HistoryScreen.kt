@@ -1,6 +1,5 @@
 package io.github.jeddchoi.mypage.history
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +23,7 @@ import io.github.jeddchoi.model.UserSessionHistory
 import io.github.jeddchoi.mypage.R
 import io.github.jeddchoi.ui.fullscreen.EmptyResultScreen
 import kotlinx.datetime.Instant
+import timber.log.Timber
 
 @Composable
 internal fun HistoryScreen(
@@ -97,13 +97,10 @@ internal fun HistoryScreen(
         pagingHistories.loadState.apply {
             when {
                 refresh is LoadState.Loading -> CircularProgressIndicator()
-                refresh is LoadState.Error -> Log.e(
-                    "HistoryScreen",
-                    "refresh error ${refresh.error}"
-                )
+                refresh is LoadState.Error -> Timber.e(refresh.error)
 
                 append is LoadState.Loading -> CircularProgressIndicator()
-                append is LoadState.Error -> Log.e("HistoryScreen", "refresh error ${append.error}")
+                append is LoadState.Error -> Timber.e(append.error)
             }
         }
     }

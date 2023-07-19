@@ -2,6 +2,7 @@ package io.github.jeddchoi.data.util
 
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.data.R
+import timber.log.Timber
 import java.util.regex.Pattern
 
 
@@ -12,18 +13,22 @@ object AuthInputValidator {
 
 
     fun isValidEmail(email: String): Pair<Boolean, UiText?> {
+        Timber.v("✅ $email")
         return EmailValidator.isValidEmail(email)
     }
 
     fun isPasswordValid(password: String, isRegister: Boolean): Pair<Boolean, UiText?> {
+        Timber.v("✅ $password, $isRegister")
         return PasswordValidator.isSecure(password, isRegister)
     }
 
     fun isNameValid(name: String): Pair<Boolean, UiText?> {
+        Timber.v("✅ $name")
         return NameValidator.isValidName(name)
     }
 
     fun doPasswordsMatch(password: String?, confirmPassword: String): Pair<Boolean, UiText?> {
+        Timber.v("✅ $password, $confirmPassword")
         if (confirmPassword.isBlank()) {
             return Pair(false, emptyInputGuide)
         }
@@ -45,6 +50,7 @@ object AuthInputValidator {
                     ")+$"
 
         fun isValidEmail(email: String): Pair<Boolean, UiText?> {
+            Timber.v("✅ $email")
             if (email.isBlank()) {
                 return Pair(false, emptyInputGuide)
             }
@@ -61,6 +67,7 @@ object AuthInputValidator {
         private val lengthLimitGuide = UiText.StringResource(R.string.length_limit_msg, MAX_NAME_LENGTH)
 
         fun isValidName(name: String): Pair<Boolean, UiText?> {
+            Timber.v("✅ $name")
             if (name.isBlank()) {
                 return Pair(false, emptyInputGuide)
             }
@@ -92,6 +99,7 @@ object AuthInputValidator {
         private val passwordGenerationGuide = UiText.StringResource(R.string.password_generation_guide)
 
         fun isSecure(password: String, isRegister: Boolean): Pair<Boolean, UiText?> {
+            Timber.v("✅ $password, $isRegister")
             if (password.isBlank()) {
                 return Pair(false, emptyInputGuide)
             }

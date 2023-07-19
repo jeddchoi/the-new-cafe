@@ -7,10 +7,14 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import androidx.core.content.getSystemService
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 import javax.inject.Inject
 
 class ConnectivityManagerNetworkMonitor @Inject constructor(
@@ -60,9 +64,12 @@ class ConnectivityManagerNetworkMonitor @Inject constructor(
         awaitClose {
             connectivityManager.unregisterNetworkCallback(callback)
         }
-    }.conflate()
+    }.conflate().onEach { Timber.v("💥 $it") }.flowOn(Dispatchers.IO)
 
-    private fun ConnectivityManager.isCurrentlyConnected() = activeNetwork
-        ?.let(::getNetworkCapabilities)
-        ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
+    private fun ConnectivityManager.isCurrentlyConnected(): Boolean {
+        Timber.v("✅")
+        return activeNetwork
+            ?.let(::getNetworkCapabilities)
+            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) ?: false
+    }
 }

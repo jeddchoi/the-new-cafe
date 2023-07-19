@@ -6,10 +6,12 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.navigation
 import androidx.navigation.navDeepLink
+import timber.log.Timber
 
 internal const val MainRoutePattern = "main"
 
 fun NavController.navigateToMain(navOptions: NavOptions? = null) {
+    Timber.v("✅ $navOptions")
     this.navigate(MainRoutePattern, navOptions)
 }
 

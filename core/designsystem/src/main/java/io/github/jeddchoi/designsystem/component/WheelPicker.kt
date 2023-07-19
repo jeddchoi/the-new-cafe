@@ -1,7 +1,6 @@
 package io.github.jeddchoi.designsystem.component
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
@@ -86,7 +85,6 @@ fun Picker(
             .distinctUntilChanged()
             .collect { selectedIndex ->
                 val item = getItem(selectedIndex)
-                Log.d("Picker", "selectedItem: $item")
                 state.selectedItem = item
             }
     }

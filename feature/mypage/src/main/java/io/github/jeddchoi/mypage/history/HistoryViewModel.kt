@@ -14,7 +14,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,15 +25,16 @@ internal class HistoryViewModel @Inject constructor(
     val userSessionRepository: UserSessionRepository,
 ) : ViewModel() {
 
-    val histories = userSessionHistoryRepository.getHistories().cachedIn(viewModelScope)
-
-    val currentSession = userSessionRepository.userSession
+    val histories = userSessionHistoryRepository.getHistories().cachedIn(viewModelScope).onEach { Timber.v("💥 $it") }
+    val currentSession = userSessionRepository.userSession.onEach { Timber.v("💥 $it") }
     val uiState: StateFlow<HistoryUiState> = histories.map {
         HistoryUiState.Success(
             history = it
         )
     }.catch {
         HistoryUiState.Error(it)
+    }.onEach {
+        Timber.v("💥 $it")
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),

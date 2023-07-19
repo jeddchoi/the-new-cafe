@@ -8,6 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.timber)
     implementation(project(":core:common"))
     implementation(libs.kotlinx.datetime)
 }

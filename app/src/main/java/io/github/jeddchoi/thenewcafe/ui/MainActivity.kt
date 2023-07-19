@@ -2,7 +2,6 @@ package io.github.jeddchoi.thenewcafe.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -26,6 +25,7 @@ import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.thenewcafe.splash.SplashViewModel
 import io.github.jeddchoi.thenewcafe.ui.root.RootScreen
 import io.github.jeddchoi.thenewcafe.ui.root.RootViewModel
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -38,13 +38,14 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     private val viewModel: SplashViewModel by viewModels()
-    lateinit var navController: NavHostController
+    private lateinit var navController: NavHostController
 
     @Inject
     lateinit var networkMonitor: NetworkMonitor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Timber.v("✅")
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         installSplashScreen().apply {
@@ -76,7 +77,7 @@ class MainActivity : ComponentActivity() {
 
                     LaunchedEffect(Unit) {
                         navController.currentBackStack.collect {
-                            Log.d("MainActivity", it.joinToString("\n"))
+                            Timber.d(it.joinToString("\n"))
                         }
                     }
 
@@ -89,6 +90,6 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val result = navController.handleDeepLink(intent)
-        Log.d("MainActivity", "new intent = ${intent?.dataString} / result = $result")
+        Timber.v("✅ ${intent?.dataString} $result")
     }
 }

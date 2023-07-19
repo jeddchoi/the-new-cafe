@@ -28,6 +28,7 @@ kotlinxSerializationJson = "1.5.1"
 lottieCompose = "6.1.0"
 protobuf = "3.18.0"
 protobufGradlePlugin = "0.9.4"
+timber = "5.0.1"
 wheelPickerCompose = "1.1.11"
 
 [libraries]
@@ -75,8 +76,8 @@ kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime",
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottieCompose" }
 protobuf = { group = "com.google.protobuf", name = "protobuf-javalite", version.ref = "protobuf" }
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 wheel-picker-compose = { group = "com.github.commandiron", name = "WheelPickerCompose", version.ref = "wheelPickerCompose" }
-
 # Dependencies of the included build-logic
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }

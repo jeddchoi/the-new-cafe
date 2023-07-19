@@ -1,6 +1,5 @@
 package io.github.jeddchoi.mypage
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,10 +21,12 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,7 +40,7 @@ internal class MyPageViewModel @Inject constructor(
 
     private val oneShotActionState = MutableStateFlow(OneShotActionState())
     val uiState: StateFlow<MyPageUiState> =
-        tickHandler.tickFlow.combine(sessionRepository.userSession) { current, userSession ->
+        tickHandler.tickFlow.combine(sessionRepository.userSession.onEach { Timber.v("💥 $it") }) { current, userSession ->
             if (userSession != null) {
                 MyPageUiState.Success(
                     displayedUserSession = userSession.toDisplayedUserSession(
@@ -51,11 +52,13 @@ internal class MyPageViewModel @Inject constructor(
             }
         }.catch {
             emit(MyPageUiState.Error(it))
+        }.onEach {
+            Timber.v("💥 $it")
         }.stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
-            MyPageUiState.InitialLoading,
-        )
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                MyPageUiState.InitialLoading,
+            )
 
 
     fun sendRequest(
@@ -63,6 +66,7 @@ internal class MyPageViewModel @Inject constructor(
         duration: Int? = null,
         endTime: Long? = null,
     ) {
+        Timber.v("✅ $seatFinderUserRequestType $duration $endTime")
         launchOneShotJob(
             job = {
                 val result = seatFinderService.requestInSession(
@@ -77,7 +81,7 @@ internal class MyPageViewModel @Inject constructor(
                     )
                 }
             },
-            onError = {e, job ->
+            onError = { e, job ->
                 oneShotActionState.update {
                     it.copy(
                         userMessage = e.toErrorMessage(Action.Retry { launchOneShotJob(job) })
@@ -91,6 +95,7 @@ internal class MyPageViewModel @Inject constructor(
         job: suspend () -> Unit,
         onError: (Throwable, suspend () -> Unit) -> Unit = { _, _ -> }
     ) {
+        Timber.v("✅")
         oneShotActionState.update {
             it.copy(isLoading = true, userMessage = null)
         }
@@ -100,7 +105,7 @@ internal class MyPageViewModel @Inject constructor(
                     job()
                 }
             } catch (e: Throwable) {
-                Log.e("launchOneShotJob", e.stackTraceToString())
+                Timber.e(e)
                 onError(e, job)
             } finally {
                 oneShotActionState.update {

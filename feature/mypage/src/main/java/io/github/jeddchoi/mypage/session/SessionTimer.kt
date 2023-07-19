@@ -1,8 +1,8 @@
 package io.github.jeddchoi.mypage.session
 
-import android.util.Log
 import kotlinx.datetime.Instant
 import kotlinx.datetime.isDistantPast
+import timber.log.Timber
 import kotlin.time.Duration
 
 data class SessionTimer(
@@ -21,10 +21,13 @@ data class SessionTimer(
                 totalTime?.isFinite() == true
 
     fun progress(remaining: Boolean): Float? {
-        Log.i("SessionTimer", "hasEndTime : $hasEndTime, isStarted : $isStarted")
+        Timber.i("hasEndTime : $hasEndTime, isStarted : $isStarted")
         return if (hasEndTime && isStarted) {
-            if (remaining) remainingTime?.inWholeSeconds?.div(totalTime?.inWholeSeconds?.toFloat() ?: 1f)?.coerceIn(0f, 1f)
-            else elapsedTime.inWholeSeconds.div(totalTime?.inWholeSeconds?.toFloat() ?: 1f).coerceIn(0f, 1f)
+            if (remaining) remainingTime?.inWholeSeconds?.div(
+                totalTime?.inWholeSeconds?.toFloat() ?: 1f
+            )?.coerceIn(0f, 1f)
+            else elapsedTime.inWholeSeconds.div(totalTime?.inWholeSeconds?.toFloat() ?: 1f)
+                .coerceIn(0f, 1f)
         } else {
             null
         }

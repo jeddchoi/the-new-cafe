@@ -1,6 +1,5 @@
 package io.github.jeddchoi.data.firebase.repository
 
-import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import io.github.jeddchoi.data.repository.CurrentUserRepository
@@ -17,6 +16,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -38,18 +38,19 @@ class FirebaseCurrentUserRepositoryImpl @Inject constructor(
         awaitClose {
             auth.removeAuthStateListener(authStateListener)
         }
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
 
     override val currentUser: StateFlow<CurrentUser?> =
-        _currentUser.stateIn(
-            coroutineScope,
-            SharingStarted.WhileSubscribed(5000),
-            auth.currentUser?.toCurrentUser()
-        )
+        _currentUser.onEach { Timber.v("💥 $it") }
+            .stateIn(
+                coroutineScope,
+                SharingStarted.WhileSubscribed(5000),
+                auth.currentUser?.toCurrentUser()
+            )
 
     override val currentUserId: Flow<String?> =
-        _currentUser.map { it?.authId }.onEach { Log.e("FirebaseCurrentUserRepositoryImpl", "currentUserId: $it") }.distinctUntilChanged()
-            .onEach { Log.e("FirebaseCurrentUserRepositoryImpl", "after currentUserId: $it") }
+        _currentUser.map { it?.authId }.distinctUntilChanged()
+            .onEach { Timber.v("💥 $it") }
 
 }
 

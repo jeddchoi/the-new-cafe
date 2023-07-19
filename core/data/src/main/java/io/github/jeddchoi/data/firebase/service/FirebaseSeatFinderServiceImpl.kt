@@ -1,6 +1,5 @@
 package io.github.jeddchoi.data.firebase.service
 
-import android.util.Log
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.FirebaseFunctionsException
 import io.github.jeddchoi.data.firebase.model.FirebaseRequestResult
@@ -22,6 +21,7 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,6 +39,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         request: SeatFinderRequest
     ) = withContext(Dispatchers.IO) {
         kotlin.runCatching {
+            Timber.v("✅ $request")
             withTimeout(5000L) {
                 if (!currentUserRepository.isUserSignedIn()) {
                     return@withTimeout SeatFinderResult(resultCode = ResultCode.UNAUTHENTICATED);
@@ -60,9 +61,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
                 val data =
                     functions.getHttpsCallable(CLOUD_FUNCTION_USER_ACTION_HANDLE).call(inputData)
                         .await().data.toJsonElement(json)
-                Log.i("SeatFinder", data.toString())
                 val result = json.decodeFromJsonElement<FirebaseRequestResult>(data)
-                Log.i("SeatFinder", result.toString())
                 result.toSeatFinderResult()
             }
         }.fold(
@@ -72,7 +71,6 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
             },
             onFailure = {
                 // handles technical errors
-                Log.e("SeatFinder", it.stackTraceToString())
                 SeatFinderResult(
                     resultCode =
                     when (it) {
@@ -105,27 +103,33 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
                     }
                 )
             }
-        )
+        ).also { result ->
+            Timber.i(result.toString())
+        }
     }
 
     override suspend fun reserveSeat(
         seatPosition: SeatPosition,
         endTime: Long?,
         durationInSeconds: Int?
-    ) = sendUserActionRequest(
-        SeatFinderRequest(
-            requestType = SeatFinderRequestType.ReserveSeat,
-            seatPosition = seatPosition,
-            endTime = endTime,
-            durationInSeconds = durationInSeconds
+    ): SeatFinderResult {
+        Timber.v("✅ $seatPosition, $endTime, $durationInSeconds")
+        return sendUserActionRequest(
+            SeatFinderRequest(
+                requestType = SeatFinderRequestType.ReserveSeat,
+                seatPosition = seatPosition,
+                endTime = endTime,
+                durationInSeconds = durationInSeconds
+            )
         )
-    )
+    }
 
     override suspend fun requestInSession(
         seatFinderRequestType: SeatFinderUserRequestType,
         endTime: Long?,
         durationInSeconds: Int?
     ): SeatFinderResult {
+        Timber.v("✅ $seatFinderRequestType, $endTime, $durationInSeconds")
         return when (seatFinderRequestType) {
             SeatFinderUserRequestType.Reserve -> throw IllegalArgumentException("Reserved seat is not request in session")
             SeatFinderUserRequestType.Occupy -> occupySeat(endTime, durationInSeconds)
@@ -155,92 +159,110 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun occupySeat(endTime: Long?, durationInSeconds: Int?) =
-        sendUserActionRequest(
+    override suspend fun occupySeat(endTime: Long?, durationInSeconds: Int?): SeatFinderResult {
+        Timber.v("✅ $endTime, $durationInSeconds")
+        return sendUserActionRequest(
             SeatFinderRequest(
                 requestType = SeatFinderRequestType.OccupySeat,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
         )
+    }
 
-    override suspend fun quit() =
-        sendUserActionRequest(
+    override suspend fun quit(): SeatFinderResult {
+        Timber.v("✅")
+        return sendUserActionRequest(
             SeatFinderRequest(
                 requestType = SeatFinderRequestType.Quit,
             )
         )
+    }
 
-    override suspend fun doBusiness(endTime: Long?, durationInSeconds: Int?) =
-        sendUserActionRequest(
+    override suspend fun doBusiness(endTime: Long?, durationInSeconds: Int?): SeatFinderResult {
+        Timber.v("✅ $endTime, $durationInSeconds")
+        return sendUserActionRequest(
             SeatFinderRequest(
                 requestType = SeatFinderRequestType.DoBusiness,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
         )
+    }
 
-    override suspend fun leaveAway(endTime: Long?, durationInSeconds: Int?) =
-        sendUserActionRequest(
+    override suspend fun leaveAway(endTime: Long?, durationInSeconds: Int?): SeatFinderResult {
+        Timber.v("✅ $endTime, $durationInSeconds")
+        return sendUserActionRequest(
             SeatFinderRequest(
                 requestType = SeatFinderRequestType.LeaveAway,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
         )
+    }
 
-    override suspend fun resumeUsing() =
-        sendUserActionRequest(
+    override suspend fun resumeUsing(): SeatFinderResult {
+        Timber.v("✅")
+        return sendUserActionRequest(
             SeatFinderRequest(
                 requestType = SeatFinderRequestType.ResumeUsing,
             )
         )
+    }
 
     override suspend fun changeReservationEndTime(
         endTime: Long?,
         durationInSeconds: Int?
-    ) =
-        sendUserActionRequest(
+    ): SeatFinderResult {
+        Timber.v("✅ $endTime, $durationInSeconds")
+        return sendUserActionRequest(
             SeatFinderRequest(
                 requestType = SeatFinderRequestType.ChangeMainStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
         )
+    }
 
     override suspend fun changeOccupyEndTime(
         endTime: Long?,
         durationInSeconds: Int?
-    ) =
-        sendUserActionRequest(
+    ): SeatFinderResult {
+        Timber.v("✅ $endTime, $durationInSeconds")
+        return sendUserActionRequest(
             SeatFinderRequest(
                 requestType = SeatFinderRequestType.ChangeMainStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
         )
+    }
 
     override suspend fun changeBusinessEndTime(
         endTime: Long?,
         durationInSeconds: Int?
-    ) =
-        sendUserActionRequest(
+    ): SeatFinderResult {
+        Timber.v("✅ $endTime, $durationInSeconds")
+        return sendUserActionRequest(
             SeatFinderRequest(
                 requestType = SeatFinderRequestType.ChangeSubStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
         )
+    }
 
     override suspend fun changeAwayEndTime(
         endTime: Long?,
         durationInSeconds: Int?
-    ) =
-        sendUserActionRequest(
+    ): SeatFinderResult {
+        Timber.v("✅ $endTime, $durationInSeconds")
+        return sendUserActionRequest(
             SeatFinderRequest(
                 requestType = SeatFinderRequestType.ChangeSubStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
         )
+    }
 }

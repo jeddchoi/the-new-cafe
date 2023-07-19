@@ -1,6 +1,5 @@
 package io.github.jeddchoi.profile
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,8 +12,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,19 +27,29 @@ internal class ProfileViewModel @Inject constructor(
 
 
     private val feedbackUiState = MutableStateFlow(OneShotFeedbackUiState())
-    val uiState = combine(userProfileRepository.userProfile, feedbackUiState) { profile, feedback ->
+    val uiState = combine(
+        userProfileRepository.userProfile.onEach { Timber.v("💥 $it") },
+        feedbackUiState.onEach { Timber.v("💥 $it") }
+    ) { profile, feedback ->
         if (profile != null) {
             ProfileUiState.Success(profile, feedback)
         } else {
             ProfileUiState.NotAuthenticated
         }
     }.catch {
-        Log.e("uiState", it.stackTraceToString())
+        Timber.e(it)
         emit(ProfileUiState.Error(it))
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ProfileUiState.InitialLoading)
+    }.onEach {
+        Timber.v("💥 $it")
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        ProfileUiState.InitialLoading
+    )
 
 
     fun signOut() {
+        Timber.v("✅")
         viewModelScope.launch {
             authRepository.logout()
             appFlagsRepository.setShowMainScreenOnStart(false)
