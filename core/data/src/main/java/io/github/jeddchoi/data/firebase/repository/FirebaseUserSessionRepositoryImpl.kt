@@ -1,7 +1,9 @@
 package io.github.jeddchoi.data.firebase.repository
 
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.values
+import com.google.firebase.ktx.Firebase
 import io.github.jeddchoi.data.firebase.model.FirebaseCurrentSession
 import io.github.jeddchoi.data.firebase.model.toUserSession
 import io.github.jeddchoi.data.repository.CurrentUserRepository
@@ -21,8 +23,8 @@ import javax.inject.Inject
 
 class FirebaseUserSessionRepositoryImpl @Inject constructor(
     private val currentUserRepository: CurrentUserRepository,
-    private val database: FirebaseDatabase,
 ) : UserSessionRepository {
+    private val database: FirebaseDatabase = Firebase.database
     override val userSession: Flow<UserSession?> = currentUserRepository.currentUserId.transform {
         if (it != null) {
             emitAll(

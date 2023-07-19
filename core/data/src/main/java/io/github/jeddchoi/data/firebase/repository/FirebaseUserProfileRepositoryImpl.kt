@@ -1,7 +1,9 @@
 package io.github.jeddchoi.data.firebase.repository
 
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.values
+import com.google.firebase.ktx.Firebase
 import io.github.jeddchoi.data.firebase.model.FirebasePrivateInfo
 import io.github.jeddchoi.data.firebase.model.FirebaseUserProfile
 import io.github.jeddchoi.data.firebase.model.toUserProfile
@@ -22,8 +24,8 @@ import javax.inject.Inject
 
 class FirebaseUserProfileRepositoryImpl @Inject constructor(
     private val currentUserRepository: CurrentUserRepository,
-    private val database: FirebaseDatabase,
 ) : UserProfileRepository {
+    private val database: FirebaseDatabase = Firebase.database
     override val userProfile: Flow<UserProfile?> = currentUserRepository.currentUserId.transform {
         if (it != null) {
             emitAll(

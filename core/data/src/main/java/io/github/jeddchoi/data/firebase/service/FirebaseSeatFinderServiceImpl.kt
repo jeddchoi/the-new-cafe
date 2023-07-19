@@ -2,6 +2,8 @@ package io.github.jeddchoi.data.firebase.service
 
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.FirebaseFunctionsException
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
 import io.github.jeddchoi.data.firebase.model.FirebaseRequestResult
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.service.seatfinder.ResultCode
@@ -24,16 +26,14 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
-import javax.inject.Singleton
 
 const val CLOUD_FUNCTION_USER_ACTION_HANDLE = "SeatFinder-onHandleRequest"
 
 @OptIn(ExperimentalSerializationApi::class)
-@Singleton
 class FirebaseSeatFinderServiceImpl @Inject constructor(
     private val currentUserRepository: CurrentUserRepository,
-    private val functions: FirebaseFunctions
 ) : SeatFinderService {
+    private val functions: FirebaseFunctions = Firebase.functions("asia-northeast3")
 
     private suspend fun sendUserActionRequest(
         request: SeatFinderRequest

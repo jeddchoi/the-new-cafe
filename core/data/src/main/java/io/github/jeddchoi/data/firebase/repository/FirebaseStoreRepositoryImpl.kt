@@ -2,6 +2,8 @@ package io.github.jeddchoi.data.firebase.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import io.github.jeddchoi.data.firebase.model.FirebaseSeat
 import io.github.jeddchoi.data.firebase.model.FirebaseSection
 import io.github.jeddchoi.data.firebase.model.FirebaseStore
@@ -20,9 +22,8 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import javax.inject.Inject
 
-class FirebaseStoreRepositoryImpl @Inject constructor(
-    private val firestore: FirebaseFirestore
-) : StoreRepository {
+class FirebaseStoreRepositoryImpl @Inject constructor() : StoreRepository {
+    private val firestore: FirebaseFirestore = Firebase.firestore
     override val stores: Flow<List<Store>> =
         firestore.collection("stores").dataObjects<FirebaseStore>().map { firebaseStores ->
             firebaseStores.map { it.toStore() }

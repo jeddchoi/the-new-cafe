@@ -12,6 +12,7 @@ import timber.log.Timber
 class CafeApplication : Application() {
 
     override fun onCreate() {
+        super.onCreate()
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
                 ThreadPolicy.Builder()
@@ -33,7 +34,7 @@ class CafeApplication : Application() {
             )
             Timber.plant(TimberDebugTree())
         }
-        super.onCreate()
+
     }
 }
 

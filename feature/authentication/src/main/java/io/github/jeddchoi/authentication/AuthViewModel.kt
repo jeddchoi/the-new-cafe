@@ -23,7 +23,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class AuthViewModel @Inject constructor(
-    private val authInputValidator: AuthInputValidator,
     private val authRepository: AuthRepository,
     private val appFlagsRepository: AppFlagsRepository,
 ) : ViewModel() {
@@ -35,7 +34,7 @@ internal class AuthViewModel @Inject constructor(
 
     fun checkEmailInput(email: String): Boolean {
         Timber.v("✅ $email")
-        val (isEmailValid, supportingText) = authInputValidator.isValidEmail(email)
+        val (isEmailValid, supportingText) = AuthInputValidator.isValidEmail(email)
         _uiState.update {
             it.copy(
                 emailInput = email,
@@ -49,7 +48,7 @@ internal class AuthViewModel @Inject constructor(
 
     fun checkDisplayNameInput(displayName: String): Boolean {
         Timber.v("✅ $displayName")
-        val (isNameValid, supportingText) = authInputValidator.isNameValid(displayName)
+        val (isNameValid, supportingText) = AuthInputValidator.isNameValid(displayName)
         _uiState.update {
             it.copy(
                 displayNameInput = displayName,
@@ -64,7 +63,7 @@ internal class AuthViewModel @Inject constructor(
 
     fun checkPasswordInput(password: String, isRegister: Boolean = false): Boolean {
         Timber.v("✅ $password, $isRegister")
-        val (isPasswordValid, supportingText) = authInputValidator.isPasswordValid(
+        val (isPasswordValid, supportingText) = AuthInputValidator.isPasswordValid(
             password,
             isRegister
         )
@@ -82,7 +81,7 @@ internal class AuthViewModel @Inject constructor(
 
     fun checkConfirmPasswordInput(confirmPassword: String): Boolean {
         Timber.v("✅ $confirmPassword")
-        val (doMatch, supportingText) = authInputValidator.doPasswordsMatch(
+        val (doMatch, supportingText) = AuthInputValidator.doPasswordsMatch(
             _uiState.value.passwordInput,
             confirmPassword
         )

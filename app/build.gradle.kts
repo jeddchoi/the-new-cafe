@@ -6,6 +6,7 @@ plugins {
     id("jeddchoi.android.application")
     id("jeddchoi.android.application.compose")
     id("jeddchoi.android.hilt")
+    id("com.google.gms.google-services") // for firebase
 }
 
 android {

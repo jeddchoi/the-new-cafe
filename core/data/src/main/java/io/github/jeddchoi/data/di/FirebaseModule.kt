@@ -2,15 +2,6 @@ package io.github.jeddchoi.data.di
 
 import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import androidx.paging.PagingConfig
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.functions.FirebaseFunctions
-import com.google.firebase.functions.ktx.functions
-import com.google.firebase.ktx.Firebase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -40,26 +31,26 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 abstract class FirebaseModule {
     companion object {
-        @Provides
-        fun provideFirebaseFunctions(): FirebaseFunctions {
-            return Firebase.functions("asia-northeast3")
-        }
+//        @Provides
+//        fun provideFirebaseFunctions(): FirebaseFunctions {
+//            return Firebase.functions("asia-northeast3")
+//        }
 
-        @Provides
-        fun provideFirebaseAuth(
-        ): FirebaseAuth {
-            return Firebase.auth
-        }
+//        @Provides
+//        fun provideFirebaseAuth(
+//        ): FirebaseAuth {
+//            return Firebase.auth
+//        }
 
-        @Provides
-        fun provideFirebaseRealtimeDatabase(): FirebaseDatabase {
-            return Firebase.database
-        }
-
-        @Provides
-        fun provideFirebaseFirestore(): FirebaseFirestore {
-            return Firebase.firestore
-        }
+//        @Provides
+//        fun provideFirebaseRealtimeDatabase(): FirebaseDatabase {
+//            return Firebase.database
+//        }
+//
+//        @Provides
+//        fun provideFirebaseFirestore(): FirebaseFirestore {
+//            return Firebase.firestore
+//        }
 
         @Provides
         fun provideProductsRepository(
@@ -72,10 +63,8 @@ abstract class FirebaseModule {
 
         @Provides
         fun provideProductsPagingSource(
-            database: FirebaseDatabase,
             currentUserRepository: CurrentUserRepository
         ) = UserSessionHistoryPagingSource(
-            db = database.reference,
             currentUserRepository = currentUserRepository
         )
 

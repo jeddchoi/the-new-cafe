@@ -1,0 +1,85 @@
+{
+  "project_info": {
+    "project_number": "92802943034",
+    "firebase_url": "https://the-new-cafe-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "the-new-cafe",
+    "storage_bucket": "the-new-cafe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92802943034:android:f8101d555f1bc92d7b8d03",
+        "android_client_info": {
+          "package_name": "io.github.jeddchoi.thenewcafe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "92802943034-cu63cf49g5017ot17vka8ugnptdh7bm7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.github.jeddchoi.thenewcafe",
+            "certificate_hash": "f592804a0546800abf383710e2416a3b50c84147"
+          }
+        },
+        {
+          "client_id": "92802943034-jhiamsh4rq7g9bsp3j5n9k5eq41dk8hu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACSIk3HUKyIsd7bEpyXVfJ6wlWRTRdIHU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "92802943034-jhiamsh4rq7g9bsp3j5n9k5eq41dk8hu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92802943034:android:ceff37e77578a0c17b8d03",
+        "android_client_info": {
+          "package_name": "io.github.jeddchoi.thenewcafe.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "92802943034-6hl9arv1og5f6brj3vmd1q92tpg6c0n7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.github.jeddchoi.thenewcafe.debug",
+            "certificate_hash": "f592804a0546800abf383710e2416a3b50c84147"
+          }
+        },
+        {
+          "client_id": "92802943034-jhiamsh4rq7g9bsp3j5n9k5eq41dk8hu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACSIk3HUKyIsd7bEpyXVfJ6wlWRTRdIHU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "92802943034-jhiamsh4rq7g9bsp3j5n9k5eq41dk8hu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

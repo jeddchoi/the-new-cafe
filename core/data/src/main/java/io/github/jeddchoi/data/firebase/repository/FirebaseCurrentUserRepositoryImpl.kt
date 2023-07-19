@@ -2,6 +2,8 @@ package io.github.jeddchoi.data.firebase.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.model.CurrentUser
 import kotlinx.coroutines.CoroutineScope
@@ -21,9 +23,10 @@ import javax.inject.Inject
 
 
 class FirebaseCurrentUserRepositoryImpl @Inject constructor(
-    private val auth: FirebaseAuth,
     private val coroutineScope: CoroutineScope,
 ) : CurrentUserRepository {
+    private val auth: FirebaseAuth = Firebase.auth
+
     override fun isUserSignedIn() = auth.currentUser != null
 
     override fun getUserId() = currentUser.value?.authId

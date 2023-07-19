@@ -1,7 +1,9 @@
 package io.github.jeddchoi.data.firebase.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.auth.ktx.userProfileChangeRequest
+import com.google.firebase.ktx.Firebase
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.UserProfileRepository
 import kotlinx.coroutines.Dispatchers
@@ -9,14 +11,11 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class FirebaseAuthRepositoryImpl @Inject constructor(
-    private val auth: FirebaseAuth,
     private val userProfileRepository: UserProfileRepository,
 ) : AuthRepository {
-
+    private val auth: FirebaseAuth = Firebase.auth
 
     override suspend fun signInWithEmail(email: String, password: String): Result<Unit> =
         withContext(Dispatchers.IO) {

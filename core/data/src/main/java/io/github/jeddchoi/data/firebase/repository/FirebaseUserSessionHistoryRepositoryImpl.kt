@@ -6,7 +6,8 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import io.github.jeddchoi.data.firebase.model.FirebaseUserSessionHistory
 import io.github.jeddchoi.data.firebase.model.toUserSessionHistory
 import io.github.jeddchoi.data.repository.CurrentUserRepository
@@ -33,7 +34,6 @@ class FirebaseUserSessionHistoryRepositoryImpl (
 
 class UserSessionHistoryPagingSource(
     private val currentUserRepository: CurrentUserRepository,
-    private val db: DatabaseReference
 ) : PagingSource<DataSnapshot, UserSessionHistory>() {
     override fun getRefreshKey(state: PagingState<DataSnapshot, UserSessionHistory>): DataSnapshot? =
         null
@@ -43,7 +43,7 @@ class UserSessionHistoryPagingSource(
         val currentUserId =
             currentUserRepository.getUserId() ?: throw RuntimeException("User not signed in")
         val queryUserSessionHistoryNames =
-            db.child("seatFinder/history/$currentUserId").orderByKey()
+            Firebase.database.reference.child("seatFinder/history/$currentUserId").orderByKey()
                 .limitToFirst(20)
         val currentPage = params.key ?: queryUserSessionHistoryNames.get().await()
         val lastVisibleUserSessionHistoryKey = currentPage.children.last().key

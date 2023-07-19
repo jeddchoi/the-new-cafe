@@ -4,6 +4,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import io.github.jeddchoi.data.firebase.model.FirebaseUserStateChange
 import io.github.jeddchoi.data.firebase.model.toUserStateChange
 import io.github.jeddchoi.data.repository.CurrentUserRepository
@@ -22,8 +24,8 @@ import javax.inject.Inject
 
 class FirebaseUserSessionHistoryDetailRepositoryImpl @Inject constructor(
     val currentUserRepository: CurrentUserRepository,
-    val database: FirebaseDatabase,
 ) : UserSessionHistoryDetailRepository {
+    private val database: FirebaseDatabase = Firebase.database
     override fun getStateChanges(sessionId: String): Flow<List<UserStateChange>> {
         Timber.v("✅ $sessionId")
         return currentUserRepository.currentUserId.transform { currentUserId ->
