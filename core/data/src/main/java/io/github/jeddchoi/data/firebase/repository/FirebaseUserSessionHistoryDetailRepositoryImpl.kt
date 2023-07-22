@@ -31,7 +31,7 @@ class FirebaseUserSessionHistoryDetailRepositoryImpl @Inject constructor(
         return currentUserRepository.currentUserId.flatMapLatest { currentUserId ->
             if (currentUserId != null) {
                 val ref =
-                    database.getReference("seatFinder/stateChanges/${currentUserId}/$sessionId")
+                    database.getReference("seatFinder/${currentUserId}/stateChanges/$sessionId")
                 callbackFlow {
                     val valueEventListener = object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot) {

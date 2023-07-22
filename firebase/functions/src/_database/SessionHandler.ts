@@ -20,7 +20,7 @@ export default class SessionHandler {
     ) {
         logger.debug("[SessionHandler] constructor");
         const seatFinderRef = DatabaseUtil.Instance.seatFinderRef();
-        this.userCurrentSessionRef = seatFinderRef.child(REFERENCE_CURRENT_SESSION_NAME).child(userId);
+        this.userCurrentSessionRef = seatFinderRef.child(userId).child(REFERENCE_CURRENT_SESSION_NAME);
         this.userCurrentSessionPath = DatabaseUtil.Instance.getRefPath(this.userCurrentSessionRef);
     }
 

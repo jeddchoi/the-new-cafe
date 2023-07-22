@@ -26,9 +26,9 @@ class FirebaseUserSessionRepositoryImpl @Inject constructor(
 ) : UserSessionRepository {
     private val database: FirebaseDatabase = Firebase.database
     override val userSession: Flow<UserSession?> =
-        currentUserRepository.currentUserId.flatMapLatest {
-            if (it != null) {
-                database.getReference("seatFinder/session/${it}").values<FirebaseCurrentSession>()
+        currentUserRepository.currentUserId.flatMapLatest { currentUserId ->
+            if (currentUserId != null) {
+                database.getReference("seatFinder/${currentUserId}/session").values<FirebaseCurrentSession>()
                     .map { session ->
                         session.toUserSession()
                     }

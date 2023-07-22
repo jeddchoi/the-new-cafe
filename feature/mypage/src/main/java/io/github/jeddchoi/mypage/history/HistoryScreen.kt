@@ -53,13 +53,8 @@ internal fun HistoryScreen(
         LazyColumn(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
-            reverseLayout = true,
         ) {
-            item {
-                Spacer(
-                    modifier = Modifier.height(200.dp)
-                )
-            }
+
 
             when (currentSession) {
                 null,
@@ -112,6 +107,12 @@ internal fun HistoryScreen(
                     refresh is LoadState.Error -> Timber.e(refresh.error)
                     append is LoadState.Error -> Timber.e(append.error)
                 }
+            }
+
+            item {
+                Spacer(
+                    modifier = Modifier.height(200.dp)
+                )
             }
         }
     }

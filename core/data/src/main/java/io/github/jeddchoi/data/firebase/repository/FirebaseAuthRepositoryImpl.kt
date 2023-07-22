@@ -37,14 +37,17 @@ class FirebaseAuthRepositoryImpl @Inject constructor(
             val request = userProfileChangeRequest {
                 this.displayName = displayName
             }
+            Timber.v("✅ $request")
             createdUser.updateProfile(request).await()
-
+            Timber.v("✅ updateProfile")
             userProfileRepository.createUserProfile(
                 displayName = displayName,
                 emailAddress = email,
                 isAnonymous = false,
             )
+            Timber.v("✅ createUserProfile")
             auth.signInWithEmailAndPassword(email, password).await()
+            Timber.v("✅ signInWithEmailAndPassword")
             return@withContext Result.success(Unit)
         } else {
             return@withContext Result.failure(RuntimeException("Registration failed"))

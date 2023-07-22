@@ -53,7 +53,7 @@ class UserSessionHistoryPagingSource(
         try {
             Timber.v("✅ ${params.key}")
             val queryUserSessionHistoryNames =
-                Firebase.database.reference.child("seatFinder/history/$currentUserId").orderByKey()
+                Firebase.database.reference.child("seatFinder/$currentUserId/history").orderByKey()
                     .limitToFirst(20)
             val currentPage = params.key ?: queryUserSessionHistoryNames.get().await()
             val lastVisibleUserSessionHistoryKey =
