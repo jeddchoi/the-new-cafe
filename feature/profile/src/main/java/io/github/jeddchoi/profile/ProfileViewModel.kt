@@ -52,7 +52,7 @@ internal class ProfileViewModel @Inject constructor(
         Timber.v("✅")
         viewModelScope.launch {
             authRepository.logout()
-            appFlagsRepository.setShowMainScreenOnStart(false)
+//            appFlagsRepository.setShowMainScreenOnStart(false)
         }
     }
 }

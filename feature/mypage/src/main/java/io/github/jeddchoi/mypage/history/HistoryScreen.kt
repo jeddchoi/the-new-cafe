@@ -11,6 +11,8 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -36,35 +38,33 @@ internal fun HistoryScreen(
     val append = pagingHistories.loadState.append
 
 
-    if (pagingHistories.itemCount == 0) {
+    LaunchedEffect(currentSession) {
+        currentSession?.let {
+            pagingHistories.refresh()
+        }
+    }
+
+    if (pagingHistories.itemCount == 0 && (currentSession == null || currentSession == UserSession.None) ) {
         EmptyResultScreen(
             subject = UiText.StringResource(R.string.user_session_history),
             modifier = modifier,
         )
     } else {
         LazyColumn(
-            modifier = modifier
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            reverseLayout = true,
         ) {
-            items(pagingHistories.itemCount) { item ->
-                pagingHistories[item]?.let { history ->
-                    UserSessionHistoryCard(
-                        startTime = history.startTime,
-                        endTime = history.endTime,
-                        seatPosition = history.seatPosition,
-                        sessionId = history.sessionId,
-                        hasFailure = history.hasFailure,
-                        modifier = Modifier
-                            .clickable {
-                                navigateToHistoryDetail(history.sessionId)
-                            }
-                            .fillMaxWidth()
-                    )
-                }
+            item {
+                Spacer(
+                    modifier = Modifier.height(200.dp)
+                )
             }
 
             when (currentSession) {
                 null,
                 UserSession.None -> {
+
                 }
 
                 is UserSession.UsingSeat -> {
@@ -84,23 +84,34 @@ internal fun HistoryScreen(
                         )
                     }
                 }
-
             }
 
-            item {
-                Spacer(
-                    modifier = Modifier.height(200.dp)
-                )
+            items(pagingHistories.itemCount) { item ->
+
+                pagingHistories[pagingHistories.itemCount - item - 1]?.let { history ->
+                    UserSessionHistoryCard(
+                        startTime = history.startTime,
+                        endTime = history.endTime,
+                        seatPosition = history.seatPosition,
+                        sessionId = history.sessionId,
+                        hasFailure = history.hasFailure,
+                        modifier = Modifier
+                            .clickable {
+                                navigateToHistoryDetail(history.sessionId)
+                            }
+                            .fillMaxWidth()
+                    )
+                }
             }
-        }
 
-        pagingHistories.loadState.apply {
-            when {
-                refresh is LoadState.Loading -> CircularProgressIndicator()
-                refresh is LoadState.Error -> Timber.e(refresh.error)
+            pagingHistories.loadState.apply {
+                when {
+                    refresh is LoadState.Loading -> item { CircularProgressIndicator() }
+                    append is LoadState.Loading -> item { CircularProgressIndicator() }
 
-                append is LoadState.Loading -> CircularProgressIndicator()
-                append is LoadState.Error -> Timber.e(append.error)
+                    refresh is LoadState.Error -> Timber.e(refresh.error)
+                    append is LoadState.Error -> Timber.e(append.error)
+                }
             }
         }
     }

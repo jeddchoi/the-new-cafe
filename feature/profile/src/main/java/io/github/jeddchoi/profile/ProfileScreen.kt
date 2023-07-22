@@ -1,10 +1,11 @@
 package io.github.jeddchoi.profile
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,7 +22,6 @@ import io.github.jeddchoi.ui.fullscreen.LoadingScreen
 import io.github.jeddchoi.ui.fullscreen.NotAuthenticatedScreen
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProfileScreen(
     uiState: ProfileUiState,
@@ -38,9 +38,7 @@ internal fun ProfileScreen(
         ProfileUiState.NotAuthenticated -> {
             NotAuthenticatedScreen(
                 modifier = modifier,
-                navigateToSignIn = {
-                    signOut()
-                }
+                navigateToSignIn = navigateToSignIn
             )
         }
 
@@ -49,7 +47,9 @@ internal fun ProfileScreen(
                 title = UiText.StringResource(R.string.profile),
             ) {
                 Column(
-                    modifier = modifier.padding(it).fillMaxSize(),
+                    modifier = modifier
+                        .padding(it)
+                        .fillMaxSize(),
                 ) {
                     Text(
                         text = uiState.profile.toString()
@@ -82,6 +82,7 @@ private fun ProfileScreenPreview() {
         val viewModel: ProfileViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         ProfileScreen(
-            uiState = uiState)
+            uiState = uiState
+        )
     }
 }

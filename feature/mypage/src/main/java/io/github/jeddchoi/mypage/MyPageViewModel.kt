@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -52,13 +53,13 @@ internal class MyPageViewModel @Inject constructor(
             }
         }.catch {
             emit(MyPageUiState.Error(it))
-        }.onEach {
+        }.distinctUntilChanged().onEach {
             Timber.v("💥 $it")
         }.stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5_000),
-                MyPageUiState.InitialLoading,
-            )
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            MyPageUiState.InitialLoading,
+        )
 
 
     fun sendRequest(

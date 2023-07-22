@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
@@ -29,7 +29,7 @@ class FirebaseCurrentUserRepositoryImpl @Inject constructor(
 
     override fun isUserSignedIn() = auth.currentUser != null
 
-    override fun getUserId() = currentUser.value?.authId
+    override fun getUserId() = auth.currentUser?.uid
 
     private val _currentUser = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
@@ -47,12 +47,17 @@ class FirebaseCurrentUserRepositoryImpl @Inject constructor(
         _currentUser.onEach { Timber.v("💥 $it") }
             .stateIn(
                 coroutineScope,
-                SharingStarted.WhileSubscribed(5000),
-                auth.currentUser?.toCurrentUser()
+                SharingStarted.WhileSubscribed(5_000),
+                null
             )
 
     override val currentUserId: Flow<String?> =
-        _currentUser.map { it?.authId }.distinctUntilChanged()
+        flow {
+            _currentUser.collect { user ->
+                emit(user?.authId)
+            }
+        }
+            .distinctUntilChanged()
             .onEach { Timber.v("💥 $it") }
 
 }

@@ -14,7 +14,6 @@ import io.github.jeddchoi.data.firebase.repository.FirebaseUserProfileRepository
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionHistoryDetailRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionHistoryRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionRepositoryImpl
-import io.github.jeddchoi.data.firebase.repository.UserSessionHistoryPagingSource
 import io.github.jeddchoi.data.firebase.service.FirebaseSeatFinderServiceImpl
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository
@@ -31,46 +30,20 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 abstract class FirebaseModule {
     companion object {
-//        @Provides
-//        fun provideFirebaseFunctions(): FirebaseFunctions {
-//            return Firebase.functions("asia-northeast3")
-//        }
-
-//        @Provides
-//        fun provideFirebaseAuth(
-//        ): FirebaseAuth {
-//            return Firebase.auth
-//        }
-
-//        @Provides
-//        fun provideFirebaseRealtimeDatabase(): FirebaseDatabase {
-//            return Firebase.database
-//        }
-//
-//        @Provides
-//        fun provideFirebaseFirestore(): FirebaseFirestore {
-//            return Firebase.firestore
-//        }
-
         @Provides
         fun provideProductsRepository(
-            source: UserSessionHistoryPagingSource,
-            config: PagingConfig
+            currentUserRepository: CurrentUserRepository,
+            config: PagingConfig,
         ): UserSessionHistoryRepository = FirebaseUserSessionHistoryRepositoryImpl(
-            source = source,
-            config = config
-        )
-
-        @Provides
-        fun provideProductsPagingSource(
-            currentUserRepository: CurrentUserRepository
-        ) = UserSessionHistoryPagingSource(
+            config = config,
             currentUserRepository = currentUserRepository
         )
 
+
         @Provides
         fun providePagingConfig() = PagingConfig(
-            pageSize = PAGE_SIZE
+            pageSize = PAGE_SIZE,
+            enablePlaceholders = false,
         )
     }
 

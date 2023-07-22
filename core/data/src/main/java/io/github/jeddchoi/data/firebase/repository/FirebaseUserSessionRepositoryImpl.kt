@@ -12,11 +12,11 @@ import io.github.jeddchoi.model.UserSession
 import io.github.jeddchoi.model.UserStateAndUsedSeatPosition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.transform
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -25,19 +25,19 @@ class FirebaseUserSessionRepositoryImpl @Inject constructor(
     private val currentUserRepository: CurrentUserRepository,
 ) : UserSessionRepository {
     private val database: FirebaseDatabase = Firebase.database
-    override val userSession: Flow<UserSession?> = currentUserRepository.currentUserId.transform {
-        if (it != null) {
-            emitAll(
+    override val userSession: Flow<UserSession?> =
+        currentUserRepository.currentUserId.flatMapLatest {
+            if (it != null) {
                 database.getReference("seatFinder/session/${it}").values<FirebaseCurrentSession>()
                     .map { session ->
                         session.toUserSession()
-                    })
-        } else { // not signed in
-            emit(null)
-        }
-    }.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
+                    }
+            } else { // not signed in
+                flowOf(null)
+            }
+        }.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
 
-    override val userStateAndUsedSeatPosition= userSession.map {
+    override val userStateAndUsedSeatPosition = userSession.map {
         UserStateAndUsedSeatPosition(
             seatPosition = if (it is UserSession.UsingSeat) it.seatPosition else null,
             userState = it?.currentState

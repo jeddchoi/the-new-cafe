@@ -12,11 +12,11 @@ import io.github.jeddchoi.data.repository.UserProfileRepository
 import io.github.jeddchoi.model.UserProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import timber.log.Timber
@@ -26,17 +26,17 @@ class FirebaseUserProfileRepositoryImpl @Inject constructor(
     private val currentUserRepository: CurrentUserRepository,
 ) : UserProfileRepository {
     private val database: FirebaseDatabase = Firebase.database
-    override val userProfile: Flow<UserProfile?> = currentUserRepository.currentUserId.transform {
-        if (it != null) {
-            emitAll(
+    override val userProfile: Flow<UserProfile?> =
+        currentUserRepository.currentUserId.flatMapLatest {
+            if (it != null) {
                 database.getReference("users/${it}/profile").values<FirebaseUserProfile>()
                     .map { profile ->
                         profile?.toUserProfile() ?: UserProfile()
-                    })
-        } else {
-            emit(null)
-        }
-    }.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
+                    }
+            } else {
+                flowOf(null)
+            }
+        }.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
 
     override suspend fun createUserProfile(
         displayName: String,

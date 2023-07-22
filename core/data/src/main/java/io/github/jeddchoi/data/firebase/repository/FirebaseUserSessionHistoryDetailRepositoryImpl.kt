@@ -15,10 +15,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.transform
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,39 +28,35 @@ class FirebaseUserSessionHistoryDetailRepositoryImpl @Inject constructor(
     private val database: FirebaseDatabase = Firebase.database
     override fun getStateChanges(sessionId: String): Flow<List<UserStateChange>> {
         Timber.v("✅ $sessionId")
-        return currentUserRepository.currentUserId.transform { currentUserId ->
+        return currentUserRepository.currentUserId.flatMapLatest { currentUserId ->
             if (currentUserId != null) {
                 val ref =
                     database.getReference("seatFinder/stateChanges/${currentUserId}/$sessionId")
-                emitAll(
-                    callbackFlow<List<UserStateChange>> {
-                        val valueEventListener = object : ValueEventListener {
-                            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                                trySend(
-                                    dataSnapshot.children.mapNotNull {
-                                        it.getValue(
-                                            FirebaseUserStateChange::class.java
-                                        )?.toUserStateChange()
-                                    }.toList()
-                                ).isSuccess
-                            }
-
-                            override fun onCancelled(databaseError: DatabaseError) {
-                                close(databaseError.toException())
-                            }
+                callbackFlow {
+                    val valueEventListener = object : ValueEventListener {
+                        override fun onDataChange(dataSnapshot: DataSnapshot) {
+                            trySend(
+                                dataSnapshot.children.mapNotNull {
+                                    it.getValue(
+                                        FirebaseUserStateChange::class.java
+                                    )?.toUserStateChange()
+                                }.toList()
+                            ).isSuccess
                         }
 
-                        ref.addValueEventListener(valueEventListener)
-
-                        awaitClose {
-                            ref.removeEventListener(valueEventListener)
+                        override fun onCancelled(databaseError: DatabaseError) {
+                            close(databaseError.toException())
                         }
                     }
-                )
 
+                    ref.addValueEventListener(valueEventListener)
 
+                    awaitClose {
+                        ref.removeEventListener(valueEventListener)
+                    }
+                }
             } else { // not signed in
-                emit(emptyList())
+                flowOf(emptyList())
             }
         }.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
     }

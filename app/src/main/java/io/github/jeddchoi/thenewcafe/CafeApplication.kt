@@ -39,7 +39,27 @@ class CafeApplication : Application() {
 }
 
 class TimberDebugTree : Timber.DebugTree() {
+
     override fun createStackElementTag(element: StackTraceElement): String {
-        return "${element.fileName}:${element.lineNumber}#${element.methodName}"
+        // returns a clickable Android Studio link
+        return String.format(
+            "\n%4\$s.%1\$s(%2\$s:%3\$s)\n\n",
+            element.methodName,
+            element.fileName,
+            element.lineNumber,
+            super.createStackElementTag(element)
+        )
     }
+
+    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+        super.log(
+            priority = priority,
+            tag = null,
+            message = "$message $tag",
+            t = t
+        )
+//        println(String.format("%2\$s %1\$s", tag, message))
+//        t?.printStackTrace(System.out)
+    }
+
 }
