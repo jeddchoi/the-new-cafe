@@ -13,7 +13,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,13 +21,17 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.item.DateTimeItem
+import io.github.jeddchoi.designsystem.component.item.DurationItem
+import io.github.jeddchoi.designsystem.component.item.EnumItem
+import io.github.jeddchoi.designsystem.component.item.StringItem
 import io.github.jeddchoi.model.SeatPosition
+import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.mypage.R
 import io.github.jeddchoi.ui.fullscreen.PlaceholderScreen
 import kotlinx.datetime.Clock
@@ -56,57 +59,34 @@ internal fun SessionScreen(
                     .size(200.dp),
             )
 
-            ListItem(
-                headlineContent = {
-                    Text(
-                        text = displayedUserSession.stateName.asString(),
-                    )
-                },
-                supportingContent = {
-                    Text(
-                        text = stringResource(R.string.user_session_state)
-                    )
-                }
+            val modifierWithMaxWidth = Modifier.fillMaxWidth()
+
+
+            EnumItem(
+                modifier = modifierWithMaxWidth,
+                currentIdx = displayedUserSession.state.ordinal,
+                values = UserStateType.VALUES.map { it.name },
+                title = UiText.StringResource(R.string.user_session_state)
             )
 
-            ListItem(
-                headlineContent = {
-                    Text(
-                        text = stringResource(id = if (displayedUserSession.hasFailure) R.string.has_error else R.string.good),
-                    )
-                },
-                supportingContent = {
-                    Text(
-                        text = stringResource(R.string.user_session_state_check)
-                    )
-                }
+            StringItem(
+                modifier = modifierWithMaxWidth,
+                title = UiText.StringResource(R.string.user_session_state_check),
+                content = UiText.StringResource(if (displayedUserSession.hasFailure) R.string.has_error else R.string.good)
             )
 
-            ListItem(
-                headlineContent = {
-                    Text(
-                        text = displayedUserSession.seatPosition.toString(),
-                    )
-                },
-                supportingContent = {
-                    Text(
-                        text = stringResource(R.string.user_session_seat_position)
-                    )
-                }
+            StringItem(
+                modifier = modifierWithMaxWidth,
+                title = UiText.StringResource(R.string.user_session_seat_position),
+                content = UiText.DynamicString(displayedUserSession.seatPosition.toString())
             )
 
-            ListItem(
-                headlineContent = {
-                    Text(
-                        text = displayedUserSession.resultStateAfterCurrentState?.name
-                            ?: "-",
-                    )
-                },
-                supportingContent = {
-                    Text(
-                        text = stringResource(R.string.user_session_state_after_timeout)
-                    )
-                }
+
+            EnumItem(
+                modifier = modifierWithMaxWidth,
+                currentIdx = displayedUserSession.resultStateAfterCurrentState?.ordinal,
+                values = UserStateType.VALUES.map { it.name },
+                title = UiText.StringResource(R.string.user_session_state_after_timeout)
             )
 
             SessionTimerItems(
@@ -179,74 +159,45 @@ private fun ColumnScope.SessionTimerItems(
     Text(
         text = title.asString(),
         style = MaterialTheme.typography.headlineMedium,
-        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth(),
         textAlign = TextAlign.Start,
     )
 
-    ListItem(
-        headlineContent = {
-            Text(
-                text = sessionTimer.startTime.toString(),
-            )
-        },
-        supportingContent = {
-            Text(
-                text = stringResource(R.string.session_timer_start_time)
-            )
-        }
+    val modifierWithFullWidth = Modifier.fillMaxWidth()
+    DateTimeItem(
+        modifier = modifierWithFullWidth,
+        date = sessionTimer.startTime,
+        title = UiText.StringResource(R.string.session_timer_start_time)
     )
 
-    ListItem(
-        headlineContent = {
-            Text(
-                text = sessionTimer.endTime?.toString() ?: "-",
-            )
-        },
-        supportingContent = {
-            Text(
-                text = stringResource(R.string.session_timer_end_time)
-            )
-        }
+    DateTimeItem(
+        modifier = modifierWithFullWidth,
+        date = sessionTimer.endTime,
+        title = UiText.StringResource(R.string.session_timer_end_time)
     )
 
-    ListItem(
-        headlineContent = {
-            Text(
-                text = sessionTimer.totalTime?.toString() ?: "-",
-            )
-        },
-        supportingContent = {
-            Text(
-                text = stringResource(R.string.session_timer_total_time)
-            )
-        }
+    DurationItem(
+        modifier = modifierWithFullWidth,
+        duration = sessionTimer.totalTime,
+        title = UiText.StringResource(R.string.session_timer_total_time),
     )
 
-    ListItem(
-        headlineContent = {
-            Text(
-                text = sessionTimer.elapsedTime.toString(),
-            )
-        },
-        supportingContent = {
-            Text(
-                text = stringResource(R.string.session_timer_elapsed_time)
-            )
-        }
+    DurationItem(
+        modifier = modifierWithFullWidth,
+        duration = sessionTimer.elapsedTime,
+        title = UiText.StringResource(R.string.session_timer_elapsed_time),
+        progress = sessionTimer.progress(false)
     )
 
-    ListItem(
-        headlineContent = {
-            Text(
-                text = sessionTimer.remainingTime?.toString() ?: "-",
-            )
-        },
-        supportingContent = {
-            Text(
-                text = stringResource(R.string.session_timer_remaining_time)
-            )
-        }
+    DurationItem(
+        modifier = modifierWithFullWidth,
+        duration = sessionTimer.remainingTime,
+        title = UiText.StringResource(R.string.session_timer_remaining_time),
+        progress = sessionTimer.progress(true)
     )
+
 }
 
 @Preview(
@@ -262,7 +213,7 @@ fun SessionScreenPreview() {
     TheNewCafeTheme {
         Surface {
             SessionScreen(
-                displayedUserSession = DisplayedUserSession.UsingSeat.Away(
+                displayedUserSession = DisplayedUserSession.UsingSeat(
                     SessionTimer(
                         startTime = Clock.System.now().minus(10.minutes),
                         endTime = Clock.System.now().plus(10.minutes),
@@ -280,6 +231,7 @@ fun SessionScreenPreview() {
                     hasFailure = true,
                     seatPosition = SeatPosition(),
                     resultStateAfterCurrentState = null,
+                    state = UserStateType.Away,
                 )
             )
         }

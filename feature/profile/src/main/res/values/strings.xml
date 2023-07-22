@@ -5,4 +5,12 @@
     <string name="navigate_to_sign_in">Sign in</string>
     <string name="sign_out">Sign out</string>
     <string name="not_authenticated">You are not authenticated</string>
+    <string name="hello_user">👋 Hello, %s</string>
+    <string name="email_address">Email Address</string>
+    <string name="created_at">Created at</string>
+    <string name="last_sign_in_at">Last sign in at</string>
+    <string name="is_anonymous">Is annonymous</string>
+    <string name="is_email_verified">Is email verified</string>
+    <string name="is_online">Is online</string>
+    <string name="sex">Sex</string>
 </resources>

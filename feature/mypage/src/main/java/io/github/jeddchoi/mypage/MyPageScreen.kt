@@ -36,6 +36,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.model.SeatPosition
+import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.mypage.history.HistoryScreen
 import io.github.jeddchoi.mypage.history.HistoryViewModel
 import io.github.jeddchoi.mypage.session.DisplayedUserSession
@@ -243,12 +244,13 @@ private fun MyPagePreview() {
         Surface {
             MyPageScreen(
                 uiState = MyPageUiState.Success(
-                    displayedUserSession = DisplayedUserSession.UsingSeat.Occupied(
+                    displayedUserSession = DisplayedUserSession.UsingSeat(
                         SessionTimer(),
                         SessionTimer(),
                         hasFailure = false,
                         seatPosition = SeatPosition(),
                         resultStateAfterCurrentState = null,
+                        state = UserStateType.Occupied
                     )
                 )
             )

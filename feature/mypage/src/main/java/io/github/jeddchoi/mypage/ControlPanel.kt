@@ -38,6 +38,7 @@ import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.BottomButton
 import io.github.jeddchoi.designsystem.component.SegmentedControl
 import io.github.jeddchoi.model.SeatPosition
+import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.mypage.session.DisplayedUserSession
 import io.github.jeddchoi.mypage.session.SessionTimer
 import io.github.jeddchoi.ui.component.ComponentWithBottomButtons
@@ -232,12 +233,13 @@ private fun ControlPanelPreview() {
                 verticalArrangement = Arrangement.Center,
             ) {
                 ControlPanel(
-                    DisplayedUserSession.UsingSeat.Reserved(
+                    DisplayedUserSession.UsingSeat(
                         SessionTimer(),
                         SessionTimer(),
                         hasFailure = false,
                         seatPosition = SeatPosition(),
-                        null
+                        null,
+                        state = UserStateType.Reserved
                     )
                 )
             }

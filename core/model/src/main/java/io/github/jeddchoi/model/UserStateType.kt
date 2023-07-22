@@ -9,7 +9,7 @@ enum class UserStateType {
 
 
     companion object {
-        private val VALUES = values()
+        val VALUES = values()
         fun getByValue(input: String?) =
             input?.let {
                 val userStateStr = it.substringAfter("_")

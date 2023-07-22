@@ -191,7 +191,7 @@ private fun SectionWithSeatsScreen(
                                 .fillMaxWidth(),
                             leadingContent = {
                                 if (isSelected) {
-                                    UiIcon.ImageVectorIcon(CafeIcons.Checked).ToComposable()
+                                    UiIcon.ImageVectorIcon(CafeIcons.CheckCircle).ToComposable()
                                 }
                             },
                             headlineContent = {

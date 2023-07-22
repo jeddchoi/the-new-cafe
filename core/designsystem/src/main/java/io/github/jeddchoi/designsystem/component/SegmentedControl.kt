@@ -106,7 +106,7 @@ fun SegmentedControl(
                     text = item.asString(),
                     fontWeight = FontWeight.Normal,
                     color = if (selectedItemIndex == index) {
-                        Color.White
+                        MaterialTheme.colorScheme.onSecondary
                     } else {
                         color.copy(alpha = 0.9f)
                     },

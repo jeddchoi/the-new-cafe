@@ -7,12 +7,14 @@ import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.Store
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.DataUsage
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.ShoppingBasket
 import androidx.compose.material.icons.rounded.Store
 import androidx.compose.material.icons.rounded.Visibility
@@ -38,9 +40,12 @@ object CafeIcons {
 
     val ArrowBack = Icons.Rounded.ArrowBack
 
-    val Checked = Icons.Rounded.CheckCircle
+    val CheckCircle = Icons.Rounded.CheckCircle
 
     val ExpandMore = Icons.Rounded.ExpandMore
     val ExpandLess = Icons.Rounded.ExpandLess
+
+    val Schedule = Icons.Rounded.Schedule
+    val Check = Icons.Rounded.Check
 }
 
