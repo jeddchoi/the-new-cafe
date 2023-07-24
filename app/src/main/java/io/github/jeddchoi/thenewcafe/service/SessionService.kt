@@ -1,13 +1,18 @@
 package io.github.jeddchoi.thenewcafe.service
 
+import android.app.PendingIntent
 import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.Lifecycle
+import androidx.core.app.TaskStackBuilder
+import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.thenewcafe.R
+import io.github.jeddchoi.thenewcafe.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -15,8 +20,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class SessionService : LifecycleService() {
-    override fun getLifecycle(): Lifecycle = lifecycle
+
 
     @Inject
     lateinit var userSessionRepository: UserSessionRepository
@@ -87,10 +93,24 @@ class SessionService : LifecycleService() {
 
 
     private fun showNotification(content: String) {
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            "https://io.github.jeddchoi.thenewcafe/mypage".toUri(),
+            applicationContext,
+            MainActivity::class.java
+        )
+
+        val deepLinkPendingIntent: PendingIntent? = TaskStackBuilder.create(applicationContext).run {
+            addNextIntentWithParentStack(deepLinkIntent)
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
+
+
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(getString(io.github.jeddchoi.mypage.R.string.user_session))
             .setContentText(content)
+            .setContentIntent(deepLinkPendingIntent)
             .build()
 
         startForeground(1, notification)

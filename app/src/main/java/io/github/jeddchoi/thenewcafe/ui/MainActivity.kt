@@ -88,6 +88,10 @@ class MainActivity : ComponentActivity() {
                     )
 
                     LaunchedEffect(Unit) {
+                        navController.handleDeepLink(intent)
+                    }
+
+                    LaunchedEffect(Unit) {
                         navController.currentBackStack.collect {
                             Timber.d(it.joinToString("\n"))
                         }
@@ -97,6 +101,7 @@ class MainActivity : ComponentActivity() {
                         if (startMyService) {
                             Intent(applicationContext, SessionService::class.java).also {
                                 it.action = SessionService.Action.START.name
+
                                 startForegroundService(it)
                             }
                         }
