@@ -87,9 +87,6 @@ class MainActivity : ComponentActivity() {
                         redirectToAuth = redirectToAuth
                     )
 
-                    LaunchedEffect(Unit) {
-                        navController.handleDeepLink(intent)
-                    }
 
                     LaunchedEffect(Unit) {
                         navController.currentBackStack.collect {
@@ -111,11 +108,5 @@ class MainActivity : ComponentActivity() {
             }
         }
         viewModel.initialize()
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        val result = navController.handleDeepLink(intent)
-        Timber.v("✅ ${intent?.dataString} $result")
     }
 }
