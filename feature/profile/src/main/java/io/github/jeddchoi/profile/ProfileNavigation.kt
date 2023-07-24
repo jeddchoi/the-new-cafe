@@ -12,8 +12,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
+import androidx.navigation.navigation
 import io.github.jeddchoi.ui.LogCompositions
 
+private const val ProfileGraphRoutePattern = "profile_graph"
 private const val ProfileRoutePattern = "profile"
 
 /**
@@ -31,8 +33,21 @@ fun NavController.navigateToProfile(navOptions: NavOptions? = null) {
  * @param navigateToAuth
  * @param onBackClick
  * @receiver
- * @receiver
  */
+
+
+
+fun NavGraphBuilder.profileGraph(
+    nestedGraphs: NavGraphBuilder.() -> Unit,
+) {
+    navigation(
+        route = ProfileGraphRoutePattern,
+        startDestination = ProfileRoutePattern
+    ) {
+        nestedGraphs()
+    }
+}
+
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.profileScreen(
     navigateToAuth: () -> Unit,

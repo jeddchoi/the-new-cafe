@@ -14,6 +14,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 
@@ -33,6 +34,8 @@ internal enum class MyPageTab(@StringRes val titleId: Int) {
     }
 }
 internal const val MyPageTabArg = "tabId"
+
+private const val MyPageGraphRoutePattern = "mypage_graph"
 private const val MyPageRoutePattern = "mypage?$MyPageTabArg={${MyPageTabArg}}"
 
 //internal class MyPageArgs(val tab: MyPageTab) {
@@ -47,6 +50,16 @@ fun NavController.navigateToMyPage(navOptions: NavOptions? = null) {
     this.navigate(MyPageRoutePattern, navOptions)
 }
 
+fun NavGraphBuilder.myPageGraph(
+    nestedGraphs: NavGraphBuilder.() -> Unit,
+) {
+    navigation(
+        route = MyPageGraphRoutePattern,
+        startDestination = MyPageRoutePattern
+    ) {
+        nestedGraphs()
+    }
+}
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.myPageScreen(

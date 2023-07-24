@@ -6,7 +6,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.navigation
 import io.github.jeddchoi.order.store_list.StoreListRoutePattern
 
-private const val OrderGraphRoutePattern = "order"
+private const val OrderGraphRoutePattern = "order_graph"
 
 fun NavController.navigateToOrder(
     navOptions: NavOptions? = null

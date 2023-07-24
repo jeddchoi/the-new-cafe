@@ -32,6 +32,7 @@ fun BottomBar(
                 selected = selected,
                 onClick = {
                     Timber.v("✅")
+
                     val navOptions = navOptions {
                         // Pop up to the start destination of the graph to
                         // avoid building up a large stack of destinations

@@ -14,6 +14,7 @@ import io.github.jeddchoi.authentication.register.registerScreen
 import io.github.jeddchoi.authentication.signin.signInScreen
 import io.github.jeddchoi.historydetail.historyDetailScreen
 import io.github.jeddchoi.historydetail.navigateToHistoryDetail
+import io.github.jeddchoi.mypage.myPageGraph
 import io.github.jeddchoi.mypage.myPageScreen
 import io.github.jeddchoi.mypage.navigateToMyPage
 import io.github.jeddchoi.order.navigateToOrder
@@ -21,6 +22,7 @@ import io.github.jeddchoi.order.orderGraph
 import io.github.jeddchoi.order.store.navigateToStore
 import io.github.jeddchoi.order.store.storeScreen
 import io.github.jeddchoi.order.store_list.storeListScreen
+import io.github.jeddchoi.profile.profileGraph
 import io.github.jeddchoi.profile.profileScreen
 import io.github.jeddchoi.thenewcafe.ui.main.MainRoutePattern
 import io.github.jeddchoi.thenewcafe.ui.main.mainGraph
@@ -61,9 +63,12 @@ fun RootNavGraph(
                     launchSingleTop = true
                 })
             }
-            profileScreen(
-                navigateToAuth = navigateToAuth,
-            )
+            profileGraph {
+                profileScreen(
+                    navigateToAuth = navigateToAuth,
+                )
+            }
+
             orderGraph {
                 storeListScreen(
                     navigateToStore = navController::navigateToStore
@@ -89,12 +94,14 @@ fun RootNavGraph(
                     },
                 )
             }
-            myPageScreen(
-                navigateToStoreList = navController::navigateToOrder,
-                navigateToStore = navController::navigateToStore,
-                navigateToHistoryDetail = navController::navigateToHistoryDetail,
-                navigateToSignIn = navigateToAuth
-            )
+            myPageGraph {
+                myPageScreen(
+                    navigateToStoreList = navController::navigateToOrder,
+                    navigateToStore = navController::navigateToStore,
+                    navigateToHistoryDetail = navController::navigateToHistoryDetail,
+                    navigateToSignIn = navigateToAuth
+                )
+            }
         }
 
         historyDetailScreen(
