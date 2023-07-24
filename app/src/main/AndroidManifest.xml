@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+
     <application
         android:name=".CafeApplication"
         android:allowBackup="false"
@@ -48,6 +52,8 @@
                     android:scheme="jeddchoi" />
             </intent-filter>
         </activity>
+
+        <service android:name=".service.SessionService" android:exported="false" android:description="@string/desc_session_service"/>
     </application>
 
 </manifest>

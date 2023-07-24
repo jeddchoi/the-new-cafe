@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.AppFlagsRepository
+import io.github.jeddchoi.data.repository.UserSessionRepository
+import io.github.jeddchoi.model.UserStateType
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -14,6 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RootViewModel @Inject constructor(
+    private val userSessionRepository: UserSessionRepository,
     private val appFlagsRepository: AppFlagsRepository
 ) : ViewModel() {
 
@@ -22,4 +25,11 @@ class RootViewModel @Inject constructor(
         .onEach { Timber.v("💥 $it") }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
+    val startMyService =
+        userSessionRepository.userSession.map { it?.currentState == UserStateType.Reserved }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                false
+            )
 }

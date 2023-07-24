@@ -1,10 +1,13 @@
 package io.github.jeddchoi.thenewcafe
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
 import dagger.hilt.android.HiltAndroidApp
+import io.github.jeddchoi.thenewcafe.service.SessionService
 import timber.log.Timber
 
 
@@ -35,6 +38,18 @@ class CafeApplication : Application() {
             Timber.plant(TimberDebugTree())
         }
 
+        createNotificationChannel()
+    }
+
+
+    private fun createNotificationChannel() {
+        val channel = NotificationChannel(
+            SessionService.CHANNEL_ID,
+            "Session Notifications",
+            NotificationManager.IMPORTANCE_HIGH
+        )
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(channel)
     }
 }
 

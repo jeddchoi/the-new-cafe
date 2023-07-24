@@ -1,6 +1,7 @@
 package io.github.jeddchoi.thenewcafe.ui
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +14,7 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -22,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.thenewcafe.service.SessionService
 import io.github.jeddchoi.thenewcafe.splash.SplashViewModel
 import io.github.jeddchoi.thenewcafe.ui.root.RootScreen
 import io.github.jeddchoi.thenewcafe.ui.root.RootViewModel
@@ -54,6 +57,14 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                0
+            )
+        }
+
         val maxSizeModifier = Modifier.fillMaxSize()
 
         setContent {
@@ -64,6 +75,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val rootViewModel: RootViewModel = hiltViewModel()
                     val redirectToAuth by rootViewModel.redirectToAuth.collectAsStateWithLifecycle()
+                    val startMyService by rootViewModel.startMyService.collectAsStateWithLifecycle()
 
                     navController = rememberNavController()
 
@@ -78,6 +90,15 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(Unit) {
                         navController.currentBackStack.collect {
                             Timber.d(it.joinToString("\n"))
+                        }
+                    }
+
+                    LaunchedEffect(startMyService) {
+                        if (startMyService) {
+                            Intent(applicationContext, SessionService::class.java).also {
+                                it.action = SessionService.Action.START.name
+                                startForegroundService(it)
+                            }
                         }
                     }
 
