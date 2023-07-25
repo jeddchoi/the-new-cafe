@@ -1,5 +1,6 @@
 package io.github.jeddchoi.order.store
 
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,16 +17,20 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import io.github.jeddchoi.common.CafeIcons
 import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.common.UiIcon
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.component.BottomButton
+import io.github.jeddchoi.designsystem.textColor
 import io.github.jeddchoi.model.Store
 import io.github.jeddchoi.order.R
 import io.github.jeddchoi.ui.component.ComponentWithBottomButtons
@@ -34,6 +39,7 @@ import io.github.jeddchoi.ui.fullscreen.EmptyResultScreen
 import io.github.jeddchoi.ui.fullscreen.ErrorScreen
 import io.github.jeddchoi.ui.fullscreen.LoadingScreen
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun StoreScreen(
     uiState: StoreUiState,
@@ -44,7 +50,23 @@ internal fun StoreScreen(
     quit: () -> Unit = {},
     changeSeat: () -> Unit = {},
     navigateToSignIn: () -> Unit = {},
+    setUserMessage: (Message?) -> Unit = {},
 ) {
+
+    val servicePermissionState = rememberMultiplePermissionsState(
+        buildList {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                add(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+            add(android.Manifest.permission.ACCESS_FINE_LOCATION)
+            add(android.Manifest.permission.ACCESS_COARSE_LOCATION)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                add(android.Manifest.permission.BLUETOOTH_SCAN)
+                add(android.Manifest.permission.BLUETOOTH_CONNECT)
+            }
+        }
+    )
 
     when (uiState) {
         StoreUiState.Loading -> LoadingScreen(modifier = modifier)
@@ -64,13 +86,25 @@ internal fun StoreScreen(
             } else { // signed in
                 if (uiState.userStateAndUsedSeatPosition.seatPosition == null) { // not in session
                     buttonText = UiText.StringResource(R.string.reserve_seat)
-                    onClick = reserve
+                    onClick = {
+                        if (servicePermissionState.allPermissionsGranted.not()) {
+                            servicePermissionState.launchMultiplePermissionRequest()
+                        } else {
+                            reserve()
+                        }
+                    }
                     enabled = uiState.selectedSeat != null
                 } else { // in session
                     enabled = true
                     if (uiState.selectedUsedSeat == false) { // selected different seat
                         buttonText = UiText.StringResource(R.string.quit_and_reserve)
-                        onClick = changeSeat
+                        onClick = {
+                            if (servicePermissionState.allPermissionsGranted.not()) {
+                                servicePermissionState.launchMultiplePermissionRequest()
+                            } else {
+                                changeSeat()
+                            }
+                        }
                     } else { // not selected or selected same seat used
                         buttonText = UiText.StringResource(R.string.cancel_reservation)
                         onClick = quit
@@ -92,6 +126,38 @@ internal fun StoreScreen(
                 onBackClick = onBackClick,
                 onButtonClick = onClick
             )
+
+            LaunchedEffect(
+                servicePermissionState.allPermissionsGranted,
+                servicePermissionState.shouldShowRationale,
+                uiState.userStateAndUsedSeatPosition.userState,
+                uiState.selectedSeat,
+            ) {
+                if (servicePermissionState.allPermissionsGranted.not()) {
+                    if (servicePermissionState.shouldShowRationale) {
+                        setUserMessage(
+                            Message(
+                                title = UiText.StringResource(R.string.error),
+                                content = UiText.StringResource(R.string.permissions_rationale),
+                                severity = Message.Severity.ERROR
+                            )
+                        )
+                    } else if (uiState.userStateAndUsedSeatPosition.userState != null && uiState.selectedSeat != null) {
+                        setUserMessage(
+                            Message(
+                                title = UiText.StringResource(R.string.warning),
+                                content = UiText.StringResource(R.string.permissions_required,
+                                    servicePermissionState.permissions.joinToString("\n") {
+                                        it.permission
+                                    }),
+                                severity = Message.Severity.WARNING
+                            )
+                        )
+                    } else {
+                        setUserMessage(null)
+                    }
+                }
+            }
         }
 
         is StoreUiState.Error -> ErrorScreen(exception = uiState.exception, modifier = modifier)

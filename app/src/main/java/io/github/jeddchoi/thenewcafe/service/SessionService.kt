@@ -18,6 +18,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.altbeacon.beacon.BeaconManager
+import org.altbeacon.beacon.Region
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -26,6 +28,9 @@ class SessionService : LifecycleService() {
 
     @Inject
     lateinit var userSessionRepository: UserSessionRepository
+
+//    private val beaconManager = BeaconManager.getInstanceForApplication(this)
+
 
     var job: Job? = null
 
@@ -114,6 +119,11 @@ class SessionService : LifecycleService() {
             .build()
 
         startForeground(1, notification)
+    }
+
+    private fun startScan() {
+        val region = Region("myBeacon", null, null, null)
+
     }
 
     enum class Action {

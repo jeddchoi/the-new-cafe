@@ -1,8 +1,7 @@
-package io.github.jeddchoi.mypage.session
+package io.github.jeddchoi.model
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.isDistantPast
-import timber.log.Timber
 import kotlin.time.Duration
 
 data class SessionTimer(
@@ -21,7 +20,6 @@ data class SessionTimer(
                 totalTime?.isFinite() == true
 
     fun progress(remaining: Boolean): Float? {
-        Timber.i("hasEndTime : $hasEndTime, isStarted : $isStarted")
         return if (hasEndTime && isStarted) {
             if (remaining) remainingTime?.inWholeSeconds?.div(
                 totalTime?.inWholeSeconds?.toFloat() ?: 1f

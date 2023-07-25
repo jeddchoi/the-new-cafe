@@ -7,4 +7,9 @@
     <string name="cancel_reservation">Cancel reservation</string>
     <string name="quit_and_reserve">Quit and reserve</string>
     <string name="sign_in_before_reservation">Sign in before reservation</string>
+    <string name="permissions_required">This action requires permissions as below. Please grant the permissions.\n%s</string>
+    <string name="permissions_rationale">Location and bluetooth scan/connection is important for this app. Please grant the permissions.</string>
+    <string name="grant_permissions">Grant required permissions</string>
+    <string name="warning">Warning</string>
+    <string name="error">Error</string>
 </resources>

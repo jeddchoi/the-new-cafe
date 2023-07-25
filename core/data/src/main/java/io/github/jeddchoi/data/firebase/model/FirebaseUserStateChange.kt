@@ -1,6 +1,6 @@
 package io.github.jeddchoi.data.firebase.model
 
-import io.github.jeddchoi.model.SeatFinderRequestType
+import io.github.jeddchoi.model.SeatFinderUserRequestType
 import io.github.jeddchoi.model.SeatStateType
 import io.github.jeddchoi.model.UserStateChange
 import io.github.jeddchoi.model.UserStateChangeReason
@@ -20,7 +20,8 @@ data class FirebaseUserStateChange(
 
 
 fun FirebaseUserStateChange.toUserStateChange() = UserStateChange(
-    requestType = SeatFinderRequestType.getByValue(requestType) ?: SeatFinderRequestType.Quit,
+    requestType = FirebaseSeatFinderRequestType.getByValue(requestType)?.toSeatFinderRequestType()
+        ?: SeatFinderUserRequestType.Quit,
     success = success ?: false,
     resultSeatState = SeatStateType.getByValue(resultSeatState),
     resultUserState = UserStateType.getByValue(resultUserState),

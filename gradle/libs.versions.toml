@@ -1,5 +1,6 @@
 [versions]
-accompanist = "0.29.1-alpha"
+accompanist = "0.31.5-beta"
+altbeacon = "2.19.6"
 androidGradlePlugin = "8.0.2"
 androidxActivity = "1.7.2"
 androidxAppCompat = "1.6.1"
@@ -35,6 +36,8 @@ timber = "5.0.1"
 wheelPickerCompose = "1.1.11"
 
 [libraries]
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+altbeacon = { group = "org.altbeacon", name = "android-beacon-library", version.ref = "altbeacon" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }

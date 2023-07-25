@@ -1,5 +1,6 @@
 package io.github.jeddchoi.data.service.seatfinder
 
+import io.github.jeddchoi.model.SeatFinderUserRequestType
 import io.github.jeddchoi.model.SeatPosition
 
 interface SeatFinderService {

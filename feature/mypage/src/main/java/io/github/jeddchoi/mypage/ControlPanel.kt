@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -33,14 +34,14 @@ import androidx.compose.ui.unit.dp
 import com.commandiron.wheel_picker_compose.WheelDateTimePicker
 import com.commandiron.wheel_picker_compose.core.TimeFormat
 import io.github.jeddchoi.common.UiText
-import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.BottomButton
 import io.github.jeddchoi.designsystem.component.SegmentedControl
+import io.github.jeddchoi.model.SeatFinderUserRequestType
 import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.model.UserStateType
-import io.github.jeddchoi.mypage.session.DisplayedUserSession
-import io.github.jeddchoi.mypage.session.SessionTimer
+import io.github.jeddchoi.model.DisplayedUserSession
+import io.github.jeddchoi.model.SessionTimer
 import io.github.jeddchoi.ui.component.ComponentWithBottomButtons
 import java.time.Instant
 import java.time.LocalDateTime
@@ -204,7 +205,7 @@ private fun ControlPanelButtons(
                 enabled = displayedUserSession.canDo(it)
             ) {
                 Text(
-                    text = it.toUiText().asString(),
+                    text = it.title(),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                 )
@@ -213,6 +214,25 @@ private fun ControlPanelButtons(
 
     }
 }
+
+@Composable
+private fun SeatFinderUserRequestType.title(): String {
+    return stringResource(
+        id = when (this) {
+            SeatFinderUserRequestType.Reserve -> io.github.jeddchoi.data.R.string.reserve
+            SeatFinderUserRequestType.Occupy -> io.github.jeddchoi.data.R.string.occupy
+            SeatFinderUserRequestType.Quit -> io.github.jeddchoi.data.R.string.quit
+            SeatFinderUserRequestType.DoBusiness -> io.github.jeddchoi.data.R.string.do_business
+            SeatFinderUserRequestType.LeaveAway -> io.github.jeddchoi.data.R.string.leave_away
+            SeatFinderUserRequestType.ResumeUsing -> io.github.jeddchoi.data.R.string.resume_using
+            SeatFinderUserRequestType.ChangeReservationEndTime -> io.github.jeddchoi.data.R.string.change_reservation_end_time
+            SeatFinderUserRequestType.ChangeOccupyEndTime -> io.github.jeddchoi.data.R.string.change_occupy_end_time
+            SeatFinderUserRequestType.ChangeBusinessEndTime -> io.github.jeddchoi.data.R.string.change_business_end_time
+            SeatFinderUserRequestType.ChangeAwayEndTime -> io.github.jeddchoi.data.R.string.change_away_end_time
+        }
+    )
+}
+
 
 @Preview(
     showBackground = true,

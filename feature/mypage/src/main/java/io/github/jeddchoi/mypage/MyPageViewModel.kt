@@ -10,18 +10,16 @@ import io.github.jeddchoi.common.OneShotFeedbackUiState
 import io.github.jeddchoi.common.toErrorMessage
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
-import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
 import io.github.jeddchoi.data.service.seatfinder.toMessage
-import io.github.jeddchoi.data.util.TickHandler
-import io.github.jeddchoi.mypage.session.DisplayedUserSession
-import io.github.jeddchoi.mypage.session.toDisplayedUserSession
+import io.github.jeddchoi.model.DisplayedUserSession
+import io.github.jeddchoi.model.SeatFinderUserRequestType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -34,20 +32,15 @@ import javax.inject.Inject
 internal class MyPageViewModel @Inject constructor(
     private val sessionRepository: UserSessionRepository,
     private val seatFinderService: SeatFinderService,
-    private val tickHandler: TickHandler,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
 
     private val oneShotActionState = MutableStateFlow(OneShotActionState())
     val uiState: StateFlow<MyPageUiState> =
-        tickHandler.tickFlow.combine(sessionRepository.userSession.onEach { Timber.v("💥 $it") }) { current, userSession ->
-            if (userSession != null) {
-                MyPageUiState.Success(
-                    displayedUserSession = userSession.toDisplayedUserSession(
-                        current
-                    )
-                )
+        sessionRepository.userSessionWithTimer.map {
+            if (it != null) {
+                MyPageUiState.Success(displayedUserSession = it)
             } else {
                 MyPageUiState.NotAuthenticated
             }

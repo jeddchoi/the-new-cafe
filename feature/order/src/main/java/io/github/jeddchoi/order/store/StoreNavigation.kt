@@ -71,6 +71,7 @@ fun NavGraphBuilder.storeScreen(
                 navigateToMyPage()
             },
             navigateToSignIn = navigateToAuth,
+            setUserMessage = viewModel::setUserMessage
         )
     }
 }

@@ -3,7 +3,7 @@ package io.github.jeddchoi.model
 import kotlinx.datetime.Instant
 
 data class UserStateChange(
-    val requestType: SeatFinderRequestType = SeatFinderRequestType.Quit,
+    val requestType: SeatFinderUserRequestType = SeatFinderUserRequestType.Quit,
     val success: Boolean = false,
     val resultSeatState: SeatStateType = SeatStateType.Empty,
     val resultUserState: UserStateType = UserStateType.None,

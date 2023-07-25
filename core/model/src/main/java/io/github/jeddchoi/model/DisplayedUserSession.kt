@@ -1,9 +1,5 @@
-package io.github.jeddchoi.mypage.session
+package io.github.jeddchoi.model
 
-import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
-import io.github.jeddchoi.model.SeatPosition
-import io.github.jeddchoi.model.UserSession
-import io.github.jeddchoi.model.UserStateType
 import kotlinx.datetime.Instant
 
 /**

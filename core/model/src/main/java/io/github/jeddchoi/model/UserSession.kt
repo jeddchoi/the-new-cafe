@@ -18,6 +18,6 @@ sealed class UserSession {
         val endTime: Instant? = null,
         val seatPosition: SeatPosition = SeatPosition(),
         override val currentState: UserStateType = UserStateType.Reserved,
-        val requestTypeAfterCurrentState: SeatFinderRequestType? = null,
+        val requestTypeAfterCurrentState: SeatFinderUserRequestType? = null,
     ) : UserSession()
 }

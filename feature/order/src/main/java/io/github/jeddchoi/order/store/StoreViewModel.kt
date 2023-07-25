@@ -155,6 +155,12 @@ internal class StoreViewModel @Inject constructor(
         )
     }
 
+    fun setUserMessage(message: Message?) {
+        Timber.v("✅")
+        oneShotActionState.update {
+            it.copy(userMessage = message)
+        }
+    }
     private fun launchOneShotJob(
         job: suspend () -> Unit,
         onError: (Throwable, suspend () -> Unit) -> Unit = { _, _ -> }

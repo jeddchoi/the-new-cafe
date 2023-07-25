@@ -9,5 +9,7 @@ android {
 
 dependencies {
     implementation(libs.timber)
+    implementation(libs.accompanist.permissions)
+
     implementation(project(":core:common"))
 }
