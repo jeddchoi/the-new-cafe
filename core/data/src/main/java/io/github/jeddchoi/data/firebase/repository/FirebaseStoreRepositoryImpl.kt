@@ -11,7 +11,9 @@ import io.github.jeddchoi.data.firebase.model.toSeat
 import io.github.jeddchoi.data.firebase.model.toSection
 import io.github.jeddchoi.data.firebase.model.toStore
 import io.github.jeddchoi.data.repository.StoreRepository
+import io.github.jeddchoi.model.BleSeat
 import io.github.jeddchoi.model.Seat
+import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.model.Section
 import io.github.jeddchoi.model.Store
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -72,5 +75,20 @@ class FirebaseStoreRepositoryImpl @Inject constructor() : StoreRepository {
         return firestore.document("stores/${storeId}/sections/${sectionId}/seats/${seatId}")
             .dataObjects<FirebaseSeat>()
             .map { it?.toSeat() }.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
+    }
+
+    override suspend fun getBleSeat(seatPosition: SeatPosition): BleSeat? {
+        var document = firestore.document("stores/${seatPosition.storeId}")
+        val uuid = document.get().await().get("uuid", String::class.java)
+        document = document.collection("sections").document(seatPosition.sectionId)
+        val major = document.get().await().get("major", String::class.java)
+        document = document.collection("seats").document(seatPosition.seatId)
+        val minor = document.get().await().get("minor", String::class.java)
+
+        return if (uuid != null && major != null && minor != null) {
+            BleSeat(uuid, major, minor)
+        } else {
+            null
+        }
     }
 }

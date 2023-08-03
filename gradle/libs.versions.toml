@@ -25,6 +25,7 @@ firebaseBom = "32.2.0"
 googleServices = "4.3.15"
 hilt = "2.46.1"
 junit4 = "4.13.2"
+kable = "0.24.0"
 kotlin = "1.8.10" # TODO: compatible with jetpack compose
 kotlinxCoroutines = "1.7.2"
 kotlinxDatetime = "0.4.0"
@@ -78,6 +79,7 @@ firebase-functions-ktx = { group = "com.google.firebase", name = "firebase-funct
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
+kable = { group = "com.juul.kable", name = "core", version.ref = "kable" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutines" }

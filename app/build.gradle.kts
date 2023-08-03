@@ -73,7 +73,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.lifecycle.common)
 
-    implementation(libs.altbeacon)
+//    implementation(libs.altbeacon)
+    implementation(libs.kable)
 
     testImplementation(kotlin("test"))
     testImplementation(project(":core:testing"))

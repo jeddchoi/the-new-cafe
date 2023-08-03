@@ -56,7 +56,6 @@ fun UserSession.toDisplayedUserSession(current: Instant): DisplayedUserSession {
         }
 
         is UserSession.UsingSeat -> {
-            this.currentState
             val sessionTimer = SessionTimer(
                 startTime = startSessionTime,
                 endTime = endSessionTime,
@@ -72,7 +71,7 @@ fun UserSession.toDisplayedUserSession(current: Instant): DisplayedUserSession {
                 totalTime = endTime?.minus(startTime),
             )
             return when (currentState) {
-                UserStateType.None -> DisplayedUserSession.None
+                UserStateType.None -> throw IllegalStateException()
                 UserStateType.Reserved,
                 UserStateType.Occupied,
                 UserStateType.Away,

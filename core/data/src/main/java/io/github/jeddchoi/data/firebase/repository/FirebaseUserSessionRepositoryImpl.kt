@@ -44,10 +44,22 @@ class FirebaseUserSessionRepositoryImpl @Inject constructor(
         }.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
 
     override val userStateAndUsedSeatPosition = userSession.map {
-        UserStateAndUsedSeatPosition(
-            seatPosition = if (it is UserSession.UsingSeat) it.seatPosition else null,
-            userState = it?.currentState
-        )
+        when (it) {
+            is UserSession.UsingSeat -> {
+                UserStateAndUsedSeatPosition.UsingSeat(
+                    seatPosition = it.seatPosition,
+                    userState = it.currentState
+                )
+            }
+
+            is UserSession.None -> {
+                UserStateAndUsedSeatPosition.None
+            }
+
+            else -> {
+                null
+            }
+        }
     }.onEach { Timber.v("💥 $it") }
 
     override val userSessionWithTimer: Flow<DisplayedUserSession?> =

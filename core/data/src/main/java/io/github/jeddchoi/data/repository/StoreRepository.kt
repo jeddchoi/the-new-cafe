@@ -1,6 +1,8 @@
 package io.github.jeddchoi.data.repository
 
+import io.github.jeddchoi.model.BleSeat
 import io.github.jeddchoi.model.Seat
+import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.model.Section
 import io.github.jeddchoi.model.Store
 import kotlinx.coroutines.flow.Flow
@@ -14,4 +16,5 @@ interface StoreRepository {
 
     fun seats(storeId: String, sectionId: String) : Flow<List<Seat>>
     fun getSeatDetail(storeId: String, sectionId: String, seatId: String) : Flow<Seat?>
+    suspend fun getBleSeat(seatPosition: SeatPosition) : BleSeat?
 }

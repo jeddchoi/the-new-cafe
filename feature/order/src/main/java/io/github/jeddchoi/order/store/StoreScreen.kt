@@ -1,5 +1,6 @@
 package io.github.jeddchoi.order.store
 
+import android.bluetooth.BluetoothManager
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,9 +21,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getSystemService
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import io.github.jeddchoi.common.CafeIcons
@@ -32,6 +35,7 @@ import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.component.BottomButton
 import io.github.jeddchoi.designsystem.textColor
 import io.github.jeddchoi.model.Store
+import io.github.jeddchoi.model.UserStateAndUsedSeatPosition
 import io.github.jeddchoi.order.R
 import io.github.jeddchoi.ui.component.ComponentWithBottomButtons
 import io.github.jeddchoi.ui.component.ScreenWithTopAppBar
@@ -52,6 +56,8 @@ internal fun StoreScreen(
     navigateToSignIn: () -> Unit = {},
     setUserMessage: (Message?) -> Unit = {},
 ) {
+    val bluetoothManager = getSystemService(LocalContext.current, BluetoothManager::class.java)
+    bluetoothManager?.adapter
 
     val servicePermissionState = rememberMultiplePermissionsState(
         buildList {
@@ -79,14 +85,15 @@ internal fun StoreScreen(
             var enabled = false
             var onClick = {}
             // not signed in
-            if (uiState.userStateAndUsedSeatPosition.userState == null) {
+            if (uiState.userStateAndUsedSeatPosition == null) {
                 buttonText = UiText.StringResource(R.string.sign_in_before_reservation)
                 enabled = true
                 onClick = navigateToSignIn
             } else { // signed in
-                if (uiState.userStateAndUsedSeatPosition.seatPosition == null) { // not in session
+                if (uiState.userStateAndUsedSeatPosition == UserStateAndUsedSeatPosition.None) { // not in session
                     buttonText = UiText.StringResource(R.string.reserve_seat)
                     onClick = {
+
                         if (servicePermissionState.allPermissionsGranted.not()) {
                             servicePermissionState.launchMultiplePermissionRequest()
                         } else {
@@ -130,7 +137,7 @@ internal fun StoreScreen(
             LaunchedEffect(
                 servicePermissionState.allPermissionsGranted,
                 servicePermissionState.shouldShowRationale,
-                uiState.userStateAndUsedSeatPosition.userState,
+                uiState.userStateAndUsedSeatPosition,
                 uiState.selectedSeat,
             ) {
                 if (servicePermissionState.allPermissionsGranted.not()) {
@@ -142,7 +149,7 @@ internal fun StoreScreen(
                                 severity = Message.Severity.ERROR
                             )
                         )
-                    } else if (uiState.userStateAndUsedSeatPosition.userState != null && uiState.selectedSeat != null) {
+                    } else if (uiState.userStateAndUsedSeatPosition is UserStateAndUsedSeatPosition.UsingSeat && uiState.selectedSeat != null) {
                         setUserMessage(
                             Message(
                                 title = UiText.StringResource(R.string.warning),

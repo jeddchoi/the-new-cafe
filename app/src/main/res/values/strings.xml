@@ -14,5 +14,7 @@
     <string name="desc_order_unselected">Order tab unselected</string>
     <string name="desc_mypage_unselected">My page tab unselected</string>
     <string name="desc_session_service">This is a service that shows state of user session regarding to seat reservation.</string>
+    <string name="remaining_time">Remaining time : %s</string>
+    <string name="unlimited">Unlimited</string>
 
 </resources>

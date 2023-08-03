@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val rootViewModel: RootViewModel = hiltViewModel()
                     val redirectToAuth by rootViewModel.redirectToAuth.collectAsStateWithLifecycle()
-                    val startMyService by rootViewModel.startMyService.collectAsStateWithLifecycle()
+                    val shouldRunService by rootViewModel.shouldRunService.collectAsStateWithLifecycle()
 
                     navController = rememberNavController()
 
@@ -84,11 +84,10 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    LaunchedEffect(startMyService) {
-                        if (startMyService) {
+                    LaunchedEffect(shouldRunService) {
+                        if (shouldRunService) {
                             Intent(applicationContext, SessionService::class.java).also {
                                 it.action = SessionService.Action.START.name
-
                                 startForegroundService(it)
                             }
                         }

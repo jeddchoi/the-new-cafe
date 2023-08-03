@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserSessionRepository {
     val userSession: Flow<UserSession?>
-    val userStateAndUsedSeatPosition: Flow<UserStateAndUsedSeatPosition>
-
+    val userStateAndUsedSeatPosition: Flow<UserStateAndUsedSeatPosition?>
     val userSessionWithTimer: Flow<DisplayedUserSession?>
 }
