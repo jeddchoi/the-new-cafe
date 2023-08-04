@@ -83,10 +83,12 @@ class FirebaseStoreRepositoryImpl @Inject constructor() : StoreRepository {
         document = document.collection("sections").document(seatPosition.sectionId)
         val major = document.get().await().get("major", String::class.java)
         document = document.collection("seats").document(seatPosition.seatId)
-        val minor = document.get().await().get("minor", String::class.java)
-
-        return if (uuid != null && major != null && minor != null) {
-            BleSeat(uuid, major, minor)
+        val seat = document.get().await().toObject(FirebaseSeat::class.java)
+        val minor = seat?.minor
+        val name = seat?.name
+        val macAddress = seat?.macAddress
+        return if (uuid != null && major != null && minor != null && name != null && macAddress != null) {
+            BleSeat(uuid, major, minor, name, macAddress)
         } else {
             null
         }

@@ -7,6 +7,7 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import com.benasher44.uuid.bytes
 import com.benasher44.uuid.uuidFrom
 import com.juul.kable.ConnectionLostException
 import com.juul.kable.Filter
@@ -27,8 +28,6 @@ import io.github.jeddchoi.thenewcafe.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
@@ -63,7 +62,6 @@ class SessionService : LifecycleService() {
     private var observeBleStateJob: Job? = null
 
 
-    //    override fun getLifecycle(): Lifecycle = lifecycle
     private val _peripheral = MutableStateFlow<Peripheral?>(null)
 
     private val peripheralState = _peripheral.flatMapLatest {
@@ -121,6 +119,7 @@ class SessionService : LifecycleService() {
             }
         }
     }
+
 
     private fun showNotification(
         title: String,
@@ -220,18 +219,29 @@ class SessionService : LifecycleService() {
     ) {
         if (_peripheral.value == null) {
             Timber.i("peripheral == null")
-            val bleSeat = storeRepository.getBleSeat(seatPosition)
+            val bleSeat = storeRepository.getBleSeat(seatPosition) ?: throw IllegalStateException()
             Timber.d("start scan $bleSeat")
+
+            val major = bleSeat.major.toInt()
+            val minor = bleSeat.minor.toInt()
             val scanner = Scanner {
                 filters = listOf(
-//                        Filter.ManufacturerData(
-//                            id = byteArrayOf(0x00, 0x59),
-//                            data = byteArrayOf(),
-//                            dataMask = byteArrayOf(),
-//                        ),
-                    Filter.Service(uuidFrom("9FD42000-E46F-7C9A-57B1-2DA365E18FA1")),
-                    Filter.Name("My beacon1"),
-                    Filter.Address("EC:60:5E:E5:34:AC") // A1
+                    Filter.Service(BEACON_SERVICE_UUID),
+                    Filter.Name(bleSeat.name),
+                    Filter.Address(bleSeat.macAddress),
+                    Filter.ManufacturerData(
+                        id = MANUFACTURER_ID,
+                        data = byteArrayOf(
+                            0, 0, 0, 0,
+                            *uuidFrom(bleSeat.uuid).bytes,
+                            major.shr(8).toByte(),
+                            major.shr(0).toByte(),
+                            minor.shr(8).toByte(),
+                            minor.shr(0).toByte(),
+                            0
+                        ),
+                        dataMask = MASK_UUID_MAJOR_MINOR,
+                    ),
                 )
             }
             val adv = scanner.advertisements.first()
@@ -309,6 +319,7 @@ class SessionService : LifecycleService() {
                                         UserStateType.Occupied -> {
                                             seatFinderService.leaveAway()
                                         }
+
                                         UserStateType.Away -> {}
                                         UserStateType.OnBusiness -> {}
                                     }
@@ -329,5 +340,14 @@ class SessionService : LifecycleService() {
 
     companion object {
         const val CHANNEL_ID = "session_channel"
+        val BEACON_SERVICE_UUID = uuidFrom("9FD42000-E46F-7C9A-57B1-2DA365E18FA1")
+        val MANUFACTURER_ID = byteArrayOf(0, 0x59) // Nordic
+
+        val MASK_UUID_MAJOR_MINOR = byteArrayOf(
+            0, 0, 0, 0,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, 0,
+        )
     }
 }
