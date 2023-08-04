@@ -240,7 +240,6 @@ private fun SectionWithSeatsScreen(
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
                     .align(Alignment.TopCenter)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Center
@@ -248,17 +247,18 @@ private fun SectionWithSeatsScreen(
                 item {
                     Text(text = store.toString())
                 }
-                sectionsWithSeats.forEach { sectionWithSeats ->
+                sectionsWithSeats.sortedBy { it.section.name }.forEach { sectionWithSeats ->
                     item {
                         Text(text = sectionWithSeats.section.toString())
                     }
-                    items(sectionWithSeats.seats, key = { it.id }) { seat ->
+                    items(sectionWithSeats.seats.sortedBy { it.name }, key = { it.id }) { seat ->
                         val isSelected =
                             selectedSeat?.seatId == seat.id && selectedSeat.sectionId == sectionWithSeats.section.id
                         ListItem(
                             modifier = Modifier
                                 .selectable(
                                     selected = isSelected,
+                                    enabled = seat.isAvailable,
                                     onClick = { onSelect(sectionWithSeats.section.id, seat.id) }
                                 )
                                 .fillMaxWidth(),

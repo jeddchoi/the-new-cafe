@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.AppFlagsRepository
+import io.github.jeddchoi.data.repository.CurrentUserRepository
+import io.github.jeddchoi.data.repository.UserPresenceRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.model.UserSession
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RootViewModel @Inject constructor(
     private val userSessionRepository: UserSessionRepository,
-    private val appFlagsRepository: AppFlagsRepository
+    private val appFlagsRepository: AppFlagsRepository,
 ) : ViewModel() {
 
     val redirectToAuth: StateFlow<Boolean> = appFlagsRepository.getShowMainScreenOnStart

@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.thenewcafe.service.SessionService
@@ -74,7 +75,6 @@ class MainActivity : ComponentActivity() {
                         networkMonitor = networkMonitor,
                         modifier = maxSizeModifier,
                         navController = navController,
-                        redirectToAuth = redirectToAuth
                     )
 
 
@@ -84,6 +84,11 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+                    LaunchedEffect(redirectToAuth) {
+                        if (redirectToAuth) {
+                            navController.navigateToAuth()
+                        }
+                    }
                     LaunchedEffect(shouldRunService) {
                         if (shouldRunService) {
                             Intent(applicationContext, SessionService::class.java).also {

@@ -27,6 +27,7 @@ data class FirebaseCurrentSession(
     val seatPosition: SeatPosition? = null,
     val startSessionTime: Long? = null,
     val hasFailure: Boolean? = null,
+    val disconnectedOnOccupied: Boolean? = null,
     val mainState: FirebasePartialUserState? = null,
     val subState: FirebasePartialUserState? = null,
 ) {

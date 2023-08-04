@@ -17,6 +17,7 @@ import com.juul.kable.State
 import com.juul.kable.peripheral
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jeddchoi.data.repository.StoreRepository
+import io.github.jeddchoi.data.repository.UserPresenceRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import io.github.jeddchoi.model.DisplayedUserSession
@@ -56,6 +57,9 @@ class SessionService : LifecycleService() {
     @Inject
     lateinit var seatFinderService: SeatFinderService
 
+    @Inject
+    lateinit var userPresenceRepository: UserPresenceRepository
+
 
     private var handleNotificationJob: Job? = null
     private var handleBleJob: Job? = null
@@ -72,6 +76,7 @@ class SessionService : LifecycleService() {
 
     private val _userSession = MutableStateFlow<UserStateAndUsedSeatPosition?>(null)
 
+    private var startedObserveConnection = false
 
     // This would be called multiple times
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -163,11 +168,19 @@ class SessionService : LifecycleService() {
                     .collectLatest { userSession ->
                         Timber.i("💥 $userSession")
                         _userSession.update { userSession }
+
+                        if (userSession?.userState == UserStateType.Occupied) {
+                            observePresence()
+                        } else {
+                            userPresenceRepository.stopObserveUserPresence()
+                        }
+
                         when (userSession) {
                             null,
                             UserStateAndUsedSeatPosition.None -> {
                                 withTimeoutOrNull(5_000) {
                                     _peripheral.value?.disconnect()
+
                                     stopSelf()
                                 }
                             }
@@ -329,6 +342,14 @@ class SessionService : LifecycleService() {
                     }
                 }
             }
+        }
+    }
+
+    private fun observePresence() {
+        Timber.i("✅")
+        if (!startedObserveConnection) {
+            userPresenceRepository.observeUserPresence()
+            startedObserveConnection = true
         }
     }
 

@@ -1,7 +1,6 @@
 package io.github.jeddchoi.thenewcafe.ui.root
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -32,7 +31,6 @@ import io.github.jeddchoi.thenewcafe.ui.main.navigateToMain
 fun RootNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    redirectToAuth: Boolean = false,
 ) {
     NavHost(
         modifier = modifier,
@@ -108,9 +106,5 @@ fun RootNavGraph(
             clickBack = navController::popBackStack
         )
     }
-    LaunchedEffect(redirectToAuth) {
-        if (redirectToAuth) {
-            navController.navigateToAuth()
-        }
-    }
+
 }

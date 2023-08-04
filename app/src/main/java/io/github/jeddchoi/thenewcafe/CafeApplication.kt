@@ -46,8 +46,9 @@ class CafeApplication : Application() {
         val channel = NotificationChannel(
             SessionService.CHANNEL_ID,
             "Session Notifications",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_LOW
         )
+
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(channel)
     }
