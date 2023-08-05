@@ -24,7 +24,7 @@ enum class AppFlavorType(val dimension: FlavorDimension, val applicationIdSuffix
 
 @Suppress("UnstableApiUsage")
 fun Project.configureFlavors(
-    commonExtension: CommonExtension<*, *, *, *>,
+    commonExtension: CommonExtension<*, *, *, *, *>,
     flavorConfigurationBlock: ProductFlavor.(flavor: AppFlavorType) -> Unit = {}
 ) {
     commonExtension.apply {
