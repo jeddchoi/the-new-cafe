@@ -31,6 +31,7 @@ import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
+import io.github.jeddchoi.designsystem.textColor
 import io.github.jeddchoi.ui.R
 
 @Composable

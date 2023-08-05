@@ -4,6 +4,7 @@ data class Seat (
     val id : String = "",
     val name: String = "",
     val minor: String = "",
+    val macAddress:String = "",
     val state: SeatStateType = SeatStateType.Empty,
     val isAvailable: Boolean = false,
     val userId: String? = null,

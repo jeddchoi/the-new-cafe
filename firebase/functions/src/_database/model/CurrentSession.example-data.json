@@ -8,6 +8,7 @@
         "seatId": ""
       },
       "startSessionTime": 0,
+      "disconnectedOnOccupied": false,
       "mainState": {
         "startTime": 0,
         "state": 0,

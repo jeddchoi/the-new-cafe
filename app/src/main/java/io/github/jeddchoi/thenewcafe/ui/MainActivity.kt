@@ -20,8 +20,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.thenewcafe.service.SessionService
 import io.github.jeddchoi.thenewcafe.splash.SplashViewModel
 import io.github.jeddchoi.thenewcafe.ui.root.RootScreen
 import io.github.jeddchoi.thenewcafe.ui.root.RootViewModel
@@ -64,6 +66,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val rootViewModel: RootViewModel = hiltViewModel()
                     val redirectToAuth by rootViewModel.redirectToAuth.collectAsStateWithLifecycle()
+                    val shouldRunService by rootViewModel.shouldRunService.collectAsStateWithLifecycle()
 
                     navController = rememberNavController()
 
@@ -72,8 +75,8 @@ class MainActivity : ComponentActivity() {
                         networkMonitor = networkMonitor,
                         modifier = maxSizeModifier,
                         navController = navController,
-                        redirectToAuth = redirectToAuth
                     )
+
 
                     LaunchedEffect(Unit) {
                         navController.currentBackStack.collect {
@@ -81,15 +84,23 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+                    LaunchedEffect(redirectToAuth) {
+                        if (redirectToAuth) {
+                            navController.navigateToAuth()
+                        }
+                    }
+                    LaunchedEffect(shouldRunService) {
+                        if (shouldRunService) {
+                            Intent(applicationContext, SessionService::class.java).also {
+                                it.action = SessionService.Action.START.name
+                                startForegroundService(it)
+                            }
+                        }
+                    }
+
                 }
             }
         }
         viewModel.initialize()
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        val result = navController.handleDeepLink(intent)
-        Timber.v("✅ ${intent?.dataString} $result")
     }
 }

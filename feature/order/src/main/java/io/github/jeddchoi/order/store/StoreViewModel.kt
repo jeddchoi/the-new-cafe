@@ -155,6 +155,12 @@ internal class StoreViewModel @Inject constructor(
         )
     }
 
+    fun setUserMessage(message: Message?) {
+        Timber.v("✅")
+        oneShotActionState.update {
+            it.copy(userMessage = message)
+        }
+    }
     private fun launchOneShotJob(
         job: suspend () -> Unit,
         onError: (Throwable, suspend () -> Unit) -> Unit = { _, _ -> }
@@ -203,21 +209,20 @@ internal sealed class StoreUiState {
         val selectedSeat: SelectedSeat? = null,
         val isLoading: Boolean = false,
         val userMessage: Message? = null,
-        val userStateAndUsedSeatPosition: UserStateAndUsedSeatPosition = UserStateAndUsedSeatPosition(
-            null,
-            null
-        ),
+        val userStateAndUsedSeatPosition: UserStateAndUsedSeatPosition? = null,
     ) : StoreUiState() {
 
         /**
          * Selected same used seat?
          * if null, it means not selected or not signed in or not used
          */
-        val selectedUsedSeat = with(userStateAndUsedSeatPosition.seatPosition) {
-            if (this == null || selectedSeat == null) {
-                null
+        val selectedUsedSeat = with(userStateAndUsedSeatPosition) {
+            if (this is UserStateAndUsedSeatPosition.UsingSeat && selectedSeat != null) {
+                seatPosition.storeId == store.id &&
+                        seatPosition.sectionId == selectedSeat.sectionId &&
+                        seatPosition.seatId == selectedSeat.seatId
             } else {
-                this.storeId == store.id && this.sectionId == selectedSeat.sectionId && this.seatId == selectedSeat.seatId
+                null
             }
         }
     }

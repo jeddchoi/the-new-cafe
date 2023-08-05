@@ -30,7 +30,9 @@ import io.github.jeddchoi.designsystem.component.item.DateTimeItem
 import io.github.jeddchoi.designsystem.component.item.DurationItem
 import io.github.jeddchoi.designsystem.component.item.EnumItem
 import io.github.jeddchoi.designsystem.component.item.StringItem
+import io.github.jeddchoi.model.DisplayedUserSession
 import io.github.jeddchoi.model.SeatPosition
+import io.github.jeddchoi.model.SessionTimer
 import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.mypage.R
 import io.github.jeddchoi.ui.fullscreen.PlaceholderScreen

@@ -13,7 +13,7 @@ enum class MainBottomNav(
     val unselectedIcon: UiIcon
 ) {
     Profile(
-        "profile",
+        "profile_graph",
         R.string.profile,
         UiIcon.ImageVectorIcon(
             CafeIcons.Profile_Filled,
@@ -26,7 +26,7 @@ enum class MainBottomNav(
     ),
 
     Order(
-        "order",
+        "order_graph",
         R.string.order,
         UiIcon.ImageVectorIcon(
             CafeIcons.Order_Filled,
@@ -39,7 +39,7 @@ enum class MainBottomNav(
     ),
 
     MyPage(
-        "mypage",
+        "mypage_graph",
         R.string.mypage,
         UiIcon.ImageVectorIcon(
             CafeIcons.MyPage_Filled,

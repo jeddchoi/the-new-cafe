@@ -1,9 +1,5 @@
-package io.github.jeddchoi.mypage.session
+package io.github.jeddchoi.model
 
-import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
-import io.github.jeddchoi.model.SeatPosition
-import io.github.jeddchoi.model.UserSession
-import io.github.jeddchoi.model.UserStateType
 import kotlinx.datetime.Instant
 
 /**
@@ -60,7 +56,6 @@ fun UserSession.toDisplayedUserSession(current: Instant): DisplayedUserSession {
         }
 
         is UserSession.UsingSeat -> {
-            this.currentState
             val sessionTimer = SessionTimer(
                 startTime = startSessionTime,
                 endTime = endSessionTime,
@@ -76,7 +71,7 @@ fun UserSession.toDisplayedUserSession(current: Instant): DisplayedUserSession {
                 totalTime = endTime?.minus(startTime),
             )
             return when (currentState) {
-                UserStateType.None -> DisplayedUserSession.None
+                UserStateType.None -> throw IllegalStateException()
                 UserStateType.Reserved,
                 UserStateType.Occupied,
                 UserStateType.Away,

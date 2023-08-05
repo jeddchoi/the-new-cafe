@@ -1,12 +1,13 @@
 [versions]
-accompanist = "0.29.1-alpha"
+accompanist = "0.31.5-beta"
+altbeacon = "2.19.6"
 androidGradlePlugin = "8.0.2"
 androidxActivity = "1.7.2"
 androidxAppCompat = "1.6.1"
 androidxComposeBom = "2023.06.01"
 androidxComposeCompiler = "1.4.3"
 androidxComposeFoundation ="1.5.0-rc01"
-androidxComposeRuntime = "1.5.0-beta03"
+androidxComposeRuntime = "1.5.0-rc01"
 androidxCore = "1.10.1"
 androidxCoreSplashscreen = "1.0.1"
 androidxDatastore = "1.0.0"
@@ -24,8 +25,9 @@ firebaseBom = "32.2.0"
 googleServices = "4.3.15"
 hilt = "2.46.1"
 junit4 = "4.13.2"
+kable = "0.24.0"
 kotlin = "1.8.10" # TODO: compatible with jetpack compose
-kotlinxCoroutines = "1.7.2"
+kotlinxCoroutines = "1.7.3"
 kotlinxDatetime = "0.4.0"
 kotlinxSerializationJson = "1.5.1"
 lottieCompose = "6.1.0"
@@ -35,6 +37,8 @@ timber = "5.0.1"
 wheelPickerCompose = "1.1.11"
 
 [libraries]
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanist" }
+altbeacon = { group = "org.altbeacon", name = "android-beacon-library", version.ref = "altbeacon" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
@@ -51,7 +55,9 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxCoreSplashscreen" }
 androidx-datastore-proto = { group = "androidx.datastore", name = "datastore", version.ref = "androidxDatastore" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidxHiltNavigationCompose" }
+androidx-lifecycle-common = { group = "androidx.lifecycle", name = "lifecycle-common", version.ref = "androidxLifecycle" }
 androidx-lifecycle-runtimeCompose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
+androidx-lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "androidxLifecycle" }
 androidx-lifecycle-viewModelCompose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
 androidx-navigation-common = { group = "androidx.navigation", name = "navigation-common-ktx", version.ref = "androidxNavigation" }
@@ -73,6 +79,7 @@ firebase-functions-ktx = { group = "com.google.firebase", name = "firebase-funct
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 junit4 = { group = "junit", name = "junit", version.ref = "junit4" }
+kable = { group = "com.juul.kable", name = "core", version.ref = "kable" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutines" }

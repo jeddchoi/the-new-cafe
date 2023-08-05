@@ -34,7 +34,6 @@ fun RootScreen(
         networkMonitor = networkMonitor,
         navController = navController,
     ),
-    redirectToAuth: Boolean = false,
     showConfetti: Boolean = false,
 ) {
     val showBottomBar by rootState.showBottomBar.collectAsStateWithLifecycle(initialValue = false)
@@ -66,7 +65,6 @@ fun RootScreen(
             RootNavGraph(
                 modifier = Modifier.fillMaxSize(),
                 navController = rootState.navController,
-                redirectToAuth = redirectToAuth
             )
             if (showConfetti) {
                 ConfettiLottie(

@@ -2,7 +2,6 @@ package io.github.jeddchoi.data.firebase.model
 
 import io.github.jeddchoi.data.service.seatfinder.ResultCode
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderResult
-import io.github.jeddchoi.model.SeatFinderRequestType
 import io.github.jeddchoi.model.UserStateType
 import kotlinx.datetime.Instant
 import kotlinx.serialization.EncodeDefault
@@ -43,7 +42,7 @@ data class FirebaseRequestResult(
             )
         },
         requestTypeAfterCurrentState = sessionResult?.after?.getRequestTypeStrAfterCurrentState()?.let {
-            SeatFinderRequestType.getByValue(it)
+            FirebaseSeatFinderRequestType.getByValue(it)
         }
     )
 

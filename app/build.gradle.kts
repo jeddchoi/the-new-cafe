@@ -60,6 +60,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":core:data"))
     implementation(project(":core:common"))
+    implementation(project(":core:model"))
 
 
     implementation(libs.timber)
@@ -69,6 +70,11 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.material3.windowSizeClass)
+    implementation(libs.androidx.lifecycle.service)
+    implementation(libs.androidx.lifecycle.common)
+
+//    implementation(libs.altbeacon)
+    implementation(libs.kable)
 
     testImplementation(kotlin("test"))
     testImplementation(project(":core:testing"))

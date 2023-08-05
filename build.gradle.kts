@@ -18,3 +18,16 @@ idea {
         isDownloadJavadoc = true
     }
 }
+
+
+// It fixes 'getLifecycle' overrides nothing in LifecycleService
+configurations.all {
+    resolutionStrategy {
+        eachDependency {
+            when (requested.module.toString()) {
+                "androidx.lifecycle:lifecycle-common" -> useVersion("2.6.1")
+                // ...etc
+            }
+        }
+    }
+}

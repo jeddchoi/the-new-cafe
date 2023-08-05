@@ -4,8 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.AppFlagsRepository
+import io.github.jeddchoi.data.repository.CurrentUserRepository
+import io.github.jeddchoi.data.repository.UserPresenceRepository
+import io.github.jeddchoi.data.repository.UserSessionRepository
+import io.github.jeddchoi.model.UserSession
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -14,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RootViewModel @Inject constructor(
-    private val appFlagsRepository: AppFlagsRepository
+    private val userSessionRepository: UserSessionRepository,
+    private val appFlagsRepository: AppFlagsRepository,
 ) : ViewModel() {
 
     val redirectToAuth: StateFlow<Boolean> = appFlagsRepository.getShowMainScreenOnStart
@@ -22,4 +28,20 @@ class RootViewModel @Inject constructor(
         .onEach { Timber.v("💥 $it") }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
+    val shouldRunService =
+        userSessionRepository.userSession.map {
+            when (it) {
+                null,
+                UserSession.None -> false
+
+                is UserSession.UsingSeat -> {
+                    true
+                }
+            }
+        }.distinctUntilChanged()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                false
+            )
 }

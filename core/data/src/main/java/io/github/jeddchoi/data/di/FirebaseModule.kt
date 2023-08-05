@@ -10,6 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import io.github.jeddchoi.data.firebase.repository.FirebaseAuthRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseCurrentUserRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseStoreRepositoryImpl
+import io.github.jeddchoi.data.firebase.repository.FirebaseUserPresenceRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserProfileRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionHistoryDetailRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionHistoryRepositoryImpl
@@ -18,6 +19,7 @@ import io.github.jeddchoi.data.firebase.service.FirebaseSeatFinderServiceImpl
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.repository.StoreRepository
+import io.github.jeddchoi.data.repository.UserPresenceRepository
 import io.github.jeddchoi.data.repository.UserProfileRepository
 import io.github.jeddchoi.data.repository.UserSessionHistoryDetailRepository
 import io.github.jeddchoi.data.repository.UserSessionHistoryRepository
@@ -85,5 +87,9 @@ abstract class FirebaseModule {
         historyDetailRepositoryImpl: FirebaseUserSessionHistoryDetailRepositoryImpl,
     ): UserSessionHistoryDetailRepository
 
+    @Binds
+    abstract fun bindsUserPresenceRepository(
+        repositoryImpl: FirebaseUserPresenceRepositoryImpl,
+    ): UserPresenceRepository
 
 }

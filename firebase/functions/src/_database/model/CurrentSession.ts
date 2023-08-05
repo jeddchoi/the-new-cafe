@@ -8,6 +8,7 @@ export interface CurrentSession {
     seatPosition: SeatPosition;
     startSessionTime: number;
     hasFailure: boolean;
+    disconnectedOnOccupied: boolean;
     mainState: PartialUserState<UserMainStateType>;
     subState: PartialUserState<UserSubStateType> | null;
 }

@@ -59,7 +59,6 @@ class FirebaseCurrentUserRepositoryImpl @Inject constructor(
         }
             .distinctUntilChanged()
             .onEach { Timber.v("💥 $it") }
-
 }
 
 private fun FirebaseUser.toCurrentUser() = CurrentUser(

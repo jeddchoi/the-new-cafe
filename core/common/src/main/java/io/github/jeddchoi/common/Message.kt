@@ -1,8 +1,5 @@
 package io.github.jeddchoi.common
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-
 data class Message(
     val title: UiText,
     val severity: Severity,
@@ -25,13 +22,6 @@ data class Message(
             )
         )
         ;
-
-        @Composable
-        fun textColor() = when (this) {
-            INFO -> MaterialTheme.colorScheme.primary
-            WARNING -> MaterialTheme.colorScheme.errorContainer
-            ERROR -> MaterialTheme.colorScheme.error
-        }
     }
 }
 

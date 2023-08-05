@@ -8,10 +8,14 @@ import io.github.jeddchoi.data.firebase.model.FirebaseCurrentSession
 import io.github.jeddchoi.data.firebase.model.toUserSession
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
+import io.github.jeddchoi.data.util.TickHandler
+import io.github.jeddchoi.model.DisplayedUserSession
 import io.github.jeddchoi.model.UserSession
 import io.github.jeddchoi.model.UserStateAndUsedSeatPosition
+import io.github.jeddchoi.model.toDisplayedUserSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
@@ -22,13 +26,16 @@ import javax.inject.Inject
 
 
 class FirebaseUserSessionRepositoryImpl @Inject constructor(
+    private val tickHandler: TickHandler,
     private val currentUserRepository: CurrentUserRepository,
 ) : UserSessionRepository {
     private val database: FirebaseDatabase = Firebase.database
     override val userSession: Flow<UserSession?> =
         currentUserRepository.currentUserId.flatMapLatest { currentUserId ->
             if (currentUserId != null) {
-                database.getReference("seatFinder/${currentUserId}/session").values<FirebaseCurrentSession>()
+
+                database.getReference("seatFinder/${currentUserId}/session")
+                    .values<FirebaseCurrentSession>()
                     .map { session ->
                         session.toUserSession()
                     }
@@ -38,11 +45,28 @@ class FirebaseUserSessionRepositoryImpl @Inject constructor(
         }.flowOn(Dispatchers.IO).onEach { Timber.v("💥 $it") }
 
     override val userStateAndUsedSeatPosition = userSession.map {
-        UserStateAndUsedSeatPosition(
-            seatPosition = if (it is UserSession.UsingSeat) it.seatPosition else null,
-            userState = it?.currentState
-        )
+        when (it) {
+            is UserSession.UsingSeat -> {
+                UserStateAndUsedSeatPosition.UsingSeat(
+                    seatPosition = it.seatPosition,
+                    userState = it.currentState
+                )
+            }
+
+            is UserSession.None -> {
+                UserStateAndUsedSeatPosition.None
+            }
+
+            else -> {
+                null
+            }
+        }
     }.onEach { Timber.v("💥 $it") }
+
+    override val userSessionWithTimer: Flow<DisplayedUserSession?> =
+        tickHandler.tickFlow.combine(userSession.onEach { Timber.v("💥 $it") }) { current, userSession ->
+            userSession?.toDisplayedUserSession(current)
+        }
 
 }
 

@@ -5,14 +5,14 @@ import com.google.firebase.functions.FirebaseFunctionsException
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import io.github.jeddchoi.data.firebase.model.FirebaseRequestResult
+import io.github.jeddchoi.data.firebase.model.FirebaseSeatFinderRequestType
 import io.github.jeddchoi.data.repository.CurrentUserRepository
 import io.github.jeddchoi.data.service.seatfinder.ResultCode
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequest
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderResult
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
-import io.github.jeddchoi.data.service.seatfinder.SeatFinderUserRequestType
+import io.github.jeddchoi.model.SeatFinderUserRequestType
 import io.github.jeddchoi.data.util.toJsonElement
-import io.github.jeddchoi.model.SeatFinderRequestType
 import io.github.jeddchoi.model.SeatPosition
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -116,7 +116,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         Timber.v("✅ $seatPosition, $endTime, $durationInSeconds")
         return sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.ReserveSeat,
+                requestType = FirebaseSeatFinderRequestType.ReserveSeat,
                 seatPosition = seatPosition,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
@@ -163,7 +163,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         Timber.v("✅ $endTime, $durationInSeconds")
         return sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.OccupySeat,
+                requestType = FirebaseSeatFinderRequestType.OccupySeat,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
@@ -174,7 +174,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         Timber.v("✅")
         return sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.Quit,
+                requestType = FirebaseSeatFinderRequestType.Quit,
             )
         )
     }
@@ -183,7 +183,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         Timber.v("✅ $endTime, $durationInSeconds")
         return sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.DoBusiness,
+                requestType = FirebaseSeatFinderRequestType.DoBusiness,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
@@ -194,7 +194,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         Timber.v("✅ $endTime, $durationInSeconds")
         return sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.LeaveAway,
+                requestType = FirebaseSeatFinderRequestType.LeaveAway,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
@@ -205,7 +205,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         Timber.v("✅")
         return sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.ResumeUsing,
+                requestType = FirebaseSeatFinderRequestType.ResumeUsing,
             )
         )
     }
@@ -217,7 +217,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         Timber.v("✅ $endTime, $durationInSeconds")
         return sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.ChangeMainStateEndTime,
+                requestType = FirebaseSeatFinderRequestType.ChangeMainStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
@@ -231,7 +231,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         Timber.v("✅ $endTime, $durationInSeconds")
         return sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.ChangeMainStateEndTime,
+                requestType = FirebaseSeatFinderRequestType.ChangeMainStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
@@ -245,7 +245,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         Timber.v("✅ $endTime, $durationInSeconds")
         return sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.ChangeSubStateEndTime,
+                requestType = FirebaseSeatFinderRequestType.ChangeSubStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
@@ -259,7 +259,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         Timber.v("✅ $endTime, $durationInSeconds")
         return sendUserActionRequest(
             SeatFinderRequest(
-                requestType = SeatFinderRequestType.ChangeSubStateEndTime,
+                requestType = FirebaseSeatFinderRequestType.ChangeSubStateEndTime,
                 endTime = endTime,
                 durationInSeconds = durationInSeconds
             )
