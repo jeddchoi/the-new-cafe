@@ -1,5 +1,8 @@
 package io.github.jeddchoi.thenewcafe.ui
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -35,12 +38,10 @@ import javax.inject.Inject
  * Single activity which is main entry.
  * It should be kept simple.
  */
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val viewModel: SplashViewModel by viewModels()
-    private lateinit var navController: NavHostController
 
     @Inject
     lateinit var networkMonitor: NetworkMonitor
@@ -68,27 +69,12 @@ class MainActivity : ComponentActivity() {
                     val redirectToAuth by rootViewModel.redirectToAuth.collectAsStateWithLifecycle()
                     val shouldRunService by rootViewModel.shouldRunService.collectAsStateWithLifecycle()
 
-                    navController = rememberNavController()
-
                     RootScreen(
-                        windowSizeClass = calculateWindowSizeClass(this),
+                        redirectToAuth = redirectToAuth,
                         networkMonitor = networkMonitor,
                         modifier = maxSizeModifier,
-                        navController = navController,
                     )
 
-
-                    LaunchedEffect(Unit) {
-                        navController.currentBackStack.collect {
-                            Timber.d(it.joinToString("\n"))
-                        }
-                    }
-
-                    LaunchedEffect(redirectToAuth) {
-                        if (redirectToAuth) {
-                            navController.navigateToAuth()
-                        }
-                    }
                     LaunchedEffect(shouldRunService) {
                         if (shouldRunService) {
                             Intent(applicationContext, SessionService::class.java).also {
@@ -103,4 +89,14 @@ class MainActivity : ComponentActivity() {
         }
         viewModel.initialize()
     }
+}
+
+
+fun Context.findActivity(): Activity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("no activity")
 }
