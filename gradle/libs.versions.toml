@@ -1,7 +1,7 @@
 [versions]
 accompanist = "0.31.5-beta"
 altbeacon = "2.19.6"
-androidGradlePlugin = "8.0.2"
+androidGradlePlugin = "8.1.0"
 androidxActivity = "1.7.2"
 androidxAppCompat = "1.6.1"
 androidxComposeBom = "2023.06.01"
