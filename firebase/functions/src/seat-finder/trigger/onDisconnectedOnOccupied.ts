@@ -3,8 +3,10 @@ import {REFERENCE_CURRENT_SESSION_NAME, REFERENCE_SEAT_FINDER_NAME} from "../../
 import {logger} from "firebase-functions/v2";
 import SeatFinderHandler from "../SeatFinderHandler";
 import {SeatFinderRequestType} from "../_enum/SeatFinderRequestType";
+import {getEndTime} from "../_model/SeatFinderRequest";
+import {defineInt} from "firebase-functions/params";
 
-
+const SEAT_FINDER_AWAY_TIMEOUT_SEC = defineInt("SEAT_FINDER_AWAY_TIMEOUT_SEC");
 export const onDisconnectedOnOccupied =
     onValueCreated(
         {
@@ -20,7 +22,7 @@ export const onDisconnectedOnOccupied =
             return handler.handleSeatFinderRequest(
                 SeatFinderRequestType.LeaveAway,
                 current,
-                null,
+                getEndTime(current, SEAT_FINDER_AWAY_TIMEOUT_SEC.value()),
                 null,
                 false,
             );

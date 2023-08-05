@@ -15,6 +15,12 @@ import {SeatFinderEventBy} from "./_enum/SeatFinderEventBy";
 import {PreviousSession} from "../_database/model/PreviousSession";
 import {SeatFinderResult} from "./_model/SeatFinderResult";
 import {REFERENCE_HISTORY_NAME, REFERENCE_STATE_CHANGES_NAME} from "../_database/NameConstant";
+import {getEndTime} from "./_model/SeatFinderRequest";
+import {defineInt} from "firebase-functions/params";
+
+
+const SEAT_FINDER_RESERVATION_TIMEOUT_SEC = defineInt("SEAT_FINDER_RESERVATION_TIMEOUT_SEC");
+const SEAT_FINDER_AWAY_TIMEOUT_SEC = defineInt("SEAT_FINDER_AWAY_TIMEOUT_SEC");
 
 export default class SeatFinderHandler {
     private readonly sessionHandler: SessionHandler;
@@ -48,13 +54,13 @@ export default class SeatFinderHandler {
                     if (!seatPosition) {
                         throw new https.HttpsError("invalid-argument", "Seat position is required");
                     }
-                    return this.reserveSeat(seatPosition, current, endTime);
+                    return this.reserveSeat(seatPosition, current);
                 }
                 case SeatFinderRequestType.OccupySeat: {
                     return this.occupySeat(current, endTime);
                 }
                 case SeatFinderRequestType.LeaveAway: {
-                    return this.leaveAway(current, endTime);
+                    return this.leaveAway(current);
                 }
                 case SeatFinderRequestType.DoBusiness: {
                     return this.doBusiness(current, endTime);
@@ -103,11 +109,10 @@ export default class SeatFinderHandler {
     async reserveSeat(
         seatPosition: SeatPosition,
         startTime: number,
-        endTime: number | null = null,
     ) {
         logger.debug("[SeatFinderHandler] createSession");
         const sessionId = this.newSessionKey();
-
+        const endTime = getEndTime(startTime, SEAT_FINDER_RESERVATION_TIMEOUT_SEC.value());
         return this.seatHandler.reserveSeat(seatPosition, endTime)
             .then((seatResult) => {
                 if (seatResult.resultCode !== ResultCode.OK) {
@@ -137,8 +142,8 @@ export default class SeatFinderHandler {
 
     async leaveAway(
         startTime: number,
-        endTime: number | null = null,
     ) {
+        const endTime = getEndTime(startTime, SEAT_FINDER_AWAY_TIMEOUT_SEC.value());
         return this.handleSessionAndSeat(
             () => this.sessionHandler.leaveAway(startTime, endTime),
             (currentSession: CurrentSession) => this.seatHandler.away(currentSession.seatPosition),

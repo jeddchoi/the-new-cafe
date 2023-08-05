@@ -24,25 +24,25 @@ export const onTest =
 
         switch (request.requestType) {
             case SeatFinderRequestType.ReserveSeat: {
-                return sessionHandler.reserveSeat("NEW_SESSION_ID", existingSeatPos, current, getEndTime(request.durationInSeconds, request.endTime, current));
+                return sessionHandler.reserveSeat("NEW_SESSION_ID", existingSeatPos, current, getEndTime(current, request.durationInSeconds, request.endTime));
             }
             case SeatFinderRequestType.OccupySeat: {
-                return sessionHandler.occupySeat(current, getEndTime(request.durationInSeconds, request.endTime, current));
+                return sessionHandler.occupySeat(current, getEndTime(current, request.durationInSeconds, request.endTime));
             }
             case SeatFinderRequestType.LeaveAway: {
-                return sessionHandler.leaveAway(current, getEndTime(request.durationInSeconds, request.endTime, current));
+                return sessionHandler.leaveAway(current, getEndTime(current, request.durationInSeconds, request.endTime));
             }
             case SeatFinderRequestType.DoBusiness: {
-                return sessionHandler.doBusiness(current, getEndTime(request.durationInSeconds, request.endTime, current));
+                return sessionHandler.doBusiness(current, getEndTime(current, request.durationInSeconds, request.endTime));
             }
             case SeatFinderRequestType.ResumeUsing: {
                 return sessionHandler.resumeUsing();
             }
             case SeatFinderRequestType.ChangeMainStateEndTime: {
-                return sessionHandler.changeMainStateEndTime(current, getEndTime(request.durationInSeconds, request.endTime, current));
+                return sessionHandler.changeMainStateEndTime(current, getEndTime(current, request.durationInSeconds, request.endTime));
             }
             case SeatFinderRequestType.ChangeSubStateEndTime: {
-                return sessionHandler.changeSubStateEndTime(current, getEndTime(request.durationInSeconds, request.endTime, current));
+                return sessionHandler.changeSubStateEndTime(current, getEndTime(current, request.durationInSeconds, request.endTime));
             }
             case SeatFinderRequestType.Quit: {
                 return sessionHandler.quit();

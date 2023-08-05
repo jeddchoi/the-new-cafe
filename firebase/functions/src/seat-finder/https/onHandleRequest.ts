@@ -24,7 +24,7 @@ export const onHandleRequest =
             return handler.handleSeatFinderRequest(
                 request.data.requestType,
                 current,
-                getEndTime(request.data.durationInSeconds, request.data.endTime, current),
+                getEndTime(current, request.data.durationInSeconds, request.data.endTime),
                 request.data.seatPosition,
             );
         });

@@ -9,7 +9,7 @@ export interface ISeatFinderRequest {
     endTime: number | null;
 }
 
-export function getEndTime(durationInSeconds : number | null, endTime: number | null, startTime: number) {
+export function getEndTime(startTime: number, durationInSeconds: number | null, endTime: number | null = null) {
     if (durationInSeconds === null && endTime === null) {
         return null;
     } else if (durationInSeconds !== null) {

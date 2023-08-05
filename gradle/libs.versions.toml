@@ -1,11 +1,11 @@
 [versions]
 accompanist = "0.31.5-beta"
 altbeacon = "2.19.6"
-androidGradlePlugin = "8.1.0"
+androidGradlePlugin = "8.1.0" # TODO: compatible with Android Studio, gradle version
 androidxActivity = "1.7.2"
 androidxAppCompat = "1.6.1"
 androidxComposeBom = "2023.06.01"
-androidxComposeCompiler = "1.4.3"
+androidxComposeCompiler = "1.5.1"
 androidxComposeFoundation ="1.5.0-beta03"
 androidxComposeRuntime = "1.5.0-rc01"
 androidxCore = "1.10.1"
@@ -26,7 +26,7 @@ googleServices = "4.3.15"
 hilt = "2.47"
 junit4 = "4.13.2"
 kable = "0.25.1"
-kotlin = "1.8.10" # TODO: compatible with jetpack compose
+kotlin = "1.9.0" # TODO: compatible with jetpack compose
 kotlinxCoroutines = "1.7.3"
 kotlinxDatetime = "0.4.0"
 kotlinxSerializationJson = "1.5.1"
