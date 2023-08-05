@@ -1,22 +1,21 @@
 package io.github.jeddchoi.thenewcafe.ui.root
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.navOptions
+import io.github.jeddchoi.authentication.authGraph
+import io.github.jeddchoi.authentication.navigateToAuth
+import io.github.jeddchoi.authentication.register.registerScreen
+import io.github.jeddchoi.authentication.signin.signInScreen
 import io.github.jeddchoi.data.util.NetworkMonitor
-import io.github.jeddchoi.designsystem.component.lottie.ConfettiLottie
-import io.github.jeddchoi.thenewcafe.ui.main.BottomBar
+import io.github.jeddchoi.historydetail.historyDetailScreen
+import io.github.jeddchoi.historydetail.navigateToHistoryDetail
+import io.github.jeddchoi.thenewcafe.ui.main.MainRoutePattern
+import io.github.jeddchoi.thenewcafe.ui.main.mainScreen
+import io.github.jeddchoi.thenewcafe.ui.main.navigateToMain
 
 /**
  * Single entry point of composable world
@@ -25,52 +24,54 @@ import io.github.jeddchoi.thenewcafe.ui.main.BottomBar
  */
 @Composable
 fun RootScreen(
-    windowSizeClass: WindowSizeClass,
+    redirectToAuth: Boolean,
     networkMonitor: NetworkMonitor,
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
-    rootState: RootState = rememberRootState(
-        windowSizeClass = windowSizeClass,
-        networkMonitor = networkMonitor,
-        navController = navController,
-    ),
-    showConfetti: Boolean = false,
+    rootState: RootState = rememberRootState(),
 ) {
-    val showBottomBar by rootState.showBottomBar.collectAsStateWithLifecycle(initialValue = false)
-    val connectedState by rootState.connectedState.collectAsStateWithLifecycle()
-
-    Scaffold(
+    NavHost(
         modifier = modifier,
-        bottomBar = {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (showBottomBar) {
-                    BottomBar(
-                        navController = rootState.navController,
-                        currentDestination = rootState.currentDestination,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                ConnectionState(connectedState)
+        navController = rootState.navController,
+        startDestination = MainRoutePattern,
+    ) {
+        authGraph {
+            val navigateToMain = {
+                rootState.navController.navigateToMain(navOptions = navOptions {
+                    popUpTo(rootState.navController.graph.findStartDestination().id)
+                    launchSingleTop = true
+                })
             }
-        },
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier.padding(innerPadding),
-            contentAlignment = Alignment.Center
-        ) {
-
-            RootNavGraph(
-                modifier = Modifier.fillMaxSize(),
+            signInScreen(
                 navController = rootState.navController,
+                navigateToMain = navigateToMain,
             )
-            if (showConfetti) {
-                ConfettiLottie(
-                    modifier = Modifier.matchParentSize(),
-                )
+            registerScreen(
+                navController = rootState.navController,
+                navigateToMain = navigateToMain,
+            )
+        }
+
+        mainScreen(
+            networkMonitor = networkMonitor,
+            navigateToAuth = {
+                rootState.navController.navigateToAuth(navOptions = navOptions {
+                    popUpTo(rootState.navController.graph.findStartDestination().id)
+                    launchSingleTop = true
+                })
+            },
+            navigateToHistoryDetail = {
+                rootState.navController.navigateToHistoryDetail(it)
             }
+        )
+
+        historyDetailScreen(
+            clickBack = rootState.navController::popBackStack
+        )
+    }
+
+    LaunchedEffect(redirectToAuth) {
+        if (redirectToAuth) {
+            rootState.navController.navigateToAuth()
         }
     }
 }

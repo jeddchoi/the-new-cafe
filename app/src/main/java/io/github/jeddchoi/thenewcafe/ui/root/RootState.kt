@@ -30,67 +30,22 @@ import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun rememberRootState(
-    windowSizeClass: WindowSizeClass,
-    networkMonitor: NetworkMonitor,
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
     navController: NavHostController = rememberNavController(),
 ): RootState {
-    return remember(navController, coroutineScope, windowSizeClass, networkMonitor, ) {
-        RootState(navController, coroutineScope, windowSizeClass, networkMonitor, )
+    return remember(navController) {
+        RootState(navController)
     }
 }
 
 @Stable
 class RootState(
     val navController: NavHostController,
-    val coroutineScope: CoroutineScope,
-    val windowSizeClass: WindowSizeClass,
-    networkMonitor: NetworkMonitor,
 ) {
 
     val currentDestination: NavDestination?
         @Composable get() = navController.currentBackStackEntryAsState().value?.destination
 
-    private val isMainRoute = navController.currentBackStackEntryFlow.map { backStackEntry ->
-        backStackEntry.destination.hierarchy.any {
-            it.route?.contains(MainRoutePattern, true) ?: false
-        }
-    }
 
-    private val isCompact = snapshotFlow { windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact }
-
-
-    val showBottomBar = combine(
-        isMainRoute.onEach{Timber.v("💥 $it")},
-        isCompact.onEach{Timber.v("💥 $it")},
-    ) {isMainRoute, isCompact ->
-        isMainRoute && isCompact
-    }.onEach { Timber.v("💥 $it") }
-    
-    val connectedState = networkMonitor.isOnline
-        .map(Boolean::not) // isOffline
-        .runningFold(
-            Pair(false, false),
-            operation = { accumulator, new -> Pair(accumulator.second, new) }
-        ).transform { (prev, cur) ->
-            if (cur) { // current is offline
-                emit(ConnectedState.LOST)
-            } else { // current is online
-                if (prev) { // previous was offline
-                    emit(ConnectedState.FOUND_CONNECTION)
-                    delay(3.seconds)
-                    emit(ConnectedState.CONNECTED)
-                } else { // previous was online
-                    emit(ConnectedState.CONNECTED)
-                }
-            }
-        }
-        .onEach { Timber.v("💥 $it") }
-        .stateIn(
-            scope = coroutineScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = ConnectedState.CONNECTED,
-        )
 }
 
 
