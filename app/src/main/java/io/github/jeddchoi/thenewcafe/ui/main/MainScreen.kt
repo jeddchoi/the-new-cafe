@@ -24,7 +24,6 @@ fun MainScreen(
     navigateToAuth: () -> Unit = {},
     navigateToHistoryDetail: (String) -> Unit = {},
 ) {
-
     val connectedState by mainState.connectedState.collectAsStateWithLifecycle()
     Scaffold(
         modifier = modifier,

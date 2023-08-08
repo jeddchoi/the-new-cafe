@@ -38,6 +38,9 @@ internal class StoreViewModel @Inject constructor(
 ) : ViewModel() {
     private val storeArgs = StoreArgs(savedStateHandle)
 
+    init {
+        Timber.i("StoreId = ${storeArgs.storeId}")
+    }
     private val storeDetail = storeRepository.getStoreDetail(storeArgs.storeId)
     private val sectionWithSeats =
         storeRepository.sections(storeArgs.storeId).flatMapLatest { sections ->

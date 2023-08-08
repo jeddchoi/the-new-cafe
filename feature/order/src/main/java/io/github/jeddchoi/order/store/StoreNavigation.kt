@@ -1,7 +1,6 @@
 package io.github.jeddchoi.order.store
 
 import android.content.Intent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
@@ -30,7 +29,6 @@ fun NavController.navigateToStore(
 }
 
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.storeScreen(
     onBackClick: () -> Unit,
     navigateToAuth: () -> Unit,

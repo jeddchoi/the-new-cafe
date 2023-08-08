@@ -4,6 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.nfc.NdefMessage
+import android.nfc.NfcAdapter
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,8 +14,6 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -23,7 +24,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.thenewcafe.service.SessionService
@@ -46,9 +46,13 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
 
+    lateinit var navController: NavHostController
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.v("✅")
+        performNfcRead(intent)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         installSplashScreen().apply {
@@ -69,10 +73,13 @@ class MainActivity : ComponentActivity() {
                     val redirectToAuth by rootViewModel.redirectToAuth.collectAsStateWithLifecycle()
                     val shouldRunService by rootViewModel.shouldRunService.collectAsStateWithLifecycle()
 
+                    navController = rememberNavController()
+
                     RootScreen(
                         redirectToAuth = redirectToAuth,
                         networkMonitor = networkMonitor,
                         modifier = maxSizeModifier,
+                        navController = navController
                     )
 
                     LaunchedEffect(shouldRunService) {
@@ -88,6 +95,36 @@ class MainActivity : ComponentActivity() {
             }
         }
         viewModel.initialize()
+    }
+
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Timber.i("onNewIntent ${intent.action} ${intent.dataString}")
+        if (intent.action == Intent.ACTION_VIEW && intent.dataString != null) {
+            navController.handleDeepLink(intent)
+        }
+
+        performNfcRead(intent)
+    }
+
+    private fun performNfcRead(intent: Intent) {
+        Timber.i("performNfcRead ${intent.action} ${intent.extras}")
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
+            val messages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableArrayExtra(
+                    NfcAdapter.EXTRA_NDEF_MESSAGES,
+                    NdefMessage::class.java
+                )?.toList()
+            } else {
+                @Suppress("DEPRECATION")
+                intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+                    ?.map { it as NdefMessage }?.toList()
+            }
+            messages?.first()?.let {
+                Timber.i("TAG discovered : ${String(it.records.first().payload)}")
+            }
+        }
     }
 }
 
