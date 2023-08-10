@@ -53,7 +53,7 @@ fun NavGraphBuilder.historyDetailScreen(
                 action = Intent.ACTION_VIEW
             }
         )
-    ) { backStackEntry ->
+    ) { _ ->
         val viewModel: HistoryDetailViewModel = hiltViewModel()
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
