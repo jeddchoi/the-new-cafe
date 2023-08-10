@@ -42,6 +42,7 @@ import io.github.jeddchoi.ui.component.ScreenWithTopAppBar
 import io.github.jeddchoi.ui.fullscreen.EmptyResultScreen
 import io.github.jeddchoi.ui.fullscreen.ErrorScreen
 import io.github.jeddchoi.ui.fullscreen.LoadingScreen
+import timber.log.Timber
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -56,6 +57,7 @@ internal fun StoreScreen(
     navigateToSignIn: () -> Unit = {},
     setUserMessage: (Message?) -> Unit = {},
 ) {
+    Timber.e("uiState = $uiState")
     val bluetoothManager = getSystemService(LocalContext.current, BluetoothManager::class.java)
     bluetoothManager?.adapter
 

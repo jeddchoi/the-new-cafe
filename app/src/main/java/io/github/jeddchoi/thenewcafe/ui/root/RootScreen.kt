@@ -1,7 +1,6 @@
 package io.github.jeddchoi.thenewcafe.ui.root
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -26,7 +25,6 @@ import io.github.jeddchoi.thenewcafe.ui.main.navigateToMain
  */
 @Composable
 fun RootScreen(
-    redirectToAuth: Boolean,
     networkMonitor: NetworkMonitor,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
@@ -75,10 +73,6 @@ fun RootScreen(
         )
     }
 
-    LaunchedEffect(redirectToAuth) {
-        if (redirectToAuth) {
-            rootState.navController.navigateToAuth()
-        }
-    }
+
 }
 

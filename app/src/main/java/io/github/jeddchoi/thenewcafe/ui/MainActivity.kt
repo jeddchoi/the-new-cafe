@@ -14,16 +14,19 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.thenewcafe.service.SessionService
@@ -46,7 +49,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var networkMonitor: NetworkMonitor
 
-    lateinit var navController: NavHostController
+    private lateinit var navController: NavHostController
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,7 +79,6 @@ class MainActivity : ComponentActivity() {
                     navController = rememberNavController()
 
                     RootScreen(
-                        redirectToAuth = redirectToAuth,
                         networkMonitor = networkMonitor,
                         modifier = maxSizeModifier,
                         navController = navController
@@ -91,22 +93,29 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
+                    DisposableEffect(Unit) {
+                        val listener = Consumer<Intent> { intent ->
+                            if (intent.action == Intent.ACTION_VIEW && intent.dataString != null) {
+                                navController.handleDeepLink(intent)
+                            }
+
+                            performNfcRead(intent)
+                        }
+                        addOnNewIntentListener(listener)
+                        onDispose { removeOnNewIntentListener(listener) }
+                    }
+
+                    LaunchedEffect(redirectToAuth) {
+                        if (redirectToAuth) {
+                            navController.navigateToAuth()
+                        }
+                    }
                 }
             }
         }
         viewModel.initialize()
     }
 
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        Timber.i("onNewIntent ${intent.action} ${intent.dataString}")
-        if (intent.action == Intent.ACTION_VIEW && intent.dataString != null) {
-            navController.handleDeepLink(intent)
-        }
-
-        performNfcRead(intent)
-    }
 
     private fun performNfcRead(intent: Intent) {
         Timber.i("performNfcRead ${intent.action} ${intent.extras}")

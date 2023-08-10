@@ -1,7 +1,6 @@
 package io.github.jeddchoi.historydetail
 
 import android.content.Intent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -18,7 +17,7 @@ import androidx.navigation.navDeepLink
 
 
 private const val HistoryDetailArg = "sessionId"
-private const val HistoryDetailRoutePattern = "history/{$HistoryDetailArg}"
+private const val HistoryDetailRoutePattern = "history?$HistoryDetailArg={$HistoryDetailArg}"
 
 internal class HistoryDetailArgs(val sessionId: String) {
     constructor(savedStateHandle: SavedStateHandle) :
@@ -29,11 +28,10 @@ fun NavController.navigateToHistoryDetail(
     sessionId: String,
     navOptions: NavOptions? = null,
 ) {
-    navigate("history/$sessionId", navOptions)
+    navigate("history?$HistoryDetailArg=$sessionId", navOptions)
 }
 
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.historyDetailScreen(
     clickBack: () -> Unit,
 ) {
