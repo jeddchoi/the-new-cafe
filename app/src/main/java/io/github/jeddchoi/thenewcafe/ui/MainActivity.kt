@@ -54,8 +54,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.v("✅")
-        performNfcRead(intent)
+        Timber.i("✅")
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         installSplashScreen().apply {
@@ -72,11 +71,24 @@ class MainActivity : ComponentActivity() {
                     modifier = maxSizeModifier,
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val rootViewModel: RootViewModel = hiltViewModel()
-                    val redirectToAuth by rootViewModel.redirectToAuth.collectAsStateWithLifecycle()
-                    val shouldRunService by rootViewModel.shouldRunService.collectAsStateWithLifecycle()
-
                     navController = rememberNavController()
+
+                    DisposableEffect(Unit) {
+                        val listener = Consumer<Intent> { intent ->
+                            Timber.i("onNewIntent : $intent ${intent.dataString}")
+                            if (intent.action == Intent.ACTION_VIEW && intent.dataString != null) {
+                                Timber.i("onNewIntent -> handleDeepLink $intent")
+                                navController.handleDeepLink(intent)
+                            }
+                            if (intent.action == NfcAdapter.ACTION_NDEF_DISCOVERED) {
+                                Timber.i("onNewIntent -> ACTION_NDEF_DISCOVERED $intent")
+                                performNfcRead(intent)
+                            }
+                        }
+                        addOnNewIntentListener(listener)
+                        onDispose { removeOnNewIntentListener(listener) }
+                    }
+
 
                     RootScreen(
                         networkMonitor = networkMonitor,
@@ -84,6 +96,9 @@ class MainActivity : ComponentActivity() {
                         navController = navController
                     )
 
+                    val rootViewModel: RootViewModel = hiltViewModel()
+                    val redirectToAuth by rootViewModel.redirectToAuth.collectAsStateWithLifecycle()
+                    val shouldRunService by rootViewModel.shouldRunService.collectAsStateWithLifecycle()
                     LaunchedEffect(shouldRunService) {
                         if (shouldRunService) {
                             Intent(applicationContext, SessionService::class.java).also {
@@ -91,18 +106,6 @@ class MainActivity : ComponentActivity() {
                                 startForegroundService(it)
                             }
                         }
-                    }
-
-                    DisposableEffect(Unit) {
-                        val listener = Consumer<Intent> { intent ->
-                            if (intent.action == Intent.ACTION_VIEW && intent.dataString != null) {
-                                navController.handleDeepLink(intent)
-                            }
-
-                            performNfcRead(intent)
-                        }
-                        addOnNewIntentListener(listener)
-                        onDispose { removeOnNewIntentListener(listener) }
                     }
 
                     LaunchedEffect(redirectToAuth) {
@@ -116,23 +119,36 @@ class MainActivity : ComponentActivity() {
         viewModel.initialize()
     }
 
+//    override fun onNewIntent(intent: Intent) {
+//        super.onNewIntent(intent)
+//
+//
+//    }
 
     private fun performNfcRead(intent: Intent) {
-        Timber.i("performNfcRead ${intent.action} ${intent.extras}")
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
-            val messages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableArrayExtra(
-                    NfcAdapter.EXTRA_NDEF_MESSAGES,
-                    NdefMessage::class.java
-                )?.toList()
-            } else {
-                @Suppress("DEPRECATION")
-                intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
-                    ?.map { it as NdefMessage }?.toList()
-            }
-            messages?.first()?.let {
-                Timber.i("TAG discovered : ${String(it.records.first().payload)}")
-            }
+        Timber.v("✅")
+        val messages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableArrayExtra(
+                NfcAdapter.EXTRA_NDEF_MESSAGES,
+                NdefMessage::class.java
+            )?.toList()
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+                ?.map { it as NdefMessage }?.toList()
+        }
+
+        messages?.first()?.records?.first()?.toUri()?.let {
+            val deepLinkIntent = Intent(
+                Intent.ACTION_VIEW,
+                it,
+                this,
+                MainActivity::class.java
+            )
+            deepLinkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+
+            setIntent(deepLinkIntent)
+            navController.handleDeepLink(deepLinkIntent)
         }
     }
 }

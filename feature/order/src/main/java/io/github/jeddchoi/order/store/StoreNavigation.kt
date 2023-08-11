@@ -50,7 +50,7 @@ fun NavGraphBuilder.storeScreen(
             navDeepLink {
                 uriPattern = "jeddchoi://thenewcafe/$StoreRoutePattern"
                 action = Intent.ACTION_VIEW
-            }
+            },
         )
     ) {
         val viewModel: StoreViewModel = hiltViewModel()
