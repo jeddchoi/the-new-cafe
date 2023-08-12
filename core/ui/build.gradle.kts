@@ -18,4 +18,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
 
     androidTestImplementation(project(":core:testing"))
+
+    implementation(libs.coil.compose)
 }

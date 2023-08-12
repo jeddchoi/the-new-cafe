@@ -3,8 +3,10 @@ package io.github.jeddchoi.order.store
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -22,6 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -29,7 +34,10 @@ import io.github.jeddchoi.common.CafeIcons
 import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.common.UiIcon
 import io.github.jeddchoi.common.UiText
+import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.BottomButton
+import io.github.jeddchoi.designsystem.component.card.ProgressCard
+import io.github.jeddchoi.designsystem.component.card.TextCard
 import io.github.jeddchoi.designsystem.textColor
 import io.github.jeddchoi.model.Store
 import io.github.jeddchoi.model.UserStateAndUsedSeatPosition
@@ -242,7 +250,7 @@ private fun SectionWithSeatsScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 item {
-                    Text(text = store.toString())
+                    StoreInfoCard(store = store)
                 }
                 sectionsWithSeats.sortedBy { it.section.name }.forEach { sectionWithSeats ->
                     item {
@@ -281,6 +289,59 @@ private fun SectionWithSeatsScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun StoreInfoCard(store: Store) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth()
+    ) {
+
+        TextCard(
+            modifier = Modifier.fillMaxWidth(),
+            title = UiText.StringResource(R.string.uuid),
+            content = UiText.DynamicString(store.uuid),
+        )
+
+        Row(
+            modifier = Modifier.height(intrinsicSize = IntrinsicSize.Max)
+        ) {
+            TextCard(
+                modifier = Modifier.fillMaxWidth().weight(1f).fillMaxHeight(),
+                title = UiText.StringResource(R.string.total_sections),
+                content = UiText.DynamicString(store.totalSections.toString()),
+            )
+            ProgressCard(
+                modifier = Modifier.fillMaxWidth().weight(1f).fillMaxHeight(),
+                title = UiText.StringResource(R.string.total_available_seats),
+                content = UiText.DynamicString(store.seatsStat()),
+                progress = store.totalAvailableSeats.toFloat().div(store.totalSeats)
+            )
+        }
+    }
+}
+
+
+@Preview
+@Composable
+fun StoreInfoCardPreview() {
+    TheNewCafeTheme {
+        Surface {
+            StoreInfoCard(
+                store = Store(
+                    id = "id",
+                    acceptsReservation = true,
+                    name = "Starbucks",
+                    totalAvailableSeats = 10,
+                    totalSeats = 24,
+                    totalSections = 3,
+                    uuid = LoremIpsum(10).values.joinToString(" ")
+                )
+            )
         }
     }
 }

@@ -12,4 +12,7 @@
     <string name="grant_permissions">Grant required permissions</string>
     <string name="warning">Warning</string>
     <string name="error">Error</string>
+    <string name="uuid">UUID</string>
+    <string name="total_available_seats">Total available seats</string>
+    <string name="total_sections">Total Sections</string>
 </resources>

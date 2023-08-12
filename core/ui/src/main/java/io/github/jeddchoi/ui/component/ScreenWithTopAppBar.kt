@@ -32,7 +32,9 @@ fun ScreenWithTopAppBar(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { Text(title.asString()) },
+                title = {
+                    Text(text = title.asString(),)
+                },
                 navigationIcon = {
                     if (showNavigateUp) {
                         BackButton(onClick = clickBack)

@@ -12,4 +12,5 @@ dependencies {
     implementation(libs.accompanist.permissions)
 
     implementation(project(":core:common"))
+    implementation(libs.coil.compose)
 }
