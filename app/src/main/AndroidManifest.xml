@@ -2,27 +2,40 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Request legacy Bluetooth permissions on versions older than API 31 (Android 12). -->
-    <uses-permission android:name="android.permission.BLUETOOTH"
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
         android:maxSdkVersion="30" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
         android:maxSdkVersion="30" />
 
     <uses-permission
         android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
-        android:maxSdkVersion="30"/>
+        android:maxSdkVersion="30" />
 
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation"
         tools:targetApi="s" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+
+    <!-- NFC related  -->
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature
+        android:name="android.hardware.nfc"
+        android:required="true" />
+
 
     <application
         android:name=".CafeApplication"
@@ -34,28 +47,31 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.App.Starting"
         tools:targetApi="31">
+
+        <!-- @see https://developer.android.com/guide/navigation/navigation-deep-link?hl=ko#handle -->
+        <!-- launchMode=singleInstance for launching this app on own task when scanning NFC tag -->
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
             android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.App.Starting">
+            android:launchMode="singleInstance"
+            android:theme="@style/Theme.App.Starting"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
+                <!-- For implicit intent -->
                 <category android:name="android.intent.category.DEFAULT" />
+                <!-- To be accessible from browsers -->
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
                     android:host="io.github.jeddchoi.thenewcafe"
                     android:scheme="https" />
-
             </intent-filter>
 
             <intent-filter>
@@ -68,13 +84,22 @@
                     android:host="thenewcafe"
                     android:scheme="jeddchoi" />
             </intent-filter>
+
+
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:host="thenewcafe"
+                    android:scheme="jeddchoi" />
+            </intent-filter>
         </activity>
 
         <service
             android:name=".service.SessionService"
-            android:exported="false"
             android:description="@string/desc_session_service"
-            android:foregroundServiceType="location"/>
+            android:exported="false"
+            android:foregroundServiceType="location" />
     </application>
 
 </manifest>

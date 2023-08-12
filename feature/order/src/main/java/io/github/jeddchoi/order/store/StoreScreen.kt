@@ -1,6 +1,5 @@
 package io.github.jeddchoi.order.store
 
-import android.bluetooth.BluetoothManager
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,11 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getSystemService
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import io.github.jeddchoi.common.CafeIcons
@@ -56,8 +53,8 @@ internal fun StoreScreen(
     navigateToSignIn: () -> Unit = {},
     setUserMessage: (Message?) -> Unit = {},
 ) {
-    val bluetoothManager = getSystemService(LocalContext.current, BluetoothManager::class.java)
-    bluetoothManager?.adapter
+//    val bluetoothManager = getSystemService(LocalContext.current, BluetoothManager::class.java)
+//    bluetoothManager?.adapter
 
     val servicePermissionState = rememberMultiplePermissionsState(
         buildList {

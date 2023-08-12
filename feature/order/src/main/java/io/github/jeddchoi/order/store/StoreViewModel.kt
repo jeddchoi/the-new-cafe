@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -38,6 +39,10 @@ internal class StoreViewModel @Inject constructor(
 ) : ViewModel() {
     private val storeArgs = StoreArgs(savedStateHandle)
 
+    init {
+        Timber.i("StoreId = ${storeArgs.storeId}")
+    }
+
     private val storeDetail = storeRepository.getStoreDetail(storeArgs.storeId)
     private val sectionWithSeats =
         storeRepository.sections(storeArgs.storeId).flatMapLatest { sections ->
@@ -54,30 +59,31 @@ internal class StoreViewModel @Inject constructor(
 
     private val oneShotActionState = MutableStateFlow(OneShotActionState())
 
-    val uiState = combine(
-        storeDetail.onEach{Timber.v("💥 $it")},
-        sectionWithSeats.onEach{Timber.v("💥 $it")},
-        oneShotActionState.onEach{Timber.v("💥 $it")},
-        userSessionRepository.userStateAndUsedSeatPosition.onEach{Timber.v("💥 $it")},
-    ) { store, sections, oneShotActionState, userStateAndUsedSeatPosition ->
+
+    val uiState = storeDetail.onEach { Timber.v("💥 $it") }.flatMapLatest { store ->
         if (store == null) {
-            StoreUiState.NotFound
+            flowOf(StoreUiState.NotFound)
         } else {
-            StoreUiState.Success(
-                store = store,
-                sectionWithSeats = sections,
-                isLoading = oneShotActionState.isLoading,
-                userMessage = oneShotActionState.userMessage,
-                selectedSeat = oneShotActionState.selectedSeat,
-                userStateAndUsedSeatPosition = userStateAndUsedSeatPosition,
-            )
+            combine(
+                sectionWithSeats.onEach { Timber.v("💥 $it") },
+                oneShotActionState.onEach { Timber.v("💥 $it") },
+                userSessionRepository.userStateAndUsedSeatPosition.onEach { Timber.v("💥 $it") },
+            ) { sections, oneShotActionState, userStateAndUsedSeatPosition ->
+                StoreUiState.Success(
+                    store = store,
+                    sectionWithSeats = sections,
+                    isLoading = oneShotActionState.isLoading,
+                    userMessage = oneShotActionState.userMessage,
+                    selectedSeat = oneShotActionState.selectedSeat,
+                    userStateAndUsedSeatPosition = userStateAndUsedSeatPosition,
+                )
+            }
         }
     }
         .catch {
             Timber.e(it)
             emit(StoreUiState.Error(it))
         }
-        .onEach { Timber.v("💥 $it") }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StoreUiState.Loading)
 
     fun selectSeat(sectionId: String, seatId: String) {
@@ -161,6 +167,7 @@ internal class StoreViewModel @Inject constructor(
             it.copy(userMessage = message)
         }
     }
+
     private fun launchOneShotJob(
         job: suspend () -> Unit,
         onError: (Throwable, suspend () -> Unit) -> Unit = { _, _ -> }
@@ -201,8 +208,8 @@ data class OneShotActionState(
 
 
 internal sealed class StoreUiState {
-    object Loading : StoreUiState()
-    object NotFound : StoreUiState()
+    data object Loading : StoreUiState()
+    data object NotFound : StoreUiState()
     data class Success(
         val store: Store,
         val sectionWithSeats: List<SectionWithSeats>,

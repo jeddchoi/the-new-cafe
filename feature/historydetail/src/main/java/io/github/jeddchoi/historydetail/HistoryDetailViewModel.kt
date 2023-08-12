@@ -17,15 +17,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HistoryDetailViewModel @Inject constructor(
-    val userSessionHistoryDetailRepository: UserSessionHistoryDetailRepository,
-    val savedStateHandle: SavedStateHandle,
+    private val userSessionHistoryDetailRepository: UserSessionHistoryDetailRepository,
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val historyDetailArgs = HistoryDetailArgs(savedStateHandle)
     val uiState = userSessionHistoryDetailRepository.getStateChanges(historyDetailArgs.sessionId)
         .map {
-            HistoryDetailUiState.Success(
-                stateChanges = it
-            )
+            if (it.isEmpty()) {
+                HistoryDetailUiState.NotFound
+            } else {
+                HistoryDetailUiState.Success(
+                    stateChanges = it
+                )
+            }
         }
         .catch { HistoryDetailUiState.Error(it) }
         .onEach { Timber.v("💥 $it") }
@@ -38,8 +42,8 @@ class HistoryDetailViewModel @Inject constructor(
 }
 
 sealed class HistoryDetailUiState {
-    object Loading : HistoryDetailUiState()
-    object NotFound : HistoryDetailUiState()
+    data object Loading : HistoryDetailUiState()
+    data object NotFound : HistoryDetailUiState()
     data class Success(
         val stateChanges: List<UserStateChange> = emptyList(),
         val isLoading: Boolean = false,

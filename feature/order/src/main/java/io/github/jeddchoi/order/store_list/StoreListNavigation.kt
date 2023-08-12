@@ -1,7 +1,6 @@
 package io.github.jeddchoi.order.store_list
 
 import android.content.Intent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -20,7 +19,6 @@ fun NavController.navigateToStoreList(
     navigate(StoreListRoutePattern, navOptions)
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.storeListScreen(
     navigateToStore: (String) -> Unit,
 ) {

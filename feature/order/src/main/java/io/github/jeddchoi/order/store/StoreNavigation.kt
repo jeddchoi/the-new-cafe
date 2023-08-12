@@ -1,7 +1,6 @@
 package io.github.jeddchoi.order.store
 
 import android.content.Intent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
@@ -15,7 +14,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 
 private const val StoreIdArg = "storeId"
-private const val StoreRoutePattern = "stores/{$StoreIdArg}"
+private const val StoreRoutePattern = "stores?$StoreIdArg={$StoreIdArg}"
 
 internal class StoreArgs(val storeId: String) {
     constructor(savedStateHandle: SavedStateHandle) :
@@ -26,11 +25,10 @@ fun NavController.navigateToStore(
     storeId: String,
     navOptions: NavOptions? = null,
 ) {
-    navigate("stores/$storeId", navOptions)
+    navigate("stores?$StoreIdArg=$storeId", navOptions)
 }
 
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.storeScreen(
     onBackClick: () -> Unit,
     navigateToAuth: () -> Unit,
@@ -52,7 +50,7 @@ fun NavGraphBuilder.storeScreen(
             navDeepLink {
                 uriPattern = "jeddchoi://thenewcafe/$StoreRoutePattern"
                 action = Intent.ACTION_VIEW
-            }
+            },
         )
     ) {
         val viewModel: StoreViewModel = hiltViewModel()

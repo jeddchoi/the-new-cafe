@@ -1,10 +1,11 @@
 package io.github.jeddchoi.thenewcafe.ui.root
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import io.github.jeddchoi.authentication.authGraph
 import io.github.jeddchoi.authentication.navigateToAuth
@@ -24,15 +25,18 @@ import io.github.jeddchoi.thenewcafe.ui.main.navigateToMain
  */
 @Composable
 fun RootScreen(
-    redirectToAuth: Boolean,
     networkMonitor: NetworkMonitor,
     modifier: Modifier = Modifier,
-    rootState: RootState = rememberRootState(),
+    navController: NavHostController = rememberNavController(),
+    rootState: RootState = rememberRootState(
+        navController = navController
+    ),
 ) {
     NavHost(
         modifier = modifier,
         navController = rootState.navController,
         startDestination = MainRoutePattern,
+
     ) {
         authGraph {
             val navigateToMain = {
@@ -69,10 +73,6 @@ fun RootScreen(
         )
     }
 
-    LaunchedEffect(redirectToAuth) {
-        if (redirectToAuth) {
-            rootState.navController.navigateToAuth()
-        }
-    }
+
 }
 

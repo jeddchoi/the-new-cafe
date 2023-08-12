@@ -70,12 +70,16 @@ class TimberDebugTree : Timber.DebugTree() {
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
         super.log(
             priority = priority,
-            tag = null,
+            tag = TAG,
             message = "$message $tag",
             t = t
         )
 //        println(String.format("%2\$s %1\$s", tag, message))
 //        t?.printStackTrace(System.out)
+    }
+
+    companion object {
+        const val TAG = "MY_DEBUG"
     }
 
 }
