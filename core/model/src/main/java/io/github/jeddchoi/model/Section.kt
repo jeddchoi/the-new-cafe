@@ -6,4 +6,6 @@ data class Section(
     val name: String = "",
     val totalAvailableSeats: Int = 0,
     val totalSeats: Int = 0,
-)
+) {
+    fun seatsStat() = "${totalAvailableSeats}/${totalSeats}"
+}
