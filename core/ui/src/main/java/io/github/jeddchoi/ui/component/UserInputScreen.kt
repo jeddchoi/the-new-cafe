@@ -13,8 +13,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,11 +35,13 @@ import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.BackButton
 import io.github.jeddchoi.designsystem.component.input.GeneralTextField
 import io.github.jeddchoi.designsystem.component.input.PasswordField
 import io.github.jeddchoi.designsystem.textColor
 import io.github.jeddchoi.ui.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserInputScreen(
     title: UiText,
@@ -49,11 +57,23 @@ fun UserInputScreen(
 ) {
     val isKeyboardOpen by keyboardAsState()
 
-    ScreenWithTopAppBar(
-        title = title,
-        modifier = modifier,
-        showNavigateUp = existBackStack,
-        clickBack = clickBack,
+    val topAppBarScrollState = rememberTopAppBarState()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(topAppBarScrollState)
+    Scaffold (
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
+                title = {
+                    Text(text = title.asString(),)
+                },
+                navigationIcon = {
+                    if (existBackStack) {
+                        BackButton(onClick = clickBack)
+                    }
+                },
+                scrollBehavior = scrollBehavior
+            )
+        },
     ) { scaffoldPadding ->
         ComponentWithBottomButtons(
             modifier = Modifier
@@ -121,6 +141,7 @@ fun UserInputScreen(
                 inputFields(Modifier)
             }
         }
+
     }
 }
 

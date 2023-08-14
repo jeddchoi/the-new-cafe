@@ -1,6 +1,5 @@
 package io.github.jeddchoi.authentication.signin
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -15,7 +14,6 @@ import io.github.jeddchoi.authentication.register.navigateToRegister
 
 internal const val SignInRoutePattern = "signin"
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.signInScreen(
     navController: NavHostController,
     navigateToMain: () -> Unit = {}
