@@ -27,7 +27,7 @@ fun StoreInfoCard(
 ) {
     Column(
         modifier = modifier
-            .padding(horizontal = 8.dp)
+            .padding(8.dp)
             .fillMaxWidth()
     ) {
 

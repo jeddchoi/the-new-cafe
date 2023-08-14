@@ -1,15 +1,19 @@
 package io.github.jeddchoi.order.store_list
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -75,21 +79,38 @@ fun StoreListItem(
     modifier: Modifier = Modifier,
     onClick: (String) -> Unit = {},
 ) {
-    Card(
+    ElevatedCard(
         modifier = modifier,
         onClick = {
             onClick(store.id)
         },
         enabled = store.acceptsReservation,
     ) {
-        AsyncImage(
-            model = store.photoUrl,
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
+        Box(
             modifier = Modifier.height(200.dp)
-        )
-        Text(text = store.name)
-        Text(text = store.uuid)
-        Text(text = store.seatsStat())
+        ) {
+            AsyncImage(
+                model = store.photoUrl,
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize()
+            )
+            Text(
+                text = store.seatsStat(),
+                style = MaterialTheme.typography.displayMedium,
+                modifier = Modifier.padding(8.dp).align(Alignment.BottomEnd)
+            )
+        }
+
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(
+                text = store.name,
+                style = MaterialTheme.typography.headlineMedium
+            )
+
+            Text(text = store.uuid)
+        }
     }
 }
