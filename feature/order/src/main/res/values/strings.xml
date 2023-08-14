@@ -16,4 +16,5 @@
     <string name="total_available_seats">Total available seats</string>
     <string name="total_sections">Total Sections</string>
     <string name="major">Major</string>
+    <string name="change_seat">Change seat</string>
 </resources>
