@@ -13,19 +13,28 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 
-private const val StoreIdArg = "storeId"
-private const val StoreRoutePattern = "stores?$StoreIdArg={$StoreIdArg}"
+private const val STORE_ID_ARG = "storeId"
+private const val SECTION_ID_ARG = "sectionId"
+private const val SEAT_ID_ARG = "seatId"
+private const val STORE_ROUTE_PATTERN =
+    "stores?$STORE_ID_ARG={$STORE_ID_ARG}&$SECTION_ID_ARG={$SECTION_ID_ARG}&$SEAT_ID_ARG={$SEAT_ID_ARG}"
 
-internal class StoreArgs(val storeId: String) {
+internal class StoreArgs(val storeId: String, val sectionId: String?, val seatId: String?) {
     constructor(savedStateHandle: SavedStateHandle) :
-            this(checkNotNull(savedStateHandle[StoreIdArg]) as String)
+            this(
+                checkNotNull(savedStateHandle[STORE_ID_ARG]) as String,
+                savedStateHandle[SECTION_ID_ARG],
+                savedStateHandle[SEAT_ID_ARG]
+            )
 }
 
 fun NavController.navigateToStore(
     storeId: String,
+    sectionId: String? = null,
+    seatId: String? = null,
     navOptions: NavOptions? = null,
 ) {
-    navigate("stores?$StoreIdArg=$storeId", navOptions)
+    navigate("stores?$STORE_ID_ARG=$storeId&$SECTION_ID_ARG=$sectionId&$SEAT_ID_ARG=$seatId", navOptions)
 }
 
 
@@ -35,20 +44,28 @@ fun NavGraphBuilder.storeScreen(
     navigateToMyPage: () -> Unit,
 ) {
     composable(
-        route = StoreRoutePattern,
+        route = STORE_ROUTE_PATTERN,
         arguments = listOf(
-            navArgument(StoreIdArg) {
+            navArgument(STORE_ID_ARG) {
                 type = NavType.StringType
                 nullable = false
+            },
+            navArgument(SECTION_ID_ARG) {
+                type = NavType.StringType
+                nullable = true
+            },
+            navArgument(SEAT_ID_ARG) {
+                type = NavType.StringType
+                nullable = true
             }
         ),
         deepLinks = listOf(
             navDeepLink {
-                uriPattern = "https://io.github.jeddchoi.thenewcafe/$StoreRoutePattern"
+                uriPattern = "https://io.github.jeddchoi.thenewcafe/$STORE_ROUTE_PATTERN"
                 action = Intent.ACTION_VIEW
             },
             navDeepLink {
-                uriPattern = "jeddchoi://thenewcafe/$StoreRoutePattern"
+                uriPattern = "jeddchoi://thenewcafe/$STORE_ROUTE_PATTERN"
                 action = Intent.ACTION_VIEW
             },
         )

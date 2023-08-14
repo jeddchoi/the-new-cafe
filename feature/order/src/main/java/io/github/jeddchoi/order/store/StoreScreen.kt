@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
@@ -78,6 +79,7 @@ internal fun StoreScreen(
             subject = UiText.StringResource(R.string.store),
             modifier = modifier
         )
+
         is StoreUiState.Success -> {
             var buttonText: UiText
             var enabled: Boolean
@@ -115,6 +117,7 @@ internal fun StoreScreen(
                             UserStateType.Reserved -> {
                                 UiText.StringResource(R.string.cancel_reservation)
                             }
+
                             else -> {
                                 UiText.StringResource(io.github.jeddchoi.data.R.string.quit)
                             }
@@ -245,7 +248,9 @@ private fun SectionWithSeatsScreen(
                 }
             }
         ) {
+            val lazyListState = rememberLazyListState()
             LazyColumn(
+                state = lazyListState,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .fillMaxSize(),
@@ -255,7 +260,7 @@ private fun SectionWithSeatsScreen(
                     StoreInfoCard(store = store)
                 }
 
-                sectionsWithSeats.sortedBy { it.section.name }.forEach { sectionWithSeats ->
+                sectionsWithSeats.forEach { sectionWithSeats ->
                     item {
                         Divider()
                     }
@@ -266,7 +271,6 @@ private fun SectionWithSeatsScreen(
                         onSelect = onSelect
                     )
                 }
-
 
                 item {
                     Spacer(modifier = Modifier.height(200.dp))
