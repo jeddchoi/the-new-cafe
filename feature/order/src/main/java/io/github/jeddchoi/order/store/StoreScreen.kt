@@ -15,7 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -27,9 +27,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import io.github.jeddchoi.common.CafeIcons
 import io.github.jeddchoi.common.Message
-import io.github.jeddchoi.common.UiIcon
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.component.BottomButton
 import io.github.jeddchoi.designsystem.textColor
@@ -249,6 +247,10 @@ private fun SectionWithSeatsScreen(
                 }
 
                 sectionsWithSeats.sortedBy { it.section.name }.forEach { sectionWithSeats ->
+                    item {
+                        Divider()
+                    }
+
                     SectionScreen(
                         selectedSeat = selectedSeat,
                         sectionWithSeats = sectionWithSeats,
@@ -278,30 +280,14 @@ private fun LazyListScope.SectionScreen(
         val isSelected =
             selectedSeat?.seatId == seat.id && selectedSeat.sectionId == sectionWithSeats.section.id
 
-
-        ListItem(
-            modifier = Modifier
-                .selectable(
-                    selected = isSelected,
-                    enabled = seat.isAvailable,
-                    onClick = { onSelect(sectionWithSeats.section.id, seat.id) }
-                )
-                .fillMaxWidth(),
-            leadingContent = {
-                if (isSelected) {
-                    UiIcon.ImageVectorIcon(CafeIcons.CheckCircle).ToComposable()
-                }
-            },
-            headlineContent = {
-                Text(text = seat.name)
-            },
-            supportingContent = {
-                Text(text = seat.id)
-            },
-            trailingContent = {
-                Text(text = seat.isAvailable.toString())
-            },
-            tonalElevation = if (isSelected) 4.dp else 0.dp
+        SeatItem(
+            seat = seat,
+            isSelected = isSelected,
+            modifier = Modifier.selectable(
+                selected = isSelected,
+                enabled = seat.isAvailable,
+                onClick = { onSelect(sectionWithSeats.section.id, seat.id) }
+            )
         )
     }
 }

@@ -8,9 +8,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.timber)
     implementation(libs.accompanist.permissions)
-
-    implementation(project(":core:common"))
     implementation(libs.coil.compose)
+    implementation(libs.kotlinx.datetime)
 }

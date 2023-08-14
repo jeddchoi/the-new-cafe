@@ -8,6 +8,4 @@ android {
 }
 
 dependencies {
-    implementation(libs.timber)
-    implementation(project(":core:common"))
 }
