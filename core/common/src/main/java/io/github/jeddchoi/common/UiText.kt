@@ -21,5 +21,6 @@ sealed class UiText {
 
     companion object {
         val PlaceHolder = DynamicString("Placeholder")
+        val Empty = DynamicString("")
     }
 }

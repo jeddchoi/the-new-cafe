@@ -1,6 +1,7 @@
 package io.github.jeddchoi.order.store
 
 import android.os.Build
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,9 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,9 +27,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import io.github.jeddchoi.common.CafeIcons
 import io.github.jeddchoi.common.Message
-import io.github.jeddchoi.common.UiIcon
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.component.BottomButton
 import io.github.jeddchoi.designsystem.textColor
@@ -168,6 +168,7 @@ internal fun StoreScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SectionWithSeatsScreen(
     store: Store,
@@ -242,45 +243,52 @@ private fun SectionWithSeatsScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 item {
-                    Text(text = store.toString())
+                    StoreInfoCard(store = store)
                 }
+
                 sectionsWithSeats.sortedBy { it.section.name }.forEach { sectionWithSeats ->
                     item {
-                        Text(text = sectionWithSeats.section.toString())
+                        Divider()
                     }
-                    items(sectionWithSeats.seats.sortedBy { it.name }, key = { it.id }) { seat ->
-                        val isSelected =
-                            selectedSeat?.seatId == seat.id && selectedSeat.sectionId == sectionWithSeats.section.id
-                        ListItem(
-                            modifier = Modifier
-                                .selectable(
-                                    selected = isSelected,
-                                    enabled = seat.isAvailable,
-                                    onClick = { onSelect(sectionWithSeats.section.id, seat.id) }
-                                )
-                                .fillMaxWidth(),
-                            leadingContent = {
-                                if (isSelected) {
-                                    UiIcon.ImageVectorIcon(CafeIcons.CheckCircle).ToComposable()
-                                }
-                            },
-                            headlineContent = {
-                                Text(text = seat.name)
-                            },
-                            supportingContent = {
-                                Text(text = seat.id)
-                            },
-                            trailingContent = {
-                                Text(text = seat.isAvailable.toString())
-                            },
-                            tonalElevation = if (isSelected) 4.dp else 0.dp
-                        )
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(200.dp))
-                    }
+
+                    SectionScreen(
+                        selectedSeat = selectedSeat,
+                        sectionWithSeats = sectionWithSeats,
+                        onSelect = onSelect
+                    )
+                }
+
+
+                item {
+                    Spacer(modifier = Modifier.height(200.dp))
                 }
             }
         }
     }
 }
+
+private fun LazyListScope.SectionScreen(
+    sectionWithSeats: SectionWithSeats,
+    selectedSeat: SelectedSeat?,
+    onSelect: (String, String) -> Unit
+) {
+    item {
+        SectionInfoCard(sectionWithSeats.section)
+    }
+
+    items(sectionWithSeats.seats.sortedBy { it.name }) { seat ->
+        val isSelected =
+            selectedSeat?.seatId == seat.id && selectedSeat.sectionId == sectionWithSeats.section.id
+
+        SeatItem(
+            seat = seat,
+            isSelected = isSelected,
+            modifier = Modifier.selectable(
+                selected = isSelected,
+                enabled = seat.isAvailable,
+                onClick = { onSelect(sectionWithSeats.section.id, seat.id) }
+            )
+        )
+    }
+}
+

@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.designsystem.component.CircularFilledProgressIndicator
 import io.github.jeddchoi.designsystem.component.item.DateTimeItem
 import io.github.jeddchoi.designsystem.component.item.DurationItem
 import io.github.jeddchoi.designsystem.component.item.EnumItem
@@ -134,13 +135,13 @@ private fun SessionTimerCircularIndicators(
             }
         }
 
-        CircularProgressIndicator(
+        CircularFilledProgressIndicator(
             progress = innerProgress.value,
-            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.fillMaxSize(0.5f),
+            color = MaterialTheme.colorScheme.primary,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            strokeWidth = 40.dp,
         )
+
         CircularProgressIndicator(
             progress = outerProgress.value,
             color = MaterialTheme.colorScheme.secondary,
