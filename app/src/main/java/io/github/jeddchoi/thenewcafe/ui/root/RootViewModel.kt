@@ -77,15 +77,15 @@ class RootViewModel @Inject constructor(
             UserSession.None -> true
 
             is UserSession.UsingSeat -> {
-                val storeId = readUri.getQueryParameter(STORE_ID_ARG)
-                val sectionId = readUri.getQueryParameter(SECTION_ID_ARG)
-                val seatId = readUri.getQueryParameter(SEAT_ID_ARG)
                 when (cus.currentState) {
                     UserStateType.None -> throw IllegalStateException()
                     UserStateType.Occupied -> true
                     UserStateType.Reserved,
                     UserStateType.Away,
                     UserStateType.OnBusiness -> {
+                        val storeId = readUri.getQueryParameter(STORE_ID_ARG)
+                        val sectionId = readUri.getQueryParameter(SECTION_ID_ARG)
+                        val seatId = readUri.getQueryParameter(SEAT_ID_ARG)
                         !(cus.seatPosition.storeId == storeId && cus.seatPosition.sectionId == sectionId && cus.seatPosition.seatId == seatId)
                     }
                 }

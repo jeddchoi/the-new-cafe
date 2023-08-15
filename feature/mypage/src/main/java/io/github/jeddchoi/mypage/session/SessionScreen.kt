@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.CircularFilledProgressIndicator
+import io.github.jeddchoi.designsystem.component.card.EnumCard
 import io.github.jeddchoi.designsystem.component.item.DateTimeItem
 import io.github.jeddchoi.designsystem.component.item.DurationItem
 import io.github.jeddchoi.designsystem.component.item.EnumItem
@@ -65,7 +66,7 @@ internal fun SessionScreen(
             val modifierWithMaxWidth = Modifier.fillMaxWidth()
 
 
-            EnumItem(
+            EnumCard(
                 modifier = modifierWithMaxWidth,
                 currentIdx = displayedUserSession.state.ordinal,
                 values = UserStateType.VALUES.map { it.name },
