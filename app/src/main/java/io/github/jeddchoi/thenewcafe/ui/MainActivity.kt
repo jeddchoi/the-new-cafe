@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.net.Uri
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.os.Build
@@ -73,23 +74,6 @@ class MainActivity : ComponentActivity() {
                 ) {
                     navController = rememberNavController()
 
-                    DisposableEffect(Unit) {
-                        val listener = Consumer<Intent> { intent ->
-                            Timber.i("onNewIntent : $intent ${intent.dataString}")
-                            if (intent.action == Intent.ACTION_VIEW && intent.dataString != null) {
-                                Timber.i("onNewIntent -> handleDeepLink $intent")
-                                navController.handleDeepLink(intent)
-                            }
-                            if (intent.action == NfcAdapter.ACTION_NDEF_DISCOVERED) {
-                                Timber.i("onNewIntent -> ACTION_NDEF_DISCOVERED $intent")
-                                performNfcRead(intent)
-                            }
-                        }
-                        addOnNewIntentListener(listener)
-                        onDispose { removeOnNewIntentListener(listener) }
-                    }
-
-
                     RootScreen(
                         networkMonitor = networkMonitor,
                         modifier = maxSizeModifier,
@@ -99,6 +83,9 @@ class MainActivity : ComponentActivity() {
                     val rootViewModel: RootViewModel = hiltViewModel()
                     val redirectToAuth by rootViewModel.redirectToAuth.collectAsStateWithLifecycle()
                     val shouldRunService by rootViewModel.shouldRunService.collectAsStateWithLifecycle()
+                    val navigateToStoreDetail by rootViewModel.navigateToStoreDetail.collectAsStateWithLifecycle()
+                    rootViewModel.arriveOnSeat.collectAsStateWithLifecycle()
+
                     LaunchedEffect(shouldRunService) {
                         if (shouldRunService) {
                             Intent(applicationContext, SessionService::class.java).also {
@@ -113,6 +100,32 @@ class MainActivity : ComponentActivity() {
                             navController.navigateToAuth()
                         }
                     }
+
+
+                    DisposableEffect(Unit) {
+                        val listener = Consumer<Intent> { intent ->
+                            Timber.i("onNewIntent : $intent ${intent.dataString}")
+                            if (intent.action == Intent.ACTION_VIEW && intent.dataString != null) {
+                                Timber.i("onNewIntent -> handleDeepLink $intent")
+                                navController.handleDeepLink(intent)
+                            }
+                            if (intent.action == NfcAdapter.ACTION_NDEF_DISCOVERED) {
+                                Timber.i("onNewIntent -> ACTION_NDEF_DISCOVERED $intent")
+                                performNfcRead(intent) {
+                                    rootViewModel.taggedNfc(it)
+                                }
+                            }
+                        }
+                        addOnNewIntentListener(listener)
+                        onDispose { removeOnNewIntentListener(listener) }
+                    }
+
+
+                    LaunchedEffect(navigateToStoreDetail) {
+                        navigateToStoreDetail?.let {
+                            handleDeepLink(it)
+                        }
+                    }
                 }
             }
         }
@@ -125,7 +138,7 @@ class MainActivity : ComponentActivity() {
 //
 //    }
 
-    private fun performNfcRead(intent: Intent) {
+    private fun performNfcRead(intent: Intent, onRead: (Uri) -> Unit) {
         Timber.v("✅")
         val messages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableArrayExtra(
@@ -139,17 +152,23 @@ class MainActivity : ComponentActivity() {
         }
 
         messages?.first()?.records?.first()?.toUri()?.let {
-            val deepLinkIntent = Intent(
-                Intent.ACTION_VIEW,
-                it,
-                this,
-                MainActivity::class.java
-            )
-            deepLinkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-
-            setIntent(deepLinkIntent)
-            navController.handleDeepLink(deepLinkIntent)
+            onRead(it)
+//            handleDeepLink(it)
         }
+    }
+
+    private fun handleDeepLink(uri: Uri): Boolean {
+        Timber.v("✅")
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            uri,
+            this,
+            MainActivity::class.java
+        )
+        deepLinkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+
+        intent = deepLinkIntent
+        return navController.handleDeepLink(deepLinkIntent)
     }
 }
 

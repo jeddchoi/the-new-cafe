@@ -70,7 +70,7 @@ class SessionService : LifecycleService() {
 
     private val peripheralState = _peripheral.flatMapLatest {
         it?.state ?: flowOf(null)
-    }.onEach { Timber.i("peripheralState == $it") }
+    }.onEach { Timber.v("💥") }
         .stateIn(lifecycleScope, SharingStarted.WhileSubscribed(5000), null)
 
 
@@ -80,7 +80,7 @@ class SessionService : LifecycleService() {
 
     // This would be called multiple times
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Timber.i("✅")
+        Timber.v("✅")
         when (intent?.action) {
             Action.START.name -> {
                 handleBleConnection()
@@ -94,7 +94,7 @@ class SessionService : LifecycleService() {
     }
 
     private fun handleNotification() {
-        Timber.i("handleNotification == ${handleNotificationJob?.isCompleted}")
+        Timber.v("${handleNotificationJob?.isCompleted}")
         if (handleNotificationJob == null || handleNotificationJob?.isCompleted == true) {
             handleNotificationJob = lifecycleScope.launch {
                 userSessionRepository.userSessionWithTimer.collectLatest {
@@ -161,12 +161,12 @@ class SessionService : LifecycleService() {
     }
 
     private fun handleBleConnection() {
-        Timber.i("handleBleConnection == ${handleBleJob?.isCompleted}")
+        Timber.v("${handleBleJob?.isCompleted}")
         if (handleBleJob == null || handleBleJob?.isCompleted == true) {
             handleBleJob = lifecycleScope.launch(Dispatchers.IO) {
                 userSessionRepository.userStateAndUsedSeatPosition.distinctUntilChanged()
                     .collectLatest { userSession ->
-                        Timber.i("💥 $userSession")
+                        Timber.v("💥 $userSession")
                         _userSession.update { userSession }
 
                         if (userSession?.userState == UserStateType.Occupied) {
@@ -180,7 +180,6 @@ class SessionService : LifecycleService() {
                             UserStateAndUsedSeatPosition.None -> {
                                 withTimeoutOrNull(5_000) {
                                     _peripheral.value?.disconnect()
-
                                     stopSelf()
                                 }
                             }
@@ -230,11 +229,9 @@ class SessionService : LifecycleService() {
         bleCoroutineScope: CoroutineScope,
         seatPosition: SeatPosition,
     ) {
+        Timber.v("✅ ${_peripheral.value}")
         if (_peripheral.value == null) {
-            Timber.i("peripheral == null")
             val bleSeat = storeRepository.getBleSeat(seatPosition) ?: throw IllegalStateException()
-            Timber.d("start scan $bleSeat")
-
             val major = bleSeat.major.toInt()
             val minor = bleSeat.minor.toInt()
             val scanner = Scanner {
@@ -258,7 +255,7 @@ class SessionService : LifecycleService() {
                 )
             }
             val adv = scanner.advertisements.first()
-            Timber.i("Advertisement $adv")
+            Timber.d("Advertisement $adv")
 
             _peripheral.update {
                 bleCoroutineScope.peripheral(adv)
@@ -280,7 +277,7 @@ class SessionService : LifecycleService() {
     private fun observeConnectionState(
         coroutineScope: CoroutineScope,
     ) {
-        Timber.i("observeConnectionState ${observeBleStateJob?.isCompleted}")
+        Timber.v("✅ ${observeBleStateJob?.isCompleted}")
         if (observeBleStateJob == null || observeBleStateJob?.isCompleted == true) {
             observeBleStateJob = coroutineScope.launch {
                 peripheralState.collectLatest {
@@ -293,7 +290,6 @@ class SessionService : LifecycleService() {
                         }
 
                         State.Connected -> {
-                            Timber.i("connected when ${_userSession.value}")
                             when (val userSession = _userSession.value) {
                                 null,
                                 UserStateAndUsedSeatPosition.None -> {
@@ -318,7 +314,6 @@ class SessionService : LifecycleService() {
                         }
 
                         is State.Disconnected -> {
-                            Timber.i("disconnected when ${_userSession.value}")
                             when (val userSession = _userSession.value) {
                                 null,
                                 UserStateAndUsedSeatPosition.None -> {
@@ -346,7 +341,7 @@ class SessionService : LifecycleService() {
     }
 
     private fun observePresence() {
-        Timber.i("✅")
+        Timber.v("✅")
         if (!startedObserveConnection) {
             userPresenceRepository.observeUserPresence()
             startedObserveConnection = true

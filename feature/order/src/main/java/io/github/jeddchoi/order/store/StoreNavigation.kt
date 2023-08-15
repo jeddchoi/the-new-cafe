@@ -13,9 +13,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 
-private const val STORE_ID_ARG = "storeId"
-private const val SECTION_ID_ARG = "sectionId"
-private const val SEAT_ID_ARG = "seatId"
+const val STORE_ID_ARG = "storeId"
+const val SECTION_ID_ARG = "sectionId"
+const val SEAT_ID_ARG = "seatId"
 private const val STORE_ROUTE_PATTERN =
     "stores?$STORE_ID_ARG={$STORE_ID_ARG}&$SECTION_ID_ARG={$SECTION_ID_ARG}&$SEAT_ID_ARG={$SEAT_ID_ARG}"
 
