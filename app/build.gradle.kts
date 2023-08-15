@@ -75,6 +75,7 @@ dependencies {
 
 //    implementation(libs.altbeacon)
     implementation(libs.kable)
+    implementation(libs.kotlinx.datetime)
 
     testImplementation(kotlin("test"))
     testImplementation(project(":core:testing"))

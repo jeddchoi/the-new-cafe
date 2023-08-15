@@ -44,6 +44,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @AndroidEntryPoint
 class SessionService : LifecycleService() {
@@ -64,6 +65,7 @@ class SessionService : LifecycleService() {
     private var handleNotificationJob: Job? = null
     private var handleBleJob: Job? = null
     private var observeBleStateJob: Job? = null
+    private var connectBleJob: Job? = null
 
 
     private val _peripheral = MutableStateFlow<Peripheral?>(null)
@@ -187,27 +189,15 @@ class SessionService : LifecycleService() {
                             is UserStateAndUsedSeatPosition.UsingSeat -> {
                                 when (userSession.userState) {
                                     UserStateType.None -> throw IllegalStateException()
-                                    UserStateType.Reserved -> {
-                                        observeConnectionState(this)
-                                        scanAndConnectBleIfDisconnected(
-                                            this,
-                                            userSession.seatPosition
-                                        )
-                                    }
 
-                                    UserStateType.Occupied -> {
-                                        observeConnectionState(this)
-                                        scanAndConnectBleIfDisconnected(
-                                            this,
-                                            userSession.seatPosition
-                                        )
-                                    }
-
+                                    UserStateType.Reserved,
+                                    UserStateType.Occupied,
                                     UserStateType.Away -> {
                                         observeConnectionState(this)
                                         scanAndConnectBleIfDisconnected(
                                             this,
-                                            userSession.seatPosition
+                                            userSession.seatPosition,
+                                            userSession.userState
                                         )
                                     }
 
@@ -225,13 +215,34 @@ class SessionService : LifecycleService() {
     }
 
 
-    private suspend fun scanAndConnectBleIfDisconnected(
+    private fun scanAndConnectBleIfDisconnected(
         bleCoroutineScope: CoroutineScope,
         seatPosition: SeatPosition,
+        currentUserState: UserStateType,
     ) {
         Timber.v("✅ ${_peripheral.value}")
+
+        connectBleJob?.cancel()
+        connectBleJob = bleCoroutineScope.launch {
+            if (currentUserState == UserStateType.Occupied) {
+                withTimeoutOrNull(60.seconds) {
+                    scanAndConnect(seatPosition, bleCoroutineScope)
+                } ?: run {
+                    seatFinderService.leaveAway()
+                }
+            } else {
+                scanAndConnect(seatPosition, bleCoroutineScope)
+            }
+        }
+    }
+
+    private suspend fun scanAndConnect(
+        seatPosition: SeatPosition,
+        bleCoroutineScope: CoroutineScope
+    ) {
         if (_peripheral.value == null) {
-            val bleSeat = storeRepository.getBleSeat(seatPosition) ?: throw IllegalStateException()
+            val bleSeat =
+                storeRepository.getBleSeat(seatPosition) ?: throw IllegalStateException()
             val major = bleSeat.major.toInt()
             val minor = bleSeat.minor.toInt()
             val scanner = Scanner {
@@ -254,89 +265,91 @@ class SessionService : LifecycleService() {
                     ),
                 )
             }
+            Timber.i("Scanning...")
             val adv = scanner.advertisements.first()
-            Timber.d("Advertisement $adv")
+            Timber.i("Found $adv!")
 
             _peripheral.update {
                 bleCoroutineScope.peripheral(adv)
             }
-
         }
+
+
         while (true) {
             try {
-                Timber.i("TRY CONNECTING...")
+                Timber.i("Try connecting...")
                 _peripheral.value?.connect()
+                Timber.i("Connected!")
                 break
             } catch (e: ConnectionLostException) {
                 Timber.e(e)
             }
         }
-        Timber.i("CONNECTED")
     }
 
     private fun observeConnectionState(
         coroutineScope: CoroutineScope,
     ) {
         Timber.v("✅ ${observeBleStateJob?.isCompleted}")
-        if (observeBleStateJob == null || observeBleStateJob?.isCompleted == true) {
-            observeBleStateJob = coroutineScope.launch {
-                peripheralState.collectLatest {
-                    when (it) {
-                        null,
-                        State.Connecting.Bluetooth,
-                        State.Connecting.Observes,
-                        State.Connecting.Services,
-                        State.Disconnecting -> {
-                        }
+        observeBleStateJob?.cancel()
+        observeBleStateJob = coroutineScope.launch {
+            peripheralState.collectLatest {
+                when (it) {
+                    null,
+                    State.Connecting.Bluetooth,
+                    State.Connecting.Observes,
+                    State.Connecting.Services,
+                    is State.Disconnected -> {
+                    }
 
-                        State.Connected -> {
-                            when (val userSession = _userSession.value) {
-                                null,
-                                UserStateAndUsedSeatPosition.None -> {
-                                }
+                    State.Connected -> {
+                        when (val userSession = _userSession.value) {
+                            null,
+                            UserStateAndUsedSeatPosition.None -> {
+                            }
 
-                                is UserStateAndUsedSeatPosition.UsingSeat -> {
-                                    when (userSession.userState) {
-                                        UserStateType.None,
-                                        UserStateType.OnBusiness -> throw IllegalStateException()
+                            is UserStateAndUsedSeatPosition.UsingSeat -> {
+                                when (userSession.userState) {
+                                    UserStateType.None,
+                                    UserStateType.OnBusiness -> throw IllegalStateException()
 
-                                        UserStateType.Reserved -> {
-                                            seatFinderService.occupySeat()
-                                        }
+                                    UserStateType.Reserved -> {
+                                        seatFinderService.occupySeat()
+                                    }
 
-                                        UserStateType.Occupied -> {}
-                                        UserStateType.Away -> {
-                                            seatFinderService.resumeUsing()
-                                        }
+                                    UserStateType.Occupied -> {}
+                                    UserStateType.Away -> {
+                                        seatFinderService.resumeUsing()
                                     }
                                 }
                             }
                         }
+                    }
 
-                        is State.Disconnected -> {
-                            when (val userSession = _userSession.value) {
-                                null,
-                                UserStateAndUsedSeatPosition.None -> {
-                                }
+                    State.Disconnecting -> {
+                        when (val userSession = _userSession.value) {
+                            null,
+                            UserStateAndUsedSeatPosition.None -> {
+                            }
 
-                                is UserStateAndUsedSeatPosition.UsingSeat -> {
-                                    when (userSession.userState) {
-                                        UserStateType.None -> throw IllegalStateException()
+                            is UserStateAndUsedSeatPosition.UsingSeat -> {
+                                when (userSession.userState) {
+                                    UserStateType.None -> throw IllegalStateException()
 
-                                        UserStateType.Reserved -> {}
-                                        UserStateType.Occupied -> {
-                                            seatFinderService.leaveAway()
-                                        }
-
-                                        UserStateType.Away -> {}
-                                        UserStateType.OnBusiness -> {}
+                                    UserStateType.Reserved -> {}
+                                    UserStateType.Occupied -> {
+                                        seatFinderService.leaveAway()
                                     }
+
+                                    UserStateType.Away -> {}
+                                    UserStateType.OnBusiness -> {}
                                 }
                             }
                         }
                     }
                 }
             }
+
         }
     }
 
