@@ -218,6 +218,7 @@ fun SessionScreenPreview() {
         Surface {
             SessionScreen(
                 displayedUserSession = DisplayedUserSession.UsingSeat(
+                    sessionId = "",
                     SessionTimer(
                         startTime = Clock.System.now().minus(10.minutes),
                         endTime = Clock.System.now().plus(10.minutes),

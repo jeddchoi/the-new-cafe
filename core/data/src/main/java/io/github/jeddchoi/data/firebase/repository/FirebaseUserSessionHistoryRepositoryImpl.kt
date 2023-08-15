@@ -1,5 +1,6 @@
 package io.github.jeddchoi.data.firebase.repository
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -31,8 +32,8 @@ class FirebaseUserSessionHistoryRepositoryImpl(
             if (it != null) {
                 Pager(
                     config = config,
-                    pagingSourceFactory = { UserSessionHistoryPagingSource(it) }
-                        ).flow
+                    pagingSourceFactory = { UserSessionHistoryPagingSource(it) },
+                ).flow
             } else {
                 flowOf(PagingData.empty())
             }
@@ -43,28 +44,20 @@ class FirebaseUserSessionHistoryRepositoryImpl(
 class UserSessionHistoryPagingSource(
     private val currentUserId: String,
 ) : PagingSource<DataSnapshot, UserSessionHistory>() {
-    override fun getRefreshKey(state: PagingState<DataSnapshot, UserSessionHistory>): DataSnapshot? =
-        state.anchorPosition?.let { anchorPosition ->
-            val anchorPageIndex = state.pages.indexOf(state.closestPageToPosition(anchorPosition))
-            state.pages.getOrNull(anchorPageIndex + 1)?.prevKey ?: state.pages.getOrNull(anchorPageIndex - 1)?.nextKey
-        }
+
+    override fun getRefreshKey(state: PagingState<DataSnapshot, UserSessionHistory>): DataSnapshot? =null
 
     override suspend fun load(params: LoadParams<DataSnapshot>): LoadResult<DataSnapshot, UserSessionHistory> {
         try {
             Timber.v("✅ ${params.key}")
-            val queryUserSessionHistoryNames =
-                Firebase.database.reference.child("seatFinder/$currentUserId/history").orderByKey()
-                    .limitToFirst(20)
-            val currentPage = params.key ?: queryUserSessionHistoryNames.get().await()
-            val lastVisibleUserSessionHistoryKey =
-                currentPage.children.lastOrNull()?.key ?: return LoadResult.Page(
-                    emptyList(),
-                    null,
-                    null
-                )
-            val nextPage =
-                queryUserSessionHistoryNames.startAfter(lastVisibleUserSessionHistoryKey).get()
-                    .await()
+
+            val queryUserSessionHistories = Firebase.database.reference.child("seatFinder/$currentUserId/history").orderByKey()
+            val currentPage = params.key ?: queryUserSessionHistories.limitToLast(PAGE_SIZE).get().await()
+            val firstVisibleUserSessionHistoryKey = currentPage.children.firstOrNull()?.key
+
+            val prevPage = queryUserSessionHistories.endBefore(firstVisibleUserSessionHistoryKey).limitToLast(
+                PAGE_SIZE).get().await()
+
 
             val products = currentPage.children.mapNotNull { snapshot ->
                 snapshot.key?.let {
@@ -74,11 +67,15 @@ class UserSessionHistoryPagingSource(
             }
             return LoadResult.Page(
                 data = products,
-                prevKey = null,
-                nextKey = nextPage
+                prevKey = prevPage,
+                nextKey = null,
             )
         } catch (e: Exception) {
             return LoadResult.Error(e)
         }
+    }
+
+    companion object {
+        const val PAGE_SIZE = 10
     }
 }

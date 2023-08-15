@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import androidx.paging.compose.collectAsLazyPagingItems
 
 
 /**
@@ -89,14 +90,17 @@ fun NavGraphBuilder.myPageScreen(
     ) { backStackEntry ->
         val viewModel: MyPageViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val pagingHistories = viewModel.histories.collectAsLazyPagingItems()
+
         val myPageTabArg = backStackEntry.arguments?.getString(MyPageTabArg)?.uppercase() ?: MyPageTab.SESSION.name
 
         var selectedTab by rememberSaveable(myPageTabArg) {
             mutableStateOf(MyPageTab.valueOf(myPageTabArg))
         }
         MyPageScreen(
-            selectedTab = selectedTab,
             uiState = uiState,
+            pagingHistories= pagingHistories,
+            selectedTab = selectedTab,
             selectTab = {
                 selectedTab = it
             },

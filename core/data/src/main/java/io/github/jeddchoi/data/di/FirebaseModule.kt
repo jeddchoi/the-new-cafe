@@ -1,6 +1,5 @@
 package io.github.jeddchoi.data.di
 
-import android.nfc.tech.MifareUltralight.PAGE_SIZE
 import androidx.paging.PagingConfig
 import dagger.Binds
 import dagger.Module
@@ -15,6 +14,7 @@ import io.github.jeddchoi.data.firebase.repository.FirebaseUserProfileRepository
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionHistoryDetailRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionHistoryRepositoryImpl
 import io.github.jeddchoi.data.firebase.repository.FirebaseUserSessionRepositoryImpl
+import io.github.jeddchoi.data.firebase.repository.UserSessionHistoryPagingSource.Companion.PAGE_SIZE
 import io.github.jeddchoi.data.firebase.service.FirebaseSeatFinderServiceImpl
 import io.github.jeddchoi.data.repository.AuthRepository
 import io.github.jeddchoi.data.repository.CurrentUserRepository

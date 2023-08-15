@@ -36,6 +36,7 @@ sealed interface DisplayedUserSession {
      *
      */
     data class UsingSeat(
+        val sessionId: String,
         val sessionTimer: SessionTimer,
         val currentStateTimer: SessionTimer,
         val hasFailure: Boolean,
@@ -76,6 +77,7 @@ fun UserSession.toDisplayedUserSession(current: Instant): DisplayedUserSession {
                 UserStateType.Occupied,
                 UserStateType.Away,
                 UserStateType.OnBusiness -> DisplayedUserSession.UsingSeat(
+                    sessionId = sessionId,
                     sessionTimer = sessionTimer,
                     currentStateTimer = currentStateTimer,
                     hasFailure = hasFailure,
