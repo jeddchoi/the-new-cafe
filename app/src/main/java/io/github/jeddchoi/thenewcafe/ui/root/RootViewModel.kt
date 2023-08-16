@@ -13,12 +13,15 @@ import io.github.jeddchoi.order.store.SEAT_ID_ARG
 import io.github.jeddchoi.order.store.SECTION_ID_ARG
 import io.github.jeddchoi.order.store.STORE_ID_ARG
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -30,6 +33,14 @@ class RootViewModel @Inject constructor(
     private val seatFinderService: SeatFinderService,
 ) : ViewModel() {
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading = _isLoading.asStateFlow()
+
+
+    fun initialize() {
+        Timber.v("✅")
+        _isLoading.update { false }
+    }
 
     val redirectToAuth: StateFlow<Boolean> = appFlagsRepository.getShowMainScreenOnStart
         .map { it.not() }

@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -31,7 +30,6 @@ import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.thenewcafe.service.SessionService
-import io.github.jeddchoi.thenewcafe.splash.SplashViewModel
 import io.github.jeddchoi.thenewcafe.ui.root.RootScreen
 import io.github.jeddchoi.thenewcafe.ui.root.RootViewModel
 import timber.log.Timber
@@ -45,7 +43,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: SplashViewModel by viewModels()
+    private val viewModel: RootViewModel by viewModels()
 
     @Inject
     lateinit var networkMonitor: NetworkMonitor
@@ -63,7 +61,6 @@ class MainActivity : ComponentActivity() {
                 viewModel.isLoading.value
             }
         }
-        Timber.i("savedInstanceState : ${savedInstanceState?.keySet()?.joinToString("\n")} \n\n$savedInstanceState")
 
         val maxSizeModifier = Modifier.fillMaxSize()
 
@@ -81,11 +78,10 @@ class MainActivity : ComponentActivity() {
                         navController = navController
                     )
 
-                    val rootViewModel: RootViewModel = hiltViewModel()
-                    val redirectToAuth by rootViewModel.redirectToAuth.collectAsStateWithLifecycle()
-                    val shouldRunService by rootViewModel.shouldRunService.collectAsStateWithLifecycle()
-                    val navigateToStoreDetail by rootViewModel.navigateToStoreDetail.collectAsStateWithLifecycle()
-                    rootViewModel.arriveOnSeat.collectAsStateWithLifecycle()
+                    val redirectToAuth by viewModel.redirectToAuth.collectAsStateWithLifecycle()
+                    val shouldRunService by viewModel.shouldRunService.collectAsStateWithLifecycle()
+                    val navigateToStoreDetail by viewModel.navigateToStoreDetail.collectAsStateWithLifecycle()
+                    viewModel.arriveOnSeat.collectAsStateWithLifecycle()
 
                     LaunchedEffect(shouldRunService) {
                         if (shouldRunService) {
@@ -113,7 +109,7 @@ class MainActivity : ComponentActivity() {
                             if (intent.action == NfcAdapter.ACTION_NDEF_DISCOVERED) {
                                 Timber.i("onNewIntent -> ACTION_NDEF_DISCOVERED $intent")
                                 performNfcRead(intent) {
-                                    rootViewModel.taggedNfc(it)
+                                    viewModel.taggedNfc(it)
                                 }
                             }
                         }
@@ -126,11 +122,15 @@ class MainActivity : ComponentActivity() {
                         navigateToStoreDetail?.let {
                             handleDeepLink(it)
                         }
-                        rootViewModel.handledNfcReadUri()
+                        viewModel.handledNfcReadUri()
                     }
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
         viewModel.initialize()
     }
 
