@@ -1,12 +1,16 @@
 package io.github.jeddchoi.thenewcafe.ui
 
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
+import android.nfc.tech.Ndef
+import android.nfc.tech.NdefFormatable
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -50,6 +54,11 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
 
+    private lateinit var adapter: NfcAdapter
+    private lateinit var pendingIntent: PendingIntent
+    private lateinit var intentFiltersArray: Array<IntentFilter>
+    private lateinit var techListsArray: Array<Array<String>>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +70,8 @@ class MainActivity : ComponentActivity() {
                 viewModel.isLoading.value
             }
         }
+
+        prepareNfcReadIntent()
 
         val maxSizeModifier = Modifier.fillMaxSize()
 
@@ -97,7 +108,12 @@ class MainActivity : ComponentActivity() {
                             navController.navigateToAuth()
                         }
                     }
-
+                    LaunchedEffect(navigateToStoreDetail) {
+                        navigateToStoreDetail?.let {
+                            handleDeepLink(it)
+                        }
+                        viewModel.handledNfcReadUri()
+                    }
 
                     DisposableEffect(Unit) {
                         val listener = Consumer<Intent> { intent ->
@@ -116,14 +132,6 @@ class MainActivity : ComponentActivity() {
                         addOnNewIntentListener(listener)
                         onDispose { removeOnNewIntentListener(listener) }
                     }
-
-
-                    LaunchedEffect(navigateToStoreDetail) {
-                        navigateToStoreDetail?.let {
-                            handleDeepLink(it)
-                        }
-                        viewModel.handledNfcReadUri()
-                    }
                 }
             }
         }
@@ -132,6 +140,36 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.initialize()
+        adapter.enableForegroundDispatch(this, pendingIntent, intentFiltersArray, techListsArray)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        adapter.disableForegroundDispatch(this)
+    }
+
+    private fun prepareNfcReadIntent() {
+        adapter = NfcAdapter.getDefaultAdapter(this)
+
+        val intent = Intent(this, javaClass).apply {
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
+        pendingIntent = PendingIntent.getActivity(
+            this, 0, intent,
+            PendingIntent.FLAG_MUTABLE
+        )
+
+        val ndef = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
+            try {
+                addDataScheme("jeddchoi")
+                addDataAuthority("thenewcafe", null)
+            } catch (e: IntentFilter.MalformedMimeTypeException) {
+                throw RuntimeException("fail", e)
+            }
+        }
+
+        intentFiltersArray = arrayOf(ndef)
+        techListsArray = arrayOf(arrayOf(Ndef::class.java.name, NdefFormatable::class.java.name))
     }
 
     private fun performNfcRead(intent: Intent, onRead: (Uri) -> Unit) {
