@@ -63,6 +63,7 @@ class MainActivity : ComponentActivity() {
                 viewModel.isLoading.value
             }
         }
+        Timber.i("savedInstanceState : ${savedInstanceState?.keySet()?.joinToString("\n")} \n\n$savedInstanceState")
 
         val maxSizeModifier = Modifier.fillMaxSize()
 
@@ -125,18 +126,13 @@ class MainActivity : ComponentActivity() {
                         navigateToStoreDetail?.let {
                             handleDeepLink(it)
                         }
+                        rootViewModel.handledNfcReadUri()
                     }
                 }
             }
         }
         viewModel.initialize()
     }
-
-//    override fun onNewIntent(intent: Intent) {
-//        super.onNewIntent(intent)
-//
-//
-//    }
 
     private fun performNfcRead(intent: Intent, onRead: (Uri) -> Unit) {
         Timber.v("✅")
@@ -153,7 +149,6 @@ class MainActivity : ComponentActivity() {
 
         messages?.first()?.records?.first()?.toUri()?.let {
             onRead(it)
-//            handleDeepLink(it)
         }
     }
 

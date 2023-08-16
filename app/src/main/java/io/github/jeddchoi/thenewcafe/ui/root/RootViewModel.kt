@@ -12,7 +12,6 @@ import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.order.store.SEAT_ID_ARG
 import io.github.jeddchoi.order.store.SECTION_ID_ARG
 import io.github.jeddchoi.order.store.STORE_ID_ARG
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -60,16 +59,21 @@ class RootViewModel @Inject constructor(
             )
 
     private var _nfcReadUri =
-        MutableSharedFlow<Uri?>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+        MutableSharedFlow<Uri?>(replay = 0)
 
     fun taggedNfc(uri: Uri) {
         Timber.i("✅")
         viewModelScope.launch {
-            _nfcReadUri.tryEmit(uri)
+            _nfcReadUri.emit(uri)
         }
     }
 
-    val navigateToStoreDetail = _nfcReadUri.onEach { Timber.v("💥") }.map { readUri ->
+    fun handledNfcReadUri() {
+        viewModelScope.launch {
+            _nfcReadUri.emit(null)
+        }
+    }
+    val navigateToStoreDetail = _nfcReadUri.onEach { Timber.v("💥 $it") }.map { readUri ->
         if (readUri == null) return@map null
 
         val needToNavigate = when (val cus = currentUserSession.value) {
@@ -104,7 +108,7 @@ class RootViewModel @Inject constructor(
 
 
     val arriveOnSeat = _nfcReadUri.onEach {readUri ->
-        Timber.i("💥")
+        Timber.i("💥 $readUri")
         if (readUri == null) return@onEach
         val storeId = readUri.getQueryParameter(STORE_ID_ARG)
         val sectionId = readUri.getQueryParameter(SECTION_ID_ARG)
