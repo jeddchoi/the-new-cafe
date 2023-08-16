@@ -14,6 +14,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -71,7 +72,7 @@ internal fun MyPageScreen(
 
         MyPageWithBottomSheet(
             uiState = uiState,
-            pagingHistories= pagingHistories,
+            pagingHistories = pagingHistories,
             selectedTab = selectedTab,
             selectTab = selectTab,
             sendRequest = sendRequest,
@@ -118,9 +119,7 @@ private fun MyPageWithBottomSheet(
     pagingHistories: LazyPagingItems<UserSessionHistory>,
     modifier: Modifier = Modifier,
     selectedTab: MyPageTab = MyPageTab.SESSION,
-    bottomSheetScaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        rememberStandardBottomSheetState(skipHiddenState = true)
-    ),
+
     selectTab: (MyPageTab) -> Unit = {},
     sendRequest: (SeatFinderUserRequestType, Int?, Long?) -> Unit = { _, _, _ -> },
     navigateToHistoryDetail: (String) -> Unit = {},
@@ -142,6 +141,13 @@ private fun MyPageWithBottomSheet(
         }
 
         is MyPageUiState.Success -> {
+            val bottomSheetScaffoldState: BottomSheetScaffoldState =
+                rememberBottomSheetScaffoldState(
+                    rememberStandardBottomSheetState(
+                        skipHiddenState = false,
+                        initialValue = if (uiState.displayedUserSession is DisplayedUserSession.UsingSeat) SheetValue.PartiallyExpanded else SheetValue.Hidden
+                    )
+                )
             BottomSheetScaffold(
                 modifier = modifier,
                 scaffoldState = bottomSheetScaffoldState,
@@ -160,12 +166,19 @@ private fun MyPageWithBottomSheet(
             ) { _ ->
                 MyPageWithPager(
                     displayedUserSession = uiState.displayedUserSession,
-                    pagingHistories= pagingHistories,
+                    pagingHistories = pagingHistories,
                     modifier = Modifier.fillMaxSize(),
                     selectedTab = selectedTab,
                     selectTab = selectTab,
                     navigateToHistoryDetail = navigateToHistoryDetail,
                 )
+            }
+            LaunchedEffect(uiState.displayedUserSession.state) {
+                if (uiState.displayedUserSession is DisplayedUserSession.UsingSeat && !bottomSheetScaffoldState.bottomSheetState.isVisible) {
+                    bottomSheetScaffoldState.bottomSheetState.show()
+                } else if (uiState.displayedUserSession !is DisplayedUserSession.UsingSeat && bottomSheetScaffoldState.bottomSheetState.isVisible) {
+                    bottomSheetScaffoldState.bottomSheetState.hide()
+                }
             }
         }
 
