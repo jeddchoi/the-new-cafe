@@ -37,11 +37,11 @@ import io.github.jeddchoi.common.UiText
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
 import io.github.jeddchoi.designsystem.component.BottomButton
 import io.github.jeddchoi.designsystem.component.SegmentedControl
+import io.github.jeddchoi.model.DisplayedUserSession
 import io.github.jeddchoi.model.SeatFinderUserRequestType
 import io.github.jeddchoi.model.SeatPosition
-import io.github.jeddchoi.model.UserStateType
-import io.github.jeddchoi.model.DisplayedUserSession
 import io.github.jeddchoi.model.SessionTimer
+import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.ui.component.ComponentWithBottomButtons
 import java.time.Instant
 import java.time.LocalDateTime
@@ -254,6 +254,7 @@ private fun ControlPanelPreview() {
             ) {
                 ControlPanel(
                     DisplayedUserSession.UsingSeat(
+                        "",
                         SessionTimer(),
                         SessionTimer(),
                         hasFailure = false,

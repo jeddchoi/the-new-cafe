@@ -20,7 +20,7 @@ class FirebaseUserPresenceRepositoryImpl @Inject constructor(
     private var listener: com.google.firebase.database.ValueEventListener? = null
 
     override fun observeUserPresence() {
-        Timber.i("✅")
+        Timber.v("✅")
         val currentUserId = currentUserRepository.getUserId() ?: return
         val disconnectedOnOccupiedDatabaseRef =
             database.getReference("seatFinder/${currentUserId}/session/disconnectedOnOccupied")
@@ -59,7 +59,7 @@ class FirebaseUserPresenceRepositoryImpl @Inject constructor(
     }
 
     override fun stopObserveUserPresence() {
-        Timber.i("✅")
+        Timber.v("✅")
         val currentUserId = currentUserRepository.getUserId() ?: return
         val disconnectedOnOccupiedDatabaseRef =
             database.getReference("seatFinder/${currentUserId}/session/disconnectedOnOccupied")

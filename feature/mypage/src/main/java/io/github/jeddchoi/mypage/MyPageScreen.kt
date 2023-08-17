@@ -14,6 +14,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -22,7 +23,6 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -31,17 +31,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import io.github.jeddchoi.model.SeatFinderUserRequestType
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.model.DisplayedUserSession
+import io.github.jeddchoi.model.SeatFinderUserRequestType
 import io.github.jeddchoi.model.SeatPosition
+import io.github.jeddchoi.model.SessionTimer
+import io.github.jeddchoi.model.UserSessionHistory
 import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.mypage.history.HistoryScreen
-import io.github.jeddchoi.mypage.history.HistoryViewModel
-import io.github.jeddchoi.model.DisplayedUserSession
 import io.github.jeddchoi.mypage.session.SessionScreen
-import io.github.jeddchoi.model.SessionTimer
 import io.github.jeddchoi.ui.fullscreen.ErrorScreen
 import io.github.jeddchoi.ui.fullscreen.LoadingScreen
 import io.github.jeddchoi.ui.fullscreen.NotAuthenticatedScreen
@@ -53,6 +53,7 @@ import timber.log.Timber
 @Composable
 internal fun MyPageScreen(
     uiState: MyPageUiState,
+    pagingHistories: LazyPagingItems<UserSessionHistory>,
     modifier: Modifier = Modifier,
     selectedTab: MyPageTab = MyPageTab.SESSION,
     selectTab: (MyPageTab) -> Unit = {},
@@ -71,6 +72,7 @@ internal fun MyPageScreen(
 
         MyPageWithBottomSheet(
             uiState = uiState,
+            pagingHistories = pagingHistories,
             selectedTab = selectedTab,
             selectTab = selectTab,
             sendRequest = sendRequest,
@@ -114,11 +116,10 @@ private fun MyPageTabRow(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 private fun MyPageWithBottomSheet(
     uiState: MyPageUiState,
+    pagingHistories: LazyPagingItems<UserSessionHistory>,
     modifier: Modifier = Modifier,
     selectedTab: MyPageTab = MyPageTab.SESSION,
-    bottomSheetScaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-        rememberStandardBottomSheetState(skipHiddenState = true)
-    ),
+
     selectTab: (MyPageTab) -> Unit = {},
     sendRequest: (SeatFinderUserRequestType, Int?, Long?) -> Unit = { _, _, _ -> },
     navigateToHistoryDetail: (String) -> Unit = {},
@@ -140,6 +141,13 @@ private fun MyPageWithBottomSheet(
         }
 
         is MyPageUiState.Success -> {
+            val bottomSheetScaffoldState: BottomSheetScaffoldState =
+                rememberBottomSheetScaffoldState(
+                    rememberStandardBottomSheetState(
+                        skipHiddenState = false,
+                        initialValue = if (uiState.displayedUserSession is DisplayedUserSession.UsingSeat) SheetValue.PartiallyExpanded else SheetValue.Hidden
+                    )
+                )
             BottomSheetScaffold(
                 modifier = modifier,
                 scaffoldState = bottomSheetScaffoldState,
@@ -158,11 +166,19 @@ private fun MyPageWithBottomSheet(
             ) { _ ->
                 MyPageWithPager(
                     displayedUserSession = uiState.displayedUserSession,
+                    pagingHistories = pagingHistories,
                     modifier = Modifier.fillMaxSize(),
                     selectedTab = selectedTab,
                     selectTab = selectTab,
                     navigateToHistoryDetail = navigateToHistoryDetail,
                 )
+            }
+            LaunchedEffect(uiState.displayedUserSession.state) {
+                if (uiState.displayedUserSession is DisplayedUserSession.UsingSeat && !bottomSheetScaffoldState.bottomSheetState.isVisible) {
+                    bottomSheetScaffoldState.bottomSheetState.show()
+                } else if (uiState.displayedUserSession !is DisplayedUserSession.UsingSeat && bottomSheetScaffoldState.bottomSheetState.isVisible) {
+                    bottomSheetScaffoldState.bottomSheetState.hide()
+                }
             }
         }
 
@@ -179,6 +195,7 @@ private fun MyPageWithBottomSheet(
 @OptIn(ExperimentalFoundationApi::class)
 private fun MyPageWithPager(
     displayedUserSession: DisplayedUserSession,
+    pagingHistories: LazyPagingItems<UserSessionHistory>,
     modifier: Modifier = Modifier,
     selectedTab: MyPageTab = MyPageTab.SESSION,
     pagerState: PagerState = rememberPagerState(
@@ -202,6 +219,7 @@ private fun MyPageWithPager(
         }
     }
 
+
     HorizontalPager(
         modifier = modifier,
         state = pagerState,
@@ -216,14 +234,11 @@ private fun MyPageWithPager(
             }
 
             MyPageTab.HISTORY -> {
-                val viewModel: HistoryViewModel = hiltViewModel()
-                val pagingHistories = viewModel.histories.collectAsLazyPagingItems()
-                val currentSession by viewModel.currentSession.collectAsStateWithLifecycle(null)
                 HistoryScreen(
                     modifier = Modifier.fillMaxSize(),
                     pagingHistories = pagingHistories,
                     navigateToHistoryDetail = navigateToHistoryDetail,
-                    currentSession = currentSession
+                    currentSession = displayedUserSession
                 )
             }
         }
@@ -242,9 +257,12 @@ private fun MyPageWithPager(
 private fun MyPagePreview() {
     TheNewCafeTheme {
         Surface {
+            val viewModel: MyPageViewModel = hiltViewModel()
+            val pagingHistories = viewModel.histories.collectAsLazyPagingItems()
             MyPageScreen(
                 uiState = MyPageUiState.Success(
                     displayedUserSession = DisplayedUserSession.UsingSeat(
+                        "",
                         SessionTimer(),
                         SessionTimer(),
                         hasFailure = false,
@@ -252,7 +270,8 @@ private fun MyPagePreview() {
                         resultStateAfterCurrentState = null,
                         state = UserStateType.Occupied
                     )
-                )
+                ),
+                pagingHistories = pagingHistories
             )
         }
     }

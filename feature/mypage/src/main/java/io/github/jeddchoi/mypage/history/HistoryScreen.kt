@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import io.github.jeddchoi.common.UiText
+import io.github.jeddchoi.model.DisplayedUserSession
 import io.github.jeddchoi.model.SeatPosition
-import io.github.jeddchoi.model.UserSession
 import io.github.jeddchoi.model.UserSessionHistory
 import io.github.jeddchoi.mypage.R
 import io.github.jeddchoi.ui.fullscreen.EmptyResultScreen
@@ -30,21 +30,20 @@ import timber.log.Timber
 @Composable
 internal fun HistoryScreen(
     pagingHistories: LazyPagingItems<UserSessionHistory>,
-    currentSession: UserSession?,
+    currentSession: DisplayedUserSession?,
     modifier: Modifier = Modifier,
     navigateToHistoryDetail: (String) -> Unit = {},
 ) {
     val refresh = pagingHistories.loadState.refresh
-    val append = pagingHistories.loadState.append
+    val prepend = pagingHistories.loadState.prepend
 
-
-    LaunchedEffect(currentSession) {
+    LaunchedEffect(currentSession?.state) {
         currentSession?.let {
             pagingHistories.refresh()
         }
     }
 
-    if (pagingHistories.itemCount == 0 && (currentSession == null || currentSession == UserSession.None) ) {
+    if (pagingHistories.itemCount == 0 && (currentSession == null || currentSession == DisplayedUserSession.None) ) {
         EmptyResultScreen(
             subject = UiText.StringResource(R.string.user_session_history),
             modifier = modifier,
@@ -54,36 +53,26 @@ internal fun HistoryScreen(
             modifier = modifier,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-
-
-            when (currentSession) {
-                null,
-                UserSession.None -> {
-
-                }
-
-                is UserSession.UsingSeat -> {
-                    item {
-                        UserSessionHistoryCard(
-                            startTime = currentSession.startTime,
-                            endTime = currentSession.endTime,
-                            seatPosition = currentSession.seatPosition,
-                            sessionId = currentSession.sessionId,
-                            hasFailure = currentSession.hasFailure,
-                            normalContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            modifier = Modifier
-                                .clickable {
-                                    navigateToHistoryDetail(currentSession.sessionId)
-                                }
-                                .fillMaxWidth()
-                        )
-                    }
+            if (currentSession is DisplayedUserSession.UsingSeat) {
+                item {
+                    UserSessionHistoryCard(
+                        startTime = currentSession.sessionTimer.startTime,
+                        endTime = currentSession.sessionTimer.endTime,
+                        seatPosition = currentSession.seatPosition,
+                        sessionId = currentSession.sessionId,
+                        hasFailure = currentSession.hasFailure,
+                        normalContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        modifier = Modifier
+                            .clickable {
+                                navigateToHistoryDetail(currentSession.sessionId)
+                            }
+                            .fillMaxWidth()
+                    )
                 }
             }
 
-            items(pagingHistories.itemCount) { item ->
-
-                pagingHistories[pagingHistories.itemCount - item - 1]?.let { history ->
+            items(pagingHistories.itemCount) { itemIndex ->
+                pagingHistories[pagingHistories.itemCount - itemIndex - 1]?.let { history ->
                     UserSessionHistoryCard(
                         startTime = history.startTime,
                         endTime = history.endTime,
@@ -102,10 +91,10 @@ internal fun HistoryScreen(
             pagingHistories.loadState.apply {
                 when {
                     refresh is LoadState.Loading -> item { CircularProgressIndicator() }
-                    append is LoadState.Loading -> item { CircularProgressIndicator() }
+                    prepend is LoadState.Loading -> item { CircularProgressIndicator() }
 
                     refresh is LoadState.Error -> Timber.e(refresh.error)
-                    append is LoadState.Error -> Timber.e(append.error)
+                    prepend is LoadState.Error -> Timber.e(prepend.error)
                 }
             }
 

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
@@ -33,6 +34,7 @@ import io.github.jeddchoi.designsystem.component.BottomButton
 import io.github.jeddchoi.designsystem.textColor
 import io.github.jeddchoi.model.Store
 import io.github.jeddchoi.model.UserStateAndUsedSeatPosition
+import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.order.R
 import io.github.jeddchoi.ui.component.ComponentWithBottomButtons
 import io.github.jeddchoi.ui.component.ScreenWithTopAppBar
@@ -76,11 +78,12 @@ internal fun StoreScreen(
         StoreUiState.NotFound -> EmptyResultScreen(
             subject = UiText.StringResource(R.string.store),
             modifier = modifier
-        ) // TODO: Not Found
+        )
+
         is StoreUiState.Success -> {
-            var buttonText: UiText = UiText.DynamicString("Not resolved")
-            var enabled = false
-            var onClick = {}
+            var buttonText: UiText
+            var enabled: Boolean
+            var onClick: () -> Unit
             // not signed in
             if (uiState.userStateAndUsedSeatPosition == null) {
                 buttonText = UiText.StringResource(R.string.sign_in_before_reservation)
@@ -101,7 +104,7 @@ internal fun StoreScreen(
                 } else { // in session
                     enabled = true
                     if (uiState.selectedUsedSeat == false) { // selected different seat
-                        buttonText = UiText.StringResource(R.string.quit_and_reserve)
+                        buttonText = UiText.StringResource(R.string.change_seat)
                         onClick = {
                             if (servicePermissionState.allPermissionsGranted.not()) {
                                 servicePermissionState.launchMultiplePermissionRequest()
@@ -110,7 +113,16 @@ internal fun StoreScreen(
                             }
                         }
                     } else { // not selected or selected same seat used
-                        buttonText = UiText.StringResource(R.string.cancel_reservation)
+                        buttonText = when (uiState.userStateAndUsedSeatPosition.userState) {
+                            UserStateType.Reserved -> {
+                                UiText.StringResource(R.string.cancel_reservation)
+                            }
+
+                            else -> {
+                                UiText.StringResource(io.github.jeddchoi.data.R.string.quit)
+                            }
+                        }
+
                         onClick = quit
                     }
                 }
@@ -236,7 +248,9 @@ private fun SectionWithSeatsScreen(
                 }
             }
         ) {
+            val lazyListState = rememberLazyListState()
             LazyColumn(
+                state = lazyListState,
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .fillMaxSize(),
@@ -246,7 +260,7 @@ private fun SectionWithSeatsScreen(
                     StoreInfoCard(store = store)
                 }
 
-                sectionsWithSeats.sortedBy { it.section.name }.forEach { sectionWithSeats ->
+                sectionsWithSeats.forEach { sectionWithSeats ->
                     item {
                         Divider()
                     }
@@ -257,7 +271,6 @@ private fun SectionWithSeatsScreen(
                         onSelect = onSelect
                     )
                 }
-
 
                 item {
                     Spacer(modifier = Modifier.height(200.dp))

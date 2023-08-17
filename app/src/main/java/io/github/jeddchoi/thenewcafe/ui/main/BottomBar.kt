@@ -53,12 +53,11 @@ fun BottomBar(
                         MainBottomNav.Profile -> navController.navigateToProfile(navOptions)
                     }
                 },
-                icon = {
-                    if (selected) {
-                        destination.selectedIcon.ToComposable()
-                    } else {
-                        destination.unselectedIcon.ToComposable()
-                    }
+                selectedIcon = {
+                    destination.selectedIcon.ToComposable()
+                },
+                unselectedIcon = {
+                    destination.unselectedIcon.ToComposable()
                 },
                 label = { Text(stringResource(destination.titleId)) },
             )

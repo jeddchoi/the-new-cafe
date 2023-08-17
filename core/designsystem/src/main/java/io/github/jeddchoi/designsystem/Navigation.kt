@@ -28,9 +28,9 @@ fun CafeNavigationBar(
 fun RowScope.CafeNavigationBarItem(
     selected: Boolean,
     onClick: () -> Unit,
-    icon: @Composable () -> Unit,
+    selectedIcon: @Composable () -> Unit,
+    unselectedIcon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    selectedIcon: @Composable () -> Unit = icon,
     enabled: Boolean = true,
     label: @Composable (() -> Unit)? = null,
     alwaysShowLabel: Boolean = true,
@@ -38,7 +38,7 @@ fun RowScope.CafeNavigationBarItem(
     NavigationBarItem(
         selected = selected,
         onClick = onClick,
-        icon = if (selected) selectedIcon else icon,
+        icon = if (selected) selectedIcon else unselectedIcon,
         modifier = modifier,
         enabled = enabled,
         label = label,

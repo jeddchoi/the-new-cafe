@@ -3,11 +3,13 @@ package io.github.jeddchoi.mypage
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.common.Action
 import io.github.jeddchoi.common.Message
 import io.github.jeddchoi.common.OneShotFeedbackUiState
 import io.github.jeddchoi.common.toErrorMessage
+import io.github.jeddchoi.data.repository.UserSessionHistoryRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import io.github.jeddchoi.data.service.seatfinder.toMessage
@@ -30,11 +32,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class MyPageViewModel @Inject constructor(
+    private val userSessionHistoryRepository: UserSessionHistoryRepository,
     private val sessionRepository: UserSessionRepository,
     private val seatFinderService: SeatFinderService,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
 
     private val oneShotActionState = MutableStateFlow(OneShotActionState())
     val uiState: StateFlow<MyPageUiState> =
@@ -53,6 +55,9 @@ internal class MyPageViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5_000),
             MyPageUiState.InitialLoading,
         )
+
+    val histories = userSessionHistoryRepository.getHistories()
+        .cachedIn(viewModelScope).onEach { Timber.v("💥 $it") }
 
 
     fun sendRequest(

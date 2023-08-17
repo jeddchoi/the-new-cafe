@@ -39,9 +39,6 @@ internal class StoreViewModel @Inject constructor(
 ) : ViewModel() {
     private val storeArgs = StoreArgs(savedStateHandle)
 
-    init {
-        Timber.i("StoreId = ${storeArgs.storeId}")
-    }
 
     private val storeDetail = storeRepository.getStoreDetail(storeArgs.storeId)
     private val sectionWithSeats =
@@ -71,7 +68,7 @@ internal class StoreViewModel @Inject constructor(
             ) { sections, oneShotActionState, userStateAndUsedSeatPosition ->
                 StoreUiState.Success(
                     store = store,
-                    sectionWithSeats = sections,
+                    sectionWithSeats = sections.sortedBy { it.section.major },
                     isLoading = oneShotActionState.isLoading,
                     userMessage = oneShotActionState.userMessage,
                     selectedSeat = oneShotActionState.selectedSeat,
@@ -86,6 +83,7 @@ internal class StoreViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StoreUiState.Loading)
 
+
     fun selectSeat(sectionId: String, seatId: String) {
         Timber.v("✅ $sectionId $seatId")
         val newSelectedSeat = SelectedSeat(sectionId, seatId)
@@ -98,6 +96,12 @@ internal class StoreViewModel @Inject constructor(
         }
     }
 
+    init {
+        Timber.i("StoreId = ${storeArgs.storeId} SectionId = ${storeArgs.sectionId} SeatId = ${storeArgs.seatId}")
+        if (storeArgs.sectionId != null && storeArgs.seatId != null) {
+            selectSeat(storeArgs.sectionId, storeArgs.seatId)
+        }
+    }
     fun reserve() {
         Timber.v("✅")
         launchOneShotJob(

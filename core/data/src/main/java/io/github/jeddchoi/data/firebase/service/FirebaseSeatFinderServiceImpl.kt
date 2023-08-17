@@ -11,8 +11,8 @@ import io.github.jeddchoi.data.service.seatfinder.ResultCode
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderRequest
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderResult
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
-import io.github.jeddchoi.model.SeatFinderUserRequestType
 import io.github.jeddchoi.data.util.toJsonElement
+import io.github.jeddchoi.model.SeatFinderUserRequestType
 import io.github.jeddchoi.model.SeatPosition
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +39,7 @@ class FirebaseSeatFinderServiceImpl @Inject constructor(
         request: SeatFinderRequest
     ) = withContext(Dispatchers.IO) {
         kotlin.runCatching {
-            Timber.v("✅ $request")
+            Timber.i("✅ $request")
             withTimeout(5000L) {
                 if (!currentUserRepository.isUserSignedIn()) {
                     return@withTimeout SeatFinderResult(resultCode = ResultCode.UNAUTHENTICATED);
