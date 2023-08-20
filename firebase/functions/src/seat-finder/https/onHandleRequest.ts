@@ -3,6 +3,7 @@ import {getEndTime, ISeatFinderRequest} from "../_model/SeatFinderRequest";
 import SeatFinderHandler from "../SeatFinderHandler";
 import {https, logger} from "firebase-functions/v2";
 import {defineList} from "firebase-functions/params";
+import {SeatFinderEventBy} from "../_enum/SeatFinderEventBy";
 
 const SEAT_FINDER_FUNCTION_LOCATION: unknown = defineList("SEAT_FINDER_FUNCTION_LOCATION");
 
@@ -26,5 +27,6 @@ export const onHandleRequest =
                 current,
                 getEndTime(current, request.data.durationInSeconds, request.data.endTime),
                 request.data.seatPosition,
+                SeatFinderEventBy.UserAction,
             );
         });

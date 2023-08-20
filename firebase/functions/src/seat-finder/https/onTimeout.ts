@@ -4,6 +4,7 @@ import {TimerPayload} from "../../_task/TimerPayload";
 import SeatFinderHandler from "../SeatFinderHandler";
 import {logger} from "firebase-functions/v2";
 import {defineList} from "firebase-functions/params";
+import {SeatFinderEventBy} from "../_enum/SeatFinderEventBy";
 
 const SEAT_FINDER_FUNCTION_LOCATION: unknown = defineList("SEAT_FINDER_FUNCTION_LOCATION");
 
@@ -23,7 +24,7 @@ export const onTimeout =
                 current,
                 request.endTime,
                 null,
-                true
+                SeatFinderEventBy.Timeout,
             ).then((result) => {
                 res.status(200).send(result);
             }).catch((err) => {

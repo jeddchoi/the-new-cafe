@@ -44,9 +44,9 @@ export default class SeatFinderHandler {
         current: number,
         endTime: number | null,
         seatPosition: SeatPosition | null = null,
-        isTimeout = false
+        reason: SeatFinderEventBy,
     ) {
-        logger.debug("[SeatFinderHandler] handleSeatFinderRequest", {requestType, endTime, seatPosition, isTimeout});
+        logger.debug("[SeatFinderHandler] handleSeatFinderRequest", {requestType, endTime, seatPosition, reason});
 
         return Promise.resolve().then(() => {
             switch (requestType) {
@@ -83,7 +83,7 @@ export default class SeatFinderHandler {
                 }
             }
         }).then((result: SeatFinderResult) => {
-            return this.addStateChange(requestType, current, isTimeout, result.sessionResult, result.seatResult)
+            return this.addStateChange(requestType, current, reason, result.sessionResult, result.seatResult)
                 .then(() => {
                     if (requestType === SeatFinderRequestType.Quit) {
                         if (result.sessionResult?.before) {
@@ -262,7 +262,7 @@ export default class SeatFinderHandler {
     private addStateChange(
         requestType: SeatFinderRequestType,
         current: number,
-        isTimeout: boolean,
+        reason: SeatFinderEventBy,
         sessionResult?: TransactionResult<CurrentSession>,
         seatResult?: TransactionResult<Seat>,
     ) {
@@ -273,7 +273,7 @@ export default class SeatFinderHandler {
         return this.stateChangesRef.child(sessionId).push(<SeatFinderEvent>{
             requestType: requestType,
             timestamp: current,
-            reason: isTimeout ? SeatFinderEventBy.Timeout : SeatFinderEventBy.UserAction,
+            reason: reason,
             resultUserState: sessionResult ? sessionResult.after?.subState?.state ?? sessionResult.after?.mainState?.state ?? "User_None" : null,
             resultSeatState: seatResult?.after?.state ?? null,
             success,
