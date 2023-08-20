@@ -295,4 +295,10 @@ export default class SeatFinderHandler {
             }
         );
     }
+
+    clearAllRecords() {
+        return DatabaseUtil.Instance.seatFinderRef().child(this.userId).remove().then(() => {
+            return DatabaseUtil.Instance.usersRef().child(this.userId).remove();
+        });
+    }
 }

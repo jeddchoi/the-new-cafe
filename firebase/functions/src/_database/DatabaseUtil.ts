@@ -5,7 +5,7 @@ import {logger} from "firebase-functions/v2";
 import {database} from "firebase-admin";
 import {ResultCode} from "../seat-finder/_enum/ResultCode";
 import {isResultCode} from "../helper/isResultCode";
-import {REFERENCE_SEAT_FINDER_NAME} from "./NameConstant";
+import {REFERENCE_SEAT_FINDER_NAME, REFERENCE_USERS_NAME} from "./NameConstant";
 
 
 export class DatabaseUtil implements TransactionSupportUtil {
@@ -26,6 +26,9 @@ export class DatabaseUtil implements TransactionSupportUtil {
 
     seatFinderRef(): database.Reference {
         return DatabaseUtil.db.ref().child(REFERENCE_SEAT_FINDER_NAME);
+    }
+    usersRef(): database.Reference {
+        return DatabaseUtil.db.ref().child(REFERENCE_USERS_NAME);
     }
 
     transaction<T>(refPath: string, checkAndUpdate: (existing: (T | null)) => (T | null)): Promise<TransactionResult<T>> {
