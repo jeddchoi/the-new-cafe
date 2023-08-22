@@ -9,8 +9,6 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
-import android.nfc.tech.Ndef
-import android.nfc.tech.NdefFormatable
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -57,7 +55,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var adapter: NfcAdapter
     private lateinit var pendingIntent: PendingIntent
     private lateinit var intentFiltersArray: Array<IntentFilter>
-    private lateinit var techListsArray: Array<Array<String>>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -140,7 +137,7 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.initialize()
-        adapter.enableForegroundDispatch(this, pendingIntent, intentFiltersArray, techListsArray)
+        adapter.enableForegroundDispatch(this, pendingIntent, intentFiltersArray, null)
     }
 
     override fun onPause() {
@@ -169,7 +166,6 @@ class MainActivity : ComponentActivity() {
         }
 
         intentFiltersArray = arrayOf(ndef)
-        techListsArray = arrayOf(arrayOf(Ndef::class.java.name, NdefFormatable::class.java.name))
     }
 
     private fun performNfcRead(intent: Intent, onRead: (Uri) -> Unit) {
