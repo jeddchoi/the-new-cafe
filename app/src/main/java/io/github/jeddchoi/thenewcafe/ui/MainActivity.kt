@@ -1,15 +1,13 @@
 package io.github.jeddchoi.thenewcafe.ui
 
 import android.app.Activity
-import android.app.PendingIntent
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
-import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
-import android.os.Build
+import android.nfc.Tag
+import android.nfc.tech.Ndef
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,6 +29,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.thenewcafe.nfc.payloadText
 import io.github.jeddchoi.thenewcafe.service.SessionService
 import io.github.jeddchoi.thenewcafe.ui.root.RootScreen
 import io.github.jeddchoi.thenewcafe.ui.root.RootViewModel
@@ -43,7 +42,7 @@ import javax.inject.Inject
  * It should be kept simple.
  */
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
 
     private val viewModel: RootViewModel by viewModels()
 
@@ -52,14 +51,12 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var navController: NavHostController
 
-    private lateinit var adapter: NfcAdapter
-    private lateinit var pendingIntent: PendingIntent
-    private lateinit var intentFiltersArray: Array<IntentFilter>
+    private var adapter: NfcAdapter? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.i("✅")
+        Timber.i("✅ $intent ${intent.dataString} ${intent.action}")
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         installSplashScreen().apply {
@@ -68,7 +65,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        prepareNfcReadIntent()
+        adapter = NfcAdapter.getDefaultAdapter(this)
 
         val maxSizeModifier = Modifier.fillMaxSize()
 
@@ -107,6 +104,7 @@ class MainActivity : ComponentActivity() {
                     }
                     LaunchedEffect(navigateToStoreDetail) {
                         navigateToStoreDetail?.let {
+                            Timber.i("HERE!!!")
                             handleDeepLink(it)
                         }
                         viewModel.handledNfcReadUri()
@@ -114,16 +112,10 @@ class MainActivity : ComponentActivity() {
 
                     DisposableEffect(Unit) {
                         val listener = Consumer<Intent> { intent ->
-                            Timber.i("onNewIntent : $intent ${intent.dataString}")
+                            Timber.i("onNewIntent : $intent ${intent.dataString} ${intent.action}")
                             if (intent.action == Intent.ACTION_VIEW && intent.dataString != null) {
                                 Timber.i("onNewIntent -> handleDeepLink $intent")
                                 navController.handleDeepLink(intent)
-                            }
-                            if (intent.action == NfcAdapter.ACTION_NDEF_DISCOVERED) {
-                                Timber.i("onNewIntent -> ACTION_NDEF_DISCOVERED $intent")
-                                performNfcRead(intent) {
-                                    viewModel.taggedNfc(it)
-                                }
                             }
                         }
                         addOnNewIntentListener(listener)
@@ -136,54 +128,31 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        adapter?.let {
+            val options = Bundle()
+            // Work around for some broken Nfc firmware implementations that poll the card too fast
+            options.putInt(NfcAdapter.EXTRA_READER_PRESENCE_CHECK_DELAY, 250)
+
+            // Enable ReaderMode for all types of card and disable platform sounds
+            it.enableReaderMode(
+                this,
+                this,
+                NfcAdapter.FLAG_READER_NFC_A or
+                        NfcAdapter.FLAG_READER_NFC_B or
+                        NfcAdapter.FLAG_READER_NFC_F or
+                        NfcAdapter.FLAG_READER_NFC_V or
+                        NfcAdapter.FLAG_READER_NFC_BARCODE,
+//                        NfcAdapter.FLAG_READER_NO_PLATFORM_SOUNDS,
+                options
+            )
+        }
         viewModel.initialize()
-        adapter.enableForegroundDispatch(this, pendingIntent, intentFiltersArray, null)
     }
 
     override fun onPause() {
         super.onPause()
-        adapter.disableForegroundDispatch(this)
-    }
-
-    private fun prepareNfcReadIntent() {
-        adapter = NfcAdapter.getDefaultAdapter(this)
-
-        val intent = Intent(this, javaClass).apply {
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        }
-        pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_MUTABLE
-        )
-
-        val ndef = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
-            try {
-                addDataScheme("jeddchoi")
-                addDataAuthority("thenewcafe", null)
-            } catch (e: IntentFilter.MalformedMimeTypeException) {
-                throw RuntimeException("fail", e)
-            }
-        }
-
-        intentFiltersArray = arrayOf(ndef)
-    }
-
-    private fun performNfcRead(intent: Intent, onRead: (Uri) -> Unit) {
-        Timber.v("✅")
-        val messages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableArrayExtra(
-                NfcAdapter.EXTRA_NDEF_MESSAGES,
-                NdefMessage::class.java
-            )?.toList()
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
-                ?.map { it as NdefMessage }?.toList()
-        }
-
-        messages?.first()?.records?.first()?.toUri()?.let {
-            onRead(it)
-        }
+        adapter?.disableReaderMode(this);
     }
 
     private fun handleDeepLink(uri: Uri): Boolean {
@@ -198,6 +167,28 @@ class MainActivity : ComponentActivity() {
 
         intent = deepLinkIntent
         return navController.handleDeepLink(deepLinkIntent)
+    }
+
+    override fun onTagDiscovered(tag: Tag) {
+        Timber.i("✅")
+        // Read and or write to Tag here to the appropriate Tag Technology type class
+        // in this example the card should be an Ndef Technology Type
+        val ndef = Ndef.get(tag)
+
+        // Check that it is an Ndef capable card
+        if (ndef != null) {
+
+            // If we want to read
+            // As we did not turn on the NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
+            // We can get the cached Ndef message the system read for us.
+
+            ndef.cachedNdefMessage.records?.forEach {
+                it.payloadText()?.let {payloadText->
+                    Timber.i("RECORD : $payloadText")
+                    viewModel.taggedNfc(Uri.parse(payloadText))
+                } ?: Timber.i("RECORD(not text) : ${String(it.payload)}")
+            }
+        }
     }
 }
 

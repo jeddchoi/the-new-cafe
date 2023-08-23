@@ -90,14 +90,20 @@
                     android:scheme="jeddchoi" />
             </intent-filter>
 
+<!--            <intent-filter>-->
+<!--                <action android:name="android.nfc.action.NDEF_DISCOVERED" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <data-->
+<!--                    android:mimeType="text/plain" />-->
+<!--            </intent-filter>-->
 
-            <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data
-                    android:host="thenewcafe"
-                    android:scheme="jeddchoi" />
-            </intent-filter>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.nfc.action.NDEF_DISCOVERED" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <data-->
+<!--                    android:host="thenewcafe"-->
+<!--                    android:scheme="jeddchoi" />-->
+<!--            </intent-filter>-->
         </activity>
 
         <service
