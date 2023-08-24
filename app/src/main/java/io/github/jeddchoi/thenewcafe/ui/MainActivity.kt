@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Consumer
@@ -26,13 +25,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import io.github.jeddchoi.authentication.navigateToAuth
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.designsystem.TheNewCafeTheme
+import io.github.jeddchoi.thenewcafe.nfc.ndefMessages
 import io.github.jeddchoi.thenewcafe.nfc.payloadText
 import io.github.jeddchoi.thenewcafe.service.SessionService
 import io.github.jeddchoi.thenewcafe.ui.root.RootScreen
 import io.github.jeddchoi.thenewcafe.ui.root.RootViewModel
+import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -59,11 +59,7 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
         Timber.i("✅ $intent ${intent.dataString} ${intent.action}")
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        installSplashScreen().apply {
-            setKeepOnScreenCondition {
-                viewModel.isLoading.value
-            }
-        }
+        installSplashScreen()
 
         adapter = NfcAdapter.getDefaultAdapter(this)
 
@@ -76,40 +72,36 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     navController = rememberNavController()
-
+                    viewModel.userSessionStateFlow.collectAsStateWithLifecycle()
                     RootScreen(
+                        redirectionByNfcRead = viewModel.redirectionEventByNfcRead,
+                        redirectionToAuth = viewModel.redirectionToAuth,
                         networkMonitor = networkMonitor,
                         modifier = maxSizeModifier,
                         navController = navController
                     )
 
-                    val redirectToAuth by viewModel.redirectToAuth.collectAsStateWithLifecycle()
-                    val shouldRunService by viewModel.shouldRunService.collectAsStateWithLifecycle()
-                    val navigateToStoreDetail by viewModel.navigateToStoreDetail.collectAsStateWithLifecycle()
-                    viewModel.arriveOnSeat.collectAsStateWithLifecycle()
+                    LaunchedEffect(Unit) {
+                        viewModel.startSessionEvent.collectLatest { start ->
+                            Timber.i("startSessionEvent : $start")
+                            if (start) {
+                                Intent(applicationContext, SessionService::class.java).also {
+                                    it.action = SessionService.Action.START.name
+                                    startForegroundService(it)
+                                }
 
-                    LaunchedEffect(shouldRunService) {
-                        if (shouldRunService) {
-                            Intent(applicationContext, SessionService::class.java).also {
-                                it.action = SessionService.Action.START.name
-                                startForegroundService(it)
                             }
                         }
                     }
 
-                    LaunchedEffect(redirectToAuth) {
-                        if (redirectToAuth) {
-                            navController.navigateToAuth()
+                    LaunchedEffect(Unit) {
+                        viewModel.arriveOnSeatByNfcReadEvent.collectLatest {
+                            Timber.i("arriveOnSeatWithNfcEvent : $it")
+                            it?.invoke()
                         }
-                    }
-                    LaunchedEffect(navigateToStoreDetail) {
-                        navigateToStoreDetail?.let {
-                            Timber.i("HERE!!!")
-                            handleDeepLink(it)
-                        }
-                        viewModel.handledNfcReadUri()
                     }
 
+                    // Handle Implicit Deep Link
                     DisposableEffect(Unit) {
                         val listener = Consumer<Intent> { intent ->
                             Timber.i("onNewIntent : $intent ${intent.dataString} ${intent.action}")
@@ -120,6 +112,17 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                         }
                         addOnNewIntentListener(listener)
                         onDispose { removeOnNewIntentListener(listener) }
+                    }
+
+                    // For NDEF_DISCOVERED_ACTION intent
+                    LaunchedEffect(Unit) {
+                        intent.ndefMessages()?.first()?.records?.first()?.let {
+                            it.payloadText()?.let {payloadText->
+                                Timber.i("RECORD : $payloadText")
+                                viewModel.readNfcSeatPosition(Uri.parse(payloadText))
+                                intent.removeExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+                            } ?: Timber.i("RECORD(not text) : ${String(it.payload)}")
+                        }
                     }
                 }
             }
@@ -147,26 +150,11 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                 options
             )
         }
-        viewModel.initialize()
     }
 
     override fun onPause() {
         super.onPause()
         adapter?.disableReaderMode(this);
-    }
-
-    private fun handleDeepLink(uri: Uri): Boolean {
-        Timber.v("✅")
-        val deepLinkIntent = Intent(
-            Intent.ACTION_VIEW,
-            uri,
-            this,
-            MainActivity::class.java
-        )
-        deepLinkIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-
-        intent = deepLinkIntent
-        return navController.handleDeepLink(deepLinkIntent)
     }
 
     override fun onTagDiscovered(tag: Tag) {
@@ -182,14 +170,15 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
             // As we did not turn on the NfcAdapter.FLAG_READER_SKIP_NDEF_CHECK
             // We can get the cached Ndef message the system read for us.
 
-            ndef.cachedNdefMessage.records?.forEach {
+            ndef.cachedNdefMessage.records?.first()?.let {
                 it.payloadText()?.let {payloadText->
                     Timber.i("RECORD : $payloadText")
-                    viewModel.taggedNfc(Uri.parse(payloadText))
+                    viewModel.readNfcSeatPosition(Uri.parse(payloadText))
                 } ?: Timber.i("RECORD(not text) : ${String(it.payload)}")
             }
         }
     }
+
 }
 
 

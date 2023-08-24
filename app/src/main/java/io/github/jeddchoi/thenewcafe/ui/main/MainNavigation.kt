@@ -11,6 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.thenewcafe.ui.findActivity
+import io.github.jeddchoi.thenewcafe.ui.root.Redirection
+import kotlinx.coroutines.flow.SharedFlow
 import timber.log.Timber
 
 internal const val MainRoutePattern = "main"
@@ -22,6 +24,7 @@ fun NavController.navigateToMain(navOptions: NavOptions? = null) {
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 fun NavGraphBuilder.mainScreen(
+    redirectionByNfcRead: SharedFlow<Redirection?>,
     networkMonitor: NetworkMonitor,
     navigateToAuth: () -> Unit = {},
     navigateToHistoryDetail: (String) -> Unit = {},
@@ -40,6 +43,7 @@ fun NavGraphBuilder.mainScreen(
         ),
     ) {
         MainScreen(
+            redirectionByNfcRead = redirectionByNfcRead,
             windowSizeClass = calculateWindowSizeClass(LocalContext.current.findActivity()),
             networkMonitor = networkMonitor,
             navigateToAuth = navigateToAuth,

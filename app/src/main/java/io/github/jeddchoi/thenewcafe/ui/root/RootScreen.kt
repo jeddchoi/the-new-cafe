@@ -1,6 +1,7 @@
 package io.github.jeddchoi.thenewcafe.ui.root
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -17,6 +18,9 @@ import io.github.jeddchoi.historydetail.navigateToHistoryDetail
 import io.github.jeddchoi.thenewcafe.ui.main.MainRoutePattern
 import io.github.jeddchoi.thenewcafe.ui.main.mainScreen
 import io.github.jeddchoi.thenewcafe.ui.main.navigateToMain
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import timber.log.Timber
 
 /**
  * Single entry point of composable world
@@ -25,6 +29,8 @@ import io.github.jeddchoi.thenewcafe.ui.main.navigateToMain
  */
 @Composable
 fun RootScreen(
+    redirectionByNfcRead: SharedFlow<Redirection?>,
+    redirectionToAuth: SharedFlow<Boolean>,
     networkMonitor: NetworkMonitor,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
@@ -37,7 +43,7 @@ fun RootScreen(
         navController = rootState.navController,
         startDestination = MainRoutePattern,
 
-    ) {
+        ) {
         authGraph {
             val navigateToMain = {
                 rootState.navController.navigateToMain(navOptions = navOptions {
@@ -56,6 +62,7 @@ fun RootScreen(
         }
 
         mainScreen(
+            redirectionByNfcRead = redirectionByNfcRead,
             networkMonitor = networkMonitor,
             navigateToAuth = {
                 rootState.navController.navigateToAuth(navOptions = navOptions {
@@ -65,7 +72,7 @@ fun RootScreen(
             },
             navigateToHistoryDetail = {
                 rootState.navController.navigateToHistoryDetail(it)
-            }
+            },
         )
 
         historyDetailScreen(
@@ -73,6 +80,18 @@ fun RootScreen(
         )
     }
 
+    LaunchedEffect(Unit) {
+        redirectionToAuth.collectLatest {
+            Timber.i("RedirectionToAuth : $it")
+            if (it) {
+                rootState.navController.navigateToAuth(
+                    navOptions = navOptions {
+                        popUpTo(rootState.navController.graph.findStartDestination().id)
+                        launchSingleTop = true
+                    })
 
+            }
+        }
+    }
 }
 

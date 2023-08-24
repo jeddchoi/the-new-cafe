@@ -14,13 +14,19 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.jeddchoi.data.util.NetworkMonitor
 import io.github.jeddchoi.thenewcafe.ui.root.ConnectionState
+import io.github.jeddchoi.thenewcafe.ui.root.Redirection
+import kotlinx.coroutines.flow.SharedFlow
 
 @Composable
 fun MainScreen(
+    redirectionByNfcRead: SharedFlow<Redirection?>,
     windowSizeClass: WindowSizeClass,
     networkMonitor: NetworkMonitor,
     modifier: Modifier = Modifier,
-    mainState: MainState = rememberMainState(windowSizeClass = windowSizeClass, networkMonitor = networkMonitor),
+    mainState: MainState = rememberMainState(
+        windowSizeClass = windowSizeClass,
+        networkMonitor = networkMonitor
+    ),
     navigateToAuth: () -> Unit = {},
     navigateToHistoryDetail: (String) -> Unit = {},
 ) {
@@ -47,6 +53,7 @@ fun MainScreen(
         ) {
 
             MainNavGraph(
+                redirectionByNfcRead = redirectionByNfcRead,
                 modifier = Modifier.fillMaxSize(),
                 navController = mainState.navController,
                 navigateToAuth = navigateToAuth,

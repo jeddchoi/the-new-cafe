@@ -7,21 +7,18 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.jeddchoi.data.repository.AppFlagsRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
+import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.model.UserSession
 import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.order.store.SEAT_ID_ARG
 import io.github.jeddchoi.order.store.SECTION_ID_ARG
 import io.github.jeddchoi.order.store.STORE_ID_ARG
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -33,117 +30,158 @@ class RootViewModel @Inject constructor(
     private val seatFinderService: SeatFinderService,
 ) : ViewModel() {
 
-    private val _isLoading = MutableStateFlow(true)
-    val isLoading = _isLoading.asStateFlow()
+    // it should be sharedflow because it will be notified with same value
+    // And replay should be 1 because of when launched by NFC Read
+    private var _nfcReadSeatPosition =
+        MutableSharedFlow<SeatPosition?>(replay = 1)
 
 
-    fun initialize() {
-        Timber.v("✅")
-        _isLoading.update { false }
+    fun readNfcSeatPosition(uri: Uri) {
+        Timber.i("✅ $uri")
+        val storeId = uri.getQueryParameter(STORE_ID_ARG)
+        val sectionId = uri.getQueryParameter(SECTION_ID_ARG)
+        val seatId = uri.getQueryParameter(SEAT_ID_ARG)
+
+        if (storeId != null && sectionId != null && seatId != null) {
+            viewModelScope.launch {
+                _nfcReadSeatPosition.emit(SeatPosition(storeId, sectionId, seatId))
+            }
+        }
     }
 
-    val redirectToAuth: StateFlow<Boolean> = appFlagsRepository.getShowMainScreenOnStart
-        .map { it.not() }
-        .onEach { Timber.v("💥 $it") }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
-    private val currentUserSession = userSessionRepository.userSession.stateIn(
+    val startSessionEvent = userSessionRepository.userSession.map { it is UserSession.UsingSeat }
+        .distinctUntilChanged()
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(5_000))
+
+
+    val userSessionStateFlow = userSessionRepository.userSession.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
         null
     )
-    val shouldRunService =
-        currentUserSession.map {
-            when (it) {
-                null,
-                UserSession.None -> false
 
-                is UserSession.UsingSeat -> {
-                    true
-                }
-            }
-        }.distinctUntilChanged()
-            .stateIn(
-                viewModelScope,
-                SharingStarted.WhileSubscribed(5_000),
-                false
-            )
+    val redirectionToAuth = appFlagsRepository.getShowMainScreenOnStart.map {
+        it.not() && userSessionStateFlow.value == null
+    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(5_000))
 
-    private var _nfcReadUri =
-        MutableSharedFlow<Uri?>(replay = 0)
 
-    fun taggedNfc(uri: Uri) {
-        Timber.i("✅")
-        viewModelScope.launch {
-            _nfcReadUri.emit(uri)
-        }
-    }
+    val redirectionEventByNfcRead =
+        _nfcReadSeatPosition.map { nfcReadSeatPosition ->
+            var redirectTo: Redirection? = null
+            userSessionStateFlow.value.let { userSession ->
+                Timber.i("redirectionEventByNfcRead\nnfcReadSeatPosition : $nfcReadSeatPosition / userSession : $userSession")
+                when (userSession) {
+                    null -> { // not signed in
+                        if (nfcReadSeatPosition != null) {
+                            redirectTo = Redirection.StoreScreen(nfcReadSeatPosition)
+                        }
+                    }
 
-    fun handledNfcReadUri() {
-        viewModelScope.launch {
-            _nfcReadUri.emit(null)
-        }
-    }
-    val navigateToStoreDetail = _nfcReadUri.onEach { Timber.v("💥 $it") }.map { readUri ->
-        if (readUri == null) return@map null
+                    UserSession.None -> {
+                        if (nfcReadSeatPosition != null) {
+                            redirectTo = Redirection.StoreScreen(nfcReadSeatPosition)
+                        }
+                    }
 
-        val needToNavigate = when (val cus = currentUserSession.value) {
-            null,
-            UserSession.None -> true
+                    is UserSession.UsingSeat -> {
+                        when (userSession.currentState) {
+                            UserStateType.None -> throw IllegalStateException()
+                            UserStateType.Reserved -> {
+                                if (nfcReadSeatPosition != null) {
+                                    redirectTo =
+                                        if (userSession.seatPosition == nfcReadSeatPosition) {
+                                            Redirection.SessionScreen
+                                        } else {
+                                            Redirection.StoreScreen(nfcReadSeatPosition)
+                                        }
+                                }
 
-            is UserSession.UsingSeat -> {
-                when (cus.currentState) {
-                    UserStateType.None -> throw IllegalStateException()
-                    UserStateType.Occupied -> true
-                    UserStateType.Reserved,
-                    UserStateType.Away,
-                    UserStateType.OnBusiness -> {
-                        val storeId = readUri.getQueryParameter(STORE_ID_ARG)
-                        val sectionId = readUri.getQueryParameter(SECTION_ID_ARG)
-                        val seatId = readUri.getQueryParameter(SEAT_ID_ARG)
-                        !(cus.seatPosition.storeId == storeId && cus.seatPosition.sectionId == sectionId && cus.seatPosition.seatId == seatId)
+                            }
+
+                            UserStateType.Occupied -> {
+                                if (nfcReadSeatPosition != null) {
+                                    redirectTo =
+                                        Redirection.StoreScreen(nfcReadSeatPosition)
+                                }
+                            }
+
+                            UserStateType.Away -> {
+                                if (nfcReadSeatPosition != null) {
+                                    redirectTo =
+                                        if (userSession.seatPosition == nfcReadSeatPosition) {
+                                            Redirection.SessionScreen
+                                        } else {
+                                            Redirection.StoreScreen(nfcReadSeatPosition)
+                                        }
+                                }
+                            }
+
+                            UserStateType.OnBusiness -> {
+                                if (nfcReadSeatPosition != null) {
+                                    redirectTo =
+                                        if (userSession.seatPosition == nfcReadSeatPosition) {
+                                            Redirection.SessionScreen
+                                        } else {
+                                            Redirection.StoreScreen(nfcReadSeatPosition)
+                                        }
+                                }
+
+                            }
+                        }
                     }
                 }
             }
-        }
-
-        Timber.i("needToNavigate : $needToNavigate, readUri : $readUri")
-        if (needToNavigate) readUri else null
-    }.onEach {
-        Timber.i("💥 $it")
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        null
-    )
+            redirectTo
+        }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(5_000))
 
 
-    val arriveOnSeat = _nfcReadUri.onEach {readUri ->
-        Timber.i("💥 $readUri")
-        if (readUri == null) return@onEach
-        val storeId = readUri.getQueryParameter(STORE_ID_ARG)
-        val sectionId = readUri.getQueryParameter(SECTION_ID_ARG)
-        val seatId = readUri.getQueryParameter(SEAT_ID_ARG)
+    val arriveOnSeatByNfcReadEvent =
+        _nfcReadSeatPosition.map { nfcReadSeatPosition ->
+            var arrivedOnSeatWithNfc: (() -> Unit)? = null
+            userSessionStateFlow.value.let { userSession ->
+                Timber.i("arriveOnSeatByNfcReadEvent\nnfcReadSeatPosition : $nfcReadSeatPosition / userSession : $userSession")
+                when (userSession) {
+                    null -> {} // not signed in
+                    UserSession.None -> {}
 
-        when (val cus = currentUserSession.value) {
-            null,
-            UserSession.None -> return@onEach
+                    is UserSession.UsingSeat -> {
+                        val sameWithOccupiedSeat = nfcReadSeatPosition == userSession.seatPosition
+                        when (userSession.currentState) {
+                            UserStateType.None -> throw IllegalStateException()
+                            UserStateType.Reserved -> {
+                                if (sameWithOccupiedSeat) {
+                                    arrivedOnSeatWithNfc =
+                                        { viewModelScope.launch { seatFinderService.occupySeat() } }
+                                }
+                            }
 
-            is UserSession.UsingSeat -> {
-                if (cus.seatPosition.storeId == storeId && cus.seatPosition.sectionId == sectionId && cus.seatPosition.seatId == seatId) {
-                    when (cus.currentState) {
-                        UserStateType.None -> throw IllegalStateException()
-                        UserStateType.Occupied -> return@onEach
-                        UserStateType.Reserved -> seatFinderService.occupySeat()
-                        UserStateType.Away,
-                        UserStateType.OnBusiness -> seatFinderService.resumeUsing()
+                            UserStateType.Occupied -> {
+                            }
+
+                            UserStateType.Away -> {
+                                if (sameWithOccupiedSeat) {
+                                    arrivedOnSeatWithNfc =
+                                        { viewModelScope.launch { seatFinderService.resumeUsing() } }
+                                }
+                            }
+
+                            UserStateType.OnBusiness -> {
+                                if (sameWithOccupiedSeat) {
+                                    arrivedOnSeatWithNfc =
+                                        { viewModelScope.launch { seatFinderService.occupySeat() } }
+                                }
+                            }
+                        }
                     }
-                } else return@onEach
+                }
             }
-        }
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        null
-    )
+            arrivedOnSeatWithNfc
+        }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(5_000))
+
+}
+
+sealed class Redirection {
+    data class StoreScreen(val seatPosition: SeatPosition) : Redirection()
+    data object SessionScreen : Redirection()
 }
