@@ -7,44 +7,27 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.benasher44.uuid.bytes
-import com.benasher44.uuid.uuidFrom
-import com.juul.kable.ConnectionLostException
-import com.juul.kable.Filter
-import com.juul.kable.Peripheral
-import com.juul.kable.Scanner
-import com.juul.kable.State
-import com.juul.kable.peripheral
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.jeddchoi.ble.BleRepositoryImpl
 import io.github.jeddchoi.data.repository.StoreRepository
-import io.github.jeddchoi.data.repository.UserPresenceRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import io.github.jeddchoi.model.DisplayedUserSession
-import io.github.jeddchoi.model.SeatPosition
 import io.github.jeddchoi.model.UserStateAndUsedSeatPosition
 import io.github.jeddchoi.model.UserStateType
 import io.github.jeddchoi.thenewcafe.R
 import io.github.jeddchoi.thenewcafe.ui.MainActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
 
 @AndroidEntryPoint
 class SessionService : LifecycleService() {
@@ -58,22 +41,14 @@ class SessionService : LifecycleService() {
     @Inject
     lateinit var seatFinderService: SeatFinderService
 
-    @Inject
-    lateinit var userPresenceRepository: UserPresenceRepository
+//    @Inject
+//    lateinit var userPresenceRepository: UserPresenceRepository
 
+
+    @Inject
+    lateinit var bleRepository: BleRepositoryImpl
 
     private var handleNotificationJob: Job? = null
-    private var handleBleJob: Job? = null
-    private var observeBleStateJob: Job? = null
-    private var connectBleJob: Job? = null
-
-
-    private val _peripheral = MutableStateFlow<Peripheral?>(null)
-
-    private val peripheralState = _peripheral.flatMapLatest {
-        it?.state ?: flowOf(null)
-    }.onEach { Timber.v("💥") }
-        .stateIn(lifecycleScope, SharingStarted.WhileSubscribed(5000), null)
 
 
     private val _userSession = MutableStateFlow<UserStateAndUsedSeatPosition?>(null)
@@ -82,10 +57,86 @@ class SessionService : LifecycleService() {
 
     // This would be called multiple times
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Timber.v("✅")
+        Timber.i("✅")
         when (intent?.action) {
             Action.START.name -> {
-                handleBleConnection()
+                lifecycleScope.launch(CoroutineName("ShouldBeConnected Handler")) {
+                    bleRepository.bleState.map { it?.shouldBeConnected }.distinctUntilChanged().collectLatest { shouldBeConnected ->
+                        if (shouldBeConnected == true) {
+                            bleRepository.scanAndConnect(lifecycleScope)
+                        } else if (shouldBeConnected == false){
+                            bleRepository.disconnect()
+                        }
+                    }
+                }
+
+                lifecycleScope.launch(CoroutineName("UserState Handler")) {
+                    userSessionRepository.userStateAndUsedSeatPosition.distinctUntilChanged().collectLatest {
+                        Timber.i("[${coroutineContext[CoroutineName.Key]}]\nUserState : $it")
+                        when (it) {
+                            null,
+                            UserStateAndUsedSeatPosition.None -> {
+//                                userPresenceRepository.stopObserveUserPresence()
+                                bleRepository.quit()
+                            }
+
+                            is UserStateAndUsedSeatPosition.UsingSeat -> {
+                                when (it.userState) {
+                                    UserStateType.None -> throw IllegalStateException()
+                                    UserStateType.Reserved -> {
+//                                        userPresenceRepository.stopObserveUserPresence()
+                                        bleRepository.initialize(
+                                            getBleSeat = {
+                                                storeRepository.getBleSeat(it.seatPosition) ?: throw IllegalStateException()
+                                            },
+                                            onConnected = {
+                                                seatFinderService.occupySeat()
+                                            }
+                                        )
+                                    }
+
+                                    UserStateType.Occupied -> {
+//                                        userPresenceRepository.observeUserPresence()
+                                        bleRepository.initialize(
+                                            getBleSeat = {
+                                                storeRepository.getBleSeat(it.seatPosition) ?: throw IllegalStateException()
+                                            },
+                                            onDisconnected = {
+                                                seatFinderService.leaveAway()
+                                            },
+                                            connectionTimeout = 3.minutes,
+                                            onTimeout = {
+                                                Timber.i("[${coroutineContext[CoroutineName.Key]}]\n⏰ timeout ======")
+                                                seatFinderService.leaveAway()
+                                            }
+                                        )
+                                    }
+
+                                    UserStateType.Away -> {
+//                                        userPresenceRepository.stopObserveUserPresence()
+                                        bleRepository.initialize(
+                                            getBleSeat = {
+                                                storeRepository.getBleSeat(it.seatPosition) ?: throw IllegalStateException()
+                                            },
+                                            onConnected = {
+                                                seatFinderService.resumeUsing()
+                                            }
+                                        )
+                                    }
+
+                                    UserStateType.OnBusiness -> {
+//                                        userPresenceRepository.stopObserveUserPresence()
+                                        bleRepository.initialize(
+                                            getBleSeat = {
+                                                storeRepository.getBleSeat(it.seatPosition) ?: throw IllegalStateException()
+                                            },
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 handleNotification()
             }
 
@@ -162,204 +213,6 @@ class SessionService : LifecycleService() {
         startForeground(1, builder.build())
     }
 
-    private fun handleBleConnection() {
-        Timber.v("${handleBleJob?.isCompleted}")
-        if (handleBleJob == null || handleBleJob?.isCompleted == true) {
-            handleBleJob = lifecycleScope.launch(Dispatchers.IO) {
-                userSessionRepository.userStateAndUsedSeatPosition.distinctUntilChanged()
-                    .collectLatest { userSession ->
-                        Timber.v("💥 $userSession")
-                        _userSession.update { userSession }
-
-                        if (userSession?.userState == UserStateType.Occupied) {
-                            observePresence()
-                        } else {
-                            userPresenceRepository.stopObserveUserPresence()
-                        }
-
-                        when (userSession) {
-                            null,
-                            UserStateAndUsedSeatPosition.None -> {
-                                withTimeoutOrNull(5_000) {
-                                    _peripheral.value?.disconnect()
-                                    stopSelf()
-                                }
-                            }
-
-                            is UserStateAndUsedSeatPosition.UsingSeat -> {
-                                when (userSession.userState) {
-                                    UserStateType.None -> throw IllegalStateException()
-
-                                    UserStateType.Reserved,
-                                    UserStateType.Occupied,
-                                    UserStateType.Away -> {
-                                        observeConnectionState(this)
-                                        scanAndConnectBleIfDisconnected(
-                                            this,
-                                            userSession.seatPosition,
-                                            userSession.userState
-                                        )
-                                    }
-
-                                    UserStateType.OnBusiness -> {
-                                        withTimeoutOrNull(5_000) {
-                                            _peripheral.value?.disconnect()
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-            }
-        }
-    }
-
-
-    private fun scanAndConnectBleIfDisconnected(
-        bleCoroutineScope: CoroutineScope,
-        seatPosition: SeatPosition,
-        currentUserState: UserStateType,
-    ) {
-        Timber.v("✅ ${_peripheral.value}")
-
-        connectBleJob?.cancel()
-        connectBleJob = bleCoroutineScope.launch {
-            if (currentUserState == UserStateType.Occupied) {
-                withTimeoutOrNull(60.seconds) {
-                    scanAndConnect(seatPosition, bleCoroutineScope)
-                } ?: run {
-                    seatFinderService.leaveAway()
-                }
-            } else {
-                scanAndConnect(seatPosition, bleCoroutineScope)
-            }
-        }
-    }
-
-    private suspend fun scanAndConnect(
-        seatPosition: SeatPosition,
-        bleCoroutineScope: CoroutineScope
-    ) {
-        if (_peripheral.value == null) {
-            val bleSeat =
-                storeRepository.getBleSeat(seatPosition) ?: throw IllegalStateException()
-            val major = bleSeat.major.toInt()
-            val minor = bleSeat.minor.toInt()
-            val scanner = Scanner {
-                filters = listOf(
-                    Filter.Service(BEACON_SERVICE_UUID),
-                    Filter.Name(bleSeat.name),
-                    Filter.Address(bleSeat.macAddress),
-                    Filter.ManufacturerData(
-                        id = MANUFACTURER_ID,
-                        data = byteArrayOf(
-                            0, 0, 0, 0,
-                            *uuidFrom(bleSeat.uuid).bytes,
-                            major.shr(8).toByte(),
-                            major.shr(0).toByte(),
-                            minor.shr(8).toByte(),
-                            minor.shr(0).toByte(),
-                            0
-                        ),
-                        dataMask = MASK_UUID_MAJOR_MINOR,
-                    ),
-                )
-            }
-            Timber.i("Scanning...")
-            val adv = scanner.advertisements.first()
-            Timber.i("Found $adv!")
-
-            _peripheral.update {
-                bleCoroutineScope.peripheral(adv)
-            }
-        }
-
-
-        while (true) {
-            try {
-                Timber.i("Try connecting...")
-                _peripheral.value?.connect()
-                Timber.i("Connected!")
-                break
-            } catch (e: ConnectionLostException) {
-                Timber.e(e)
-            }
-        }
-    }
-
-    private fun observeConnectionState(
-        coroutineScope: CoroutineScope,
-    ) {
-        Timber.v("✅ ${observeBleStateJob?.isCompleted}")
-        observeBleStateJob?.cancel()
-        observeBleStateJob = coroutineScope.launch {
-            peripheralState.collectLatest {
-                when (it) {
-                    null,
-                    State.Connecting.Bluetooth,
-                    State.Connecting.Observes,
-                    State.Connecting.Services,
-                    is State.Disconnected -> {
-                    }
-
-                    State.Connected -> {
-                        when (val userSession = _userSession.value) {
-                            null,
-                            UserStateAndUsedSeatPosition.None -> {
-                            }
-
-                            is UserStateAndUsedSeatPosition.UsingSeat -> {
-                                when (userSession.userState) {
-                                    UserStateType.None,
-                                    UserStateType.OnBusiness -> throw IllegalStateException()
-
-                                    UserStateType.Reserved -> {
-                                        seatFinderService.occupySeat()
-                                    }
-
-                                    UserStateType.Occupied -> {}
-                                    UserStateType.Away -> {
-                                        seatFinderService.resumeUsing()
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    State.Disconnecting -> {
-                        when (val userSession = _userSession.value) {
-                            null,
-                            UserStateAndUsedSeatPosition.None -> {
-                            }
-
-                            is UserStateAndUsedSeatPosition.UsingSeat -> {
-                                when (userSession.userState) {
-                                    UserStateType.None -> throw IllegalStateException()
-
-                                    UserStateType.Reserved -> {}
-                                    UserStateType.Occupied -> {
-                                        seatFinderService.leaveAway()
-                                    }
-
-                                    UserStateType.Away -> {}
-                                    UserStateType.OnBusiness -> {}
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-    }
-
-    private fun observePresence() {
-        Timber.v("✅")
-        if (!startedObserveConnection) {
-            userPresenceRepository.observeUserPresence()
-            startedObserveConnection = true
-        }
-    }
 
     enum class Action {
         START,
@@ -369,14 +222,5 @@ class SessionService : LifecycleService() {
 
     companion object {
         const val CHANNEL_ID = "session_channel"
-        val BEACON_SERVICE_UUID = uuidFrom("9FD42000-E46F-7C9A-57B1-2DA365E18FA1")
-        val MANUFACTURER_ID = byteArrayOf(0, 0x59) // Nordic
-
-        val MASK_UUID_MAJOR_MINOR = byteArrayOf(
-            0, 0, 0, 0,
-            -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, 0,
-        )
     }
 }

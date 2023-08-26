@@ -71,7 +71,7 @@ class TimberDebugTree : Timber.DebugTree() {
         super.log(
             priority = priority,
             tag = TAG,
-            message = "$message $tag",
+            message = "[${Thread.currentThread().name}]\n$message $tag",
             t = t
         )
 //        println(String.format("%2\$s %1\$s", tag, message))
@@ -83,3 +83,4 @@ class TimberDebugTree : Timber.DebugTree() {
     }
 
 }
+

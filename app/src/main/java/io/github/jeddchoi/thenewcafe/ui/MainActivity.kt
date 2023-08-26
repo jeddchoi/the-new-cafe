@@ -85,11 +85,14 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                         viewModel.startSessionEvent.collectLatest { start ->
                             Timber.i("startSessionEvent : $start")
                             if (start) {
-                                Intent(applicationContext, SessionService::class.java).also {
-                                    it.action = SessionService.Action.START.name
-                                    startForegroundService(it)
-                                }
-
+                                startForegroundService(
+                                    Intent(
+                                        applicationContext,
+                                        SessionService::class.java
+                                    ).also {
+                                        it.action = SessionService.Action.START.name
+                                    }
+                                )
                             }
                         }
                     }
@@ -117,7 +120,7 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
                     // For NDEF_DISCOVERED_ACTION intent
                     LaunchedEffect(Unit) {
                         intent.ndefMessages()?.first()?.records?.first()?.let {
-                            it.payloadText()?.let {payloadText->
+                            it.payloadText()?.let { payloadText ->
                                 Timber.i("RECORD : $payloadText")
                                 viewModel.readNfcSeatPosition(Uri.parse(payloadText))
                                 intent.removeExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
@@ -171,7 +174,7 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
             // We can get the cached Ndef message the system read for us.
 
             ndef.cachedNdefMessage.records?.first()?.let {
-                it.payloadText()?.let {payloadText->
+                it.payloadText()?.let { payloadText ->
                     Timber.i("RECORD : $payloadText")
                     viewModel.readNfcSeatPosition(Uri.parse(payloadText))
                 } ?: Timber.i("RECORD(not text) : ${String(it.payload)}")

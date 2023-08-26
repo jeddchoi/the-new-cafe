@@ -61,6 +61,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:common"))
     implementation(project(":core:model"))
+    implementation(project(":core:ble"))
 
 
     implementation(libs.timber)
