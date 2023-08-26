@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.jeddchoi.ble.BleRepositoryImpl
 import io.github.jeddchoi.data.repository.StoreRepository
+import io.github.jeddchoi.data.repository.UserPresenceRepository
 import io.github.jeddchoi.data.repository.UserSessionRepository
 import io.github.jeddchoi.data.service.seatfinder.SeatFinderService
 import io.github.jeddchoi.model.DisplayedUserSession
@@ -22,7 +23,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -41,8 +41,8 @@ class SessionService : LifecycleService() {
     @Inject
     lateinit var seatFinderService: SeatFinderService
 
-//    @Inject
-//    lateinit var userPresenceRepository: UserPresenceRepository
+    @Inject
+    lateinit var userPresenceRepository: UserPresenceRepository
 
 
     @Inject
@@ -61,12 +61,8 @@ class SessionService : LifecycleService() {
         when (intent?.action) {
             Action.START.name -> {
                 lifecycleScope.launch(CoroutineName("ShouldBeConnected Handler")) {
-                    bleRepository.bleState.map { it?.shouldBeConnected }.distinctUntilChanged().collectLatest { shouldBeConnected ->
-                        if (shouldBeConnected == true) {
-                            bleRepository.scanAndConnect(lifecycleScope)
-                        } else if (shouldBeConnected == false){
-                            bleRepository.disconnect()
-                        }
+                    bleRepository.shouldBeConnected.collectLatest {
+                        bleRepository.scanAndConnect(lifecycleScope)
                     }
                 }
 
@@ -76,7 +72,7 @@ class SessionService : LifecycleService() {
                         when (it) {
                             null,
                             UserStateAndUsedSeatPosition.None -> {
-//                                userPresenceRepository.stopObserveUserPresence()
+                                userPresenceRepository.stopObserveUserPresence()
                                 bleRepository.quit()
                             }
 
@@ -84,8 +80,8 @@ class SessionService : LifecycleService() {
                                 when (it.userState) {
                                     UserStateType.None -> throw IllegalStateException()
                                     UserStateType.Reserved -> {
-//                                        userPresenceRepository.stopObserveUserPresence()
-                                        bleRepository.initialize(
+                                        userPresenceRepository.stopObserveUserPresence()
+                                        bleRepository.shouldBeConnected(
                                             getBleSeat = {
                                                 storeRepository.getBleSeat(it.seatPosition) ?: throw IllegalStateException()
                                             },
@@ -96,8 +92,8 @@ class SessionService : LifecycleService() {
                                     }
 
                                     UserStateType.Occupied -> {
-//                                        userPresenceRepository.observeUserPresence()
-                                        bleRepository.initialize(
+                                        userPresenceRepository.observeUserPresence()
+                                        bleRepository.shouldBeConnected(
                                             getBleSeat = {
                                                 storeRepository.getBleSeat(it.seatPosition) ?: throw IllegalStateException()
                                             },
@@ -113,8 +109,8 @@ class SessionService : LifecycleService() {
                                     }
 
                                     UserStateType.Away -> {
-//                                        userPresenceRepository.stopObserveUserPresence()
-                                        bleRepository.initialize(
+                                        userPresenceRepository.stopObserveUserPresence()
+                                        bleRepository.shouldBeConnected(
                                             getBleSeat = {
                                                 storeRepository.getBleSeat(it.seatPosition) ?: throw IllegalStateException()
                                             },
@@ -125,12 +121,8 @@ class SessionService : LifecycleService() {
                                     }
 
                                     UserStateType.OnBusiness -> {
-//                                        userPresenceRepository.stopObserveUserPresence()
-                                        bleRepository.initialize(
-                                            getBleSeat = {
-                                                storeRepository.getBleSeat(it.seatPosition) ?: throw IllegalStateException()
-                                            },
-                                        )
+                                        userPresenceRepository.stopObserveUserPresence()
+                                        bleRepository.disconnect()
                                     }
                                 }
                             }

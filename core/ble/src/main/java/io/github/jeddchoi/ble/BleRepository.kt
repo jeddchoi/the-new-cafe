@@ -14,10 +14,10 @@ import kotlin.time.Duration
 interface BleRepository {
     val bleState: StateFlow<BleState?>
 
-    suspend fun initialize(
+    suspend fun shouldBeConnected(
         getBleSeat: suspend () -> BleSeat,
         onConnected: suspend () -> Unit = {},
-        onDisconnecting: suspend () -> Unit = {},
+        onDisconnected: suspend () -> Unit = {},
         connectionTimeout: Duration? = null,
         onTimeout: suspend () -> Unit = {},
     )
@@ -74,7 +74,7 @@ interface BleRepository {
 }
 
 data class BleState(
-    val shouldBeConnected: Boolean = false,
+//    val shouldBeConnected: Boolean = false,
     // These are connected
     val bleSeat: BleSeat? = null,
     val scanner: Scanner? = null,

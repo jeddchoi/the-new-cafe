@@ -8,11 +8,12 @@ import com.juul.kable.peripheral
 import io.github.jeddchoi.model.BleSeat
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -23,6 +24,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class BleRepositoryImpl @Inject constructor() : BleRepository {
+    private val _shouldBeConnected = MutableSharedFlow<Unit>()
+    val shouldBeConnected = _shouldBeConnected.asSharedFlow()
+
     private val _bleState = MutableStateFlow<BleState?>(null)
     override val bleState = _bleState.asStateFlow()
 
@@ -30,7 +34,7 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
         Timber.i("============== CREATED!!! ==============")
     }
 
-    override suspend fun initialize(
+    override suspend fun shouldBeConnected(
         getBleSeat: suspend () -> BleSeat,
         onConnected: suspend () -> Unit,
         onDisconnected: suspend () -> Unit,
@@ -38,6 +42,7 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
         onTimeout: suspend () -> Unit,
     ) {
         Timber.i("[${coroutineContext[CoroutineName.Key]}]\n✅")
+
         _bleState.update {
             val bleSeat = it?.bleSeat ?: getBleSeat()
             val scanner = it?.scanner ?: Scanner {
@@ -46,7 +51,6 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
 
             it?.copy(
                 bleSeat = bleSeat,
-                shouldBeConnected = true,
                 scanner = scanner,
                 onConnected = onConnected,
                 onDisconnected = onDisconnected,
@@ -54,7 +58,6 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
                 onTimeout = onTimeout
             ) ?: BleState(
                 bleSeat = bleSeat,
-                shouldBeConnected = true,
                 scanner = scanner,
                 onConnected = onConnected,
                 onDisconnected = onDisconnected,
@@ -62,6 +65,8 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
                 onTimeout = onTimeout
             )
         }
+
+        _shouldBeConnected.emit(Unit)
     }
 
     override suspend fun quit() {
@@ -77,44 +82,42 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
         coroutineScope: CoroutineScope,
     ) {
         bleState.value?.apply {
-            if (!shouldBeConnected) {
-                Timber.i("[${coroutineContext[CoroutineName.Key]}]\nShould not connect")
-                return
-            }
+            Timber.i("[${coroutineContext[CoroutineName.Key]}]\nSCAN AND CONNECT $connectionTimeout")
             val peripheral = if (connectionTimeout != null) {
-                Timber.i("[${coroutineContext[CoroutineName.Key]}]\nWith timeout : $connectionTimeout")
                 withTimeoutOrNull(connectionTimeout) {
                     scanAndConnect(coroutineScope)
-                } ?: return@apply onTimeout()
+                } ?: return@apply bleState.value?.onTimeout?.invoke() ?: Unit
             } else {
-                Timber.i("[${coroutineContext[CoroutineName.Key]}]\nWithout timeout")
                 scanAndConnect(coroutineScope)
             }
 
             coroutineScope.launch(CoroutineName("Peripheral State Handler")) {
 
-                peripheral.state.collectLatest {
-                    val previousState = _bleState.getAndUpdate { state ->
-                        state?.copy(foundPeripheralState = it)
-                    }?.foundPeripheralState
-                    Timber.i("[${coroutineContext[CoroutineName.Key]}]\n✅ $previousState -> $it")
-
-                    when (it) {
-                        State.Connected -> {
-                            Timber.i("[${coroutineContext[CoroutineName.Key]}]\nonConnected")
-                            bleState.value?.onConnected?.invoke()
+                peripheral.state.collectLatest { newState ->
+                    val previousState = bleState.value?.foundPeripheralState
+                    if (previousState != newState) {
+                        _bleState.update { state ->
+                            state?.copy(foundPeripheralState = newState)
                         }
+                        Timber.i("[${coroutineContext[CoroutineName.Key]}]\n✅ $previousState -> $newState")
 
-                        is State.Disconnected -> {
-                            Timber.i("[${coroutineContext[CoroutineName.Key]}]\nonDisconnected")
-                            bleState.value?.onDisconnected?.invoke()
+                        when (newState) {
+                            State.Connected -> {
+                                Timber.i("[${coroutineContext[CoroutineName.Key]}]\nonConnected")
+                                bleState.value?.onConnected?.invoke()
+                            }
+
+                            is State.Disconnected -> {
+                                Timber.i("[${coroutineContext[CoroutineName.Key]}]\nonDisconnected")
+                                bleState.value?.onDisconnected?.invoke()
+                            }
+
+                            State.Connecting.Bluetooth,
+                            State.Connecting.Observes,
+                            State.Connecting.Services,
+                            State.Disconnecting -> {
+                            } // no-op
                         }
-
-                        State.Connecting.Bluetooth,
-                        State.Connecting.Observes,
-                        State.Connecting.Services,
-                        State.Disconnecting -> {
-                        } // no-op
                     }
                 }
             }
@@ -152,9 +155,6 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
         }
     }
 }
-
-
-
 
 
 //private fun handleBleConnection() {

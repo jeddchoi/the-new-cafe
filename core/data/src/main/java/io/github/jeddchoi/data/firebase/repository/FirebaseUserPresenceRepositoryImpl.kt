@@ -41,6 +41,7 @@ class FirebaseUserPresenceRepositoryImpl @Inject constructor(
                     // client has disconnected by closing the app,
                     // losing internet, or any other means.
                     disconnectedOnOccupiedDatabaseRef.let { ref ->
+
                         ref.onDisconnect().setValue(true).continueWithTask {
                             Timber.i("✅")
 
@@ -67,18 +68,16 @@ class FirebaseUserPresenceRepositoryImpl @Inject constructor(
     }
 
     override fun stopObserveUserPresence() {
-        if (startedObservation) {
-            Timber.i("✅")
-            val currentUserId = currentUserRepository.getUserId() ?: return
-            val disconnectedOnOccupiedDatabaseRef =
-                database.getReference("seatFinder/${currentUserId}/session/disconnectedOnOccupied")
+        Timber.i("✅")
+        val currentUserId = currentUserRepository.getUserId() ?: return
+        val disconnectedOnOccupiedDatabaseRef =
+            database.getReference("seatFinder/${currentUserId}/session/disconnectedOnOccupied")
 
-            disconnectedOnOccupiedDatabaseRef.onDisconnect().cancel()
-            disconnectedOnOccupiedDatabaseRef.removeValue()
-            listener?.let {
-                connectionRef.removeEventListener(it)
-            }
-            startedObservation = false
+        disconnectedOnOccupiedDatabaseRef.onDisconnect().cancel()
+        disconnectedOnOccupiedDatabaseRef.removeValue()
+        listener?.let {
+            connectionRef.removeEventListener(it)
         }
+        startedObservation = false
     }
 }

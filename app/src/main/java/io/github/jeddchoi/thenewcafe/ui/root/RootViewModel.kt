@@ -159,17 +159,11 @@ class RootViewModel @Inject constructor(
                             UserStateType.Occupied -> {
                             }
 
-                            UserStateType.Away -> {
+                            UserStateType.Away,
+                            UserStateType.OnBusiness ->{
                                 if (sameWithOccupiedSeat) {
                                     arrivedOnSeatWithNfc =
                                         { viewModelScope.launch { seatFinderService.resumeUsing() } }
-                                }
-                            }
-
-                            UserStateType.OnBusiness -> {
-                                if (sameWithOccupiedSeat) {
-                                    arrivedOnSeatWithNfc =
-                                        { viewModelScope.launch { seatFinderService.occupySeat() } }
                                 }
                             }
                         }
