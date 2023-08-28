@@ -84,6 +84,8 @@ data class BleState(
 
     val foundPeripheral: Peripheral? = null,
     val foundPeripheralState: State? = null,
+    val wasConnectedSuccessfully: Boolean = false,
+
     val onDisconnected: suspend () -> Unit = {},
     val onConnected: suspend () -> Unit = {},
 )
