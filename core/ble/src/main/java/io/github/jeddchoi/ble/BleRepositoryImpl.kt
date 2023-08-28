@@ -8,6 +8,7 @@ import com.juul.kable.peripheral
 import io.github.jeddchoi.model.BleSeat
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,6 +81,7 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
         }
     }
 
+    private var observeBleState: Job? = null
 
     override suspend fun scanAndConnect(
         coroutineScope: CoroutineScope,
@@ -94,13 +96,17 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
                 scanAndConnect(coroutineScope)
             }
 
-            coroutineScope.launch(CoroutineName("Peripheral State Handler")) {
+            observeBleState?.cancel()
+            observeBleState = coroutineScope.launch(CoroutineName("Peripheral State Handler")) {
 
                 peripheral.state.collectLatest { newState ->
                     val previousState = bleState.value?.foundPeripheralState
                     if (previousState != newState) {
                         _bleState.update { state ->
-                            state?.copy(foundPeripheralState = newState, wasConnectedSuccessfully = newState == State.Connected)
+                            state?.copy(
+                                foundPeripheralState = newState,
+                                wasConnectedSuccessfully = newState == State.Connected
+                            )
                         }
                         Timber.i("[${coroutineContext[CoroutineName.Key]}]\n✅ $previousState -> $newState")
 
@@ -133,7 +139,9 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
         }
     }
 
-    override suspend fun BleState.scanAndConnect(coroutineScope: CoroutineScope): Peripheral {
+    private var connectBleJob: Job? = null
+
+    private suspend fun BleState.scanAndConnect(coroutineScope: CoroutineScope): Peripheral {
         Timber.i("[${coroutineContext[CoroutineName.Key]}]\nScanning... ${bleSeat?.name}")
         val peripheral = foundPeripheral ?: run {
             val adv = scanner?.advertisements?.first() ?: throw Exception("No scanner")
@@ -141,7 +149,8 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
         }.also { _bleState.update { state -> state?.copy(foundPeripheral = it) } }
         Timber.i("[${coroutineContext[CoroutineName.Key]}]\nFound! $peripheral")
 
-        coroutineScope.launch(CoroutineName("Connection Handler")) {
+        connectBleJob?.cancel()
+        connectBleJob = coroutineScope.launch(CoroutineName("Connection Handler")) {
             while (true) {
                 try {
                     Timber.i("[${coroutineContext[CoroutineName.Key]}]\nTry connecting... ${peripheral.name}")
@@ -161,7 +170,12 @@ class BleRepositoryImpl @Inject constructor() : BleRepository {
         Timber.i("[${coroutineContext[CoroutineName.Key]}]\nDisconnecting...")
         withTimeoutOrNull(5.seconds) {
             _bleState.update {
-                it?.copy(onConnected = {}, onDisconnected = {}, onTimeout = {}, connectionTimeout = null)
+                it?.copy(
+                    onConnected = {},
+                    onDisconnected = {},
+                    onTimeout = {},
+                    connectionTimeout = null
+                )
             }
             _bleState.value?.foundPeripheral?.disconnect()
         }

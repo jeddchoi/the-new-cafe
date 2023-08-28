@@ -28,7 +28,6 @@ interface BleRepository {
         coroutineScope: CoroutineScope,
     )
 
-    suspend fun BleState.scanAndConnect(coroutineScope: CoroutineScope): Peripheral
 
     suspend fun disconnect()
 
