@@ -1,4 +1,4 @@
-import {onValueCreated} from "firebase-functions/v2/database";
+import {onValueCreated, onValueDeleted} from "firebase-functions/v2/database";
 import {REFERENCE_CURRENT_SESSION_NAME, REFERENCE_SEAT_FINDER_NAME} from "../../_database/NameConstant";
 import {logger} from "firebase-functions/v2";
 import SeatFinderHandler from "../SeatFinderHandler";
@@ -24,6 +24,29 @@ export const onDisconnectedOnOccupied =
                 SeatFinderRequestType.LeaveAway,
                 current,
                 getEndTime(current, SEAT_FINDER_AWAY_TIMEOUT_SEC.value()),
+                null,
+                SeatFinderEventBy.Admin,
+            );
+        }
+    );
+
+
+export const onReconnectedOnOccupied =
+    onValueDeleted(
+        {
+            ref: `${REFERENCE_SEAT_FINDER_NAME}/{userId}/${REFERENCE_CURRENT_SESSION_NAME}/disconnectedOnOccupied`,
+            region: "asia-southeast1",
+        },
+        (event) => {
+            logger.debug(`[onDisconnectedOnOccupied] called ${JSON.stringify(event.data)}`);
+
+            const current = Date.now();
+            const handler = new SeatFinderHandler(event.params.userId);
+
+            return handler.handleSeatFinderRequest(
+                SeatFinderRequestType.ResumeUsing,
+                current,
+                null,
                 null,
                 SeatFinderEventBy.Admin,
             );
