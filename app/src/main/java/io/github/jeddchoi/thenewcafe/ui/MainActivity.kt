@@ -157,7 +157,7 @@ class MainActivity : ComponentActivity(), NfcAdapter.ReaderCallback {
 
     override fun onPause() {
         super.onPause()
-        adapter?.disableReaderMode(this);
+        adapter?.disableReaderMode(this)
     }
 
     override fun onTagDiscovered(tag: Tag) {

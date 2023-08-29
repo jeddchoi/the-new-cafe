@@ -11,6 +11,6 @@ enum class UserStateChangeReason {
         fun getByValue(input: String?) =
             input?.let {
                 VALUES.firstOrNull { code -> code.name == it }
-            } ?: UserStateChangeReason.UserAction
+            } ?: UserAction
     }
 }

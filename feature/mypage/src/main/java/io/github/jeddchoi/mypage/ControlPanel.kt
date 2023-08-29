@@ -246,7 +246,7 @@ private fun SeatFinderUserRequestType.title(): String {
 private fun ControlPanelPreview() {
 
     TheNewCafeTheme {
-        Surface() {
+        Surface {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,

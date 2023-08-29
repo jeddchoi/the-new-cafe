@@ -59,6 +59,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:data"))
+    implementation(project(":core:firebase"))
     implementation(project(":core:common"))
     implementation(project(":core:model"))
     implementation(project(":core:ble"))

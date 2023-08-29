@@ -1,6 +1,6 @@
 package io.github.jeddchoi.data.service.seatfinder
 
-import io.github.jeddchoi.data.firebase.model.FirebaseSeatFinderRequestType
+import io.github.jeddchoi.model.SeatFinderUserRequestType
 import io.github.jeddchoi.model.UserStateType
 import kotlinx.datetime.Instant
 
@@ -12,5 +12,5 @@ data class SeatFinderResult(
     val currentState: UserStateType = UserStateType.None,
     val startCurrentStateTime: Instant? = null,
     val endCurrentStateTime: Instant? = null,
-    val requestTypeAfterCurrentState: FirebaseSeatFinderRequestType? = null,
+    val requestTypeAfterCurrentState: SeatFinderUserRequestType? = null,
 )

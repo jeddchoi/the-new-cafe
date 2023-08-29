@@ -1,8 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-
-
-
 pluginManagement {
     includeBuild("buildlogic")
     repositories {
@@ -33,6 +30,7 @@ include(":feature:historydetail")
 include(":core:ui")
 include(":core:common")
 include(":core:data")
+include(":core:firebase")
 include(":core:designsystem")
 include(":core:domain")
 include(":core:model")

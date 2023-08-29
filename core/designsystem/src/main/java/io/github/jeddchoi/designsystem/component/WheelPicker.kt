@@ -161,7 +161,7 @@ class PickerState {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL)
 @Composable
 fun WheelPickerPreview() {
-    TheNewCafeTheme() {
+    TheNewCafeTheme {
 
         Surface(modifier = Modifier.fillMaxSize()) {
             Column(
