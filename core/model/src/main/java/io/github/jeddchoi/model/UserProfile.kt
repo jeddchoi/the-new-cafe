@@ -11,5 +11,4 @@ data class UserProfile(
     val creationTime: Instant = Instant.DISTANT_PAST,
     val lastSignInTime: Instant = Instant.DISTANT_PAST,
     val isEmailVerified: Boolean = false,
-    val sex: Sex? = null,
 )

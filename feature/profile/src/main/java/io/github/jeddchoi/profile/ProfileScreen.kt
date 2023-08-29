@@ -30,9 +30,7 @@ import io.github.jeddchoi.designsystem.component.BottomButton
 import io.github.jeddchoi.designsystem.component.CircularProfilePicture
 import io.github.jeddchoi.designsystem.component.item.BooleanItem
 import io.github.jeddchoi.designsystem.component.item.DateTimeItem
-import io.github.jeddchoi.designsystem.component.item.EnumItem
 import io.github.jeddchoi.designsystem.component.item.StringItem
-import io.github.jeddchoi.model.Sex
 import io.github.jeddchoi.model.UserProfile
 import io.github.jeddchoi.ui.component.ComponentWithBottomButtons
 import io.github.jeddchoi.ui.component.ScreenWithTopAppBar
@@ -151,13 +149,6 @@ private fun ProfileContent(
                 modifier = modifierWithFullWidth,
                 title = UiText.StringResource(R.string.is_online),
                 switchOn = userProfile.isOnline
-            )
-
-            EnumItem(
-                modifier = modifierWithFullWidth,
-                currentIdx = userProfile.sex?.ordinal,
-                values = Sex.values().map { it.name },
-                title = UiText.StringResource(R.string.sex)
             )
 
             Spacer(

@@ -1,6 +1,5 @@
 package io.github.jeddchoi.data.firebase.model
 
-import io.github.jeddchoi.model.Sex
 import io.github.jeddchoi.model.UserProfile
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -12,7 +11,6 @@ data class FirebasePrivateInfo(
     val creationTime: Long? = null,
     val lastSignInTime: Long? = null,
     val emailVerified: Boolean? = null,
-    val sex: Int? = null,
 )
 
 @Serializable
@@ -35,6 +33,5 @@ fun FirebaseUserProfile.toUserProfile() = UserProfile(
         ?: Instant.DISTANT_PAST,
     lastSignInTime = privateInfo?.lastSignInTime?.let { Instant.fromEpochMilliseconds(it) }
         ?: Instant.DISTANT_PAST,
-    isEmailVerified = privateInfo?.emailVerified ?: false,
-    sex = Sex.getByValue(privateInfo?.sex)
+    isEmailVerified = privateInfo?.emailVerified ?: false
 )
