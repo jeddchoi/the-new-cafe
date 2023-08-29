@@ -14,6 +14,6 @@ enum class UserStateType {
             input?.let {
                 val userStateStr = it.substringAfter("_")
                 VALUES.firstOrNull { code -> code.name == userStateStr }
-            } ?: None
+            } ?: throw IllegalStateException("Invalid user state : $input")
     }
 }

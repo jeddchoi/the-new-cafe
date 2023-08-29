@@ -53,11 +53,11 @@ class FirebaseUserSessionRepositoryImpl @Inject constructor(
                 )
             }
 
-            is UserSession.None -> {
+            UserSession.None -> {
                 UserStateAndUsedSeatPosition.None
             }
 
-            else -> {
+            null -> {
                 null
             }
         }
