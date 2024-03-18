@@ -1,6 +1,6 @@
 [versions]
 accompanist = "0.31.5-beta"
-androidGradlePlugin = "8.1.0" # TODO: compatible with Android Studio, gradle version
+androidGradlePlugin = "8.3.1" # TODO: compatible with Android Studio, gradle version
 androidxActivity = "1.7.2"
 androidxAppCompat = "1.6.1"
 androidxComposeBom = "2023.08.00"
